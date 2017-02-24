@@ -19,7 +19,7 @@ import os
 from katprep_shared import is_writable, which, is_valid_report
 
 vers = "0.0.1"
-LOGGER = logging.getLogger('katprep-report')
+LOGGER = logging.getLogger('katprep_report')
 #sat_url = ""
 #sat_user = ""
 #sat_pass = ""
@@ -30,7 +30,7 @@ output_file = ""
 
 def parse_options(args=None):
 #initialize parser
-	desc='''katprep_report is used for creating maintenance reports including errata per system managed with Foreman/Katello or Red Hat Satellite 6.
+	desc='''katprep_report.py is used for creating maintenance reports including errata per system managed with Foreman/Katello or Red Hat Satellite 6.
 	The utility requires two snapshots: before and after maintenance tasks were executed - just append the two files to the command line.'''
 	epilog='Check-out the website for more details: http://github.com/stdevel/katprep'
 	parser = argparse.ArgumentParser(description=desc, version=vers, epilog=epilog)
@@ -94,7 +94,7 @@ def main(options):
 	
 	#set template
 	if options.template_file == "":
-		options.template_file = "./default.tmp"
+		options.template_file = "./template.md"
 	#set output file
 	if options.output_path == "":
 		options.output_path = "./"

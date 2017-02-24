@@ -12,14 +12,13 @@
 import argparse
 import logging
 import sys
-import socket
 import simplejson
 import time
 import os
-from katprep_shared import get_credentials, get_api_result, get_id_by_name, validate_api_support, is_writable
+from katprep_shared import get_credentials, get_api_result, get_id_by_name, validate_api_support, validate_hostname, is_writable
 
 vers = "0.0.1"
-LOGGER = logging.getLogger('katprep-snapshot')
+LOGGER = logging.getLogger('katprep_snapshot')
 sat_url = ""
 sat_user = ""
 sat_pass = ""
@@ -30,7 +29,7 @@ output_file = ""
 
 def parse_options(args=None):
 #initialize parser
-	desc='''katprep_snapshot is used for creating snapshot reports of errata available to your systems managed with Foreman/Katello or Red Hat Satellite 6. You can use two snapshot reports to create delta reports using katprep_report.py.
+	desc='''katprep_snapshot.py is used for creating snapshot reports of errata available to your systems managed with Foreman/Katello or Red Hat Satellite 6. You can use two snapshot reports to create delta reports using katprep_report.py.
 	Login credentials need to be entered interactively or specified using environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an authfile.
 	When using an authfile, ensure that the file permissions are 0600 - otherwise the script will abort. The first line needs to contain the username, the second line represents the appropriate password.
 	'''
@@ -72,11 +71,8 @@ def parse_options(args=None):
 	#parse options and arguments
 	options = parser.parse_args()
 	
-	#change localhost to FQDN
-	#otherwise, connections will fail
-	if options.server == "localhost":
-		options.server = socket.gethostname()
-	
+	#validate hostname
+	options.server = validate_hostname(options.server)
 	
 	return (options, args)
 
@@ -134,13 +130,21 @@ def scan_systems():
 			if int(system["content_facet_attributes"]["errata_counts"]["total"]) > 0:
 				#errata applicable
 				system_errata[system["name"]] = {}
-				system_errata[system["name"]]["params"] = []
+				system_errata[system["name"]]["params"] = {}
 				system_errata[system["name"]]["errata"] = {}
 				result_obj = simplejson.loads(
 					get_api_result("{}/hosts/{}/errata".format(sat_url, system["id"]), sat_user, sat_pass)
 				)
-				#TODO: add katprep_* params here
-				#system_errata[system["name"]]["params"] = ...
+				#add _all_ the katprep_* params
+				params_obj = simplejson.loads(
+					get_api_result("{}/hosts/{}".format(sat_url, system["id"]), sat_user, sat_pass)
+				)
+				for entry in params_obj["parameters"]:
+					if "katprep_" in entry["name"]:
+						#add key/value
+						system_errata[system["name"]]["params"][entry["name"]] = {}
+						system_errata[system["name"]]["params"][entry["name"]] = entry["value"]
+				#add _all_ the errata information
 				system_errata[system["name"]]["errata"] = result_obj["results"]
 	except KeyError as err:
 		LOGGER.error("Unable to get system information, check filter options!")
@@ -181,7 +185,7 @@ def main(options):
 		options.output_path = "{}/".format(options.output_path)
 	output_file = "{}errata-snapshot-report-{}-{}.json".format(
 			options.output_path,
-			socket.gethostname().split('.')[0],
+			options.server.split('.')[0],
 			time.strftime("%Y%m%d-%H%M")
 			)
 	LOGGER.debug("Output file will be: '{}'".format(output_file))

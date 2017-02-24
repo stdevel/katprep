@@ -16,8 +16,9 @@ import os
 import stat
 import simplejson
 import argparse
+import socket
 
-LOGGER = logging.getLogger('katprep-shared')
+LOGGER = logging.getLogger('katprep_shared')
 
 
 
@@ -194,8 +195,23 @@ def is_valid_report(arg):
 	#check whether valid json
 	try:
 		json_obj = simplejson.loads(get_json(arg))
-		#check whether at least an empty dict is found
-		if len(json_obj) == 0:
+		#check whether at least one host with a params dict is found
+		if "params" not in json_obj.itervalues().next().keys():
+			raise argparse.ArgumentTypeError("File '{}' is not a valid JSON snapshot report.".format(arg))
+	except StopIteration as err:
 			raise argparse.ArgumentTypeError("File '{}' is not a valid JSON snapshot report.".format(arg))
 	except ValueError as err:
 		raise argparse.ArgumentTypeError("File '{}' is not a valid JSON document: '{}'".format(arg, err))
+
+
+
+def validate_hostname(hostname):
+#put the hostname in a correct format for the picky Foreman API
+	if hostname == "localhost":
+		#get real hostname
+		hostname = socket.gethostname()
+	else:
+		#convert to FQDN if possible:
+		fqdn = socket.gethostbyaddr(hostname)
+		if "." in fqdn[0]: hostname = fqdn[0]
+	return hostname
