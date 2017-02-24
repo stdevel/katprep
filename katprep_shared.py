@@ -15,6 +15,7 @@ import requests
 import os
 import stat
 import simplejson
+import argparse
 
 LOGGER = logging.getLogger('katprep-shared')
 
@@ -142,3 +143,59 @@ def validate_api_support(url, username, password):
 			)
 	except ValueError as err:
 		LOGGER.error(err)
+
+
+
+def is_writable(path):
+#checks whether the directory is writable
+	if os.access(os.path.dirname(path), os.W_OK):
+		return True
+	else:   
+		return False
+
+
+
+def which(program):
+#get path of executable if exists
+	#Credits: stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+	def is_exe(fpath):
+		return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+	
+	fpath, fname = os.path.split(program)
+	if fpath:
+		if is_exe(program):
+			return program
+	else:
+		for path in os.environ["PATH"].split(os.pathsep):
+			path = path.strip('"')
+			exe_file = os.path.join(path, program)
+			if is_exe(exe_file):
+				return exe_file
+	return None
+
+
+
+def get_json(arg):
+#return a single string of _all_ the JSON data
+	try:
+		with open (arg, "r") as json_file:
+    			json_data=json_file.read().replace("\n", "")
+		return json_data
+	except Exception as err:
+		LOGGER.error("Unable to read file '{}'".format(arg))
+
+
+
+def is_valid_report(arg):
+#checks whether the report is valid
+	#check whether existent and readable
+	if not os.path.exists(arg) or not os.access(arg, os.R_OK):
+		raise argparse.ArgumentTypeError("File '{}' non-existent or not readable".format(arg))
+	#check whether valid json
+	try:
+		json_obj = simplejson.loads(get_json(arg))
+		#check whether at least an empty dict is found
+		if len(json_obj) == 0:
+			raise argparse.ArgumentTypeError("File '{}' is not a valid JSON snapshot report.".format(arg))
+	except ValueError as err:
+		raise argparse.ArgumentTypeError("File '{}' is not a valid JSON document: '{}'".format(arg, err))

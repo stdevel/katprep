@@ -16,7 +16,7 @@ import socket
 import simplejson
 import time
 import os
-from katprep_shared import get_credentials, get_api_result, get_id_by_name, validate_api_support
+from katprep_shared import get_credentials, get_api_result, get_id_by_name, validate_api_support, is_writable
 
 vers = "0.0.1"
 LOGGER = logging.getLogger('katprep-snapshot')
@@ -30,7 +30,7 @@ output_file = ""
 
 def parse_options(args=None):
 #initialize parser
-	desc='''katprep_snapshot is used for creating snapshot reports of errata and package updates available to your systems managed with Foreman/Katello or Red Hat Satellite 6. You can use two snapshot reports to create delta reports using katprep_diff.py.
+	desc='''katprep_snapshot is used for creating snapshot reports of errata available to your systems managed with Foreman/Katello or Red Hat Satellite 6. You can use two snapshot reports to create delta reports using katprep_report.py.
 	Login credentials need to be entered interactively or specified using environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an authfile.
 	When using an authfile, ensure that the file permissions are 0600 - otherwise the script will abort. The first line needs to contain the username, the second line represents the appropriate password.
 	'''
@@ -134,25 +134,18 @@ def scan_systems():
 			if int(system["content_facet_attributes"]["errata_counts"]["total"]) > 0:
 				#errata applicable
 				system_errata[system["name"]] = {}
-				#system_errata[system["name"]] = "BLAH"
+				system_errata[system["name"]]["params"] = []
+				system_errata[system["name"]]["errata"] = {}
 				result_obj = simplejson.loads(
 					get_api_result("{}/hosts/{}/errata".format(sat_url, system["id"]), sat_user, sat_pass)
 				)
-				system_errata[system["name"]] = result_obj["results"]
+				#TODO: add katprep_* params here
+				#system_errata[system["name"]]["params"] = ...
+				system_errata[system["name"]]["errata"] = result_obj["results"]
 	except KeyError as err:
 		LOGGER.error("Unable to get system information, check filter options!")
 	except ValueError as err:
 		LOGGER.info("Unable to get data")
-
-
-
-def is_writable():
-#checks whether the directory is writable
-	if os.access(os.path.dirname(options.output_path), os.W_OK):
-		return True
-	else:
-		LOGGER.error("Directory ('{}') not writable!".format(options.output_path))
-		return False
 
 
 
@@ -194,7 +187,7 @@ def main(options):
 	LOGGER.debug("Output file will be: '{}'".format(output_file))
 	
 	#check if we can read and write before digging
-	if is_writable():
+	if is_writable(output_file):
 		#initalize Satellite connection and scan systems
 		(sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
 		sat_url = "http://{0}/api/v2".format(options.server)
@@ -203,6 +196,8 @@ def main(options):
 		
 		#create report
 		create_report()
+	else:
+		LOGGER.error("Directory '{}' is not writable!".format(output_file))
 
 
 
