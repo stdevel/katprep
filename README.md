@@ -28,7 +28,7 @@ So - stay tuned and check-out this site more often.
 - creating reports listing relevant information about installed errata (*category, date, affected packages, CVE information*)
 
 # Planned workflow
-- Once after the installation and after new systems were registered, Puppet host parameters are set using ``katprep_parameters.py`
+- Once after the installation and after new systems were registered, Puppet host parameters are set using ``katprep_parameters.py``
 - When patch maintenance is needed, a snapshot report is created using ``katprep_snapshot.py``
 - Patch maintenance per system is prepared and (*optionally*) executed using ``katprep_maintenance.py``
 - After patch maintenance, another snapshot report is created
