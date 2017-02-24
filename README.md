@@ -1,5 +1,5 @@
 # katprep
-**katprep** is a Python toolkit for automating system maintenance and generating JSON/PDF patch reports for systems managed with [Foreman](http://www.theforeman.org/)/[Katello](http://www.katello.org/) or [Red Hat Satellite 6.x](http://www.redhat.com/products/enterprise-linux/satellite/).
+**katprep** is a Python toolkit for automating system maintenance and generating patch reports for systems managed with [Foreman](http://www.theforeman.org/)/[Katello](http://www.katello.org/) or [Red Hat Satellite 6.x](http://www.redhat.com/products/enterprise-linux/satellite/).
  
 This can be very useful if you need to document software changes due to IT certifications like [ISO/IEC 27001:2005](http://en.wikipedia.org/wiki/ISO/IEC_27001:2005) or many other.
 
@@ -8,6 +8,9 @@ This toolkit is currently under development, it's a complete rewrite of my other
 So - stay tuned and check-out this site more often.
 
 # Planned features
+- Reporting
+  - various formats by using **Pandoc** and [**pypandoc**](https://pypi.python.org/pypi/pypandoc)
+  - template with variables, automation using **citeproc**?
 - Automation
   - (*un-*)scheduling downtimes within popular monitoring solutions such as:
     - Nagios / Icinga 1.x
