@@ -10,7 +10,7 @@ So - stay tuned and check-out this site more often.
 # Planned features
 - Reporting
   - various formats by using **Pandoc** and [**pypandoc**](https://pypi.python.org/pypi/pypandoc)
-  - template with variables, automation using **citeproc**?
+  - template with variables, automation using YAML metadata
 - Automation
   - (*un-*)scheduling downtimes within popular monitoring solutions such as:
     - Nagios / Icinga 1.x
