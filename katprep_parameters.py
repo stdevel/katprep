@@ -11,18 +11,53 @@
 
 import argparse
 import logging
-#import sys
 import simplejson
-#import time
-#import os
-from katprep_shared import get_credentials, get_api_result, validate_api_support, validate_hostname
+from katprep_shared import get_credentials, ForemanAPIClient
 
 vers = "0.0.1"
 LOGGER = logging.getLogger('katprep_parameters')
-sat_url = ""
-sat_user = ""
-sat_pass = ""
+sat_client = None
 parameters = { "katprep_monitoring" : "Monitoring URL of the system ($name@URL)", "katprep_virt" : "Virtualization URL of the system ($name@URL)", "katprep_virt_snapshot" : "Boolean whether system needs to be protected by a snapshot before maintenance" }
+
+
+
+def list_params():
+#list _all_ the parameters
+	global parameters
+	
+	for param in parameters:
+		LOGGER.info("Setting '{}' will define '{}'".format(param, parameters[param]))
+
+
+
+def setup_filter(options, api_object):
+#setup the filter URL
+	global sat_client
+	
+	#TODO: implement
+	if options.filter_location:
+		return "/locations/ID/hosts"
+		#return "/locations/{}/{}".format(get_id_by_name, api_object)
+	elif options.filter_organization:
+		return "/organizations/ID/hosts"
+	elif options.filter_hostgroup:
+		return "/hostgroups/ID/hosts"
+	elif options.filter_environment:
+		return "/environments/ID/hosts"
+	else:
+		return "/hosts"
+
+
+
+def manage_params():
+#add/remove/display parameter definitions
+	global parameters, sat_client
+	
+	LOGGER.info("Lorem ipsum doloret...")
+	#get all the hosts depending on the filter
+	#result_obj = simplejson.loads(
+		#sat_client.get_api_result("{}{}".format(sat_url, target), sat_user, sat_pass)
+	#)
 
 
 
@@ -41,7 +76,7 @@ def parse_options(args=None):
 	filter_opts = parser.add_argument_group("filter arguments")
 	filter_opts_excl = filter_opts.add_mutually_exclusive_group()
 	action_opts = parser.add_argument_group("action arguments")
-	action_opts_excl = action_opts.add_mutually_exclusive_group()
+	action_opts_excl = action_opts.add_mutually_exclusive_group(required=True)
 	
 	#GENERIC ARGUMENTS
 	#-q / --quiet
@@ -50,8 +85,6 @@ def parse_options(args=None):
 	gen_opts.add_argument("-d", "--debug", dest="debug", default=False, action="store_true", help="enable debugging outputs (default: no)")
 	#-n / --dry-run
 	gen_opts.add_argument("-n", "--dry-run", dest="dry_run", default=False, action="store_true", help="only simulate what would be done (default: no)")
-	#-L / --list-parameters
-	gen_opts.add_argument("-L", "--list-parameters", dest="list_only", default=False, action="store_true", help="only lists parameters this script uses (default: no)")
 	
 	#SERVER ARGUMENTS
 	#-a / --authfile
@@ -76,28 +109,35 @@ def parse_options(args=None):
 	action_opts_excl.add_argument("-r", "--remove-parameters", action="store_true", default=False, dest="action_remove", help="removes built-in parameters from all affected hosts")
 	#-D / --display-values
 	action_opts_excl.add_argument("-D", "--display-parameters", action="store_true", default=False, dest="action_display", help="lists values of defined parameters of affected hosts")
+	#-L / --list-parameters
+	action_opts_excl.add_argument("-L", "--list-parameters", dest="action_list", default=False, action="store_true", help="only lists parameters this script uses (default: no)")
+	
+	
 	
 	#parse options and arguments
 	options = parser.parse_args()
-	
-	#validate hostname
-	options.server = validate_hostname(options.server)
-	
 	return (options, args)
 
 
 
 def main(options):
 #main function
-	global sat_url, sat_user, sat_pass, output_file
+	#global sat_url, sat_user, sat_pass
+	global sat_client
 	
 	LOGGER.debug("Options: {0}".format(options))
 	LOGGER.debug("Arguments: {0}".format(args))
 	
-	#initalize Satellite connection
-	(sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
-	sat_url = "http://{0}/api/v2".format(options.server)
-	validate_api_support(sat_url, sat_user, sat_pass)
+	if options.action_list:
+		#only list parameters
+		list_params()
+	else:
+		#initalize Satellite connection
+		(sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
+		sat_client = ForemanAPIClient(options.server, sat_user, sat_pass)
+		
+		#do the stuff
+		manage_params()
 
 
 

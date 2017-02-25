@@ -92,61 +92,6 @@ def get_credentials(type, input_file=None):
 
 
 
-#TODO: Find a nicer way to display _all_ the results...
-def get_api_result(url, username, password, per_page=1337, page=1):
-#send request to Foreman/Katello
-	try:
-		result = requests.get("{}?per_page={}&page={}".format(url, per_page, page), auth=(username, password))
-		if "unable to authenticate" in result.text.lower():
-			raise ValueError("Unable to authenticate")
-		else: return result.text
-	except ValueError as err:
-		LOGGER.error(err)
-		raise
-
-
-
-def get_id_by_name(url, username, password, name, type):
-#get entity ID by name
-	try:
-		if type.lower() not in ["hostgroup", "location", "organization", "environment"]:
-			#invalid type
-			raise ValueError("Unable to lookup name by invalid field type '{}'".format(type))
-		else:
-			#get ID by name
-			result_obj = simplejson.loads(
-				get_api_result("{}/{}s".format(url, type), username, password)
-			)
-			#TODO: nicer way than looping? numpy?
-			for entry in result_obj["results"]:
-				if entry["name"].lower() == name.lower():
-					LOGGER.debug("{} {} seems to have ID #{}".format(type, name, entry["id"]))
-					return entry["id"]
-	except ValueError as err:
-		LOGGER.error(err)
-		pass
-
-
-
-def validate_api_support(url, username, password):
-#check whether API is supported
-	try:
-		#get api version
-		result_obj = simplejson.loads(
-			get_api_result("{}/status".format(url), username, password)
-			
-		)
-		LOGGER.debug("API version {} found.".format(result_obj["api_version"]))
-		if result_obj["api_version"] != 2:
-			raise APILevelNotSupportedException(
-				"Your API version ({}) does not support the required calls."
-				"You'll need API version 2 - stop using historic software!".format(result_obj["api_version"])
-			)
-	except ValueError as err:
-		LOGGER.error(err)
-
-
-
 def is_writable(path):
 #checks whether the directory is writable
 	if os.access(os.path.dirname(path), os.W_OK):
@@ -205,13 +150,88 @@ def is_valid_report(arg):
 
 
 
-def validate_hostname(hostname):
-#put the hostname in a correct format for the picky Foreman API
-	if hostname == "localhost":
-		#get real hostname
-		hostname = socket.gethostname()
-	else:
-		#convert to FQDN if possible:
-		fqdn = socket.gethostbyaddr(hostname)
-		if "." in fqdn[0]: hostname = fqdn[0]
-	return hostname
+
+
+
+class ForemanAPIClient:
+#class for accessing the Foreman API
+	api_min = 2
+	def __init__(self, hostname, username, password):
+		#constructor, setting params
+		self.hostname = self.validate_hostname(hostname)
+		self.username = username
+		self.password = password
+		self.url = "http://{0}/api/v2".format(self.hostname)
+		#check API version
+		self.validate_api_support()
+	
+	
+	
+	#TODO: find a nicer way to displaying _all_ the hits...
+	def get_api_result(self, sub_url, hits=1337, page=1):
+		#send request
+		try:
+			result = requests.get("{}{}?per_page={}&page={}".format(self.url, sub_url, hits, page), auth=(self.username, self.password))
+			if "unable to authenticate" in result.text.lower():
+				raise ValueError("Unable to authenticate")
+			else: return result.text
+		except ValueError as err:
+			LOGGER.error(err)
+			raise
+	
+	
+	
+	def validate_api_support(self):
+	#check whether API is supported
+		try:
+			#get api version
+			result_obj = simplejson.loads(
+				self.get_api_result("/status")
+			)
+			LOGGER.debug("API version {} found.".format(result_obj["api_version"]))
+			if result_obj["api_version"] != self.api_min:
+				raise APILevelNotSupportedException(
+					"Your API version ({}) does not support the required calls."
+					"You'll need API version {} - stop using historic software!".format(result_obj["api_version"], self.api_min)
+				)
+		except ValueError as err:
+			LOGGER.error(err)
+	
+	
+	
+	def validate_hostname(self, hostname):
+	#put the hostname in a correct format for the picky Foreman API
+		if hostname == "localhost":
+			#get real hostname
+			hostname = socket.gethostname()
+		else:
+			#convert to FQDN if possible:
+			fqdn = socket.gethostbyaddr(hostname)
+			if "." in fqdn[0]: hostname = fqdn[0]
+		return hostname
+	
+	
+	
+	def get_url(self):
+	#return the configured URL
+		return self.url
+
+	def get_id_by_name(self, name, element_type):
+	#get entity ID by name
+		try:
+			if element_type.lower() not in ["hostgroup", "location", "organization", "environment", "host"]:
+				#invalid type
+				raise ValueError("Unable to lookup name by invalid field type '{}'".format(element_type))
+			else:
+				#get ID by name
+				result_obj = simplejson.loads(
+					self.get_api_result("/{}s".format(element_type))
+				)
+				#TODO: nicer way than looping? numpy?
+				for entry in result_obj["results"]:
+					if entry["name"].lower() == name.lower():
+						LOGGER.debug("{} {} seems to have ID #{}".format(element_type, name, entry["id"]))
+						return entry["id"]
+		except ValueError as err:
+			LOGGER.error(err)
+			pass

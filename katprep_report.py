@@ -11,20 +11,14 @@
 
 import argparse
 import logging
-#import sys
-#import socket
 import simplejson
 import time
 import os
+import pypandoc
 from katprep_shared import is_writable, which, is_valid_report
 
 vers = "0.0.1"
 LOGGER = logging.getLogger('katprep_report')
-#sat_url = ""
-#sat_user = ""
-#sat_pass = ""
-#system_errata = {}
-output_file = ""
 
 
 
@@ -39,7 +33,6 @@ def parse_options(args=None):
 	gen_opts = parser.add_argument_group("generic arguments")
 	rep_opts = parser.add_argument_group("report arguments")
 	
-	
 	#GENERIC ARGUMENTS
 	#-q / --quiet
 	gen_opts.add_argument("-q", "--quiet", action="store_true", dest="quiet", default=False, help="don't print status messages to stdout (default: no)")
@@ -50,11 +43,11 @@ def parse_options(args=None):
 	
 	#REPORT ARGUMENTS
 	#-o / --output-type
-	rep_opts.add_argument("-o", "--output-type", dest="output_type", metavar="FILE", default="", help="defines the output file type for Pandoc, usually this is set automatically based on the file extension (default: no)")
+	rep_opts.add_argument("-o", "--output-type", dest="output_type", metavar="FILE", default="", help="defines the output file type for Pandoc, usually this is set automatically based on the template file extension (default: no)")
 	#-x / --preserve-md
-	rep_opts.add_argument("-x", "--preserve-md", dest="preserve_md", default=False, action="store_true", help="keeps the markdown files after creating the reports (default: no)")
+	rep_opts.add_argument("-x", "--preserve-yaml", dest="preserve_yaml", default=False, action="store_true", help="keeps the YAML metadata after creating the reports, important for debugging (default: no)")
 	#-t / --template
-	rep_opts.add_argument("-t", "--template", dest="template_file", metavar="FILE", default="", action="store", help="uses a template file (default: no)")
+	rep_opts.add_argument("-t", "--template", dest="template_file", metavar="FILE", default="", action="store", help="defines a dedicated template file (default: integrated HTML)")
 	#snapshot reports
 	rep_opts.add_argument('reports', metavar='FILE', nargs=2, help='Two snapshot reports (before/after maintenance)', type=is_valid_report)
 	
@@ -62,45 +55,54 @@ def parse_options(args=None):
 	
 	#parse options and arguments
 	options = parser.parse_args()
-	
 	return (options, args)
 
 
 
 def check_pandoc():
 #check Pandoc installation
-	#if not which("pandoc"): return False
-	if not which("vi"): return False
+	if not which("pandoc"): return False
 	return True
 
 
 
 def create_delta():
-#create delta report
+#create delta reports
 	LOGGER.info("Lorem ipsum doloret...")
+	#TODO: calculate delta and create YAML metadata per system
 
 
 
 def create_reports():
 #create JSON report
 	LOGGER.info("Lorem ipsum doloret...")
+	#TODO: render report based on YAML metadata
+	#output = pypandoc.convert_file("data.yml", "markdown", format="html", extra_args=["--template", "template.html"], outputfile="render.html")
 
 
 
 def main(options):
 #main function
-	LOGGER.debug("Options: {0}".format(options))
-	LOGGER.debug("Arguments: {0}".format(args))
-	
 	#set template
 	if options.template_file == "":
-		options.template_file = "./template.md"
+		options.template_file = "./template.html"
+	elif options.template_file.rfind(".") != -1:
+		#set extension as output type
+		options.output_type = options.template_file[options.template_file.rfind(".")+1:].lower()
+	else:
+		#no extension
+		LOGGER.error("Could not detect type of template, please add a file extension such as .md")
+		exit(1)
+	
 	#set output file
 	if options.output_path == "":
 		options.output_path = "./"
 	elif options.output_path != "" and options.output_path[len(options.output_path)-1:] != "/":
 		#add trailing slash
 		options.output_path = "{}/".format(options.output_path)
+	
+	LOGGER.debug("Options: {0}".format(options))
+	LOGGER.debug("Arguments: {0}".format(args))
 	
 	#check if we can read and write before digging
 	if not check_pandoc():

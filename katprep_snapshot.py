@@ -15,13 +15,11 @@ import sys
 import simplejson
 import time
 import os
-from katprep_shared import get_credentials, get_api_result, get_id_by_name, validate_api_support, validate_hostname, is_writable
+from katprep_shared import get_credentials, is_writable, ForemanAPIClient
 
 vers = "0.0.1"
 LOGGER = logging.getLogger('katprep_snapshot')
-sat_url = ""
-sat_user = ""
-sat_pass = ""
+sat_client = None
 system_errata = {}
 output_file = ""
 
@@ -70,52 +68,43 @@ def parse_options(args=None):
 	
 	#parse options and arguments
 	options = parser.parse_args()
-	
-	#validate hostname
-	options.server = validate_hostname(options.server)
-	
 	return (options, args)
 
 
 
 def scan_systems():
 #scan _all_ the systems
-	global sat_url, sat_user, sat_pass
-	
+	global sat_client
 	
 	try:
 		#set-up filter
 		if options.location != "":
 			if options.location.isdigit() == False:
-				options.location = get_id_by_name(
-					sat_url, sat_user, sat_pass,
+				options.location = sat_client.get_id_by_name(
 					options.location, "location")
 			target="/locations/{}/hosts".format(options.location)
 		elif options.organization != "":
 			if options.organization.isdigit() == False:
-				options.organization = get_id_by_name(
-					sat_url, sat_user, sat_pass,
+				options.organization = sat_client.get_id_by_name(
 					options.organization, "organization")
 			target="/organizations/{}/hosts".format(options.organization)
 		elif options.hostgroup != "":
 			if options.hostgroup.isdigit() == False:
-				options.hostgroup = get_id_by_name(
-					sat_url, sat_user, sat_pass,
+				options.hostgroup = sat_client.get_id_by_name(
 					options.hostgroup, "hostgroup")
 			target="/hostgroups/{}/hosts".format(options.hostgroup)
 		elif options.environment != "":
 			if options.environment.isdigit() == False:
-				options.hostgroup = get_id_by_name(
-					sat_url, sat_user, sat_pass,
+				options.hostgroup = sat_client.get_id_by_name(
 					options.environment, "environment")
 			target="/environments/{}/hosts".format(options.environment)
 		else:
 			target="/hosts"
-		LOGGER.debug("URL will be '{}{}'".format(sat_url, target))
+		LOGGER.debug("URL will be '{}{}'".format(sat_client.get_url(), target))
 		
 		#get JSON result
 		result_obj = simplejson.loads(
-			get_api_result("{}{}".format(sat_url, target), sat_user, sat_pass)
+			sat_client.get_api_result("{}".format(target))
 		)
 		
 		#get errata per system
@@ -133,11 +122,11 @@ def scan_systems():
 				system_errata[system["name"]]["params"] = {}
 				system_errata[system["name"]]["errata"] = {}
 				result_obj = simplejson.loads(
-					get_api_result("{}/hosts/{}/errata".format(sat_url, system["id"]), sat_user, sat_pass)
+					sat_client.get_api_result("/hosts/{}/errata".format(system["id"]))
 				)
 				#add _all_ the katprep_* params
 				params_obj = simplejson.loads(
-					get_api_result("{}/hosts/{}".format(sat_url, system["id"]), sat_user, sat_pass)
+					sat_client.get_api_result("/hosts/{}".format(system["id"]))
 				)
 				for entry in params_obj["parameters"]:
 					if "katprep_" in entry["name"]:
@@ -172,7 +161,7 @@ def create_report():
 
 def main(options):
 #main function
-	global sat_url, sat_user, sat_pass, output_file
+	global sat_client, output_file
 	
 	LOGGER.debug("Options: {0}".format(options))
 	LOGGER.debug("Arguments: {0}".format(args))
@@ -194,11 +183,10 @@ def main(options):
 	if is_writable(output_file):
 		#initalize Satellite connection and scan systems
 		(sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
-		sat_url = "http://{0}/api/v2".format(options.server)
-		validate_api_support(sat_url, sat_user, sat_pass)
-		scan_systems()
+		sat_client = ForemanAPIClient(options.server, sat_user, sat_pass)
 		
-		#create report
+		#scan systems and create report
+		scan_systems()
 		create_report()
 	else:
 		LOGGER.error("Directory '{}' is not writable!".format(output_file))

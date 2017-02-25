@@ -1,24 +1,24 @@
-# System maintenance report for @hostname@
+# System maintenance report $if(hostname)$for $hostname$$endif$
 
 ## Meta information
-|:----|:-----|:------|:-------|:------|:------|
-| IP: | @ip@ | Date: | @date@ | Time: | @time |
-| Owner: | @owner@ | | | | |
+IP | Date | Time | Owner
+-- | ---- | ---- | -----
+$if(ip)$$ip$$endif$ | $if(date)$$date$$endif$ | $if(time)$$time$$endif$ | $if(owner)$$owner$$endif$ |
 
-## Checklist
-|:-----|:-------|:------------------|
-| **Task** | **Status** | **Description/Notes** |
-| Snapshot created | @vlog_snapshot_created@ | @host_status@ |
-| Monitoring disabled | @vlog_monitoring_disabled@ | @host_status@ |
-| System rebooted | @vlog_reboot@ | @patch_reboot@ |
-| Monitoring status | @vlog_monitoring_status@ | @vlog_monitoring_status_detail@ |
-| Monitoring enabled | @vlog_monitoring_enabled@ | @host_status@ |
+## Task checklist
+Task | Status | Description/Notes
+---- | ------ | -----------------
+Snapshot created | $if(system_snapshot)$yes$else$no$endif$ | $if(system_cycle)$$system_cycle$ lifecycle$if(system_physical)$physical system$endif$$endif$
+Monitoring disabled | $if(monitoring_disabled)$yes$else$no$endif$ | $if(system_cycle)$$system_cycle$ lifecycle$endif$
+System rebooted | $if(system_rebooted)$yes$else$no$endif$ | 
+Monitoring status | $if(monitoring_status)$$monitoring_status$$endif$ | $if(monitoring_status_detail)$$monitoring_status_detail$$endif$
+Monitoring enabled | $if(monitoring_enabled)$$monitoring_enabled$$endif$ | $if(system_cycle)$$system_cycle$ lifecycle$endif$
 
 ## Patch list
-<!--
-## This is just a comment
--->
-|:---------|:---------|:---------|:----------------|:--------------------|
-| **Type** | **Name** | **Date** | **Description** | **Reboot required** |
-| @errata_type@ | @errata_name@ | @errata_date@ | @errata_desc@ | @errata_reboot@ |
+Type | Name | Date | Description | Reboot required?
+---- | ---- | ---- | ----------- | ----------------
+$for(patch)$
+$if(patch.errata_type)$$patch.errata_type$$endif$ | $if(patch.errata_name)$$patch.errata_name$$endif$ | $if(patch.errata_date)$$patch.errata_date$$endif$ | $if(patch.errata_desc)$$patch.errata_desc$$endif$ | $if(patch.errata_reboot)$yes$else$no$endif$
+$endfor$
 
+*This report was created automatically by [katprep](https://github.com/stdevel/katprep)*
