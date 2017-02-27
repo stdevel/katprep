@@ -150,34 +150,118 @@ def is_valid_report(arg):
 
 
 
+def validate_filters(options, sat_client):
+#ensure that we're using IDs
+	if options.location.isdigit() == False:
+		options.location = sat_client.get_id_by_name(options.location, "location")
+	if options.organization.isdigit() == False:
+		options.organization = sat_client.get_id_by_name(options.organization, "organization")
+	if options.hostgroup.isdigit() == False:
+		options.hostgroup = sat_client.get_id_by_name(options.hostgroup, "hostgroup")
+	if options.environment.isdigit() == False:
+		options.environment = sat_client.get_id_by_name(options.environment, "environment")
+
+
+
+def get_filter(options, api_object):
+#setup the filter URL
+	if options.location:
+		return "/locations/{}/{}s".format(options.location, api_object)
+	elif options.organization:
+		return "/organizations/{}/{}s".format(options.organization, api_object)
+	elif options.hostgroup:
+		return "/hostgroups/{}/{}s".format(options.hostgroup, api_object)
+	elif options.environment:
+		return "/environments/{}/{}s".format(options.environment, api_object)
+	else:
+		return "/{}s".format(api_object)
+
+
+
 
 
 
 class ForemanAPIClient:
 #class for accessing the Foreman API
 	api_min = 2
+	headers = {'User-Agent': 'katprep Toolkit (https://github.com/stdevel/katprep)'}
+	
 	def __init__(self, hostname, username, password):
 		#constructor, setting params
 		self.hostname = self.validate_hostname(hostname)
 		self.username = username
 		self.password = password
-		self.url = "http://{0}/api/v2".format(self.hostname)
+		self.url = "https://{0}/api/v2".format(self.hostname)
 		#check API version
 		self.validate_api_support()
 	
 	
 	
 	#TODO: find a nicer way to displaying _all_ the hits...
-	def get_api_result(self, sub_url, hits=1337, page=1):
-		#send request
+	def api_request(self, method, sub_url, payload="", hits=1337, page=1):
+		#send request to API
 		try:
-			result = requests.get("{}{}?per_page={}&page={}".format(self.url, sub_url, hits, page), auth=(self.username, self.password))
-			if "unable to authenticate" in result.text.lower():
-				raise ValueError("Unable to authenticate")
-			else: return result.text
+			if method.lower() not in [ "get", "post", "delete", "put" ]:
+				#going home
+				raise ValueError("Illegal method '{}' specified".format(method))
+			
+			#setting headers
+			my_headers = self.headers
+			if method.lower() != "get":
+				#add special headers for non-GETs
+				my_headers["Content-Type"] = "application/json"
+				my_headers["Accept"] = "application/json,version=2"
+			
+			#send request
+			if method.lower() == "put":
+				#PUT
+				result = requests.put("{}{}".format(self.url, sub_url), data=payload, headers=my_headers, auth=(self.username, self.password))
+				if "unable to authenticate" in result.text.lower():
+					raise ValueError("Unable to authenticate")
+				if result.status_code not in [200, 201, 202]:
+					raise ValueError("{}: HTTP operation not successful".format(result.status_code))
+				return True
+			elif method.lower() == "delete":
+				#DELETE
+				result = requests.delete("{}{}".format(self.url, sub_url), data=payload, headers=my_headers, auth=(self.username, self.password))
+				if "unable to authenticate" in result.text.lower():
+					raise ValueError("Unable to authenticate")
+				if result.status_code not in [200, 201, 202]:
+					raise ValueError("{}: HTTP operation not successful".format(result.status_code))
+				return True
+			elif method.lower() == "post":
+				#POST
+				result = requests.post("{}{}".format(self.url, sub_url), data=payload, headers=my_headers, auth=(self.username, self.password))
+				if "unable to authenticate" in result.text.lower():
+					raise ValueError("Unable to authenticate")
+				if result.status_code not in [200, 201, 202]:
+					raise ValueError("{}: HTTP operation not successful".format(result.status_code))
+				return True
+			else:
+				#GET
+				result = requests.get("{}{}?per_page={}&page={}".format(self.url, sub_url, hits, page), headers=self.headers, auth=(self.username, self.password))
+				if "unable to authenticate" in result.text.lower():
+					raise ValueError("Unable to authenticate")
+				if result.status_code != 200:
+					raise ValueError("{}: HTTP operation not successful".format(result.status_code))
+				else: return result.text
+			
 		except ValueError as err:
 			LOGGER.error(err)
 			raise
+	
+	#Aliases
+	def api_get(self, sub_url, hits=1337, page=1):
+		return self.api_request("get", sub_url, "", hits, page)
+	
+	def api_post(self, sub_url, payload):
+		return self.api_request("post", sub_url, payload)
+	
+	def api_delete(self, sub_url, payload):
+		return self.api_request("delete", sub_url, payload)
+	
+	def api_put(self, sub_url, payload):
+		return self.api_request("put", sub_url, payload)
 	
 	
 	
@@ -186,7 +270,7 @@ class ForemanAPIClient:
 		try:
 			#get api version
 			result_obj = simplejson.loads(
-				self.get_api_result("/status")
+				self.api_get("/status")
 			)
 			LOGGER.debug("API version {} found.".format(result_obj["api_version"]))
 			if result_obj["api_version"] != self.api_min:
@@ -225,13 +309,32 @@ class ForemanAPIClient:
 			else:
 				#get ID by name
 				result_obj = simplejson.loads(
-					self.get_api_result("/{}s".format(element_type))
+					self.api_get("/{}s".format(element_type))
 				)
 				#TODO: nicer way than looping? numpy?
 				for entry in result_obj["results"]:
 					if entry["name"].lower() == name.lower():
 						LOGGER.debug("{} {} seems to have ID #{}".format(element_type, name, entry["id"]))
 						return entry["id"]
+		except ValueError as err:
+			LOGGER.error(err)
+			pass
+	
+	
+	
+	def get_hostparam_id_by_name(self, host, param):
+	#get host parameter id by name
+		try:
+			result_obj = simplejson.loads(
+				self.api_get("/hosts/{}/parameters".format(host))
+			)
+			#TODO: nicer way than looping? numpy?
+			#TODO allow/return multiple IDs to reduce overhead?
+			for entry in result_obj["results"]:
+				if entry["name"].lower() == param.lower():
+					LOGGER.debug("Found relevant parameter '{}' with ID #{}".format(entry["name"], entry["id"]))
+					return entry["id"]
+					
 		except ValueError as err:
 			LOGGER.error(err)
 			pass

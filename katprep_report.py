@@ -66,6 +66,12 @@ def check_pandoc():
 
 
 
+def analyze_reports():
+#find and load report data
+	LOGGER.info("Lorem ipsum doloret...")
+
+
+
 def create_delta():
 #create delta reports
 	LOGGER.info("Lorem ipsum doloret...")
@@ -112,6 +118,7 @@ def main(options):
 		LOGGER.error("Template file '{}' non-existent or not readable".format(options.template_file))
 	elif is_writable(options.output_path):
 		#find reports
+		analyze_reports()
 		
 		#create reports
 		create_reports()

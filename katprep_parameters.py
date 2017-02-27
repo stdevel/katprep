@@ -12,12 +12,13 @@
 import argparse
 import logging
 import simplejson
-from katprep_shared import get_credentials, ForemanAPIClient
+from katprep_shared import get_credentials, ForemanAPIClient, validate_filters, get_filter
 
 vers = "0.0.1"
 LOGGER = logging.getLogger('katprep_parameters')
 sat_client = None
 parameters = { "katprep_monitoring" : "Monitoring URL of the system ($name@URL)", "katprep_virt" : "Virtualization URL of the system ($name@URL)", "katprep_virt_snapshot" : "Boolean whether system needs to be protected by a snapshot before maintenance" }
+values = { "katprep_monitoring": "fixmepls", "katprep_virt": "fixmepls", "katprep_virt_snapshot": "" }
 
 
 
@@ -30,34 +31,77 @@ def list_params():
 
 
 
-def setup_filter(options, api_object):
-#setup the filter URL
-	global sat_client
-	
-	#TODO: implement
-	if options.filter_location:
-		return "/locations/ID/hosts"
-		#return "/locations/{}/{}".format(get_id_by_name, api_object)
-	elif options.filter_organization:
-		return "/organizations/ID/hosts"
-	elif options.filter_hostgroup:
-		return "/hostgroups/ID/hosts"
-	elif options.filter_environment:
-		return "/environments/ID/hosts"
-	else:
-		return "/hosts"
-
-
-
 def manage_params():
 #add/remove/display parameter definitions
-	global parameters, sat_client
+	global parameters, values, sat_client
 	
-	LOGGER.info("Lorem ipsum doloret...")
 	#get all the hosts depending on the filter
-	#result_obj = simplejson.loads(
-		#sat_client.get_api_result("{}{}".format(sat_url, target), sat_user, sat_pass)
-	#)
+	filter_url = get_filter(options, "host")
+	LOGGER.debug("Filter URL will be '{}'".format(filter_url))
+	result_obj = simplejson.loads(
+		sat_client.api_get("{}".format(filter_url))
+	)
+	
+	#manage _all_ the hosts
+	for entry in result_obj["results"]:
+		LOGGER.debug("Found host '{}' (#{}),".format(entry["name"], entry["id"]))
+		#execute action
+		if options.action_add:
+			LOGGER.debug("Adding parameters...")
+			
+			#add _all_ the params
+			for param in parameters:
+				if options.dry_run:
+					LOGGER.info("Host '{}' (#{}) --> Add parameter '{}'".format(entry["name"], entry["id"], param))
+				else:
+					payload = {}
+					payload["parameter"] = { "name": param, "value": values[param]}
+					LOGGER.debug("JSON payload: {}".format(simplejson.dumps(payload)))
+					sat_client.api_post("/hosts/{}/parameters".format(entry["id"]), simplejson.dumps(payload))
+		elif options.action_update:
+			LOGGER.debug("Updating parameters...")
+			
+			#update _all_ the params
+			for param in parameters:
+				if options.dry_run:
+					LOGGER.info("Host '{}' (#{}) --> Update parameter '{}' value to '{}'".format(entry["name"], entry["id"], param, values[param]))
+				else:
+					param_id = sat_client.get_hostparam_id_by_name(entry["id"], param)
+					payload = {}
+					payload["parameter"] = { "name": param, "value": values[param]}
+					LOGGER.debug("JSON payload: {}".format(simplejson.dumps(payload)))
+					sat_client.api_put("/hosts/{}/parameters/{}".format(entry["id"], param_id), simplejson.dumps(payload))
+			
+		elif options.action_remove:
+			LOGGER.debug("Removing parameters...")
+			
+			#remove _all_ the parms
+			for param in parameters:
+				if options.dry_run:
+					LOGGER.info("Host '{}' (#{}) --> Remove parameter '{}'".format(entry["name"], entry["id"], param))
+				else:
+					#delete particular parameter
+					param_id = sat_client.get_hostparam_id_by_name(entry["id"], param)
+					payload = {}
+					payload["parameter"] = { "id": param_id }
+					LOGGER.debug("JSON payload: {}".format(simplejson.dumps(payload)))
+					sat_client.api_delete("/hosts/{}/parameters/{}".format(entry["id"], param_id), simplejson.dumps(payload))
+		else:
+			LOGGER.debug("Displaying parameter values...")
+			
+			#display _all_ the params
+			params_obj = simplejson.loads(
+				sat_client.api_get("/hosts/{}/parameters".format(entry["id"]))
+			)
+			for setting in params_obj["results"]:
+				#TODO: nicer way than looping, numpy?
+				if "katprep_" in setting["name"]:
+					#warn if default value detected
+					if setting["value"] == values[setting["name"]]: note = "DEFAULT (!) "
+					else: note = ""
+					LOGGER.info("Host '{}' (#{}) --> setting '{}' has {}value '{}' (created: {} - last updated: {})".format(
+						entry["name"], entry["id"], setting["name"], note,
+						setting["value"], setting["created_at"], setting["updated_at"]))
 
 
 
@@ -104,13 +148,15 @@ def parse_options(args=None):
 	
 	#ACTION ARGUMENTS
 	#-A / --add-parameters
-	action_opts_excl.add_argument("-A", "--add-parameters", action="store_true", default=False, dest="action_add", help="adds built-in parameters to all affected hosts")
-	#-r / --remove-parameters
-	action_opts_excl.add_argument("-r", "--remove-parameters", action="store_true", default=False, dest="action_remove", help="removes built-in parameters from all affected hosts")
+	action_opts_excl.add_argument("-A", "--add-parameters", action="store_true", default=False, dest="action_add", help="adds built-in parameters to all affected hosts (default: no)")
+	#-R / --remove-parameters
+	action_opts_excl.add_argument("-R", "--remove-parameters", action="store_true", default=False, dest="action_remove", help="removes built-in parameters from all affected hosts (default: no)")
 	#-D / --display-values
-	action_opts_excl.add_argument("-D", "--display-parameters", action="store_true", default=False, dest="action_display", help="lists values of defined parameters of affected hosts")
+	action_opts_excl.add_argument("-D", "--display-parameters", action="store_true", default=False, dest="action_display", help="lists values of defined parameters of affected hosts (default: no)")
+	#-U / --update-parameters
+	action_opts_excl.add_argument("-U", "--update-parameters", action="store_true", default=False, dest="action_update", help="updates values of defined parameters of affected hosts (default: no)")
 	#-L / --list-parameters
-	action_opts_excl.add_argument("-L", "--list-parameters", dest="action_list", default=False, action="store_true", help="only lists parameters this script uses (default: no)")
+	action_opts_excl.add_argument("-L", "--list-parameters", action="store_true", default=False, dest="action_list", help="only lists parameters this script uses (default: no)")
 	
 	
 	
@@ -122,19 +168,34 @@ def parse_options(args=None):
 
 def main(options):
 #main function
-	#global sat_url, sat_user, sat_pass
-	global sat_client
+	global sat_client, values, parameters
 	
 	LOGGER.debug("Options: {0}".format(options))
 	LOGGER.debug("Arguments: {0}".format(args))
 	
+	if options.dry_run:
+		LOGGER.info("This is just a SIMULATION - no changes will be made.")
+	
 	if options.action_list:
 		#only list parameters
 		list_params()
-	else:
+	
+	if options.action_update:
+		#retrieve values for parameters
+		for param in parameters:
+			#prompt for _all_ the parameters
+			user_input = ""
+			while user_input == "":
+				user_input = raw_input("Enter value for '{}' (hint: {}): ".format(param, parameters[param]))
+			values[param] = user_input
+	
+	if not options.action_list:
 		#initalize Satellite connection
 		(sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
 		sat_client = ForemanAPIClient(options.server, sat_user, sat_pass)
+		
+		#validate filters
+		validate_filters(options, sat_client)
 		
 		#do the stuff
 		manage_params()

@@ -15,7 +15,7 @@ import sys
 import simplejson
 import time
 import os
-from katprep_shared import get_credentials, is_writable, ForemanAPIClient
+from katprep_shared import get_credentials, is_writable, ForemanAPIClient, validate_filters, get_filter
 
 vers = "0.0.1"
 LOGGER = logging.getLogger('katprep_snapshot')
@@ -77,34 +77,11 @@ def scan_systems():
 	global sat_client
 	
 	try:
-		#set-up filter
-		if options.location != "":
-			if options.location.isdigit() == False:
-				options.location = sat_client.get_id_by_name(
-					options.location, "location")
-			target="/locations/{}/hosts".format(options.location)
-		elif options.organization != "":
-			if options.organization.isdigit() == False:
-				options.organization = sat_client.get_id_by_name(
-					options.organization, "organization")
-			target="/organizations/{}/hosts".format(options.organization)
-		elif options.hostgroup != "":
-			if options.hostgroup.isdigit() == False:
-				options.hostgroup = sat_client.get_id_by_name(
-					options.hostgroup, "hostgroup")
-			target="/hostgroups/{}/hosts".format(options.hostgroup)
-		elif options.environment != "":
-			if options.environment.isdigit() == False:
-				options.hostgroup = sat_client.get_id_by_name(
-					options.environment, "environment")
-			target="/environments/{}/hosts".format(options.environment)
-		else:
-			target="/hosts"
-		LOGGER.debug("URL will be '{}{}'".format(sat_client.get_url(), target))
-		
-		#get JSON result
+		#get all the hosts depending on the filter
+		filter_url = get_filter(options, "host")
+		LOGGER.debug("Filter URL will be '{}'".format(filter_url))
 		result_obj = simplejson.loads(
-			sat_client.get_api_result("{}".format(target))
+			sat_client.api_get("{}".format(filter_url))
 		)
 		
 		#get errata per system
@@ -122,11 +99,11 @@ def scan_systems():
 				system_errata[system["name"]]["params"] = {}
 				system_errata[system["name"]]["errata"] = {}
 				result_obj = simplejson.loads(
-					sat_client.get_api_result("/hosts/{}/errata".format(system["id"]))
+					sat_client.api_get("/hosts/{}/errata".format(system["id"]))
 				)
 				#add _all_ the katprep_* params
 				params_obj = simplejson.loads(
-					sat_client.get_api_result("/hosts/{}".format(system["id"]))
+					sat_client.api_get("/hosts/{}".format(system["id"]))
 				)
 				for entry in params_obj["parameters"]:
 					if "katprep_" in entry["name"]:
@@ -184,6 +161,9 @@ def main(options):
 		#initalize Satellite connection and scan systems
 		(sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
 		sat_client = ForemanAPIClient(options.server, sat_user, sat_pass)
+		
+		#validate filters
+		validate_filters(options, sat_client)
 		
 		#scan systems and create report
 		scan_systems()
