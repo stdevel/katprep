@@ -1,137 +1,165 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+katprep_report.py - a script for creating maintenance
+reports including installed errata per system managed
+with Foreman/Katello or Red Hat Satellite 6.
 
-# katprep_report.py - a script for creating maintenance
-# reports including installed errata per system managed
-# with Foreman/Katello or Red Hat Satellite 6.
-#
-# 2017 By Christian Stankowic
-# <info at stankowic hyphen development dot net>
-# https://github.com/stdevel/katprep
+2017 By Christian Stankowic
+<info at stankowic hyphen development dot net>
+https://github.com/stdevel/katprep
+"""
 
 import argparse
 import logging
-import simplejson
-import time
+#import simplejson
+#import time
 import os
-import pypandoc
+#import pypandoc
 from katprep_shared import is_writable, which, is_valid_report
 
-vers = "0.0.1"
+VERS = "0.0.1"
 LOGGER = logging.getLogger('katprep_report')
 
 
 
 def parse_options(args=None):
-#initialize parser
-	desc='''katprep_report.py is used for creating maintenance reports including errata per system managed with Foreman/Katello or Red Hat Satellite 6.
-	The utility requires two snapshots: before and after maintenance tasks were executed - just append the two files to the command line.'''
-	epilog='Check-out the website for more details: http://github.com/stdevel/katprep'
-	parser = argparse.ArgumentParser(description=desc, version=vers, epilog=epilog)
-	
-	#define option groups
-	gen_opts = parser.add_argument_group("generic arguments")
-	rep_opts = parser.add_argument_group("report arguments")
-	
-	#GENERIC ARGUMENTS
-	#-q / --quiet
-	gen_opts.add_argument("-q", "--quiet", action="store_true", dest="quiet", default=False, help="don't print status messages to stdout (default: no)")
-	#-d / --debug
-	gen_opts.add_argument("-d", "--debug", dest="debug", default=False, action="store_true", help="enable debugging outputs (default: no)")
-	#-p / --output-path
-	gen_opts.add_argument("-p", "--output-path", dest="output_path", metavar="PATH", default="", action="store", help="defines the output path for reports (default: current directory)")
-	
-	#REPORT ARGUMENTS
-	#-o / --output-type
-	rep_opts.add_argument("-o", "--output-type", dest="output_type", metavar="FILE", default="", help="defines the output file type for Pandoc, usually this is set automatically based on the template file extension (default: no)")
-	#-x / --preserve-md
-	rep_opts.add_argument("-x", "--preserve-yaml", dest="preserve_yaml", default=False, action="store_true", help="keeps the YAML metadata after creating the reports, important for debugging (default: no)")
-	#-t / --template
-	rep_opts.add_argument("-t", "--template", dest="template_file", metavar="FILE", default="", action="store", help="defines a dedicated template file (default: integrated HTML)")
-	#snapshot reports
-	rep_opts.add_argument('reports', metavar='FILE', nargs=2, help='Two snapshot reports (before/after maintenance)', type=is_valid_report)
-	
-	
-	
-	#parse options and arguments
-	options = parser.parse_args()
-	return (options, args)
+    """Parses options and arguments."""
+    desc = '''katprep_report.py is used for creating maintenance reports
+     including errata per system managed with Foreman/Katello or Red Hat
+     Satellite 6. The utility requires two snapshots: before and after
+     maintenance tasks were executed - just append the two files to the
+     command line.'''
+    epilog = '''Check-out the website for more details:
+     http://github.com/stdevel/katprep'''
+    parser = argparse.ArgumentParser(description=desc, version=VERS, \
+    epilog=epilog)
+
+    #define option groups
+    gen_opts = parser.add_argument_group("generic arguments")
+    rep_opts = parser.add_argument_group("report arguments")
+
+    #GENERIC ARGUMENTS
+    #-q / --quiet
+    gen_opts.add_argument("-q", "--quiet", action="store_true", dest="quiet", \
+    default=False, help="don't print status messages to stdout (default: no)")
+    #-d / --debug
+    gen_opts.add_argument("-d", "--debug", dest="debug", default=False, \
+    action="store_true", help="enable debugging outputs (default: no)")
+    #-p / --output-path
+    gen_opts.add_argument("-p", "--output-path", dest="output_path", \
+    metavar="PATH", default="", action="store", \
+    help="defines the output path for reports (default: current directory)")
+
+    #REPORT ARGUMENTS
+    #-o / --output-type
+    rep_opts.add_argument("-o", "--output-type", dest="output_type", \
+    metavar="FILE", default="", help="defines the output file type for " \
+    "Pandoc, usually this is set automatically based on the template " \
+    "file extension (default: no)")
+    #-x / --preserve-md
+    rep_opts.add_argument("-x", "--preserve-yaml", dest="preserve_yaml", \
+    default=False, action="store_true", help="keeps the YAML metadata " \
+    "after creating the reports, important for debugging (default: no)")
+    #-t / --template
+    rep_opts.add_argument("-t", "--template", dest="template_file", \
+    metavar="FILE", default="", action="store", help="defines a dedicated" \
+    " template file (default: integrated HTML)")
+    #snapshot reports
+    rep_opts.add_argument('reports', metavar='FILE', nargs=2, \
+    help='Two snapshot reports (before/after patching)', type=is_valid_report)
+
+
+
+    #parse options and arguments
+    options = parser.parse_args()
+    return (options, args)
 
 
 
 def check_pandoc():
-#check Pandoc installation
-	if not which("pandoc"): return False
-	return True
+    """Checks the Pandoc installation."""
+    if not which("pandoc"):
+        return False
+    return True
 
 
 
 def analyze_reports():
-#find and load report data
-	LOGGER.info("Lorem ipsum doloret...")
+    """Finds and loads report data."""
+    LOGGER.info("Lorem ipsum doloret...")
 
 
 
 def create_delta():
-#create delta reports
-	LOGGER.info("Lorem ipsum doloret...")
-	#TODO: calculate delta and create YAML metadata per system
+    """Creats delta reports."""
+    LOGGER.info("Lorem ipsum doloret...")
+    #TODO: calculate delta and create YAML metadata per system
 
 
 
 def create_reports():
-#create JSON report
-	LOGGER.info("Lorem ipsum doloret...")
-	#TODO: render report based on YAML metadata
-	#output = pypandoc.convert_file("data.yml", "markdown", format="html", extra_args=["--template", "template.html"], outputfile="render.html")
+    """Creates patch reports"""
+    LOGGER.info("Lorem ipsum doloret...")
+    #TODO: render report based on YAML metadata
+    #output = pypandoc.convert_file("data.yml", "markdown", format="html",
+    #extra_args=["--template", "template.html"], outputfile="render.html")
 
 
 
 def main(options):
-#main function
-	#set template
-	if options.template_file == "":
-		options.template_file = "./template.html"
-	elif options.template_file.rfind(".") != -1:
-		#set extension as output type
-		options.output_type = options.template_file[options.template_file.rfind(".")+1:].lower()
-	else:
-		#no extension
-		LOGGER.error("Could not detect type of template, please add a file extension such as .md")
-		exit(1)
-	
-	#set output file
-	if options.output_path == "":
-		options.output_path = "./"
-	elif options.output_path != "" and options.output_path[len(options.output_path)-1:] != "/":
-		#add trailing slash
-		options.output_path = "{}/".format(options.output_path)
-	
-	LOGGER.debug("Options: {0}".format(options))
-	LOGGER.debug("Arguments: {0}".format(args))
-	
-	#check if we can read and write before digging
-	if not check_pandoc():
-		LOGGER.error("Pandoc can't be found - check your installation.")
-	#check if template exists
-	elif not os.path.exists(options.template_file) or not os.access(options.template_file, os.R_OK):
-		LOGGER.error("Template file '{}' non-existent or not readable".format(options.template_file))
-	elif is_writable(options.output_path):
-		#find reports
-		analyze_reports()
-		
-		#create reports
-		create_reports()
+    """Main function, starts the logic based on parameters."""
+    #set template
+    if options.template_file == "":
+        options.template_file = "./template.html"
+    elif options.template_file.rfind(".") != -1:
+        #set extension as output type
+        options.output_type = \
+        options.template_file[options.template_file.rfind(".")+1:].lower()
+    else:
+        #no extension
+        LOGGER.error("Could not detect type of template," \
+        "please add a file extension such as .md")
+        exit(1)
+
+    #set output file
+    if options.output_path == "":
+        options.output_path = "./"
+    elif options.output_path != "" and \
+    options.output_path[len(options.output_path)-1:] != "/":
+        #add trailing slash
+        options.output_path = "{}/".format(options.output_path)
+
+    LOGGER.debug("Options: {0}".format(options))
+    LOGGER.debug("Arguments: {0}".format(args))
+
+    #check if we can read and write before digging
+    if not check_pandoc():
+        LOGGER.error("Pandoc can't be found - check your installation.")
+    #check if template exists
+    elif not os.path.exists(options.template_file) or \
+    not os.access(options.template_file, os.R_OK):
+        LOGGER.error("Template file '{}' non-existent or " \
+        "not readable".format(options.template_file))
+    elif is_writable(options.output_path):
+        #find reports
+        analyze_reports()
+
+        #create reports
+        create_reports()
 
 
 
 if __name__ == "__main__":
-	(options, args) = parse_options()
-	
-	#set logging level
-	logging.basicConfig()
-	if options.debug: LOGGER.setLevel(logging.DEBUG)
-	elif options.quiet: LOGGER.setLevel(logging.ERROR)
-	else: LOGGER.setLevel(logging.INFO)
-	
-	main(options)
+    (options, args) = parse_options()
+
+    #set logging level
+    logging.basicConfig()
+    if options.debug:
+        LOGGER.setLevel(logging.DEBUG)
+    elif options.quiet:
+        LOGGER.setLevel(logging.ERROR)
+    else:
+        LOGGER.setLevel(logging.INFO)
+
+    main(options)
