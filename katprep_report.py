@@ -12,14 +12,17 @@ https://github.com/stdevel/katprep
 
 import argparse
 import logging
-#import simplejson
-#import time
+import json
+import datetime
 import os
 #import pypandoc
-from katprep_shared import is_writable, which, is_valid_report
+import yaml
+from katprep_shared import is_writable, which, is_valid_report, get_json
 
-VERS = "0.0.1"
+__version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_report')
+REPORT_OLD = {}
+REPORT_NEW = {}
 
 
 
@@ -32,7 +35,7 @@ def parse_options(args=None):
      command line.'''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(description=desc, version=VERS, \
+    parser = argparse.ArgumentParser(description=desc, version=__version__, \
     epilog=epilog)
 
     #define option groups
@@ -57,7 +60,7 @@ def parse_options(args=None):
     metavar="FILE", default="", help="defines the output file type for " \
     "Pandoc, usually this is set automatically based on the template " \
     "file extension (default: no)")
-    #-x / --preserve-md
+    #-x / --preserve-yaml
     rep_opts.add_argument("-x", "--preserve-yaml", dest="preserve_yaml", \
     default=False, action="store_true", help="keeps the YAML metadata " \
     "after creating the reports, important for debugging (default: no)")
@@ -85,25 +88,113 @@ def check_pandoc():
 
 
 
+def get_newer_report(file_a, file_b, reverse=False):
+    """Returns the newer/older file of two files.
+
+    Keyword arguments:
+    file_a -- a file
+    file_b -- another file
+    reverse -- returns the older file
+    """
+    try:
+        if os.path.getctime(file_a) < os.path.getctime(file_b):
+            #file_b is newer
+            if reverse:
+                return file_a
+            else:
+                return file_b
+        else:
+            #file_a is newer
+            if reverse:
+                return file_b
+            else:
+                return file_a
+    except IOError as err:
+        LOGGER.error("Unable to open file: '{}'".format(err))
+
+
+
 def analyze_reports():
     """Finds and loads report data."""
-    LOGGER.info("Lorem ipsum doloret...")
+    global REPORT_OLD, REPORT_NEW
+
+    #load reports
+    REPORT_OLD = json.loads(get_json(
+        get_newer_report(options.reports[0], options.reports[1], True)
+    ))
+    REPORT_NEW = json.loads(get_json(
+        get_newer_report(options.reports[0], options.reports[1])
+    ))
+    LOGGER.debug("Old report ist '{}', new report is '{}'".format(
+        get_newer_report(options.reports[0], options.reports[1], True),
+        get_newer_report(options.reports[0], options.reports[1])
+        ))
+
+
+
+def get_errata_by_host(report, hostname):
+    """Returns all errata by a particular host in a report.
+
+    Keyword arguments:
+    report -- JSON report content
+    host -- hostname
+    """
+    #TODO: find a nicer way to do this -> list comprehension?
+    errata = []
+    for host in report:
+        if host == hostname:
+            for erratum in report[host]["errata"]:
+                errata.append(erratum["errata_id"])
+    LOGGER.debug("Errata for host '{}': '{}'".format(hostname, errata))
+    return errata
 
 
 
 def create_delta():
     """Creats delta reports."""
-    LOGGER.info("Lorem ipsum doloret...")
-    #TODO: calculate delta and create YAML metadata per system
+    global REPORT_OLD
+    #open old report and remove entries from newer report
+    for host in REPORT_OLD:
+        LOGGER.debug("Analyzing changes for host '{}'".format(host))
+        for i, erratum in enumerate(REPORT_OLD[host]["errata"]):
+            if erratum["errata_id"] in get_errata_by_host(REPORT_NEW, host):
+                LOGGER.debug("Dropping erratum '{}' (#{}) as it seems not to" \
+                    " be installed".format(
+                        erratum["summary"], erratum["errata_id"]
+                    ))
+                del REPORT_OLD[host]["errata"][i]
+        #store delta report
+        #TODO: Integrate verify data!
+        timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
+            get_newer_report(options.reports[0], options.reports[1])
+        )).strftime('%Y%m%d')
+
+        #store YAML files
+        with open("{}errata-diff-{}-{}.yml".format(options.output_path, \
+            host, timestamp), "w") as json_file:
+            yaml.dump(yaml.load(json.dumps(REPORT_OLD[host])), json_file, \
+            default_flow_style=False, explicit_start=True, \
+            explicit_end=True, default_style="'")
 
 
 
 def create_reports():
     """Creates patch reports"""
-    LOGGER.info("Lorem ipsum doloret...")
-    #TODO: render report based on YAML metadata
-    #output = pypandoc.convert_file("data.yml", "markdown", format="html",
-    #extra_args=["--template", "template.html"], outputfile="render.html")
+    for host in REPORT_OLD:
+        LOGGER.debug("Creating report for host '{}'".format(host))
+        timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
+            get_newer_report(options.reports[0], options.reports[1])
+        )).strftime('%Y%m%d')
+        filename = "{}errata-diff-{}-{}".format(
+            options.output_path, host, timestamp
+        )
+        LOGGER.debug("{}.yml".format(filename))
+        #TODO: figure out why pypandoc doesn't work at this point
+        os.system("pandoc {}.yml --template {} -o {}.{}".format(filename, \
+            options.template_file, filename, options.output_type))
+        if not options.preserve_yaml:
+            #Remove file
+            os.remove("{}.yml".format(filename))
 
 
 
@@ -112,7 +203,7 @@ def main(options):
     #set template
     if options.template_file == "":
         options.template_file = "./template.html"
-    elif options.template_file.rfind(".") != -1:
+    if options.template_file.rfind(".") != -1:
         #set extension as output type
         options.output_type = \
         options.template_file[options.template_file.rfind(".")+1:].lower()
@@ -145,7 +236,8 @@ def main(options):
         #find reports
         analyze_reports()
 
-        #create reports
+        #create delta and reports
+        create_delta()
         create_reports()
 
 

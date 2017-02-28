@@ -5,4 +5,7 @@
 *.auth
 *.bak
 *.swp
+errata-*.html
+errata-*.yml
+errata-*.md
 TODO

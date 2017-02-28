@@ -12,11 +12,11 @@ https://github.com/stdevel/katprep
 
 import argparse
 import logging
-import simplejson
+import json
 from katprep_shared import get_credentials, ForemanAPIClient, \
 validate_filters, get_filter
 
-VERS = "0.0.1"
+__version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_parameters')
 SAT_CLIENT = None
 PARAMETERS = {
@@ -47,7 +47,7 @@ def manage_params():
     #get all the hosts depending on the filter
     filter_url = get_filter(options, "host")
     LOGGER.debug("Filter URL will be '{}'".format(filter_url))
-    result_obj = simplejson.loads(
+    result_obj = json.loads(
         SAT_CLIENT.api_get("{}".format(filter_url))
     )
 
@@ -74,11 +74,11 @@ def manage_params():
                         "name": param, "value": VALUES[param]
                     }
                     LOGGER.debug(
-                        "JSON payload: {}".format(simplejson.dumps(payload))
+                        "JSON payload: {}".format(json.dumps(payload))
                     )
                     SAT_CLIENT.api_post("/hosts/{}/parameters".format(
                         entry["id"]
-                    ), simplejson.dumps(payload))
+                    ), json.dumps(payload))
         elif options.action_update:
             LOGGER.debug("Updating parameters...")
 
@@ -100,11 +100,11 @@ def manage_params():
                         "name": param, "value": VALUES[param]
                     }
                     LOGGER.debug(
-                        "JSON payload: {}".format(simplejson.dumps(payload))
+                        "JSON payload: {}".format(json.dumps(payload))
                     )
                     SAT_CLIENT.api_put(
                         "/hosts/{}/parameters/{}".format(entry["id"], param_id),
-                        simplejson.dumps(payload))
+                        json.dumps(payload))
 
         elif options.action_remove:
             LOGGER.debug("Removing parameters...")
@@ -125,22 +125,23 @@ def manage_params():
                     payload = {}
                     payload["parameter"] = {"id": param_id}
                     LOGGER.debug("JSON payload: {}".format(
-                        simplejson.dumps(payload)))
+                        json.dumps(payload)))
                     SAT_CLIENT.api_delete(
                         "/hosts/{}/parameters/{}".format(entry["id"], param_id),
-                        simplejson.dumps(payload))
+                        json.dumps(payload))
         else:
             LOGGER.debug("Displaying parameter values...")
 
             #display _all_ the params
-            params_obj = simplejson.loads(
+            params_obj = json.loads(
                 SAT_CLIENT.api_get("/hosts/{}/parameters".format(entry["id"]))
             )
             for setting in params_obj["results"]:
                 #TODO: nicer way than looping, numpy?
                 if "katprep_" in setting["name"]:
                     #warn if default value detected
-                    if setting["value"] == VALUES[setting["name"]]:
+                    if setting["name"] in PARAMETERS and \
+                    setting["value"] == VALUES[setting["name"]]:
                         note = "DEFAULT (!) "
                     else:
                         note = ""
@@ -170,7 +171,7 @@ def parse_options(args=None):
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
     parser = argparse.ArgumentParser(
-        description=desc, version=VERS, epilog=epilog
+        description=desc, version=__version__, epilog=epilog
     )
 
     #define option groups

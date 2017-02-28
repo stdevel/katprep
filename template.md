@@ -1,24 +1,24 @@
-# System maintenance report $if(hostname)$for $hostname$$endif$
+# System maintenance report $if(params.name)$for $params.name$$endif$
 
 ## Meta information
 IP | Date | Time | Owner
 -- | ---- | ---- | -----
-$if(ip)$$ip$$endif$ | $if(date)$$date$$endif$ | $if(time)$$time$$endif$ | $if(owner)$$owner$$endif$ |
+$if(params.ip)$$params.ip$$endif$ | $if(params.date)$$params.date$$endif$ | $if(params.time)$$params.time$$endif$ | $if(params.owner)$$params.owner$$endif$ |
 
 ## Task checklist
 Task | Status | Description/Notes
 ---- | ------ | -----------------
-Snapshot created | $if(system_snapshot)$yes$else$no$endif$ | $if(system_cycle)$$system_cycle$ lifecycle$if(system_physical)$physical system$endif$$endif$
-Monitoring disabled | $if(monitoring_disabled)$yes$else$no$endif$ | $if(system_cycle)$$system_cycle$ lifecycle$endif$
-System rebooted | $if(system_rebooted)$yes$else$no$endif$ | 
-Monitoring status | $if(monitoring_status)$$monitoring_status$$endif$ | $if(monitoring_status_detail)$$monitoring_status_detail$$endif$
-Monitoring enabled | $if(monitoring_enabled)$$monitoring_enabled$$endif$ | $if(system_cycle)$$system_cycle$ lifecycle$endif$
+Snapshot created | $if(params.system_snapshot)$yes$else$no$endif$ | $if(params.system_physical)$physical system$endif$
+Monitoring disabled | $if(monitoring_disabled)$yes$else$no$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
+System rebooted | $if(params.system_rebooted)$yes$else$no$endif$ | 
+Monitoring status | $if(params.monitoring_status)$$params.monitoring_status$$endif$ | $if(params.monitoring_status_detail)$$params.monitoring_status_detail$$endif$
+Monitoring enabled | $if(params.monitoring_enabled)$$params.monitoring_enabled$$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
 
 ## Patch list
 Type | Name | Date | Description | Reboot required?
 ---- | ---- | ---- | ----------- | ----------------
-$for(patch)$
-$if(patch.errata_type)$$patch.errata_type$$endif$ | $if(patch.errata_name)$$patch.errata_name$$endif$ | $if(patch.errata_date)$$patch.errata_date$$endif$ | $if(patch.errata_desc)$$patch.errata_desc$$endif$ | $if(patch.errata_reboot)$yes$else$no$endif$
+$for(errata)$
+$if(errata.type)$$errata.type$$endif$ | $if(errata.summary)$$errata.summary$$endif$ | $if(errata.issued)$$errata.issued$$endif$ | $if(errata.description)$$errata.description$$endif$ | $if(errata.reboot_suggested)$yes$else$no$endif$
 $endfor$
 
 *This report was created automatically by [katprep](https://github.com/stdevel/katprep)*

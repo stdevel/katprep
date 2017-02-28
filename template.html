@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>System maintenance report $if(hostname)$for $hostname$$endif$</title>
+<title>System maintenance report$if(params.name)$ for $params.name$$endif$</title>
 <style>
 table {
   width:100%;
@@ -19,7 +19,7 @@ table tr:nth-child(odd) {
 </style>
 </head>
 <body>
-<h1>System maintenance report $if(hostname)$for $hostname$$endif$</h1>
+<h1>System maintenance report$if(params.name)$ for $params.name$$endif$</h1>
 
 <h2>Meta information</h2>
 <table>
@@ -30,10 +30,10 @@ table tr:nth-child(odd) {
 <th>Owner</th>
 </tr>
 <tr>
-<td>$if(ip)$$ip$$endif$</td>
-<td>$if(date)$$date$$endif$</td>
-<td>$if(time)$$time$$endif$</td>
-<td>$if(owner)$$owner$$endif$</td>
+<td>$if(params.ip)$$params.ip$$endif$</td>
+<td>$if(params.date)$$params.date$$endif$</td>
+<td>$if(params.time)$$params.time$$endif$</td>
+<td>$if(params.owner)$$params.owner$$endif$</td>
 </tr>
 </table>
 
@@ -46,28 +46,28 @@ table tr:nth-child(odd) {
 </tr>
 <tr>
 <td>Snapshot created</td>
-<td>$if(system_snapshot)$yes$else$no$endif$</td>
-<td>$if(system_cycle)$$system_cycle$ lifecycle$if(system_physical)$physical system$endif$$endif$</td>
+<td>$if(params.system_snapshot)$yes$else$no$endif$</td>
+<td>$if(params.system_physical)$physical system$endif$</td>
 </tr>
 <tr>
 <td>Monitoring disabled</td>
-<td>$if(monitoring_disabled)$yes$else$no$endif$</td>
-<td>$if(system_cycle)$$system_cycle$ lifecycle$endif$</td>
+<td>$if(params.monitoring_disabled)$yes$else$no$endif$</td>
+<td>$if(params.environment)$$params.environment$ lifecycle$endif$</td>
 </tr>
 <tr>
 <td>System rebooted</td>
-<td>$if(system_rebooted)$yes$else$no$endif$</td>
+<td>$if(params.system_rebooted)$yes$else$no$endif$</td>
 <td></td>
 </tr>
 <tr>
 <td>Monitoring status</td>
-<td>$if(monitoring_status)$$monitoring_status$$endif$</td>
-<td>$if(monitoring_status_detail)$$monitoring_status_detail$$endif$</td>
+<td>$if(params.monitoring_status)$$params.monitoring_status$$endif$</td>
+<td>$if(params.monitoring_status_detail)$$params.monitoring_status_detail$$endif$</td>
 </tr>
 <tr>
 <td>Monitoring enabled</td>
-<td>$if(monitoring_enabled)$$monitoring_enabled$$endif$</td>
-<td>$if(system_cycle)$$system_cycle$ lifecycle$endif$</td>
+<td>$if(params.monitoring_enabled)$$params.monitoring_enabled$$endif$</td>
+<td>$if(params.environment)$$params.environment$ lifecycle$endif$</td>
 </tr>
 </table>
 
@@ -80,13 +80,13 @@ table tr:nth-child(odd) {
 <th>Description</th>
 <th>Reboot required?</th>
 </tr>
-$for(patch)$
+$for(errata)$
 <tr>
-<td>$if(patch.errata_type)$$patch.errata_type$$endif$</td>
-<td>$if(patch.errata_name)$$patch.errata_name$$endif$</td>
-<td>$if(patch.errata_date)$$patch.errata_date$$endif$</td>
-<td>$if(patch.errata_desc)$$patch.errata_desc$$endif$</td>
-<td>$if(patch.errata_reboot)$yes$else$no$endif$</td>
+<td>$if(errata.type)$$errata.type$$endif$</td>
+<td>$if(errata.summary)$$errata.summary$$endif$</td>
+<td>$if(errata.issued)$$errata.issued$$endif$</td>
+<td>$if(errata.description)$$errata.description$$endif$</td>
+<td>$if(errata.reboot_suggested)$yes$else$no$endif$</td>
 </tr>
 $endfor$
 </table>

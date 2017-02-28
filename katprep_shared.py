@@ -15,7 +15,7 @@ import logging
 import requests
 import os
 import stat
-import simplejson
+import json
 import argparse
 import socket
 
@@ -175,7 +175,7 @@ def is_valid_report(filename):
             " readable".format(filename))
     #check whether valid json
     try:
-        json_obj = simplejson.loads(get_json(filename))
+        json_obj = json.loads(get_json(filename))
         #check whether at least one host with a params dict is found
         if "params" not in json_obj.itervalues().next().keys():
             raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
@@ -186,6 +186,7 @@ def is_valid_report(filename):
     except ValueError as err:
         raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
             " document: '{}'".format(filename, err))
+    return filename
 
 
 
@@ -359,7 +360,7 @@ class ForemanAPIClient:
         """Checks whether the API version on the Foreman server is supported"""
         try:
             #get api version
-            result_obj = simplejson.loads(
+            result_obj = json.loads(
                 self.api_get("/status")
             )
             LOGGER.debug("API version {} found.".format(
@@ -399,6 +400,15 @@ class ForemanAPIClient:
         """Returns the configured URL of the object instance"""
         return self.url
 
+    #TODO: implement - generic function with alias?
+    #def get_name_by_id(self, name, api_object):
+        #"""Return a Foreman object's name by its ID.
+
+        #Keyword arguments:
+        #name -- Foreman object name
+        #api_object -- Foreman object type (e.g. host, environment)
+        #"""
+    
     def get_id_by_name(self, name, api_object):
         """Returns a Foreman object's internal ID by its name.
 
@@ -418,7 +428,8 @@ class ForemanAPIClient:
                 )
             else:
                 #get ID by name
-                result_obj = simplejson.loads(
+                #TODO: access directly by appending /ID to URL?
+                result_obj = json.loads(
                     self.api_get("/{}s".format(api_object))
                 )
                 #TODO: nicer way than looping? numpy?
@@ -443,7 +454,7 @@ class ForemanAPIClient:
         param_name -- host parameter name
         """
         try:
-            result_obj = simplejson.loads(
+            result_obj = json.loads(
                 self.api_get("/hosts/{}/parameters".format(host))
             )
             #TODO: nicer way than looping? numpy?

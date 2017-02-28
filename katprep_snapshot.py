@@ -12,12 +12,12 @@ https://github.com/stdevel/katprep
 
 import argparse
 import logging
-import simplejson
+import json
 import time
 from katprep_shared import get_credentials, is_writable, \
 ForemanAPIClient, validate_filters, get_filter
 
-VERS = "0.0.1"
+__version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_snapshot')
 SAT_CLIENT = None
 SYSTEM_ERRATA = {}
@@ -40,7 +40,7 @@ def parse_options(args=None):
     '''
     epilog = '''Check-out the website for more details:
 http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(description=desc, version=VERS, \
+    parser = argparse.ArgumentParser(description=desc, version=__version__, \
     epilog=epilog)
 
     #define option groups
@@ -102,7 +102,7 @@ def scan_systems():
         #get all the hosts depending on the filter
         filter_url = get_filter(options, "host")
         LOGGER.debug("Filter URL will be '{}'".format(filter_url))
-        result_obj = simplejson.loads(
+        result_obj = json.loads(
             SAT_CLIENT.api_get("{}".format(filter_url))
         )
 
@@ -122,11 +122,11 @@ def scan_systems():
                 SYSTEM_ERRATA[system["name"]] = {}
                 SYSTEM_ERRATA[system["name"]]["params"] = {}
                 SYSTEM_ERRATA[system["name"]]["errata"] = {}
-                result_obj = simplejson.loads(
+                result_obj = json.loads(
                     SAT_CLIENT.api_get("/hosts/{}/errata".format(system["id"]))
                 )
                 #add _all_ the katprep_* params
-                params_obj = simplejson.loads(
+                params_obj = json.loads(
                     SAT_CLIENT.api_get("/hosts/{}".format(system["id"]))
                 )
                 for entry in params_obj["parameters"]:
@@ -134,6 +134,20 @@ def scan_systems():
                         #add key/value
                         SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = {}
                         SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = entry["value"]
+                #add some additional information required for katprep_report
+                SYSTEM_ERRATA[system["name"]]["params"]["name"] = params_obj["name"]
+                SYSTEM_ERRATA[system["name"]]["params"]["ip"] = params_obj["ip"]
+                SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  "OWNER"
+                #SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
+                    #SAT_CLIENT.get_id_by_name(params_obj["owner_id"], "user")
+                SYSTEM_ERRATA[system["name"]]["params"]["organization"] = params_obj["organization_name"]
+                SYSTEM_ERRATA[system["name"]]["params"]["location"] = params_obj["location_name"]
+                SYSTEM_ERRATA[system["name"]]["params"]["environment"] = params_obj["environment_name"]
+                SYSTEM_ERRATA[system["name"]]["params"]["operatingsystem"] = params_obj["operatingsystem_name"]
+                if params_obj["facts"]["virt::is_guest"] == True:
+                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = False
+                else:
+                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
                 #add _all_ the errata information
                 SYSTEM_ERRATA[system["name"]]["errata"] = result_obj["results"]
     except KeyError as err:
@@ -149,7 +163,7 @@ def create_report():
     try:
         target = open(OUTPUT_FILE, 'w')
         target.write(
-            simplejson.dumps(SYSTEM_ERRATA)
+            json.dumps(SYSTEM_ERRATA)
         )
         target.close()
     except IOError as err:
