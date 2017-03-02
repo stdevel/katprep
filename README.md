@@ -9,27 +9,27 @@ So - stay tuned and check-out this site more often.
 
 # Planned features
 - Reporting
-  - various formats by using **Pandoc** and [**pypandoc**](https://pypi.python.org/pypi/pypandoc)
-  - template with variables, automation using YAML metadata
+  - ~~various formats by using **Pandoc** and [**pypandoc**](https://pypi.python.org/pypi/pypandoc)~~ :white_check_mark: implemented
+  - ~~template with variables, automation using YAML metadata~~ :white_check_mark: implemented
 - Automation
   - (*un-*)scheduling downtimes within popular monitoring solutions such as:
-    - Nagios / Icinga 1.x
-    - Icinga 2
-    - Thruk
-    - Shinken
-  - creating/removing snapshots for virtual machines using [libvirt](http://www.libvirt.org) supporting multiple hypervisors including:
-    - KVM
-    - Xen
-    - VMware vSphere ESXi
-    - Microsoft Hyper-V
+    - ~~Nagios / Icinga 1.x~~ :white_check_mark: implemented
+    - Icinga 2 (*will follow soon*)
+    - ~~Thruk~~ :white_check_mark: implemented
+    - ~~Shinken~~ :white_check_mark: implemented
+  - ~~creating/removing snapshots for virtual machines using [libvirt](http://www.libvirt.org) supporting multiple hypervisors including:~~ :white_check_mark: implemented
+    - ~~KVM~~ :white_check_mark: implemented
+    - ~~Xen~~ :white_check_mark: implemented
+    - ~~VMware vSphere ESXi~~ :white_check_mark: implemented
+    - ~~Microsoft Hyper-V~~ :white_check_mark: implemented
   - applying errata after successful preparation
   - rebooting systems if patches require this
-- creating inventory snapshots of managed systems before and after maintenance
-- creating reports listing relevant information about installed errata (*category, date, affected packages, CVE information*)
+- ~~creating inventory snapshots of managed systems before and after maintenance~~ :white_check_mark: implemented
+- ~~creating reports listing relevant information about installed errata (*category, date, affected packages, CVE information*)~~ :white_check_mark: implemented
 
 # Planned workflow
-- Once after the installation and after new systems were registered, Puppet host parameters are set using ``katprep_parameters.py``
-- When patch maintenance is needed, a snapshot report is created using ``katprep_snapshot.py``
-- Patch maintenance per system is prepared and (*optionally*) executed using ``katprep_maintenance.py``
-- After patch maintenance, another snapshot report is created
-- Final patch reports per system are created using ``katprep_report.py``
+1. Once after the installation and after new systems were registered, Puppet host parameters are set using ``katprep_parameters.py``
+2. When patch maintenance is needed, a snapshot report is created using ``katprep_snapshot.py``
+3. Patch maintenance per system is prepared and (*optionally*) executed using ``katprep_maintenance.py``
+4. After patch maintenance, another snapshot report is created
+5. Final patch reports per system are created using ``katprep_report.py``
