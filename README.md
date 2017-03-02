@@ -3,13 +3,15 @@
  
 This can be very useful if you need to document software changes due to IT certifications like [ISO/IEC 27001:2005](http://en.wikipedia.org/wiki/ISO/IEC_27001:2005) or many other.
 
-This toolkit is currently under development, it's a complete rewrite of my other toolkit [**satprep**](https://github.com/stdevel/satprep), which did the same job for systems managed with [Spacewalk](http://www.spacewalkproject.org/), [Red Hat Satellite 5.x](http://www.redhat.com/products/enterprise-linux/satellite/) or [SUSE Manager](http://www.suse.com/products/suse-manager/).
+This toolkit is currently under early development, it's a complete rewrite of my other toolkit [**satprep**](https://github.com/stdevel/satprep), which did the same job for systems managed with [Spacewalk](http://www.spacewalkproject.org/), [Red Hat Satellite 5.x](http://www.redhat.com/products/enterprise-linux/satellite/) or [SUSE Manager](http://www.suse.com/products/suse-manager/).
 
 So - stay tuned and check-out this site more often.
 
 # Planned features
 - Reporting
   - ~~various formats by using **Pandoc** and [**pypandoc**](https://pypi.python.org/pypi/pypandoc)~~ :white_check_mark: implemented
+  - ~~creating inventory snapshots of managed systems before and after maintenance~~ :white_check_mark: implemented
+  - ~~creating reports listing relevant information about installed errata (*category, date, affected packages, CVE information*)~~ :white_check_mark: implemented
   - ~~template with variables, automation using YAML metadata~~ :white_check_mark: implemented
 - Automation
   - (*un-*)scheduling downtimes within popular monitoring solutions such as:
@@ -24,8 +26,11 @@ So - stay tuned and check-out this site more often.
     - ~~Microsoft Hyper-V~~ :white_check_mark: implemented
   - applying errata after successful preparation
   - rebooting systems if patches require this
-- ~~creating inventory snapshots of managed systems before and after maintenance~~ :white_check_mark: implemented
-- ~~creating reports listing relevant information about installed errata (*category, date, affected packages, CVE information*)~~ :white_check_mark: implemented
+- Documentation
+  - ~~automatic Documentation with [**Sphinx**](http://www.sphinx-doc.org)~~ :white_check_mark: implemented
+  - manpages for server installations without browser
+  - ability to execute scripts before maintenance (*e.g. to remount ``/usr`` in rw mode*)
+  - implement central configuration file to avoid using thousands of parameters
 
 # Planned workflow
 1. Once after the installation and after new systems were registered, Puppet host parameters are set using ``katprep_parameters.py``
