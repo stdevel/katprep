@@ -31,6 +31,10 @@ So - stay tuned and check-out this site more often.
   - manpages for server installations without browser
   - ability to execute scripts before maintenance (*e.g. to remount ``/usr`` in rw mode*)
   - implement central configuration file to avoid using thousands of parameters
+- Other
+  - create a Python module for this utility
+  - serve a RPM spec file for easier distribution
+  - integration into Foreman user interface? :innocent:
 
 # Planned workflow
 1. Once after the installation and after new systems were registered, Puppet host parameters are set using ``katprep_parameters.py``
