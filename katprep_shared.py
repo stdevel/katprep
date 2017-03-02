@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-katprep_shared.py - a shared library containing
-functions and calls used by other scripts of the
+A shared library containing functions used by other scripts of the
 katprep toolkit.
-
-2017 By Christian Stankowic
-<info at stankowic hyphen development dot net>
-https://github.com/stdevel/katprep
 """
 
 import getpass
@@ -24,17 +19,23 @@ LOGGER = logging.getLogger('katprep_shared')
 
 
 class APILevelNotSupportedException(Exception):
-    """Dummy class for unsupported API levels"""
+    """
+    Dummy class for unsupported API levels
+
+.. class:: APILevelNotSupportedException
+    """
     pass
 
 
 
 def get_credentials(prefix, input_file=None):
-    """Retrieves credentials for a particular external system (e.g. Satellite).
+    """
+    Retrieves credentials for a particular external system (e.g. Satellite).
 
-    Keyword arguments:
-    prefix -- prefix for the external system (used in variables and prompts)
-    input_file -- name of auth file (default none)
+    :param prefix: prefix for the external system (used in variables/prompts)
+    :type prefix: str
+    :param input_file: name of the auth file (default: none)
+    :type input_file: str
     """
     if input_file:
         LOGGER.debug("Using authfile")
@@ -57,7 +58,8 @@ def get_credentials(prefix, input_file=None):
             s_username = raw_input(prefix + " Username: ")
             s_password = getpass.getpass(prefix + " Password: ")
             return (s_username, s_password)
-    elif prefix.upper()+"_LOGIN" in os.environ and prefix.upper()+"_PASSWORD" in os.environ:
+    elif prefix.upper()+"_LOGIN" in os.environ and \
+        prefix.upper()+"_PASSWORD" in os.environ:
         #shell variables
         LOGGER.debug("Checking {} shell variables".format(prefix))
         return (os.environ[prefix.upper()+"_LOGIN"], \
@@ -105,10 +107,11 @@ def get_credentials(prefix, input_file=None):
 
 
 def is_writable(path):
-    """Checks whether a particular directory is writable.
+    """
+    Checks whether a particular directory is writable.
 
-    Keyword arguments:
-    path -- path to check for write access
+    :param path: path to check for write access
+    :type path: str
     """
     if os.access(os.path.dirname(path), os.W_OK):
         return True
@@ -118,20 +121,22 @@ def is_writable(path):
 
 
 def is_exe(file_path):
-    """Returns whether a file is an executable
+    """
+    Returns whether a file is an executable
 
-    Keyword arguments:
-    file_path -- path to the file
+    :param file_path: path to the file
+    :type file_path: str
     """
     return os.path.isfile(file_path) and os.access(file_path, os.X_OK)
 
 
 
 def which(command):
-    """Checks whether a command name links to an existing binary (like whoami).
+    """
+    Checks whether a command name links to an existing binary (like whoami).
 
-    Keyword arguments:
-    command -- command name to check
+    :param command: command name to check
+    :type command: str
     """
     #stackoverflow.com/questions/377017/test-if-executable-exists-in-python
 
@@ -150,10 +155,11 @@ def which(command):
 
 
 def get_json(filename):
-    """Reads a JSON file and returns the whole content as one-liner.
+    """
+    Reads a JSON file and returns the whole content as one-liner.
 
-    Keyword arguments:
-    filename -- the JSON filename
+    :param filename: the JSON filename
+    :type filename: str
     """
     try:
         with open(filename, "r") as json_file:
@@ -165,10 +171,11 @@ def get_json(filename):
 
 
 def is_valid_report(filename):
-    """Checks whether a JSON file contains a valid snapshot report.
+    """
+    Checks whether a JSON file contains a valid snapshot report.
 
-    Keyword arguments:
-    filename -- the JSON filename
+    :param filename: the JSON filename
+    :type filename: str
     """
     if not os.path.exists(filename) or not os.access(filename, os.R_OK):
         raise argparse.ArgumentTypeError("File '{}' non-existent or not" \
@@ -191,12 +198,14 @@ def is_valid_report(filename):
 
 
 def validate_filters(options, api_client):
-    """Ensures using IDs for the Foreman API rather than human-readable names.
+    """
+    Ensures using IDs for the Foreman API rather than human-readable names.
     This is done by detecting strings and translating them into IDs.
 
-    Keyword arguments:
-    options -- argparse option object
-    api_client -- ForemanAPIClient object
+    :param options: argparse options dict
+    :type options: dict
+    :param api_client: ForemanAPIClient object
+    :type api_client: ForemanAPIClient
     """
     if options.location.isdigit() == False:
         options.location = api_client.get_id_by_name(
@@ -214,11 +223,13 @@ def validate_filters(options, api_client):
 
 
 def get_filter(options, api_object):
-    """Sets up a filter URL based on arguments set-up with argpase.
+    """
+    Sets up a filter URL based on arguments set-up with argpase.
 
-    Keyword arguments:
-    options -- argparse option object
-    api_object -- Foreman object type (e.g. host, environment)
+    :param options: argparse options dict
+    :type options: dict
+    :param api_object: Foreman object type (e.g. host, environment)
+    :type api_object: str
     """
     if options.location:
         return "/locations/{}/{}s".format(options.location, api_object)
@@ -237,12 +248,32 @@ def get_filter(options, api_object):
 
 
 class ForemanAPIClient:
-    """Class for accessing the Foreman API."""
+    """
+    Class for communicating with the Foreman API.
+
+.. class:: ForemanAPIClient
+    """
     API_MIN = 2
-    HEADERS = {'User-Agent': 'katprep Toolkit (https://github.com/stdevel/katprep)'}
+    """
+    int: Minimum supported API version. You really don't want to use v1.
+    """
+    HEADERS = {'User-Agent': 'katprep (https://github.com/stdevel/katprep)'}
+    """
+    dict: Default headers set for every HTTP request
+    """
 
     def __init__(self, hostname, username, password):
-        """Constructor, creating the class."""
+        """
+        Constructor, creating the class. It requires specifying a
+        hostname, username and password to access the API.
+
+        :param hostname: Foreman host
+        :type hostname: str
+        :param username: API username
+        :type username: str
+        :param password: corresponding password
+        :type password: str
+        """
         self.hostname = self.validate_hostname(hostname)
         self.username = username
         self.password = password
@@ -252,15 +283,32 @@ class ForemanAPIClient:
 
     #TODO: find a nicer way to displaying _all_ the hits...
     def api_request(self, method, sub_url, payload="", hits=1337, page=1):
-        """Sends a HTTP request to the Foreman API.
-
-        Keyword arguments:
-        method -- HTTP request method (GET, POST, DELETE, PUT)
-        sub_url -- relative path within the API tree (e.g. /hosts)
-        payload -- payload for POST/PUT requests
-        hits -- numbers of hits/page for GET requests (sadly it must be set)
-        page -- number of page/results to display (sadly this must be set, too)
         """
+        Sends a HTTP request to the Foreman API. This function requires
+        a valid HTTP method and a sub-URL (such as /hosts). Optionally,
+        you can also specify payload (for POST, DELETE, PUT) and hits/page
+        and a page number (when retrieving data using GET).
+        There are also alias functions available.
+
+        :param method: HTTP request method (GET, POST, DELETE, PUT)
+        :type method: str
+        :param sub_url: relative path within the API tree (e.g. /hosts)
+        :type sub_url: str
+        :param payload: payload for POST/PUT requests
+        :type payload: str
+        :param hits: numbers of hits/page for GET requests (must be set sadly)
+        :type hits: int
+        :param page: number of page/results to display (must be set sadly)
+        :type page: int
+
+.. todo:: Find a nicer way to display all hits, we shouldn't use 1337 hits/page
+
+.. seealso:: api_get()
+.. seealso:: api_post()
+.. seealso:: api_put()
+.. seealso:: api_delete()
+        """
+        #TODO. implement sessions!
         #send request to API
         try:
             if method.lower() not in ["get", "post", "delete", "put"]:
@@ -318,46 +366,64 @@ class ForemanAPIClient:
 
     #Aliases
     def api_get(self, sub_url, hits=1337, page=1):
-        """Sends a GET request to the Foreman API.
+        """
+        Sends a GET request to the Foreman API. This function requires a
+        sub-URL (such as /hosts) and - optionally - hits/page and page
+        definitons.
 
-        Keyword arguments:
-        sub_url -- relative path within the API tree (e.g. /hosts)
-        hits -- numbers of hits/page for GET requests (sadly it must be set)
-        page -- number of page/results to display (sadly this must be set, too)
+        :param sub_url: relative path within the API tree (e.g. /hosts)
+        :type sub_url: str
+        :param hits: numbers of hits/page for GET requests (must be set sadly)
+        :type hits: int
+        :param page: number of page/results to display (must be set sadly)
+        :type page: int
         """
         return self.api_request("get", sub_url, "", hits, page)
 
     def api_post(self, sub_url, payload):
-        """Sends a POST request to the Foreman API.
+        """
+        Sends a POST request to the Foreman API. This function requires a
+        sub-URL (such as /hosts/1) and payload data.
 
-        Keyword arguments:
-        sub_url -- relative path within the API tree (e.g. /hosts)
-        payload -- payload for POST/PUT requests
+        :param sub_url: relative path within the API tree (e.g. /hosts)
+        :type sub_url: str
+        :param payload: payload for POST/PUT requests
+        :type payload: str
         """
         return self.api_request("post", sub_url, payload)
 
     def api_delete(self, sub_url, payload):
-        """Sends a DELETE request to the Foreman API.
+        """
+        Sends a DELETE request to the Foreman API. This function requires a
+        sub-URL (such as /hosts/2) and payload data.
 
-        Keyword arguments:
-        sub_url -- relative path within the API tree (e.g. /hosts)
-        payload -- payload for POST/PUT requests
+        :param sub_url: relative path within the API tree (e.g. /hosts)
+        :type sub_url: str
+        :param payload: payload for POST/PUT requests
+        :type payload: str
         """
         return self.api_request("delete", sub_url, payload)
 
     def api_put(self, sub_url, payload):
-        """Sends a PUT request to the Foreman API.
+        """
+        Sends a PUT request to the Foreman API. This function requires a
+        sub-URL (such as /hosts/3) and payload data.
 
-        Keyword arguments:
-        sub_url -- relative path within the API tree (e.g. /hosts)
-        payload -- payload for POST/PUT requests
+        :param sub_url: relative path within the API tree (e.g. /hosts)
+        :type sub_url: str
+        :param payload: payload for POST/PUT requests
+        :type payload: str
         """
         return self.api_request("put", sub_url, payload)
 
 
 
     def validate_api_support(self):
-        """Checks whether the API version on the Foreman server is supported"""
+        """
+        Checks whether the API version on the Foreman server is supported.
+        Using older version than API v2 is not recommended. In this case, an
+        exception will be thrown.
+        """
         try:
             #get api version
             result_obj = json.loads(
@@ -377,12 +443,13 @@ class ForemanAPIClient:
 
 
     def validate_hostname(self, hostname):
-        """Validates that the Foreman API uses a FQDN as hostname.
-        Also looks up localhost definitions and uses the "real" hostname.
+        """
+        Validates that the Foreman API uses a FQDN as hostname.
+        Also looks up the "real" hostname if "localhost" is specified.
         Otherwise, the picky Foreman API won't connect.
 
-        Keyword arguments:
-        hostname -- the hostname to validate
+        :param hostname: the hostname to validate
+        :type hostname: str
         """
         if hostname == "localhost":
             #get real hostname
@@ -408,13 +475,17 @@ class ForemanAPIClient:
         #name -- Foreman object name
         #api_object -- Foreman object type (e.g. host, environment)
         #"""
-    
-    def get_id_by_name(self, name, api_object):
-        """Returns a Foreman object's internal ID by its name.
 
-        Keyword arguments:
-        name -- Foreman object name
-        api_object -- Foreman object type (e.g. host, environment)
+    def get_id_by_name(self, name, api_object):
+        """
+        Returns a Foreman object's internal ID by its name. Currently,
+        this function works fine for hostgroups, locations, organizations,
+        environments and hosts.
+
+        :param name: Foreman object name
+        :type name: str
+        :param api_object: Foreman object type (e.g. host, environment)
+        :type api_object: str
         """
         valid_objects = [
             "hostgroup", "location", "organization", "environment", "host"
@@ -447,11 +518,13 @@ class ForemanAPIClient:
 
 
     def get_hostparam_id_by_name(self, host, param_name):
-        """Returns a Foreman host parameter's internal ID by its name.
+        """
+        Returns a Foreman host parameter's internal ID by its name.
 
-        Keyword arguments:
-        host -- Foreman host object ID
-        param_name -- host parameter name
+        :param host: Foreman host object ID
+        :type host: int
+        :param param_name: host parameter name
+        :type param_name: str
         """
         try:
             result_obj = json.loads(

@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-katprep_snapshot.py - a script for creating a snapshot
-report of available errata and updates for systems
-managed with Foreman/Katello or Red Hat Satellite 6.
-
-2017 By Christian Stankowic
-<info at stankowic hyphen development dot net>
-https://github.com/stdevel/katprep
+A script for creating a snapshot report of available errata and updates for
+systems managed with Foreman/Katello or Red Hat Satellite 6.
 """
 
 import argparse
@@ -137,7 +132,7 @@ def scan_systems():
                 #add some additional information required for katprep_report
                 SYSTEM_ERRATA[system["name"]]["params"]["name"] = params_obj["name"]
                 SYSTEM_ERRATA[system["name"]]["params"]["ip"] = params_obj["ip"]
-                SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  "OWNER"
+                SYSTEM_ERRATA[system["name"]]["params"]["owner"] = "OWNER"
                 #SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
                     #SAT_CLIENT.get_id_by_name(params_obj["owner_id"], "user")
                 SYSTEM_ERRATA[system["name"]]["params"]["organization"] = params_obj["organization_name"]

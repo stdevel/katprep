@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-katprep_report.py - a script for creating maintenance
-reports including installed errata per system managed
-with Foreman/Katello or Red Hat Satellite 6.
-
-2017 By Christian Stankowic
-<info at stankowic hyphen development dot net>
-https://github.com/stdevel/katprep
+A script for creating maintenance reports including installed errata per system
+managed with Foreman/Katello or Red Hat Satellite 6.
 """
 
 import argparse
@@ -81,63 +76,104 @@ def parse_options(args=None):
 
 
 def check_pandoc():
-    """Checks the Pandoc installation."""
+    """
+    Checks the Pandoc installation by ensuring that the ``pandoc`` binary is
+    available from the command line.
+    """
     if not which("pandoc"):
         return False
     return True
 
 
 
-def get_newer_report(file_a, file_b, reverse=False):
-    """Returns the newer/older file of two files.
+def get_file_by_age(file_a, file_b, return_older=False):
+    """
+    Returns the newer/older file of two files. The creation time of the
+    files is used as inidicator.
+    There are also two alias functions available:
 
-    Keyword arguments:
-    file_a -- a file
-    file_b -- another file
-    reverse -- returns the older file
+    :param file_a: a file
+    :type file_a: str
+    :param file_b: another file
+    :type file_b: str
+    :param return_older: returns the older file if set to True
+    :type return_older: bool
+
+.. seealso:: get_newer_file()
+.. seealso:: get_older_file()
     """
     try:
         if os.path.getctime(file_a) < os.path.getctime(file_b):
             #file_b is newer
-            if reverse:
+            if return_older:
                 return file_a
             else:
                 return file_b
         else:
             #file_a is newer
-            if reverse:
+            if return_older:
                 return file_b
             else:
                 return file_a
     except IOError as err:
         LOGGER.error("Unable to open file: '{}'".format(err))
 
+def get_newer_file(file_a, file_b):
+    """
+    Returns the newer of two files. The creation file of the files is used
+    as indicator.
+
+    :param file_a: a file
+    :type file_a: str
+    :param file_b: another file
+    :type file_b: str
+    """
+    return get_file_by_age(file_a, file_b)
+
+def get_older_file(file_a, file_b):
+    """
+    Returns the older of two files. The creation time of the files is used
+    as indicator.
+
+    :param file_a: a file
+    :type file_a: str
+    :param file_b: another file
+    :type file_b: str
+    """
+    return get_file_by_age(file_a, file_b, True)
+
 
 
 def analyze_reports():
-    """Finds and loads report data."""
+    """
+    Finds and loads report data. This function compares the two report files
+    passed as arguments and assigns them to dedicated dictionaries (*older and
+    *newer report*).
+    """
     global REPORT_OLD, REPORT_NEW
 
     #load reports
     REPORT_OLD = json.loads(get_json(
-        get_newer_report(options.reports[0], options.reports[1], True)
+        get_older_file(options.reports[0], options.reports[1])
     ))
     REPORT_NEW = json.loads(get_json(
-        get_newer_report(options.reports[0], options.reports[1])
+        get_newer_file(options.reports[0], options.reports[1])
     ))
     LOGGER.debug("Old report ist '{}', new report is '{}'".format(
-        get_newer_report(options.reports[0], options.reports[1], True),
-        get_newer_report(options.reports[0], options.reports[1])
+        get_older_file(options.reports[0], options.reports[1]),
+        get_newer_file(options.reports[0], options.reports[1])
         ))
 
 
 
 def get_errata_by_host(report, hostname):
-    """Returns all errata by a particular host in a report.
+    """
+    Returns all errata by a particular host in a report.
 
-    Keyword arguments:
-    report -- JSON report content
-    host -- hostname
+    :param report: JSON report content
+    :type report: str
+    :param host: hostname
+    :type host: str
     """
     #TODO: find a nicer way to do this -> list comprehension?
     errata = []
@@ -151,7 +187,10 @@ def get_errata_by_host(report, hostname):
 
 
 def create_delta():
-    """Creats delta reports."""
+    """
+    Creats delta YAML reports per system. This is done by comparing the two
+    snapshot reports passed as arguments.
+    """
     global REPORT_OLD
     #open old report and remove entries from newer report
     for host in REPORT_OLD:
@@ -166,7 +205,7 @@ def create_delta():
         #store delta report
         #TODO: Integrate verify data!
         timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
-            get_newer_report(options.reports[0], options.reports[1])
+            get_newer_file(options.reports[0], options.reports[1])
         )).strftime('%Y%m%d')
 
         #store YAML files
@@ -179,11 +218,14 @@ def create_delta():
 
 
 def create_reports():
-    """Creates patch reports"""
+    """
+    Creates patch reports per system. This is done by translating the
+    YAML reports created previously into the desired format using ``pandoc``.
+    """
     for host in REPORT_OLD:
         LOGGER.debug("Creating report for host '{}'".format(host))
         timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
-            get_newer_report(options.reports[0], options.reports[1])
+            get_newer_file(options.reports[0], options.reports[1])
         )).strftime('%Y%m%d')
         filename = "{}errata-diff-{}-{}".format(
             options.output_path, host, timestamp
@@ -203,7 +245,7 @@ def main(options):
     #set template
     if options.template_file == "":
         options.template_file = "./template.html"
-    if options.template_file.rfind(".") != -1:
+    if "." in options.template_file:
         #set extension as output type
         options.output_type = \
         options.template_file[options.template_file.rfind(".")+1:].lower()

@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-katprep_parameters.py - a script for managing
-Puppet host parameters for systems managed with
+A script for managing Puppet host parameters for systems managed with
 Foreman/Katello or Red Hat Satellite 6.
-
-2017 By Christian Stankowic
-<info at stankowic hyphen development dot net>
-https://github.com/stdevel/katprep
 """
 
 import argparse
@@ -43,7 +38,12 @@ def list_params():
 
 #TODO: clean this mess by supplying functions for branches
 def manage_params():
-    """Adds/removes/displays/updates parameter definitions."""
+    """
+    Adds/removes/displays/updates parameter definitions.
+
+.. todo:: This function needs to be split into multiple functions in order to optimize readability.
+    """
+
     #get all the hosts depending on the filter
     filter_url = get_filter(options, "host")
     LOGGER.debug("Filter URL will be '{}'".format(filter_url))
@@ -251,7 +251,6 @@ def parse_options(args=None):
 
 def main(options):
     """Main function, starts the logic based on parameters."""
-    #global SAT_CLIENT, values, parameters
     global SAT_CLIENT
 
     LOGGER.debug("Options: {0}".format(options))
