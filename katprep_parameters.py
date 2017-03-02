@@ -29,9 +29,9 @@ def list_params():
     """Lists all pre-defined parameters and values."""
     #global parameters
 
-    for param in PARAMETERS:
+    for key, value in PARAMETERS.items():
         LOGGER.info(
-            "Setting '{}' will define '{}'".format(param, PARAMETERS[param])
+            "Setting '{}' will define '{}'".format(key, value)
         )
 
 

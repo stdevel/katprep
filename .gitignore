@@ -9,4 +9,6 @@ errata-*.html
 errata-*.yml
 errata-*.md
 test*
+test/*
 TODO
+.buildinfo

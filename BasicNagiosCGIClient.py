@@ -111,7 +111,7 @@ class BasicNagiosCGIClient:
         :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
         :type sub_url: str
         """
-        return self.api_request(self, "get", sub_url)
+        return self.api_request("get", sub_url)
 
     def api_post(self, sub_url, payload):
         """
