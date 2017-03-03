@@ -8,8 +8,8 @@ Foreman/Katello or Red Hat Satellite 6.
 import argparse
 import logging
 import json
-from katprep_shared import get_credentials, ForemanAPIClient, \
-validate_filters, get_filter
+from katprep_shared import get_credentials, validate_filters, get_filter
+from ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_parameters')
@@ -36,12 +36,73 @@ def list_params():
 
 
 
-#TODO: clean this mess by supplying functions for branches
+def change_param(host, mode="add", dry_run=True):
+    """
+    Adds/updates/removes parameters for a particular host. For this, a
+    host result object and a mode need to be specified.
+
+    :param host: Foreman API result dictionary
+    :type host: dict
+    :param mode: Mode (add, delete, update)
+    """
+    if mode.lower() == "delete":
+        LOGGER.debug("Deleting parameter...")
+    elif mode.lower() == "update":
+        LOGGER.debug("Updating parameter...")
+    else:
+        LOGGER.debug("Adding parameter...")
+
+    #add _all_ the params
+    for param in PARAMETERS:
+        if dry_run:
+            LOGGER.info(
+                "Host '{}' (#{}) --> {} parameter '{}'".format(
+                    host["name"], host["id"], mode, param
+                )
+            )
+        else:
+            #get ID of parameter
+            if mode.lower() != "add":
+                param_id = SAT_CLIENT.get_hostparam_id_by_name(
+                    host["id"], param
+                )
+
+            #set payload
+            payload = {}
+            if mode.lower() == "delete":
+                #set parameter ID
+                payload["parameter"] = {"id": param_id}
+            else:
+                #set parameter name/value
+                payload["parameter"] = {
+                    "name": param, "value": VALUES[param]
+                }
+            LOGGER.debug(
+                "JSON payload: {}".format(json.dumps(payload))
+            )
+
+            #send request
+            if mode.lower() == "del":
+                #delete parameter
+                SAT_CLIENT.api_delete(
+                    "/hosts/{}/parameters/{}".format(host["id"], param_id),
+                    json.dumps(payload))
+            elif mode.lower() == "update":
+                #update parameter
+                SAT_CLIENT.api_put(
+                    "/hosts/{}/parameters/{}".format(host["id"], param_id),
+                    json.dumps(payload))
+            else:
+                #add parameter
+                SAT_CLIENT.api_post("/hosts/{}/parameters".format(
+                    host["id"]
+                ), json.dumps(payload))
+
+
+
 def manage_params():
     """
     Adds/removes/displays/updates parameter definitions.
-
-.. todo:: This function needs to be split into multiple functions in order to optimize readability.
     """
 
     #get all the hosts depending on the filter
@@ -58,77 +119,11 @@ def manage_params():
         )
         #execute action
         if options.action_add:
-            LOGGER.debug("Adding parameters...")
-
-            #add _all_ the params
-            for param in PARAMETERS:
-                if options.dry_run:
-                    LOGGER.info(
-                        "Host '{}' (#{}) --> Add parameter '{}'".format(
-                            entry["name"], entry["id"], param
-                        )
-                    )
-                else:
-                    payload = {}
-                    payload["parameter"] = {
-                        "name": param, "value": VALUES[param]
-                    }
-                    LOGGER.debug(
-                        "JSON payload: {}".format(json.dumps(payload))
-                    )
-                    SAT_CLIENT.api_post("/hosts/{}/parameters".format(
-                        entry["id"]
-                    ), json.dumps(payload))
+            change_param(entry, "add", options.dry_run)
         elif options.action_update:
-            LOGGER.debug("Updating parameters...")
-
-            #update _all_ the params
-            for param in PARAMETERS:
-                if options.dry_run:
-                    LOGGER.info(
-                        "Host '{}' (#{}) --> Update parameter '{}' value"
-                        " to '{}'".format(
-                            entry["name"], entry["id"], param, VALUES[param]
-                        )
-                    )
-                else:
-                    param_id = SAT_CLIENT.get_hostparam_id_by_name(
-                        entry["id"], param
-                    )
-                    payload = {}
-                    payload["parameter"] = {
-                        "name": param, "value": VALUES[param]
-                    }
-                    LOGGER.debug(
-                        "JSON payload: {}".format(json.dumps(payload))
-                    )
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/parameters/{}".format(entry["id"], param_id),
-                        json.dumps(payload))
-
+            change_param(entry, "update", options.dry_run)
         elif options.action_remove:
-            LOGGER.debug("Removing parameters...")
-
-            #remove _all_ the parms
-            for param in PARAMETERS:
-                if options.dry_run:
-                    LOGGER.info(
-                        "Host '{}' (#{}) --> Remove parameter '{}'".format(
-                            entry["name"], entry["id"], param
-                        )
-                    )
-                else:
-                    #delete particular parameter
-                    param_id = SAT_CLIENT.get_hostparam_id_by_name(
-                        entry["id"], param
-                    )
-                    payload = {}
-                    payload["parameter"] = {"id": param_id}
-                    LOGGER.debug("JSON payload: {}".format(
-                        json.dumps(payload)))
-                    SAT_CLIENT.api_delete(
-                        "/hosts/{}/parameters/{}".format(entry["id"], param_id),
-                        json.dumps(payload))
+            change_param(entry, "del", options.dry_run)
         else:
             LOGGER.debug("Displaying parameter values...")
 
@@ -159,14 +154,14 @@ def manage_params():
 def parse_options(args=None):
     """Parses options and arguments."""
     desc = '''katprep_parameters.py is used for managing Puppet host parameters
-     for systems managed with Foreman/Katello or Red Hat Satellite 6. You can
-     create, remove and audit host parameters for all systems. These parameters
-     are evaluated by katprep_snapshot.py to create significant reports.
+    for systems managed with Foreman/Katello or Red Hat Satellite 6. You can
+    create, remove and audit host parameters for all systems. These parameters
+    are evaluated by katprep_snapshot.py to create significant reports.
     Login credentials need to be entered interactively or specified using
-     environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an authfile.
+    environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an authfile.
     When using an authfile, ensure that the file permissions are 0600 -
-     otherwise the script will abort. The first line needs to contain the
-     username, the second line represents the appropriate password.
+    otherwise the script will abort. The first line needs to contain the
+    username, the second line represents the appropriate password.
     '''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''

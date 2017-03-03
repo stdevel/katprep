@@ -23,6 +23,22 @@ class BasicNagiosCGIClient:
     """
     dict: Default headers set for every HTTP request
     """
+    URL = ""
+    """
+    str: Nagios/Icinga URL
+    """
+    USERNAME = ""
+    """
+    str: API username
+    """
+    PASSWORD = ""
+    """
+    str: API password
+    """
+    SESSION = None
+    """
+    session: API session
+    """
 
     def __init__(self, url, username="", password=""):
         """
@@ -40,9 +56,23 @@ class BasicNagiosCGIClient:
         if url[len(url)-1:] != "/":
             #add trailing slash
             url = "{}/".format(url)
-        self.url = url
-        self.username = username
-        self.password = password
+        #set connection details and connect
+        self.URL = url
+        self.USERNAME = username
+        self.PASSWORD = password
+        self.connect()
+
+
+
+    def connect(self):
+        """
+        This function establishes a connection to Nagios/Icinga.
+        """
+        self.SESSION = requests.Session()
+        if self.USERNAME != "":
+            self.SESSION.auth = HTTPBasicAuth(self.USERNAME, self.PASSWORD)
+
+
 
     def api_request(self, method, sub_url, payload=""):
         """
@@ -67,22 +97,17 @@ class BasicNagiosCGIClient:
                 #going home
                 raise ValueError("Illegal method '{}' specified".format(method))
 
-            #start session
-            session = requests.Session()
-            if self.username != "":
-                session.auth = HTTPBasicAuth(self.username, self.password)
-
             #execute request
             if method.lower() == "post":
                 #POST
-                result = session.post(
-                    "{}{}".format(self.url, sub_url),
+                result = self.SESSION.post(
+                    "{}{}".format(self.URL, sub_url),
                     headers=self.HEADERS, data=payload
                     )
             else:
                 #GET
-                result = session.get(
-                    "{}{}".format(self.url, sub_url),
+                result = self.SESSION.get(
+                    "{}{}".format(self.URL, sub_url),
                     headers=self.HEADERS
                     )
 
@@ -176,7 +201,7 @@ class BasicNagiosCGIClient:
                 'com_data': comment, 'trigger': '0', 'fixed': '1',
                 'hours': hours, 'minutes': '0', 'start_time': current_time,
                 'end_time': end_time, 'btnSubmit': 'Commit',
-                'com_author': self.username, 'childoptions': '0', 'ahas': 'on'}
+                'com_author': self.USERNAME, 'childoptions': '0', 'ahas': 'on'}
         else:
             if remove_downtime:
                 payload = {
@@ -188,7 +213,7 @@ class BasicNagiosCGIClient:
                     'com_data': comment, 'trigger': '0', 'fixed': '1',
                     'hours': hours, 'minutes': '0', 'start_time': current_time,
                     'end_time': end_time, 'btnSubmit': 'Commit',
-                    'com_author': self.username, 'childoptions': '0'}
+                    'com_author': self.USERNAME, 'childoptions': '0'}
 
         #send POST
         return self.api_post("/cgi-bin/cmd.cgi", payload)

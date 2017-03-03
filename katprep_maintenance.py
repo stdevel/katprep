@@ -10,6 +10,7 @@ import logging
 #import json
 #from katprep_shared import get_credentials, ForemanAPIClient, \
 #validate_filters, get_filter
+#from ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_maintenance')

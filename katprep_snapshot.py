@@ -9,8 +9,9 @@ import argparse
 import logging
 import json
 import time
-from katprep_shared import get_credentials, is_writable, \
-ForemanAPIClient, validate_filters, get_filter
+from katprep_shared import get_credentials, is_writable, validate_filters, \
+get_filter
+from ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_snapshot')

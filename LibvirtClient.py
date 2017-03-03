@@ -15,6 +15,22 @@ class LibvirtClient:
     """
 .. class:: LibvirtClient
     """
+    USERNAME = ""
+    """
+    str: libvirt API username
+    """
+    PASSWORD = ""
+    """
+    str: libvirt API password
+    """
+    URI = ""
+    """
+    str: libvirt URI
+    """
+    SESSION = None
+    """
+    session: libvirt session
+    """
 
     def __init__(self, uri, username, password):
         """
@@ -30,12 +46,15 @@ class LibvirtClient:
         :param password: corresponding password
         :type password: str
         """
+        #validate and set URI
         if self.validate_uri(uri):
-            self.uri = uri
+            self.URI = uri
         else:
             raise ValueError("Invalid URI string specified!")
-        self.username = username
-        self.password = password
+        #set connection details and connect
+        self.USERNAME = username
+        self.PASSWORD = password
+        self.connect()
 
 
 
@@ -53,6 +72,7 @@ class LibvirtClient:
             "vz", "bhyve", "esx", "vpx", "vmwareplayer", "vmwarews",
             "vmwarefusion"
         }
+        #check whether a valid prefix was found
         for prefix in prefixes:
             if prefix in uri and "://" in uri:
                 return True
@@ -61,12 +81,16 @@ class LibvirtClient:
 
 
     def connect(self):
-        """This function establishes a connection to the hypervisor"""
+        """This function establishes a connection to the hypervisor."""
+        #create weirdo auth dict
         auth = [
             [libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE],
             self.retrieve_credentials, None
             ]
-        return libvirt.openAuth(self.uri, auth, 0)
+        #authenticate
+        self.SESSION = libvirt.openAuth(self.URI, auth, 0)
+        if self.SESSION == None:
+            LOGGER.error("Unable to establish connection to hypervisor!")
 
 
 
@@ -84,18 +108,20 @@ class LibvirtClient:
         #get credentials for libvirt
         for credential in credentials:
             if credential[0] == libvirt.VIR_CRED_AUTHNAME:
-                credential[4] = self.username
+                credential[4] = self.USERNAME
                 if len(credential[4]) == 0:
                     credential[4] = credential[3]
             elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
-                credential[4] = self.password
+                credential[4] = self.PASSWORD
             else:
                 return -1
         return 0
 
 
 
-    def manage_snapshot(self, vm_name, snapshot_title, snapshot_text, remove_snapshot=False):
+    def manage_snapshot(
+            self, vm_name, snapshot_title, snapshot_text, remove_snapshot=False
+        ):
         """
         Creates/removes a snapshot for a particular virtual machine.
         This requires specifying a VM, comment title and text.
@@ -111,15 +137,9 @@ class LibvirtClient:
         :type remove_snapshot: bool
 
         """
-        #connect to hypervisor
-        conn = self.connect()
-
-        if conn == None:
-            LOGGER.error("Unable to establish connection to hypervisor!")
-            return False
 
         try:
-            target_vm = conn.lookupByName(vm_name)
+            target_vm = self.SESSION.lookupByName(vm_name)
             if remove_snapshot:
                 #remove snapshot
                 target_snap = target_vm.snapshotLookupByName(snapshot_title, 0)
@@ -180,13 +200,9 @@ class LibvirtClient:
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
-        #connect to hypervisor
-        conn = self.connect()
-
-        if conn == None:
-            raise ValueError("Unsable to establish connection to hypervisor!")
         try:
-            target_vm = conn.lookupByName(vm_name)
+            #find VM and get all snapshots
+            target_vm = self.SESSION.lookupByName(vm_name)
             target_snapshots = target_vm.snapshotListNames(0)
             if snapshot_title in target_snapshots:
                 return True
