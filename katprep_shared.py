@@ -13,6 +13,9 @@ import json
 import argparse
 
 LOGGER = logging.getLogger('katprep_shared')
+"""
+logging: Logger instance
+"""
 
 
 

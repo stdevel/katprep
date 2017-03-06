@@ -7,10 +7,7 @@ APILevelNotSupportedExceptrion classes
 
 import logging
 import requests
-import os
-import stat
 import json
-import argparse
 import socket
 
 LOGGER = logging.getLogger('ForemanAPIClient')
@@ -65,7 +62,8 @@ class ForemanAPIClient:
     def __init__(self, hostname, username, password):
         """
         Constructor, creating the class. It requires specifying a
-        hostname, username and password to access the API.
+        hostname, username and password to access the API. After
+        initialization, a connected is established.
 
         :param hostname: Foreman host
         :type hostname: str
@@ -79,12 +77,12 @@ class ForemanAPIClient:
         self.PASSWORD = password
         self.URL = "https://{0}/api/v2".format(self.HOSTNAME)
         #start session and check API version
-        self.connect()
+        self.__connect()
         self.validate_api_support()
 
 
 
-    def connect(self):
+    def __connect(self):
         """This function establishes a connection to Foreman."""
         global SESSION
         self.SESSION = requests.Session()
@@ -93,7 +91,7 @@ class ForemanAPIClient:
 
 
     #TODO: find a nicer way to displaying _all_ the hits...
-    def api_request(self, method, sub_url, payload="", hits=1337, page=1):
+    def __api_request(self, method, sub_url, payload="", hits=1337, page=1):
         """
         Sends a HTTP request to the Foreman API. This function requires
         a valid HTTP method and a sub-URL (such as /hosts). Optionally,
@@ -188,7 +186,7 @@ class ForemanAPIClient:
         :param page: number of page/results to display (must be set sadly)
         :type page: int
         """
-        return self.api_request("get", sub_url, "", hits, page)
+        return self.__api_request("get", sub_url, "", hits, page)
 
     def api_post(self, sub_url, payload):
         """
@@ -200,7 +198,7 @@ class ForemanAPIClient:
         :param payload: payload for POST/PUT requests
         :type payload: str
         """
-        return self.api_request("post", sub_url, payload)
+        return self.__api_request("post", sub_url, payload)
 
     def api_delete(self, sub_url, payload):
         """
@@ -212,7 +210,7 @@ class ForemanAPIClient:
         :param payload: payload for POST/PUT requests
         :type payload: str
         """
-        return self.api_request("delete", sub_url, payload)
+        return self.__api_request("delete", sub_url, payload)
 
     def api_put(self, sub_url, payload):
         """
@@ -224,7 +222,7 @@ class ForemanAPIClient:
         :param payload: payload for POST/PUT requests
         :type payload: str
         """
-        return self.api_request("put", sub_url, payload)
+        return self.__api_request("put", sub_url, payload)
 
 
 
@@ -252,7 +250,8 @@ class ForemanAPIClient:
 
 
 
-    def validate_hostname(self, hostname):
+    @staticmethod
+    def validate_hostname(hostname):
         """
         Validates that the Foreman API uses a FQDN as hostname.
         Also looks up the "real" hostname if "localhost" is specified.

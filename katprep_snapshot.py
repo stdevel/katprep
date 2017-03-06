@@ -14,10 +14,25 @@ get_filter
 from ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
+"""
+str: Program version
+"""
 LOGGER = logging.getLogger('katprep_snapshot')
+"""
+logging: Logger instance
+"""
 SAT_CLIENT = None
+"""
+ForemanAPIClient: Foreman API client handle
+"""
 SYSTEM_ERRATA = {}
+"""
+dict: Errata and parameter information per system
+"""
 OUTPUT_FILE = ""
+"""
+str: Output file
+"""
 
 
 
@@ -117,6 +132,7 @@ def scan_systems():
                 #errata applicable
                 SYSTEM_ERRATA[system["name"]] = {}
                 SYSTEM_ERRATA[system["name"]]["params"] = {}
+                SYSTEM_ERRATA[system["name"]]["verification"] = {}
                 SYSTEM_ERRATA[system["name"]]["errata"] = {}
                 result_obj = json.loads(
                     SAT_CLIENT.api_get("/hosts/{}/errata".format(system["id"]))
@@ -134,6 +150,7 @@ def scan_systems():
                 SYSTEM_ERRATA[system["name"]]["params"]["name"] = params_obj["name"]
                 SYSTEM_ERRATA[system["name"]]["params"]["ip"] = params_obj["ip"]
                 SYSTEM_ERRATA[system["name"]]["params"]["owner"] = "OWNER"
+                #TODO: get owner name by ID!
                 #SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
                     #SAT_CLIENT.get_id_by_name(params_obj["owner_id"], "user")
                 SYSTEM_ERRATA[system["name"]]["params"]["organization"] = params_obj["organization_name"]

@@ -12,16 +12,39 @@ from katprep_shared import get_credentials, validate_filters, get_filter
 from ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
+"""
+str: Program version
+"""
 LOGGER = logging.getLogger('katprep_parameters')
+"""
+logging: Logger instance
+"""
 SAT_CLIENT = None
+"""
+ForemanAPIClient: Foreman API client handle
+"""
 PARAMETERS = {
     "katprep_monitoring" : "Monitoring URL of the system",
     "katprep_virt" : "Virtualization URL of the system ($name@URL)",
     "katprep_virt_snapshot" : "Boolean whether system needs to be"\
     "protected by a snapshot before maintenance"}
+"""
+dict: Built-in default host parameters mandatory for katprep
+"""
+OPT_PARAMETERS = {
+    "katprep_monitoring_name" : "Object name within moniting if not FQDN",
+    "katprep_virt_name": "Object name within hypervisor if not FWDN"
+}
+"""
+dict: Built-in optional host parameters
+"""
 VALUES = {
-    "katprep_monitoring": "fixmepls", "katprep_virt": "fixmepls",
-    "katprep_virt_snapshot": ""}
+    "katprep_monitoring": "fixmepls", "katprep_monitoring_name": "fixmepls",
+    "katprep_virt": "fixmepls", "katprep_virt_snapshot": "0",
+    "katprep_virt_name": "fixmepls"}
+"""
+dict: Default values for built-in host parameters
+"""
 
 
 
@@ -52,8 +75,14 @@ def change_param(host, mode="add", dry_run=True):
     else:
         LOGGER.debug("Adding parameter...")
 
+    if options.action_addopt:
+        #add optional parameters
+        my_params = OPT_PARAMETERS
+    else:
+        #add mandatory parameters
+        my_params = PARAMETERS
     #add _all_ the params
-    for param in PARAMETERS:
+    for param in my_params:
         if dry_run:
             LOGGER.info(
                 "Host '{}' (#{}) --> {} parameter '{}'".format(
@@ -118,7 +147,7 @@ def manage_params():
             "Found host '{}' (#{}),".format(entry["name"], entry["id"])
         )
         #execute action
-        if options.action_add:
+        if options.action_add or options.action_addopt:
             change_param(entry, "add", options.dry_run)
         elif options.action_update:
             change_param(entry, "update", options.dry_run)
@@ -219,6 +248,10 @@ def parse_options(args=None):
     action_opts_excl.add_argument("-A", "--add-parameters", \
     action="store_true", default=False, dest="action_add", \
     help="adds built-in parameters to all affected hosts (default: no)")
+    #--add-optional-parameters
+    action_opts_excl.add_argument("--add-optional-parameters", \
+    action="store_true", default=False, dest="action_addopt", \
+    help="adds optional built-in parameters to all affected hosts (default: no)")
     #-R / --remove-parameters
     action_opts_excl.add_argument("-R", "--remove-parameters", \
     action="store_true", default=False, dest="action_remove", \

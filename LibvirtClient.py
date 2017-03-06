@@ -37,7 +37,8 @@ class LibvirtClient:
         Constructor, creating the class. It requires specifying a URI and
         a username and password for communicating with the hypervisor.
         The constructor will throw an exception if an invalid libvirt URI
-        was specified.
+        was specified. After initialization, a connection is established
+        automatically.
 
         :param uri: libvirt URI
         :type uri: str
@@ -54,11 +55,12 @@ class LibvirtClient:
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
-        self.connect()
+        self.__connect()
 
 
 
-    def validate_uri(self, uri):
+    @staticmethod
+    def validate_uri(uri):
         """
         Verifies a libvirt URI and throws an exception if the URI is invalid.
         This is done by checking if the URI contains one of the well-known
@@ -80,7 +82,7 @@ class LibvirtClient:
 
 
 
-    def connect(self):
+    def __connect(self):
         """This function establishes a connection to the hypervisor."""
         #create weirdo auth dict
         auth = [
@@ -119,7 +121,7 @@ class LibvirtClient:
 
 
 
-    def manage_snapshot(
+    def __manage_snapshot(
             self, vm_name, snapshot_title, snapshot_text, remove_snapshot=False
         ):
         """
@@ -151,7 +153,7 @@ class LibvirtClient:
                         snapshot_title, snapshot_text
                     )
                 return target_vm.snapshotCreateXML(snap_xml, 0)
-        except ValueError as err:
+        except libvirt.libvirtError as err:
             if remove_snapshot:
                 LOGGER.error("Unable to remove snapshot: '{}'".format(err))
             else:
@@ -172,7 +174,7 @@ class LibvirtClient:
         :param snapshot_text: Snapshot text
         :type snapshot_text: str
         """
-        return self.manage_snapshot(vm_name, snapshot_title, snapshot_text)
+        return self.__manage_snapshot(vm_name, snapshot_title, snapshot_text)
 
     def remove_snapshot(self, vm_name, snapshot_title):
         """
@@ -184,7 +186,7 @@ class LibvirtClient:
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
-        return self.manage_snapshot(
+        return self.__manage_snapshot(
             vm_name, snapshot_title, "", remove_snapshot=True
         )
 
@@ -206,5 +208,7 @@ class LibvirtClient:
             target_snapshots = target_vm.snapshotListNames(0)
             if snapshot_title in target_snapshots:
                 return True
+        except libvirt.libvirtError as err:
+            LOGGER.error("Unable to determine snapshot: '{}'".format(err))
         except Exception as err:
             raise err

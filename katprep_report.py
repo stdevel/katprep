@@ -15,21 +15,33 @@ import yaml
 from katprep_shared import is_writable, which, is_valid_report, get_json
 
 __version__ = "0.0.1"
+"""
+str: Program version
+"""
 LOGGER = logging.getLogger('katprep_report')
+"""
+logging: Logger instance
+"""
 REPORT_OLD = {}
+"""
+dict: Old snapshot report
+"""
 REPORT_NEW = {}
+"""
+dic: New snapshot report
+"""
 
 
 
 def parse_options(args=None):
     """Parses options and arguments."""
     desc = '''katprep_report.py is used for creating maintenance reports
-     including errata per system managed with Foreman/Katello or Red Hat
-     Satellite 6. The utility requires two snapshots: before and after
-     maintenance tasks were executed - just append the two files to the
-     command line.'''
+    including errata per system managed with Foreman/Katello or Red Hat
+    Satellite 6. The utility requires two snapshots: before and after
+    maintenance tasks were executed - just append the two files to the
+    command line.'''
     epilog = '''Check-out the website for more details:
-     http://github.com/stdevel/katprep'''
+    http://github.com/stdevel/katprep'''
     parser = argparse.ArgumentParser(description=desc, version=__version__, \
     epilog=epilog)
 
@@ -203,7 +215,7 @@ def create_delta():
                     ))
                 del REPORT_OLD[host]["errata"][i]
         #store delta report
-        #TODO: Integrate verify data!
+        #TODO: Integrate verify data - use first snapshot report!
         timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
             get_newer_file(options.reports[0], options.reports[1])
         )).strftime('%Y%m%d')
