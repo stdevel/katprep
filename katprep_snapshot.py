@@ -128,38 +128,38 @@ def scan_systems():
                 system["content_facet_attributes"]["errata_counts"]["enhancement"],
                 system["content_facet_attributes"]["errata_counts"]["total"]
             ))
+            #add columns
+            SYSTEM_ERRATA[system["name"]] = {}
+            SYSTEM_ERRATA[system["name"]]["params"] = {}
+            SYSTEM_ERRATA[system["name"]]["verification"] = {}
+            SYSTEM_ERRATA[system["name"]]["errata"] = {}
+            #add _all_ the katprep_* params
+            params_obj = json.loads(
+                SAT_CLIENT.api_get("/hosts/{}".format(system["id"]))
+            )
+            for entry in params_obj["parameters"]:
+                if "katprep_" in entry["name"]:
+                    #add key/value
+                    SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = {}
+                    SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = entry["value"]
+            #add some additional information required for katprep_report
+            SYSTEM_ERRATA[system["name"]]["params"]["name"] = params_obj["name"]
+            SYSTEM_ERRATA[system["name"]]["params"]["ip"] = params_obj["ip"]
+            SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
+                SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
+            SYSTEM_ERRATA[system["name"]]["params"]["organization"] = params_obj["organization_name"]
+            SYSTEM_ERRATA[system["name"]]["params"]["location"] = params_obj["location_name"]
+            SYSTEM_ERRATA[system["name"]]["params"]["environment"] = params_obj["environment_name"]
+            SYSTEM_ERRATA[system["name"]]["params"]["operatingsystem"] = params_obj["operatingsystem_name"]
+            if params_obj["facts"]["virt::is_guest"] == True:
+                SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = False
+            else:
+                SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
             if int(system["content_facet_attributes"]["errata_counts"]["total"]) > 0:
-                #errata applicable
-                SYSTEM_ERRATA[system["name"]] = {}
-                SYSTEM_ERRATA[system["name"]]["params"] = {}
-                SYSTEM_ERRATA[system["name"]]["verification"] = {}
-                SYSTEM_ERRATA[system["name"]]["errata"] = {}
+                #add _all_ the errata information
                 result_obj = json.loads(
                     SAT_CLIENT.api_get("/hosts/{}/errata".format(system["id"]))
                 )
-                #add _all_ the katprep_* params
-                params_obj = json.loads(
-                    SAT_CLIENT.api_get("/hosts/{}".format(system["id"]))
-                )
-                for entry in params_obj["parameters"]:
-                    if "katprep_" in entry["name"]:
-                        #add key/value
-                        SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = {}
-                        SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = entry["value"]
-                #add some additional information required for katprep_report
-                SYSTEM_ERRATA[system["name"]]["params"]["name"] = params_obj["name"]
-                SYSTEM_ERRATA[system["name"]]["params"]["ip"] = params_obj["ip"]
-                SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
-                    SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
-                SYSTEM_ERRATA[system["name"]]["params"]["organization"] = params_obj["organization_name"]
-                SYSTEM_ERRATA[system["name"]]["params"]["location"] = params_obj["location_name"]
-                SYSTEM_ERRATA[system["name"]]["params"]["environment"] = params_obj["environment_name"]
-                SYSTEM_ERRATA[system["name"]]["params"]["operatingsystem"] = params_obj["operatingsystem_name"]
-                if params_obj["facts"]["virt::is_guest"] == True:
-                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = False
-                else:
-                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
-                #add _all_ the errata information
                 SYSTEM_ERRATA[system["name"]]["errata"] = result_obj["results"]
     except KeyError as err:
         LOGGER.error("Unable to get system information, check filter options!")
