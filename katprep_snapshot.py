@@ -149,10 +149,8 @@ def scan_systems():
                 #add some additional information required for katprep_report
                 SYSTEM_ERRATA[system["name"]]["params"]["name"] = params_obj["name"]
                 SYSTEM_ERRATA[system["name"]]["params"]["ip"] = params_obj["ip"]
-                SYSTEM_ERRATA[system["name"]]["params"]["owner"] = "OWNER"
-                #TODO: get owner name by ID!
-                #SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
-                    #SAT_CLIENT.get_id_by_name(params_obj["owner_id"], "user")
+                SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
+                    SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
                 SYSTEM_ERRATA[system["name"]]["params"]["organization"] = params_obj["organization_name"]
                 SYSTEM_ERRATA[system["name"]]["params"]["location"] = params_obj["location_name"]
                 SYSTEM_ERRATA[system["name"]]["params"]["environment"] = params_obj["environment_name"]

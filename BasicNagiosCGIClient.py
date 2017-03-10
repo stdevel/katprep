@@ -142,7 +142,7 @@ class BasicNagiosCGIClient:
 
     def __api_post(self, sub_url, payload):
         """
-        Sends a HTTP GET request to the Nagios/Icinga API. This function
+        Sends a HTTP POST request to the Nagios/Icinga API. This function
         requires a sub-URL (such as /cgi-bin/status.cgi).
 
         :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
@@ -331,7 +331,8 @@ class BasicNagiosCGIClient:
             "//td[@class='statusBGCRITICAL']//a/text()"
             )
         else:
-            #TODO: To ensure that this makes sense we need to add status..
+            #TODO: To ensure that this makes sense we need to add status
+            #information to the result set...
             data = tree.xpath(
             "//td[@class='statusOdd']/text() | "
             "//td[@class='statusOdd']//a/text() | "

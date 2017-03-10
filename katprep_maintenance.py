@@ -400,7 +400,7 @@ def parse_options(args=None):
     metavar="FILE", default="", \
     help="defines an auth file to use instead of shell variables")
     #--virt-uri
-    #TODO: check if valid URI!
+    #TODO: validate URI
     virt_opts.add_argument("--virt-uri", dest="virt_uri", \
     metavar="URI", default="", \
     help="defines a libvirt URI to use")
@@ -497,12 +497,12 @@ def main(options, args):
         (fman_user, fman_pass) = get_credentials(
             "Foreman", options.foreman_authfile
         )
-        SAT_CLIENT = ForemanClient(options.foreman_server, fman_user, fman_pass)
+        SAT_CLIENT = ForemanAPIClient(options.foreman_server, fman_user, fman_pass)
     if options.virt_skip_snapshot == False:
         (virt_user, virt_pass) = get_credentials(
             "Virtualization", options.virt_authfile
         )
-        VIRT_CLIENT = LibvirtClient(options.virt_uri, sat_user, sat_pass)
+        VIRT_CLIENT = LibvirtClient(options.virt_uri, virt_user, virt_pass)
     if options.mon_skip_downtime == False:
         (nag_user, nag_pass) = get_credentials(
             "Nagios", options.mon_authfile

@@ -276,20 +276,53 @@ class ForemanAPIClient:
         """Returns the configured URL of the object instance"""
         return self.URL
 
-    #TODO: implement - generic function with alias?
-    #def get_name_by_id(self, name, api_object):
-        #"""Return a Foreman object's name by its ID.
 
-        #Keyword arguments:
-        #name -- Foreman object name
-        #api_object -- Foreman object type (e.g. host, environment)
-        #"""
+
+    def get_name_by_id(self, object_id, api_object):
+        """
+        Returns a Foreman object's name by its ID.
+
+        param object_id: Foreman object ID
+        type object_id: int
+        param api_object: Foreman object type (e.g. host, environment)
+        type api_object: str
+        """
+        valid_objects = [
+            "hostgroup", "location", "organization", "environment",
+            "host", "user"
+        ]
+        try:
+            if api_object.lower() not in valid_objects:
+                #invalid type
+                raise ValueError(
+                    "Unable to lookup name by invalid field"
+                    " type '{}'".format(api_object)
+                )
+            else:
+                #get ID by name
+                result_obj = json.loads(
+                    self.api_get("/{}s/{}".format(api_object, object_id))
+                )
+                if result_obj["id"] == object_id:
+                    LOGGER.debug(
+                        "I think I found {} #{}...".format(
+                            api_object, object_id
+                        )
+                    )
+                if api_object.lower() == "user":
+                    return "{} {}".format(
+                        result_obj["firstname"], result_obj["lastname"]
+                    )
+                else:
+                    return result_obj["name"]
+        except ValueError as err:
+            LOGGER.error(err)
+
+
 
     def get_id_by_name(self, name, api_object):
         """
-        Returns a Foreman object's internal ID by its name. Currently,
-        this function works fine for hostgroups, locations, organizations,
-        environments and hosts.
+        Returns a Foreman object's internal ID by its name.
 
         :param name: Foreman object name
         :type name: str
@@ -297,7 +330,8 @@ class ForemanAPIClient:
         :type api_object: str
         """
         valid_objects = [
-            "hostgroup", "location", "organization", "environment", "host"
+            "hostgroup", "location", "organization", "environment",
+            "host"
         ]
         try:
             if api_object.lower() not in valid_objects:
@@ -311,7 +345,7 @@ class ForemanAPIClient:
                 result_obj = json.loads(
                     self.api_get("/{}s".format(api_object))
                 )
-                #TODO: nicer way than looping? numpy?
+                #TODO: nicer way than looping? numpy? Direct URL?
                 for entry in result_obj["results"]:
                     if entry["name"].lower() == name.lower():
                         LOGGER.debug(
