@@ -24,7 +24,7 @@ So - stay tuned and check-out this site more often.
     - ~~Xen~~ :white_check_mark: implemented
     - ~~VMware vSphere ESXi~~ :white_check_mark: implemented
     - ~~Microsoft Hyper-V~~ :white_check_mark: implemented
-  - applying errata after successful preparation
+  - ~~applying errata after successful preparation~~ :white_check_mark: implemented
   - rebooting systems if patches require this
 - Documentation
   - ~~automatic Documentation with [**Sphinx**](http://www.sphinx-doc.org)~~ :white_check_mark: implemented
