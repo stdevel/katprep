@@ -200,9 +200,9 @@ def prepare(args):
             #prepare host
             manage_host_preparation(host)
 
-            #TODO: verify preparation
-            #if not options.generic_dry_run:
-                #verify(args)
+            #verify preparation
+            if not options.generic_dry_run:
+                verify(args)
 
     except ValueError as err:
         LOGGER.error("Error preparing maintenance: '{}'".format(err))
@@ -217,11 +217,38 @@ def execute(args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    #TODO: implement applying errata
-    print "TODO: execute"
-    """
-    TODO: install errata, reboot if selected
-    """
+    try:
+         for host in REPORT:
+            LOGGER.debug("Patching host '{}'...".format(host))
+            errata_target = [x["errata_id"] for x in REPORT[host]["errata"]]
+            errata_target = [x.encode('utf-8') for x in errata_target]
+            if options.generic_dry_run:
+                LOGGER.info("Host '{}' --> install: {}".format(
+                        host, ", ".join(errata_target)
+                    )
+                )
+            else:
+                #print {"errata_ids": errata_target}
+                SAT_CLIENT.api_put(
+                    "/hosts/{}/errata/apply".format(
+                        SAT_CLIENT.get_id_by_name(host, "host")
+                    ),
+                    json.dumps({"errata_ids": errata_target})
+                )
+
+            if options.foreman_reboot:
+                if options.generic_dry_run:
+                    LOGGER.info("Host '{}' --> reboot".format(host))
+                else:
+                    SAT_CLIENT.api_put(
+                        "/hosts/{}/power".format(
+                            SAT_CLIENT.get_id_by_name(host, "host")
+                        ),
+                        json.dumps({"power_action": "soft"})
+                    )
+
+    except ValueError as err:
+        LOGGER.error("Error verifying host: '{}'".format(err))
 
 
 
@@ -238,9 +265,6 @@ def verify(args):
     try:
         for host in REPORT:
             LOGGER.debug("Verifying host '{}'...".format(host))
-            """
-            TODO: check snapshot, downtime, errata, monitoring green?
-            """
 
             #check snapshot
             if not options.virt_skip_snapshot:
@@ -283,9 +307,11 @@ def verify(args):
                 if len(crit_services) > 0:
                     services = ""
                     for service in crit_services:
-                        services = "{}{}:{}, ".format(
-                            services, service, value(service)
+                        services = "{}{} - {}, ".format(
+                            services, service.keys()[0], service.values()[0]
                         )
+                    #add status to verfication values
+                    set_verification_value(host, "mon_status", services)
 
     except ValueError as err:
         LOGGER.error("Error verifying host: '{}'".format(err))
@@ -417,13 +443,18 @@ def parse_options(args=None):
     #--mon-url
     mon_opts.add_argument("--mon-url", dest="mon_url", \
     metavar="URL", default="", help="defines a monitoring URL to use")
+    #--mon-type
+    mon_opts.add_argument("--mon-type", dest="mon_type", \
+    metavar="TYPE", type=str, choices="nagios|icinga", default="icinga", \
+    help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or" \
+    " icinga (Icinga 2.x). (default: nagios)")
     #-K / --skip-downtime
     mon_opts.add_argument("-K", "--skip-downtime", dest="mon_skip_downtime", \
     action="store_true", default=False, \
     help="skips scheduling downtimes (default: no)")
     #-t / --mon-downtime
     mon_opts.add_argument("-t", "--mon-downtime", dest="mon_downtime", \
-    action="store", type=int, default=8, \
+    metavar="HOURS", action="store", type=int, default=8, \
     help="downtime period (default: 8 hours)")
 
     #FILTER ARGUMENTS
@@ -507,7 +538,10 @@ def main(options, args):
         (nag_user, nag_pass) = get_credentials(
             "Nagios", options.mon_authfile
         )
-        NAGIOS_CLIENT = BasicNagiosCGIClient(mon_url, nag_user, nag_pass)
+        #TODO: add Icinga2 support
+        NAGIOS_CLIENT = BasicNagiosCGIClient(
+            options.mon_url, nag_user, nag_pass
+        )
 
     #start action
     options.func(options.func)

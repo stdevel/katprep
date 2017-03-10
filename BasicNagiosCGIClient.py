@@ -237,7 +237,7 @@ class BasicNagiosCGIClient:
         :param comment: Downtime comment
         :type comment: str
         """
-        return __manage_downtime(object_name, object_type, hours, \
+        return self.__manage_downtime(object_name, object_type, hours, \
             comment, remove_downtime=False)
 
 
