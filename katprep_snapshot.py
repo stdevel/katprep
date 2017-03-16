@@ -76,6 +76,10 @@ http://github.com/stdevel/katprep'''
     #-a / --authfile
     srv_opts.add_argument("-a", "--authfile", dest="authfile", metavar="FILE", \
     default="", help="defines an auth file to use instead of shell variables")
+    #-C / --auth-container
+    gen_opts.add_argument("-C", "--auth-container", default="", \
+    dest="auth_container", action="store", help="defines an " \
+    "authentication container file (default: no)")
     #-s / --server
     srv_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
     default="localhost", help="defines the server to use (default: localhost)")
@@ -121,18 +125,21 @@ def scan_systems():
         for system in result_obj["results"]:
             LOGGER.info("Checking system '{}' (#{})...".format(system["name"], \
             system["id"]))
+            errata_counter = system["content_facet_attributes"]["errata_counts"]
             LOGGER.debug("System errata counter: security={}, bugfix={}," \
             " enhancement={}, total={}".format(
-                system["content_facet_attributes"]["errata_counts"]["security"],
-                system["content_facet_attributes"]["errata_counts"]["bugfix"],
-                system["content_facet_attributes"]["errata_counts"]["enhancement"],
-                system["content_facet_attributes"]["errata_counts"]["total"]
+                errata_counter["security"],
+                errata_counter["bugfix"],
+                errata_counter["enhancement"],
+                errata_counter["total"]
             ))
             #add columns
-            SYSTEM_ERRATA[system["name"]] = {}
-            SYSTEM_ERRATA[system["name"]]["params"] = {}
-            SYSTEM_ERRATA[system["name"]]["verification"] = {}
-            SYSTEM_ERRATA[system["name"]]["errata"] = {}
+            SYSTEM_ERRATA[system["name"]] = {
+                "errata": {},
+                "params": {},
+                "verification": {},
+            }
+
             #add _all_ the katprep_* params
             params_obj = json.loads(
                 SAT_CLIENT.api_get("/hosts/{}".format(system["id"]))
@@ -142,21 +149,27 @@ def scan_systems():
                     #add key/value
                     SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = {}
                     SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = entry["value"]
+
             #add some additional information required for katprep_report
-            SYSTEM_ERRATA[system["name"]]["params"]["name"] = params_obj["name"]
-            SYSTEM_ERRATA[system["name"]]["params"]["ip"] = params_obj["ip"]
+            params = {
+                "name", "ip", "organization_name", "location_name",
+                "environment_name", "operatingsystem_name"
+            }
+            for param in params:
+                SYSTEM_ERRATA[system["name"]]["params"][param] = params_obj[param]
+
+            #get owner
             SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
                 SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
-            SYSTEM_ERRATA[system["name"]]["params"]["organization"] = params_obj["organization_name"]
-            SYSTEM_ERRATA[system["name"]]["params"]["location"] = params_obj["location_name"]
-            SYSTEM_ERRATA[system["name"]]["params"]["environment"] = params_obj["environment_name"]
-            SYSTEM_ERRATA[system["name"]]["params"]["operatingsystem"] = params_obj["operatingsystem_name"]
+
+            #set HW flag
             if params_obj["facts"]["virt::is_guest"] == True:
                 SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = False
             else:
                 SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
-            if int(system["content_facet_attributes"]["errata_counts"]["total"]) > 0:
-                #add _all_ the errata information
+
+            #add errata information if applicable
+            if int(errata_counter["total"]) > 0:
                 result_obj = json.loads(
                     SAT_CLIENT.api_get("/hosts/{}/errata".format(system["id"]))
                 )
@@ -208,7 +221,10 @@ def main(options):
     #check if we can read and write before digging
     if is_writable(OUTPUT_FILE):
         #initalize Satellite connection and scan systems
-        (sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
+        (sat_user, sat_pass) = get_credentials(
+            "Satellite", options.authfile,
+            options.server, options.auth_container
+        )
         SAT_CLIENT = ForemanAPIClient(options.server, sat_user, sat_pass)
 
         #validate filters

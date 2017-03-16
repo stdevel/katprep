@@ -11,6 +11,7 @@ import os
 import stat
 import json
 import argparse
+from AuthContainer import AuthContainer
 
 LOGGER = logging.getLogger('katprep_shared')
 """
@@ -19,23 +20,47 @@ logging: Logger instance
 
 
 
-def get_credentials(prefix, input_file=None):
+def get_credentials(prefix, auth_file=None, hostname=None, auth_container=None):
     """
     Retrieves credentials for a particular external system (e.g. Satellite).
+    This function checks whether a hostname is part of an authentication 
+    container or retrieves credentials from an authentication file. If both 
+    approaches fail, logon credentials are prompted.
 
     :param prefix: prefix for the external system (used in variables/prompts)
     :type prefix: str
-    :param input_file: name of the auth file (default: none)
-    :type input_file: str
+    :param auth_file: name of the auth file (default: none)
+    :type auth_file: str
+    :param hostname: external system hostname
+    :type hostname: str
+    :param auth_container: authentication container file name
+    :type auth_container: str
     """
-    if input_file:
+    if auth_container:
+        LOGGER.debug("Using authentication container")
+        container = AuthContainer(auth_container)
+        try:
+            s_creds = None
+            s_creds = container.get_credential(hostname)
+            if len(s_creds) == 2:
+                return (s_creds[0], s_creds[1])
+            else:
+                raise TypeError("Invalid response")
+        except TypeError:
+            LOGGER.warning("Authentication details not found in container!")
+            LOGGER.debug("Prompting for {} login credentials as we still" \
+                " haven't found what we're looking for".format(prefix))
+            s_username = raw_input(prefix + " Username: ")
+            s_password = getpass.getpass(prefix + " Password: ")
+            return (s_username, s_password)
+    elif auth_file:
         LOGGER.debug("Using authfile")
         try:
             #check filemode and read file
-            filemode = oct(stat.S_IMODE(os.lstat(input_file).st_mode))
+            filemode = oct(stat.S_IMODE(os.lstat(auth_file).st_mode))
             if filemode == "0600":
                 LOGGER.debug("File permission matches 0600")
-                with open(input_file, "r") as auth_file:
+                with open(auth_file, "r") as auth_file:
                     s_username = auth_file.readline().replace("\n", "")
                     s_password = auth_file.readline().replace("\n", "")
                 return (s_username, s_password)

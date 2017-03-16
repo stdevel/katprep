@@ -32,7 +32,7 @@ VIRT_CLIENT = None
 """
 LibvirtClient: libvirt API client handle
 """
-NAGIOS_CLIENT = None
+MON_CLIENT = None
 """
 BasicNagiosCGIClient: Nagios CGI client handle
 """
@@ -141,10 +141,10 @@ def manage_host_preparation(host, cleanup=False):
         else:
             if cleanup:
                 #remove downtime
-                NAGIOS_CLIENT.remove_downtime(mon_name)
+                MON_CLIENT.remove_downtime(mon_name)
             else:
                 #schedule downtime
-                NAGIOS_CLIENT.schedule_downtime(
+                MON_CLIENT.schedule_downtime(
                     mon_name, "host", hours=options.mon_downtime
                 )
 
@@ -252,6 +252,18 @@ def execute(args):
 
 
 
+def revert(args):
+    """
+    This function reverts maintenance tasks, which might include removing
+    errata or restoring virtual machine snapshots.
+
+    :param args: argparse options dictionary containing parameters
+    :type args: argparse options dict
+    """
+    print "TODO: implement"
+
+
+
 def verify(args):
     """
     This function verifies maintenace tasks (such as creating snapshots and
@@ -298,12 +310,12 @@ def verify(args):
                     #FQDN
                     mon_name = host
                 #check scheduled downtime
-                if NAGIOS_CLIENT.has_downtime(mon_name):
+                if MON_CLIENT.has_downtime(mon_name):
                     #set flag
                     set_verification_value(host, "mon_downtime", 1)
                     LOGGER.info("Snapshot for host '{}' found.".format(host))
                 #check critical services
-                crit_services = NAGIOS_CLIENT.get_services(mon_name)
+                crit_services = MON_CLIENT.get_services(mon_name)
                 if len(crit_services) > 0:
                     services = ""
                     for service in crit_services:
@@ -398,6 +410,10 @@ def parse_options(args=None):
     gen_opts.add_argument("-n", "--dry-run", dest="generic_dry_run", \
     default=False, action="store_true", \
     help="only simulate what would be done (default: no)")
+    #-C / --auth-container
+    gen_opts.add_argument("-C", "--auth-container", default="", \
+    dest="generic_auth_container", action="store", help="defines an " \
+    "authentication container file (default: no)")
     #-c / --config
     gen_opts.add_argument("-c", "--config", dest="config", default="", \
     action="store", metavar="FILE", \
@@ -459,9 +475,6 @@ def parse_options(args=None):
 
     #FILTER ARGUMENTS
     #-l / --location
-
-    #FILTER ARGUMENTS
-    #-l / --location
     filter_opts_excl.add_argument("-l", "--location", action="store", \
     default="", dest="filter_location", metavar="NAME|ID", \
     help="filters by a particular location (default: no)")
@@ -485,6 +498,8 @@ def parse_options(args=None):
     cmd_prepare.set_defaults(func=prepare)
     cmd_execute = subparsers.add_parser("execute", help="Installing errata")
     cmd_execute.set_defaults(func=execute)
+    cmd_revert = subparsers.add_parser("revert", help="Reverting changes")
+    cmd_revert.set_defaults(func=revert)
     cmd_verify = subparsers.add_parser("verify", help="Verifying status")
     cmd_verify.set_defaults(func=verify)
     cmd_cleanup = subparsers.add_parser("cleanup", help="Cleaning-up")
@@ -502,7 +517,7 @@ def parse_options(args=None):
 
 def main(options, args):
     """Main function, starts the logic based on parameters."""
-    global REPORT, REPORT_PREFIX, SAT_CLIENT, VIRT_CLIENT, NAGIOS_CLIENT
+    global REPORT, REPORT_PREFIX, SAT_CLIENT, VIRT_CLIENT, MON_CLIENT
 
     LOGGER.debug("Options: {0}".format(options))
     LOGGER.debug("Arguments: {0}".format(args))
@@ -524,24 +539,35 @@ def main(options, args):
     if options.mon_skip_downtime:
         LOGGER.warn("You decided to skip scheduling downtimes - happy flodding!")
 
+    #TODO: get computing/monitoring per host?
+    #dict with clients based on host parameter?
     #initialize APIs
         (fman_user, fman_pass) = get_credentials(
-            "Foreman", options.foreman_authfile
+            "Foreman", options.foreman_authfile,
+            options.foreman_server, options.generic_auth_container
         )
         SAT_CLIENT = ForemanAPIClient(options.foreman_server, fman_user, fman_pass)
     if options.virt_skip_snapshot == False:
         (virt_user, virt_pass) = get_credentials(
-            "Virtualization", options.virt_authfile
+            "Virtualization", options.virt_authfile,
+            options.virt_uri, options.generic_auth_container
         )
         VIRT_CLIENT = LibvirtClient(options.virt_uri, virt_user, virt_pass)
     if options.mon_skip_downtime == False:
         (nag_user, nag_pass) = get_credentials(
-            "Nagios", options.mon_authfile
+            "Nagios", options.mon_authfile,
+            options.mon_url, options.generic_auth_container
         )
-        #TODO: add Icinga2 support
-        NAGIOS_CLIENT = BasicNagiosCGIClient(
-            options.mon_url, nag_user, nag_pass
-        )
+        if options.mon_type == "nagios":
+            #Yet another legacy installation
+            MON_CLIENT = BasicNagiosCGIClient(
+                options.mon_url, nag_user, nag_pass
+            )
+        else:
+            #Icinga 2, yay!
+            MON_CLIENT = BasicIcinga2APIClient(
+                options.mon_url, nag_user, nag_pass
+            )
 
     #start action
     options.func(options.func)

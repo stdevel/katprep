@@ -221,6 +221,10 @@ def parse_options(args=None):
     #-a / --authfile
     srv_opts.add_argument("-a", "--authfile", dest="authfile", metavar="FILE", \
     default="", help="defines an auth file to use instead of shell variables")
+    #-C / --auth-container
+    gen_opts.add_argument("-C", "--auth-container", default="", \
+    dest="auth_container", action="store", help="defines an " \
+    "authentication container file (default: no)")
     #-s / --server
     srv_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
     default="localhost", help="defines the server to use (default: localhost)")
@@ -306,7 +310,10 @@ def main(options):
 
     if not options.action_list:
         #initalize Satellite connection
-        (sat_user, sat_pass) = get_credentials("Satellite", options.authfile)
+        (sat_user, sat_pass) = get_credentials(
+            "Satellite", options.authfile,
+            options.server, options.auth_container
+        )
         SAT_CLIENT = ForemanAPIClient(options.server, sat_user, sat_pass)
 
         #validate filters
