@@ -7,13 +7,11 @@ monitoring systems.
 
 import logging
 import requests
-#from requests.auth import HTTPBasicAuth
-#import time
-#from datetime import datetime, timedelta
-#import re
-#from lxml import html
-
-LOGGER = logging.getLogger('BasicIcinga2APIClient')
+from urlparse import urlparse
+from requests.auth import HTTPBasicAuth
+import json
+import time
+from datetime import datetime, timedelta
 
 
 
@@ -21,7 +19,11 @@ class BasicIcinga2APIClient:
     """
 .. class:: BasicIcinga2APIClient
     """
-    HEADERS = {'User-Agent': 'katprep (https://github.com/stdevel/katprep)'}
+    HEADERS = {
+        'User-Agent': 'katprep (https://github.com/stdevel/katprep)',
+        'Accept': 'application/json',
+        'Content-Type': "application/json"
+    }
     """
     dict: Default headers set for every HTTP request
     """
@@ -29,8 +31,12 @@ class BasicIcinga2APIClient:
     """
     session: API session
     """
+    LOGGER = logging.getLogger('BasicIcinga2APIClient')
+    """
+    logging: Logger instance
+    """
 
-    def __init__(self, url, username="", password=""):
+    def __init__(self, url, username="", password="", verify_ssl=True):
         """
         Constructor, creating the class. It requires specifying a
         URL, an username and password to access the API.
@@ -42,33 +48,121 @@ class BasicIcinga2APIClient:
         :param password: corresponding password
         :type password: str
         """
-        if url[len(url)-1:] != "/":
-            #add trailing slash
-            url = "{}/".format(url)
-        #set connection details and connect
-        self.URL = url
+        #set logging
+        self.LOGGER.setLevel(logging.ERROR)
+
+        #set connection data
+        if "/v1" in url:
+            self.URL = url
+        else:
+            self.URL = "{}/v1".format(url)
         self.USERNAME = username
         self.PASSWORD = password
-        self.connect()
+
+        #set SSL information and connect
+        if not verify_ssl:
+            self.VERIFY_SSL = False
+        self.__connect()
 
 
 
-    def connect(self):
+    def __connect(self):
         """
-        This function establishes a connection to Icinga 2.
+        This function establishes a connection to the Icinga2 API.
         """
-        print "TODO: connect"
+        self.SESSION = requests.Session()
+        if self.USERNAME != "":
+            self.SESSION.auth = HTTPBasicAuth(self.USERNAME, self.PASSWORD)
 
 
 
-    def api_request(self):
+    def __api_request(self, method, sub_url, payload=""):
         """
         Sends a HTTP request to the Nagios/Icinga API. This function requires
         a valid HTTP method and a sub-URL (such as /cgi-bin/status.cgi).
         Optionally, you can also specify payload (for POST).
         There are also alias functions available.
+
+        :param method: HTTP request method (GET, POST)
+        :type method: str
+        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
+        :type sub_url: str
+        :param payload: payload for POST requests
+        :type payload: str
         """
-        print "TODO: request"
+        #send request to API
+        try:
+            if method.lower() not in ["get", "post"]:
+                #going home
+                raise ValueError("Illegal method '{}' specified".format(method))
+
+            #execute request
+            if method.lower() == "post":
+                #POST
+                result = self.SESSION.post(
+                    "{}{}".format(self.URL, sub_url),
+                    headers=self.HEADERS, data=payload, verify=self.VERIFY_SSL
+                    )
+            else:
+                #GET
+                result = self.SESSION.get(
+                    "{}{}".format(self.URL, sub_url),
+                    headers=self.HEADERS, verify=self.VERIFY_SSL
+                    )
+
+            if result.status_code != 200:
+                raise ValueError("{}: HTTP operation not successful".format(
+                    result.status_code))
+            else:
+                #return result
+                if method.lower() == "get":
+                    return result.text
+                else:
+                    return True
+
+        except ValueError as err:
+            self.LOGGER.error(err)
+            raise
+
+    #Aliases
+    def __api_get(self, sub_url):
+        """
+        Sends a HTTP GET request to the Nagios/Icinga API. This function
+        requires a sub-URL (such as /cgi-bin/status.cgi).
+
+        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
+        :type sub_url: str
+        """
+        return self.__api_request("get", sub_url)
+
+    def __api_post(self, sub_url, payload):
+        """
+        Sends a HTTP POST request to the Nagios/Icinga API. This function
+        requires a sub-URL (such as /cgi-bin/status.cgi).
+
+        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
+        :type sub_url: str
+        :param payload: payload data
+        :type payload: str
+        """
+        return self.__api_request("post", sub_url, payload)
+
+
+
+    def __calculate_time(self, hours):
+        """
+        Calculates the time range for POST requests in the format the
+        Icinga 2.x API requires. For this, the current time/date
+        is chosen and the specified amount of hours is added.
+
+        :param hours: Amount of hours for the time range
+        :type hours: int
+        """
+        current_time = time.strftime("%s")
+        end_time = format(
+            datetime.now() + timedelta(hours=int(hours)),
+            '%s')
+        return (current_time, end_time)
 
 
 
@@ -91,43 +185,142 @@ class BasicIcinga2APIClient:
         :param remove_downtime: Removes a previously scheduled downtime
         :type remove_downtime: bool
         """
-        print "TODO: manage downtime"
+        #calculate timerange
+        (current_time, end_time) = self.__calculate_time(hours)
+
+        if object_type.lower() == "hostgroup":
+            if remove_downtime:
+                #remove hostgroup downtime
+                payload = {
+                    "type": "foobar",
+                    "filter": "\"{}\" in host.groups".format(object_name),
+                }
+            else:
+                #create hostgroup downtime
+                payload = {
+                    "type": "foobar",
+                    "filter": "\"{}\" in host.groups".format(object_name),
+                    "start_time": int(current_time),
+                    "end_time": int(end_time),
+                    "fixed": True,
+                    "author": self.USERNAME,
+                    "comment": comment,
+                }
+        else:
+            if remove_downtime:
+                #remove host downtime
+                payload = {
+                    "type": "foobar",
+                    "filter": "host.name==\"{}\"".format(object_name),
+                }
+            else:
+                #create host downtime
+                payload = {
+                    "type": "foobar",
+                    "filter": "host.name==\"{}\"".format(object_name),
+                    "start_time": int(current_time),
+                    "end_time": int(end_time),
+                    "fixed": True,
+                    "author": self.USERNAME,
+                    "comment": comment,
+                }
+        #send POST
+        if remove_downtime:
+            payload["type"] = "Host"
+            self.__api_post("/actions/remove-downtime", json.dumps(payload))
+            payload["type"] = "Service"
+            return self.__api_post("/actions/remove-downtime", json.dumps(payload))
+        else:
+            payload["type"] = "Host"
+            self.__api_post("/actions/schedule-downtime", json.dumps(payload))
+            payload["type"] = "Service"
+            return self.__api_post("/actions/schedule-downtime", json.dumps(payload))
 
 
 
-    def schedule_downtime(self):
+    def schedule_downtime(self, object_name, object_type, hours=8, \
+        comment="Downtime managed by katprep"):
         """
         Adds scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
         Optionally, you can specify a customized comment and downtime
         period (the default is 8 hours).
+
+        :param object_name: Hostname or hostgroup name
+        :type object_name: str
+        :param object_type: host or hostgroup
+        :type object_type: str
+        :param hours: Amount of hours for the downtime (default: 8 hours)
+        :type hours: int
+        :param comment: Downtime comment
+        :type comment: str
         """
-        print "TODO: schedule downtime"
+        return self.__manage_downtime(object_name, object_type, hours, \
+            comment, remove_downtime=False)
 
 
 
-    def remove_downtime(self):
+    def remove_downtime(self, object_name, object_type):
         """
-        Removes scheduled downtime for a host.
+        Removes scheduled downtime for a host or hostgroup
         For this, a object name is required.
-        At this point, it is not possible to remove downtime for a
-        whole hostgroup.
+
+        :param object_name: Hostname or hostgroup name
+        :type object_name: str
+        :param object_type: host or hostgroup
+        :type object_type: str
         """
-        print "TODO: remove downtime"
+        return self.__manage_downtime(object_name, object_type, hours=8, \
+            comment="Downtime managed by katprep", remove_downtime=True)
 
 
 
-    def has_downtime(self, object_name):
+    def has_downtime(self, object_name, object_type="host"):
         """
         Returns whether a particular object (host, hostgroup) is currently in
         scheduled downtime. This required specifying an object name and type.
+
+        :param object_name: Hostname or hostgroup name
+        :type object_name: str
+        :param object_type: Host or hostgroup (default: host)
+        :type object_type: str
         """
-        print "TODO: has downtime"
+        #retrieve and load data
+        result = self.__api_get("/objects/{}s?host={}".format(
+           object_type, object_name)
+        )
+        data = json.loads(result)
+
+        #check if downtime
+        #TODO: how to do this for hostgroups?!
+        if object_type == "host":
+            for result in data["results"]:
+                if result["attrs"]["downtime_depth"] > 0:
+                    return True
+            return False
 
 
 
     def get_services(self, object_name, only_failed=True):
         """
         Returns all or failed services for a particular host.
+
+        :param object_name:
+        :type object_name: str
+        :param only_failed: True will only report failed services
+        :type only_failed = bool
         """
-        print "TODO: get_services"
+        result = self.__api_get("/objects/services?host={}".format(
+            object_name)
+        )
+        data = json.loads(result)
+        services = []
+        for result in data["results"]:
+            service = result["attrs"]["display_name"]
+            state = result["attrs"]["state"]
+            #print "Service: {}".format(result["attrs"]["display_name"])
+            #print "  State: {}".format(result["attrs"]["state"])
+            if only_failed == False or state == 0:
+                this_service = {"name": service, "state": state}
+                services.append(this_service)
+        return services
