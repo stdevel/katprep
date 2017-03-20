@@ -12,3 +12,7 @@ test*
 test/*
 TODO
 .buildinfo
+
+# Python dirs
+__pycache__
+*.egg-info
