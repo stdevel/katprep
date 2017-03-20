@@ -5,11 +5,13 @@ A script for managing Puppet host parameters for systems managed with
 Foreman/Katello or Red Hat Satellite 6.
 """
 
+from __future__ import absolute_import
+
 import argparse
 import logging
 import json
-from katprep_shared import get_credentials, validate_filters, get_filter
-from ForemanAPIClient import ForemanAPIClient
+from . import get_credentials, validate_filters, get_filter
+from .clients.ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
 """
@@ -325,8 +327,7 @@ def main(options):
         manage_params()
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level

@@ -4,11 +4,13 @@
 A script which maintains entries in a authentication container.
 """
 
+from __future__ import absolute_import
+
 import argparse
 import logging
 import json
 import getpass
-from AuthContainer import AuthContainer
+from .AuthContainer import AuthContainer
 
 __version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_authconfig')
@@ -163,8 +165,7 @@ def main(options, args):
     options.func(options.func)
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level

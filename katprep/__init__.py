@@ -5,13 +5,15 @@ A shared library containing functions used by other scripts of the
 katprep toolkit.
 """
 
+from __future__ import absolute_import
+
 import getpass
 import logging
 import os
 import stat
 import json
 import argparse
-from AuthContainer import AuthContainer
+from .AuthContainer import AuthContainer
 
 LOGGER = logging.getLogger('katprep_shared')
 """

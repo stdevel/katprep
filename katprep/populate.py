@@ -5,19 +5,21 @@ A script which populates the Foreman/Katello or Red Hat Satellite 6 host
 parameters with information from Nagios/Icinga or a virtualization host
 """
 
+from __future__ import absolute_import
+
 import argparse
 import logging
 import yaml
 import json
 import time
 import os
-from katprep_shared import is_valid_report, get_json, get_credentials, \
+from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report
-from ForemanAPIClient import ForemanAPIClient
-from LibvirtClient import LibvirtClient
-from PyvmomiClient import PyvmomiClient
-from BasicNagiosCGIClient import BasicNagiosCGIClient
-from BasicIcinga2APIClient import BasicIcinga2APIClient
+from .clients.ForemanAPIClient import ForemanAPIClient
+from .clients.LibvirtClient import LibvirtClient
+from .clients.PyvmomiClient import PyvmomiClient
+from .clients.BasicNagiosCGIClient import BasicNagiosCGIClient
+from .clients.BasicIcinga2APIClient import BasicIcinga2APIClient
 
 __version__ = "0.0.1"
 """
@@ -213,8 +215,7 @@ def main(options, args):
         populate_mon()
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level

@@ -5,13 +5,15 @@ A script for creating a snapshot report of available errata and updates for
 systems managed with Foreman/Katello or Red Hat Satellite 6.
 """
 
+from __future__ import absolute_import
+
 import argparse
 import logging
 import json
 import time
-from katprep_shared import get_credentials, is_writable, validate_filters, \
+from . import get_credentials, is_writable, validate_filters, \
 get_filter
-from ForemanAPIClient import ForemanAPIClient
+from .clients.ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
 """
@@ -234,8 +236,7 @@ def main(options):
         LOGGER.error("Directory '{}' is not writable!".format(OUTPUT_FILE))
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level
