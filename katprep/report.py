@@ -36,7 +36,7 @@ dic: New snapshot report
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_report.py is used for creating maintenance reports
+    desc = '''%(prog)s is used for creating maintenance reports
     including errata per system managed with Foreman/Katello or Red Hat
     Satellite 6. The utility requires two snapshots: before and after
     maintenance tasks were executed - just append the two files to the

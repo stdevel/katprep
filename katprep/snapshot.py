@@ -40,16 +40,16 @@ str: Output file
 def parse_options(args=None):
     """Parses options and arguments."""
 
-    desc = '''katprep_snapshot.py is used for creating snapshot reports of
+    desc = '''%(prog)s is used for creating snapshot reports of
     errata available to your systems managed with Foreman/Katello or Red
     Hat Satellite 6. You can use two snapshot reports to create delta
-    reports using katprep_report.py.
+    reports using katprep_report.
     Login credentials need to be entered interactively or specified using
     environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an auth
     container.
     When using an auth container, ensure that the file permissions are 0600 -
     otherwise the script will abort. Maintain the auth container credentials
-    with the katprep_authconfig.py utility.
+    with the katprep_authconfig utility.
     '''
     epilog = '''Check-out the website for more details:
 http://github.com/stdevel/katprep'''

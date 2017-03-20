@@ -91,7 +91,7 @@ def remove(args):
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_authconfig.py is used for creating, modifying and
+    desc = '''%(prog)s is used for creating, modifying and
     removing entries in/from an authentication container.
     Authentication containers include various authentication credentials for
     external systems that can be accessed from the katprep utilities (e.g.

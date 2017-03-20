@@ -278,7 +278,7 @@ def verify(args):
     """
     This function verifies maintenance tasks (such as creating snapshots and
     installing errata) and stores status information in a verification log.
-    These information are included into host reports by katprep_report.py.
+    These information are included into host reports by katprep_report.
 
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
@@ -385,11 +385,11 @@ def load_configuration(config_file, options):
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_maintenance.py is used for preparing, executing and
+    desc = '''%(prog)s is used for preparing, executing and
     controlling maintenance tasks on systems managed with Foreman/Katello
     or Red Hat Satellite 6.
     You can automatically create snapshots and schedule monitoring downtimes
-    if you have set all necessary host parameters using katprep_parameters.py.
+    if you have set all necessary host parameters using katprep_parameters.
     It is also possible to trigger errata installation using the Foreman API.
     After completing maintenance, it is also possible to remove snapshots and
     downtimes.

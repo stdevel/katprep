@@ -84,9 +84,9 @@ def populate_mon():
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_populate.py is used for populating/updating 
-    Foreman/Katello and Red Hat Satellite 6 host parameters with information 
-    gathered from Nagios, Icinga and Icinga2 and virtualization environments 
+    desc = '''%(prog)s is used for populating/updating
+    Foreman/Katello and Red Hat Satellite 6 host parameters with information
+    gathered from Nagios, Icinga and Icinga2 and virtualization environments
     accessible via libvirt or pyVmomi (VMware vSphere Python API).
     '''
     epilog = '''Check-out the website for more details:
