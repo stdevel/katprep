@@ -20,7 +20,7 @@ logging: Logger instance
 
 
 
-def get_credentials(prefix, auth_file=None, hostname=None, auth_container=None):
+def get_credentials(prefix, hostname=None, auth_container=None):
     """
     Retrieves credentials for a particular external system (e.g. Satellite).
     This function checks whether a hostname is part of an authentication 
@@ -29,8 +29,6 @@ def get_credentials(prefix, auth_file=None, hostname=None, auth_container=None):
 
     :param prefix: prefix for the external system (used in variables/prompts)
     :type prefix: str
-    :param auth_file: name of the auth file (default: none)
-    :type auth_file: str
     :param hostname: external system hostname
     :type hostname: str
     :param auth_container: authentication container file name
@@ -47,30 +45,13 @@ def get_credentials(prefix, auth_file=None, hostname=None, auth_container=None):
             else:
                 raise TypeError("Invalid response")
         except TypeError:
-            LOGGER.warning("Authentication details not found in container!")
+            LOGGER.warning(
+                "Login information for '{}' not found in container!".format(
+                    hostname
+                )
+            )
             LOGGER.debug("Prompting for {} login credentials as we still" \
                 " haven't found what we're looking for".format(prefix))
-            s_username = raw_input(prefix + " Username: ")
-            s_password = getpass.getpass(prefix + " Password: ")
-            return (s_username, s_password)
-    elif auth_file:
-        LOGGER.debug("Using authfile")
-        try:
-            #check filemode and read file
-            filemode = oct(stat.S_IMODE(os.lstat(auth_file).st_mode))
-            if filemode == "0600":
-                LOGGER.debug("File permission matches 0600")
-                with open(auth_file, "r") as auth_file:
-                    s_username = auth_file.readline().replace("\n", "")
-                    s_password = auth_file.readline().replace("\n", "")
-                return (s_username, s_password)
-            else:
-                LOGGER.warning("File permissions (" + filemode + ")" \
-                    " not matching 0600!")
-        except OSError:
-            LOGGER.warning("File non-existent or permissions not 0600!")
-            LOGGER.debug("Prompting for {} login credentials as we have a" \
-                " faulty file".format(prefix))
             s_username = raw_input(prefix + " Username: ")
             s_password = getpass.getpass(prefix + " Password: ")
             return (s_username, s_password)
@@ -224,3 +205,26 @@ def get_filter(options, api_object):
         return "/environments/{}/{}s".format(options.environment, api_object)
     else:
         return "/{}s".format(api_object)
+
+
+
+def get_required_hosts_by_report(report, key):
+    """
+    Retrieves all required external hosts (such as monitoring systems
+    or hypervisor connections) for maintaining hosts mentioned in a
+    report.
+
+    :param report: report dictionary
+    :type report: dict
+    :param key: key that contains hostname (e.g. katprep_virt)
+    :type key: str
+    """
+    hosts=[]
+    try:
+        for host in report:
+            if report[host]["params"][key] != "" and report[host]["params"][key] not in hosts:
+                hosts.append(report[host]["params"][key])
+    except KeyError:
+            LOGGER.info("Key '{}' not found for host '{}'".format(key, host))
+            pass
+    return hosts

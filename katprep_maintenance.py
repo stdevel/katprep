@@ -11,10 +11,12 @@ import yaml
 import json
 import time
 import os
-from katprep_shared import is_valid_report, get_json, get_credentials
+from katprep_shared import is_valid_report, get_json, get_credentials, \
+get_required_hosts_by_report
 from ForemanAPIClient import ForemanAPIClient
 from LibvirtClient import LibvirtClient
 from BasicNagiosCGIClient import BasicNagiosCGIClient
+from BasicIcinga2APIClient import BasicIcinga2APIClient
 
 __version__ = "0.0.1"
 """
@@ -32,9 +34,17 @@ VIRT_CLIENT = None
 """
 LibvirtClient: libvirt API client handle
 """
+VIRT_CLIENTS = {}
+"""
+dict: libvirt API client handles
+"""
 MON_CLIENT = None
 """
 BasicNagiosCGIClient: Nagios CGI client handle
+"""
+MON_CLIENTS = {}
+"""
+dict: Nagios CGI client handles
 """
 REPORT = None
 """
@@ -228,7 +238,6 @@ def execute(args):
                     )
                 )
             else:
-                #print {"errata_ids": errata_target}
                 SAT_CLIENT.api_put(
                     "/hosts/{}/errata/apply".format(
                         SAT_CLIENT.get_id_by_name(host, "host")
@@ -266,7 +275,7 @@ def revert(args):
 
 def verify(args):
     """
-    This function verifies maintenace tasks (such as creating snapshots and
+    This function verifies maintenance tasks (such as creating snapshots and
     installing errata) and stores status information in a verification log.
     These information are included into host reports by katprep_report.py.
 
@@ -375,7 +384,7 @@ def load_configuration(config_file, options):
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_maintenace.py is used for preparing, executing and
+    desc = '''katprep_maintenance.py is used for preparing, executing and
     controlling maintenance tasks on systems managed with Foreman/Katello
     or Red Hat Satellite 6.
     You can automatically create snapshots and schedule monitoring downtimes
@@ -423,10 +432,6 @@ def parse_options(args=None):
     help='A snapshot report', type=is_valid_report)
 
     #FOREMAN ARGUMENTS
-    #-a / --foreman-authfile
-    fman_opts.add_argument("-a", "--foreman-authfile", \
-    dest="foreman_authfile", metavar="FILE", default="", \
-    help="defines an auth file to use instead of shell variables")
     #-s / --foreman-server
     fman_opts.add_argument("-s", "--foreman-server", \
     dest="foreman_server", metavar="SERVER", default="localhost", \
@@ -437,10 +442,6 @@ def parse_options(args=None):
     help="reboot systems after successful errata installation (default: no)")
 
     #VIRTUALIZATION ARGUMENTS
-    #--virt-authfile
-    virt_opts.add_argument("--virt-authfile", dest="virt_authfile", \
-    metavar="FILE", default="", \
-    help="defines an auth file to use instead of shell variables")
     #--virt-uri
     #TODO: validate URI
     virt_opts.add_argument("--virt-uri", dest="virt_uri", \
@@ -452,10 +453,6 @@ def parse_options(args=None):
     help="skips creating snapshots (default: no)")
 
     #MONITORING ARGUMENTS
-    #--mon-authfile
-    mon_opts.add_argument("--mon-authfile", dest="mon_authfile", \
-    metavar="FILE", default="", \
-    help="defines an auth file to use instead of shell variables")
     #--mon-url
     mon_opts.add_argument("--mon-url", dest="mon_url", \
     metavar="URL", default="", help="defines a monitoring URL to use")
@@ -463,7 +460,7 @@ def parse_options(args=None):
     mon_opts.add_argument("--mon-type", dest="mon_type", \
     metavar="TYPE", type=str, choices="nagios|icinga", default="icinga", \
     help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or" \
-    " icinga (Icinga 2.x). (default: nagios)")
+    " icinga (Icinga 2.x). (default: icinga)")
     #-K / --skip-downtime
     mon_opts.add_argument("-K", "--skip-downtime", dest="mon_skip_downtime", \
     action="store_true", default=False, \
@@ -494,7 +491,7 @@ def parse_options(args=None):
     #COMMANDS
     subparsers = parser.add_subparsers(title='commands', \
     description='controlling maintenance stages', help='additional help')
-    cmd_prepare = subparsers.add_parser("prepare", help="Preparing maintenace")
+    cmd_prepare = subparsers.add_parser("prepare", help="Preparing maintenance")
     cmd_prepare.set_defaults(func=prepare)
     cmd_execute = subparsers.add_parser("execute", help="Installing errata")
     cmd_execute.set_defaults(func=execute)
@@ -518,6 +515,7 @@ def parse_options(args=None):
 def main(options, args):
     """Main function, starts the logic based on parameters."""
     global REPORT, REPORT_PREFIX, SAT_CLIENT, VIRT_CLIENT, MON_CLIENT
+    global VIRT_CLIENTS, MON_CLIENTS
 
     LOGGER.debug("Options: {0}".format(options))
     LOGGER.debug("Arguments: {0}".format(args))
@@ -539,35 +537,43 @@ def main(options, args):
     if options.mon_skip_downtime:
         LOGGER.warn("You decided to skip scheduling downtimes - happy flodding!")
 
-    #TODO: get computing/monitoring per host?
-    #dict with clients based on host parameter?
     #initialize APIs
         (fman_user, fman_pass) = get_credentials(
-            "Foreman", options.foreman_authfile,
-            options.foreman_server, options.generic_auth_container
+            "Foreman", options.foreman_server, options.generic_auth_container
         )
-        SAT_CLIENT = ForemanAPIClient(options.foreman_server, fman_user, fman_pass)
+        SAT_CLIENT = ForemanAPIClient(
+            options.foreman_server, fman_user, fman_pass
+        )
+
+    #get virtualization host credentials
     if options.virt_skip_snapshot == False:
-        (virt_user, virt_pass) = get_credentials(
-            "Virtualization", options.virt_authfile,
-            options.virt_uri, options.generic_auth_container
-        )
-        VIRT_CLIENT = LibvirtClient(options.virt_uri, virt_user, virt_pass)
+        required_virt = get_required_hosts_by_report(REPORT, "katprep_virt")
+        for host in required_virt:
+            (virt_user, virt_pass) = get_credentials(
+                "Virtualization {}".format(host),
+                host, options.generic_auth_container
+            )
+            VIRT_CLIENTS[host] = LibvirtClient(host, virt_user, virt_pass)
+
+    #get monitoring host credentials
     if options.mon_skip_downtime == False:
-        (nag_user, nag_pass) = get_credentials(
-            "Nagios", options.mon_authfile,
-            options.mon_url, options.generic_auth_container
-        )
-        if options.mon_type == "nagios":
-            #Yet another legacy installation
-            MON_CLIENT = BasicNagiosCGIClient(
-                options.mon_url, nag_user, nag_pass
+        required_mon = get_required_hosts_by_report(REPORT, "katprep_mon")
+        for host in required_mon:
+            (mon_user, mon_pass) = get_credentials(
+                "Monitoring {}".format(host),
+                host, options.generic_auth_container
             )
-        else:
-            #Icinga 2, yay!
-            MON_CLIENT = BasicIcinga2APIClient(
-                options.mon_url, nag_user, nag_pass
-            )
+            #TODO: store type in parameter?
+            if options.mon_type == "nagios":
+                #Yet another legacy installation
+                MON_CLIENTS[host] = BasicNagiosCGIClient(
+                    host, mon_user, mon_pass
+                )
+            else:
+                #Icinga 2, yay!
+                MON_CLIENTS[host] = BasicIcinga2APIClient(
+                    host, mon_user, mon_pass
+                )
 
     #start action
     options.func(options.func)

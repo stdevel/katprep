@@ -24,22 +24,24 @@ SAT_CLIENT = None
 ForemanAPIClient: Foreman API client handle
 """
 PARAMETERS = {
-    "katprep_monitoring" : "Monitoring URL of the system",
-    "katprep_virt" : "Virtualization URL of the system ($name@URL)",
+    "katprep_mon" : "Monitoring URL of the system",
+    "katprep_virt" : "Virtualization URL of the system",
     "katprep_virt_snapshot" : "Boolean whether system needs to be"\
-    "protected by a snapshot before maintenance"}
+    " protected by a snapshot before maintenance"}
 """
 dict: Built-in default host parameters mandatory for katprep
 """
 OPT_PARAMETERS = {
-    "katprep_monitoring_name" : "Object name within moniting if not FQDN",
-    "katprep_virt_name": "Object name within hypervisor if not FWDN"
+    "katprep_mon_name" : "Object name within moniting if not FQDN",
+    "katprep_mon_type" : "Monitoring system type: nagios/(icinga2)",
+    "katprep_virt_name": "Object name within hypervisor if not FQDN",
+    "katprep_virt_type": "Virtualization host type: (libvirt)/pyvmomi"
 }
 """
 dict: Built-in optional host parameters
 """
 VALUES = {
-    "katprep_monitoring": "fixmepls", "katprep_monitoring_name": "fixmepls",
+    "katprep_mon": "fixmepls", "katprep_mon_name": "fixmepls",
     "katprep_virt": "fixmepls", "katprep_virt_snapshot": "0",
     "katprep_virt_name": "fixmepls"}
 """
@@ -67,6 +69,9 @@ def change_param(host, mode="add", dry_run=True):
     :param host: Foreman API result dictionary
     :type host: dict
     :param mode: Mode (add, delete, update)
+    :type mode: str
+    :param dry_run: Only simulates what woule be done
+    :type dry_run: bool
     """
     if mode.lower() == "delete":
         LOGGER.debug("Deleting parameter...")
@@ -187,10 +192,11 @@ def parse_options(args=None):
     create, remove and audit host parameters for all systems. These parameters
     are evaluated by katprep_snapshot.py to create significant reports.
     Login credentials need to be entered interactively or specified using
-    environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an authfile.
-    When using an authfile, ensure that the file permissions are 0600 -
-    otherwise the script will abort. The first line needs to contain the
-    username, the second line represents the appropriate password.
+    environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an auth 
+    container.
+    When using an auth container, ensure that the file permissions are 0600 -
+    otherwise the script will abort. Maintain the auth container credentials 
+    with the katprep_authconfig.py utility.
     '''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
@@ -218,9 +224,6 @@ def parse_options(args=None):
     action="store_true", help="only simulate what would be done (default: no)")
 
     #SERVER ARGUMENTS
-    #-a / --authfile
-    srv_opts.add_argument("-a", "--authfile", dest="authfile", metavar="FILE", \
-    default="", help="defines an auth file to use instead of shell variables")
     #-C / --auth-container
     gen_opts.add_argument("-C", "--auth-container", default="", \
     dest="auth_container", action="store", help="defines an " \
@@ -311,8 +314,7 @@ def main(options):
     if not options.action_list:
         #initalize Satellite connection
         (sat_user, sat_pass) = get_credentials(
-            "Satellite", options.authfile,
-            options.server, options.auth_container
+            "Satellite", options.server, options.auth_container
         )
         SAT_CLIENT = ForemanAPIClient(options.server, sat_user, sat_pass)
 

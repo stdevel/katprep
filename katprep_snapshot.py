@@ -44,10 +44,11 @@ def parse_options(args=None):
     Hat Satellite 6. You can use two snapshot reports to create delta
     reports using katprep_report.py.
     Login credentials need to be entered interactively or specified using
-    environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an authfile.
-    When using an authfile, ensure that the file permissions are 0600 - 
-    otherwise the script will abort. The first line needs to contain the
-    username, the second line represents the appropriate password.
+    environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an auth
+    container.
+    When using an auth container, ensure that the file permissions are 0600 -
+    otherwise the script will abort. Maintain the auth container credentials
+    with the katprep_authconfig.py utility.
     '''
     epilog = '''Check-out the website for more details:
 http://github.com/stdevel/katprep'''
@@ -73,9 +74,6 @@ http://github.com/stdevel/katprep'''
     " for reports (default: current directory)")
 
     #SERVER ARGUMENTS
-    #-a / --authfile
-    srv_opts.add_argument("-a", "--authfile", dest="authfile", metavar="FILE", \
-    default="", help="defines an auth file to use instead of shell variables")
     #-C / --auth-container
     gen_opts.add_argument("-C", "--auth-container", default="", \
     dest="auth_container", action="store", help="defines an " \
@@ -222,8 +220,7 @@ def main(options):
     if is_writable(OUTPUT_FILE):
         #initalize Satellite connection and scan systems
         (sat_user, sat_pass) = get_credentials(
-            "Satellite", options.authfile,
-            options.server, options.auth_container
+            "Satellite", options.server, options.auth_container
         )
         SAT_CLIENT = ForemanAPIClient(options.server, sat_user, sat_pass)
 

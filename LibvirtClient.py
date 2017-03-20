@@ -212,3 +212,37 @@ class LibvirtClient:
             LOGGER.error("Unable to determine snapshot: '{}'".format(err))
         except Exception as err:
             raise err
+
+
+
+    def get_vm_ips(self):
+        """
+        Returns a list of VMs and their IPs available through the current 
+        connection.
+        """
+        try:
+            #get all VMs
+            vms = self.SESSION.listDefinedDomains()
+            result = {}
+
+            #scan _all_ the VMs
+            for vm in vms:
+                #get VM and lookup hostname
+                target_vm = self.SESSION.lookupByName(vm)
+                target_hostname = target_vm.hostname()
+                #lookup IP
+                target_ip = socket.gethostbyname(target_hostname)
+                result[vm] = {}
+                result[vm] = {"hostname": target_hostname, "ip": target_ip}
+            return result
+        except libvirt.libvirtError as err:
+            LOGGER.error("Unable to get VM IP information: '{}'".format(err))
+
+
+
+    def get_vm_hosts(self):
+        """
+        Returns a list of VMs and their hypervisors available through the
+        current connection.
+        """
+        print "TODO: get_vm_hosts"
