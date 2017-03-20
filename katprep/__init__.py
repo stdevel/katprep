@@ -24,8 +24,8 @@ logging: Logger instance
 def get_credentials(prefix, hostname=None, auth_container=None):
     """
     Retrieves credentials for a particular external system (e.g. Satellite).
-    This function checks whether a hostname is part of an authentication 
-    container or retrieves credentials from an authentication file. If both 
+    This function checks whether a hostname is part of an authentication
+    container or retrieves credentials from an authentication file. If both
     approaches fail, logon credentials are prompted.
 
     :param prefix: prefix for the external system (used in variables/prompts)

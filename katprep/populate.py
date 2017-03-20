@@ -62,7 +62,7 @@ def populate_virt():
         #check _all_ the hosts
         for host in hosts["results"]:
             #check if katprep_virt_type and katprep_virt is set appropriate
-            if 
+            if
 
         #for vm in vm_ips:
             #LOGGER.debug(
