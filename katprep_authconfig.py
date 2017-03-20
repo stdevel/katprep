@@ -57,6 +57,12 @@ def add(args):
         options.entry_password = getpass.getpass(
             "{} Password: ".format(options.entry_hostname)
         )
+    #prompt again
+    verification = ""
+    while verification != options.entry_password:
+        verification = getpass.getpass(
+            "Verify {} Password: ".format(options.entry_hostname)
+        )
     LOGGER.debug("Adding entry hostname='{}', username='{}'...".format(
         options.entry_hostname, options.entry_username)
     )
