@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 A script which prepares, executes and controls maintenance tasks on systems
