@@ -253,7 +253,7 @@ def create_reports():
 
 
 
-def main(options):
+def main(options, args):
     """Main function, starts the logic based on parameters."""
     #set template
     if options.template_file == "":
@@ -308,4 +308,4 @@ def cli():
     else:
         LOGGER.setLevel(logging.INFO)
 
-    main(options)
+    main(options, args)

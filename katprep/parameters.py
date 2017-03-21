@@ -285,7 +285,7 @@ def parse_options(args=None):
 
 
 
-def main(options):
+def main(options, args):
     """Main function, starts the logic based on parameters."""
     global SAT_CLIENT
 
@@ -338,4 +338,4 @@ def cli():
     else:
         LOGGER.setLevel(logging.INFO)
 
-    main(options)
+    main(options, args)

@@ -23,7 +23,7 @@ AuthContainer: authentication container file
 
 
 
-def list(args):
+def list(options, args):
     """
     This function lists entries from the authentication container.
     """

@@ -196,7 +196,7 @@ def create_report():
 
 
 
-def main(options):
+def main(options, args):
     """Main function, starts the logic based on parameters."""
     global SAT_CLIENT, OUTPUT_FILE
 
@@ -247,4 +247,4 @@ def cli():
     else:
         LOGGER.setLevel(logging.INFO)
 
-    main(options)
+    main(options, args)
