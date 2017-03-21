@@ -1,9 +1,10 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 A script for creating maintenance reports including installed errata per system
 managed with Foreman/Katello or Red Hat Satellite 6.
 """
+
+from __future__ import absolute_import
 
 import argparse
 import logging
@@ -12,7 +13,7 @@ import datetime
 import os
 #import pypandoc
 import yaml
-from katprep_shared import is_writable, which, is_valid_report, get_json
+from . import is_writable, which, is_valid_report, get_json
 
 __version__ = "0.0.1"
 """
@@ -35,7 +36,7 @@ dic: New snapshot report
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_report.py is used for creating maintenance reports
+    desc = '''%(prog)s is used for creating maintenance reports
     including errata per system managed with Foreman/Katello or Red Hat
     Satellite 6. The utility requires two snapshots: before and after
     maintenance tasks were executed - just append the two files to the
@@ -295,8 +296,7 @@ def main(options):
         create_reports()
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level

@@ -1,14 +1,15 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 A script which maintains entries in a authentication container.
 """
 
+from __future__ import absolute_import
+
 import argparse
 import logging
 import json
 import getpass
-from AuthContainer import AuthContainer
+from .AuthContainer import AuthContainer
 
 __version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_authconfig')
@@ -90,7 +91,7 @@ def remove(args):
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_authconfig.py is used for creating, modifying and
+    desc = '''%(prog)s is used for creating, modifying and
     removing entries in/from an authentication container.
     Authentication containers include various authentication credentials for
     external systems that can be accessed from the katprep utilities (e.g.
@@ -163,8 +164,7 @@ def main(options, args):
     options.func(options.func)
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level

@@ -1,9 +1,10 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 A script which prepares, executes and controls maintenance tasks on systems
 managed with Foreman/Katello or Red Hat Satellite 6.
 """
+
+from __future__ import absolute_import
 
 import argparse
 import logging
@@ -11,12 +12,12 @@ import yaml
 import json
 import time
 import os
-from katprep_shared import is_valid_report, get_json, get_credentials, \
+from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report
-from ForemanAPIClient import ForemanAPIClient
-from LibvirtClient import LibvirtClient
-from BasicNagiosCGIClient import BasicNagiosCGIClient
-from BasicIcinga2APIClient import BasicIcinga2APIClient
+from .clients.ForemanAPIClient import ForemanAPIClient
+from .clients.LibvirtClient import LibvirtClient
+from .clients.BasicNagiosCGIClient import BasicNagiosCGIClient
+from .clients.BasicIcinga2APIClient import BasicIcinga2APIClient
 
 __version__ = "0.0.1"
 """
@@ -277,7 +278,7 @@ def verify(args):
     """
     This function verifies maintenance tasks (such as creating snapshots and
     installing errata) and stores status information in a verification log.
-    These information are included into host reports by katprep_report.py.
+    These information are included into host reports by katprep_report.
 
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
@@ -384,11 +385,11 @@ def load_configuration(config_file, options):
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_maintenance.py is used for preparing, executing and
+    desc = '''%(prog)s is used for preparing, executing and
     controlling maintenance tasks on systems managed with Foreman/Katello
     or Red Hat Satellite 6.
     You can automatically create snapshots and schedule monitoring downtimes
-    if you have set all necessary host parameters using katprep_parameters.py.
+    if you have set all necessary host parameters using katprep_parameters.
     It is also possible to trigger errata installation using the Foreman API.
     After completing maintenance, it is also possible to remove snapshots and
     downtimes.
@@ -579,8 +580,7 @@ def main(options, args):
     options.func(options.func)
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level

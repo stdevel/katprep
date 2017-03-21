@@ -1,17 +1,18 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 A script for creating a snapshot report of available errata and updates for
 systems managed with Foreman/Katello or Red Hat Satellite 6.
 """
 
+from __future__ import absolute_import
+
 import argparse
 import logging
 import json
 import time
-from katprep_shared import get_credentials, is_writable, validate_filters, \
+from . import get_credentials, is_writable, validate_filters, \
 get_filter
-from ForemanAPIClient import ForemanAPIClient
+from .clients.ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
 """
@@ -39,16 +40,16 @@ str: Output file
 def parse_options(args=None):
     """Parses options and arguments."""
 
-    desc = '''katprep_snapshot.py is used for creating snapshot reports of
+    desc = '''%(prog)s is used for creating snapshot reports of
     errata available to your systems managed with Foreman/Katello or Red
     Hat Satellite 6. You can use two snapshot reports to create delta
-    reports using katprep_report.py.
+    reports using katprep_report.
     Login credentials need to be entered interactively or specified using
     environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an auth
     container.
     When using an auth container, ensure that the file permissions are 0600 -
     otherwise the script will abort. Maintain the auth container credentials
-    with the katprep_authconfig.py utility.
+    with the katprep_authconfig utility.
     '''
     epilog = '''Check-out the website for more details:
 http://github.com/stdevel/katprep'''
@@ -234,8 +235,7 @@ def main(options):
         LOGGER.error("Directory '{}' is not writable!".format(OUTPUT_FILE))
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level

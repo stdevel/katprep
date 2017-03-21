@@ -1,15 +1,16 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 A script for managing Puppet host parameters for systems managed with
 Foreman/Katello or Red Hat Satellite 6.
 """
 
+from __future__ import absolute_import
+
 import argparse
 import logging
 import json
-from katprep_shared import get_credentials, validate_filters, get_filter
-from ForemanAPIClient import ForemanAPIClient
+from . import get_credentials, validate_filters, get_filter
+from .clients.ForemanAPIClient import ForemanAPIClient
 
 __version__ = "0.0.1"
 """
@@ -187,16 +188,16 @@ def manage_params():
 
 def parse_options(args=None):
     """Parses options and arguments."""
-    desc = '''katprep_parameters.py is used for managing Puppet host parameters
+    desc = '''%(prog)s is used for managing Puppet host parameters
     for systems managed with Foreman/Katello or Red Hat Satellite 6. You can
     create, remove and audit host parameters for all systems. These parameters
-    are evaluated by katprep_snapshot.py to create significant reports.
+    are evaluated by katprep_snapshot to create significant reports.
     Login credentials need to be entered interactively or specified using
-    environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an auth 
+    environment variables (SATELLITE_LOGIN, SATELLITE_PASSWORD) or an auth
     container.
     When using an auth container, ensure that the file permissions are 0600 -
-    otherwise the script will abort. Maintain the auth container credentials 
-    with the katprep_authconfig.py utility.
+    otherwise the script will abort. Maintain the auth container credentials
+    with the katprep_authconfig utility.
     '''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
@@ -325,8 +326,7 @@ def main(options):
         manage_params()
 
 
-
-if __name__ == "__main__":
+def cli():
     (options, args) = parse_options()
 
     #set logging level
