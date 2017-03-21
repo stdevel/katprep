@@ -55,14 +55,15 @@ def populate_virt():
         hosts = params_obj = json.loads(SAT_CLIENT.api_get("/hosts"))
         #required settings
         required_settings = {
-            "katprep_virt" = options.virt_uri,
-            "katprep_virt_type" = options.virt_type
+            "katprep_virt": options.virt_uri,
+            "katprep_virt_type": options.virt_type
         }
 
         #check _all_ the hosts
         for host in hosts["results"]:
             #check if katprep_virt_type and katprep_virt is set appropriate
-            if
+            #if
+            print "TODO"
 
         #for vm in vm_ips:
             #LOGGER.debug(

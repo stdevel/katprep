@@ -11,8 +11,6 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   To-Do list<todo>
-
 ..   Module details<modules>
 
 

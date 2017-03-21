@@ -28,7 +28,7 @@ setup(
     long_description=long_description,
     url='https://github.com/stdevel/katprep',
     author='Christian Stankowic',
-    # author_email='TBD'  # TODO: fill
+    author_email='katprep@st-devel.net',
 
     # Choose your license
     license='GPLv3',
@@ -82,7 +82,8 @@ setup(
     # need to place data files outside of your packages. See:
     # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files # noqa
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
-    data_files=[('etc/katprep/', ['template.css', 'template.html', 'template.md'])],
+    # TODO: add config.yml later
+    data_files=[('etc/katprep/', ['templates/template.css', 'templates/template.html', 'templates/template.md'])],
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow

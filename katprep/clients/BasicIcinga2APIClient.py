@@ -308,8 +308,9 @@ class BasicIcinga2APIClient:
         :param object_name:
         :type object_name: str
         :param only_failed: True will only report failed services
-        :type only_failed = bool
+        :type only_failed: bool
         """
+
         result = self.__api_get("/objects/services?host={}".format(
             object_name)
         )

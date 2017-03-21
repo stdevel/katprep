@@ -282,6 +282,7 @@ class BasicNagiosCGIClient:
 
         :param text: text
         :type text: str
+
         """
         #blacklisted strings
         blacklist = {"\n"}
@@ -316,8 +317,9 @@ class BasicNagiosCGIClient:
         :param object_name:
         :type object_name: str
         :param only_failed: True will only report failed services
-        :type only_failed = bool
+        :type only_failed: bool
         """
+
         #set-up URL
         url = "/cgi-bin/status.cgi?host={}&style=detail".format(object_name)
         if only_failed:

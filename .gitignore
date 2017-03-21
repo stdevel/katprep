@@ -12,6 +12,8 @@ test*.py
 test*.yml
 TODO
 .buildinfo
+build/
+dist/
 
 # Python dirs
 __pycache__
