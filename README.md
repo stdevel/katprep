@@ -22,6 +22,10 @@ katprep uses Puppet host parameters to assign additional meta information to sys
   - differing object names within those systems
   - snapshots required before system maintenance
 
-If you plan to execute maintenance tasks, katprep triggers monitoring and virtualization hosts to schedule downtimes and create VM snapshots. Once these tasks have been completed, katprep can automatically trigger the patch installation and system reboot. After verifying your systems, katprep can remove downtimes and snapshots automatically. As a result, patching big system landscapes becomes less time-consuming.
+![katprep workflow](https://raw.githubusercontent.com/stdevel/katprep/master/katprep_workflow.jpg "katprep workflow")
+
+If you plan to execute maintenance tasks, katprep triggers (*`katprep_maintenance` utility*) monitoring and virtualization hosts to schedule downtimes and create VM snapshots. Once these tasks have been completed, katprep can automatically trigger the patch installation and system reboot. After verifying your systems, katprep can remove downtimes and snapshots automatically. Before and after patching systems, it is necessary to create an inventory report of your system landscape. These reports contain information such as outstanding patches - after patching your systems, the `katprep_report` utility automatically calculares differences and creates patch reports for all updated hosts.
+
+As a result, patching big system landscapes becomes less time-consuming with katprep: it's only executing three commands - independent whether you are patching 1 host or 1000 hosts.
 
 To make the installation even easier, an auto-discover functionality is [currently under development](https://github.com/stdevel/katprep/issues/8). This feature will automatically scan your monitoring systems and hypervisors and link gathered information with Foreman/Katello and Red Hat Satellite.
