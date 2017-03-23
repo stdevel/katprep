@@ -23,7 +23,7 @@ AuthContainer: authentication container file
 
 
 
-def list(options, args):
+def list(options):
     """
     This function lists entries from the authentication container.
     """
@@ -41,7 +41,7 @@ def list(options, args):
 
 
 
-def add(args):
+def add(options):
     """
     This function adds/modifies an entry to/from the authentication container.
     """
@@ -53,13 +53,18 @@ def add(args):
         options.entry_username = raw_input(
             "{} Username: ".format(options.entry_hostname)
         )
+    password_prompted=False
     while options.entry_password == "":
         #prompt for password
+        password_prompted=True
         options.entry_password = getpass.getpass(
             "{} Password: ".format(options.entry_hostname)
         )
     #prompt again
-    verification = ""
+    if not password_prompted:
+        verification = options.entry_password
+    else:
+        verification = ""
     while verification != options.entry_password:
         verification = getpass.getpass(
             "Verify {} Password: ".format(options.entry_hostname)
@@ -74,7 +79,7 @@ def add(args):
 
 
 
-def remove(args):
+def remove(options):
     """
     This function removes an entry from the authentication container.
     """
@@ -161,7 +166,7 @@ def main(options, args):
     CONTAINER = AuthContainer(options.container[0])
 
     #start action
-    options.func(options.func)
+    options.func(options)
 
 
 def cli():

@@ -25,7 +25,7 @@ SAT_CLIENT = None
 ForemanAPIClient: Foreman API client handle
 """
 PARAMETERS = {
-    "katprep_mon" : "Monitoring URL of the system",
+    "katprep_mon" : "URL of the monitoring system",
     "katprep_virt" : "Virtualization URL of the system",
     "katprep_virt_snapshot" : "Boolean whether system needs to be"\
     " protected by a snapshot before maintenance"}
@@ -33,7 +33,7 @@ PARAMETERS = {
 dict: Built-in default host parameters mandatory for katprep
 """
 OPT_PARAMETERS = {
-    "katprep_mon_name" : "Object name within moniting if not FQDN",
+    "katprep_mon_name" : "Object name within monitoring if not FQDN",
     "katprep_mon_type" : "Monitoring system type: nagios/(icinga2)",
     "katprep_virt_name": "Object name within hypervisor if not FQDN",
     "katprep_virt_type": "Virtualization host type: (libvirt)/pyvmomi"

@@ -219,9 +219,9 @@ def main(options, args):
 
     #check if we can read and write before digging
     if is_writable(OUTPUT_FILE):
-        #initalize Satellite connection and scan systems
+        #initalize Foreman connection and scan systems
         (sat_user, sat_pass) = get_credentials(
-            "Satellite", options.server, options.auth_container
+            "Foreman", options.server, options.auth_container
         )
         SAT_CLIENT = ForemanAPIClient(options.server, sat_user, sat_pass)
 
