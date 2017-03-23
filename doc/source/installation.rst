@@ -82,20 +82,30 @@ Installation
 ============
 To install katprep, you can clone the GitHub repository and install the utility or build a RPM package to install. At a later point, we might also supply pre-built RPM packages::
 
-   $ wget ...
-   $ unzip ...
+   $ wget https://github.com/stdevel/katprep/archive/master.zip
+   $ unzip master.zip
+   $ cd katprep-master
 
 -------------------
 Manual installation
 -------------------
 Proceed with the following steps::
 
-   $ ...
+   $ python setup.py install
+
+In case you want to install the toolkit only for your current user (*e.g. because of file system restrictions*), use the **--user-- parameter**::
+
+   $ python setup.py install --user
 
 ---------
 Build RPM
 ---------
 Ensure to have RPM development utilities installed and proceed with the following steps::
 
-   $ python setup.py ...
+   $ python setup.py bdist_rpm
+   $ sudo yum localinstall dist/katprep*.rpm
 
+Specifying the **--spec-only** parameter will only create a RPM spec file::
+
+   $ python setup.py bdist_rpm --spec-only
+   $ less dist/katprep.spec
