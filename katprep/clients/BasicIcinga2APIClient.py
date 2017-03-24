@@ -35,8 +35,12 @@ class BasicIcinga2APIClient:
     """
     logging: Logger instance
     """
+    VERIFY_SSL = False
+    """
+    bool: Setting whether to check SSL certificate
+    """
 
-    def __init__(self, url, username="", password="", verify_ssl=True):
+    def __init__(self, url, username="", password="", verify_ssl=False):
         """
         Constructor, creating the class. It requires specifying a
         URL, an username and password to access the API.
@@ -60,8 +64,8 @@ class BasicIcinga2APIClient:
         self.PASSWORD = password
 
         #set SSL information and connect
-        if not verify_ssl:
-            self.VERIFY_SSL = False
+        if verify_ssl:
+            self.VERIFY_SSL = True
         self.__connect()
 
 
@@ -325,3 +329,20 @@ class BasicIcinga2APIClient:
                 this_service = {"name": service, "state": state}
                 services.append(this_service)
         return services
+
+
+
+    def get_hosts(self):
+        """
+        Returns hosts by their name and IP.
+        """
+
+        result = self.__api_get("/objects/hosts")
+        data = json.loads(result)
+        hosts = []
+        for result in data["results"]:
+            host = result["attrs"]["display_name"]
+            ip = result["attrs"]["address"]
+            this_host = {"name": host, "ip": ip}
+            hosts.append(this_host)
+        return hosts

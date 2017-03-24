@@ -238,17 +238,21 @@ class PyvmomiClient:
         try:
             #get _all_ the VMs
             content = self.SESSION.RetrieveContent() 
-            result = {}
+            #result = {}
+            result = []
             #create view cotaining VM objects
             object_view = content.viewManager.CreateContainerView(
                 content.rootFolder, [vim.VirtualMachine], True
             )
             for obj in object_view.view:
                 if not hide_empty or obj.summary.guest.ipAddress != None:
-                    result[obj.config.name] = {
+                    result.append(
+                    {
+                        "object_name": obj.config.name,
                         "hostname": obj.summary.guest.hostName,
                         "ip": obj.summary.guest.ipAddress
                     }
+                    )
             return result
         except Exception as err:
             self.LOGGER.error("Unable to get VM IP information: '{}'".format(err))

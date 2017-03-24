@@ -43,43 +43,111 @@ BasicNagiosCGIClient: Nagios CGI client handle
 
 
 
-def populate_virt():
+def populate(options):
     """
     Retrieves information from a virtualization system and tries to merge
     data with Foreman/Katello.
     """
     try:
-        #retrieve VM/IP information
-        vm_hosts = VIRT_CLIENT.list_vm_hosts()
         #retrieve host information
         hosts = params_obj = json.loads(SAT_CLIENT.api_get("/hosts"))
-        #required settings
-        required_settings = {
-            "katprep_virt": options.virt_uri,
-            "katprep_virt_type": options.virt_type
-        }
+        required_settings = {}
+
+        #retrieve VM/IP information
+        if not options.virt_skip:
+            vm_hosts = VIRT_CLIENT.get_vm_ips()
+            #print vm_hosts
+            for host in vm_hosts:
+                LOGGER.debug("HYPERVISOR: Found VM '{}' with IP '{}'".format(
+                    host["hostname"], host["ip"])
+                )
+
+        #retrieve monitoring information
+        if not options.mon_skip:
+            mon_hosts = MON_CLIENT.get_hosts()
+            for host in mon_hosts:
+                LOGGER.debug("MONITORING: Found host '{}' with IP '{}'".format(
+                    host["name"], host["ip"])
+                )
 
         #check _all_ the hosts
         for host in hosts["results"]:
-            #check if katprep_virt_type and katprep_virt is set appropriate
-            #if
-            print "TODO"
+            LOGGER.debug("SATELLITE: Found host '{}' with IP '{}'".format(
+                host["name"], host["ip"])
+            )
 
-        #for vm in vm_ips:
-            #LOGGER.debug(
-                #"Found VM '{}' with IP '{}'".format(vm, vm_ips[vm]["ip"])
-            #)
+            #check if host parameters set appropriately
+            required_settings={}
+
+            if host["ip"] in [x["ip"] for x in vm_hosts]:
+                LOGGER.debug("Host '{}' is a VM".format(host["name"]))
+
+                required_settings["katprep_virt"] = options.virt_uri
+                required_settings["katprep_virt_type"] = options.virt_type
+                vm_name = [x["object_name"] for x in vm_hosts if x["ip"] == host["ip"]]
+                if host["name"] != vm_name[0]:
+                    required_settings["katprep_virt_name"] = vm_name[0]
+
+            if host["ip"] in [x["ip"] for x in mon_hosts]:
+                LOGGER.debug("Host '{}' is monitored".format(host["name"]))
+
+                required_settings["katprep_mon"] = options.mon_url
+                required_settings["katprep_mon_type"] = options.mon_type
+                mon_name = [x["name"] for x in mon_hosts if x["ip"] == host["ip"]]
+                if host["name"] != mon_name[0]:
+                    required_settings["katprep_mon_name"] = mon_name[0]
+
+            #set host parameters
+            for setting in required_settings:
+                if options.generic_dry_run:
+                    LOGGER.info("Host '{}' ==> set/update parameter/value: {}/{}".format(
+                        host["name"], setting, required_settings[setting]
+                        )
+                    )
+                else:
+                    #host_id = SAT_CLIENT.get_id_by_name(host["name"], "host")
+                    host_params = SAT_CLIENT.get_host_params(host["id"])
+                    key_exists = [x for x in host_params if x["name"] == setting]
+                    #set payload
+                    payload = {}
+                    payload["parameter"] = {
+                        "name": setting, "value": required_settings[setting]
+                    }
+                    #update or create parameter
+                    if len(key_exists) > 0:
+                        if options.foreman_update:
+                            LOGGER.debug("Host '{}' ==> UPDATE parameter/value: {}/{}".format(
+                                host["name"], setting, required_settings[setting]
+                                )
+                            )
+                            #get parameter ID to update
+                            param_id = SAT_CLIENT.get_hostparam_id_by_name(
+                                host["id"], setting
+                            )
+                            #update parameter
+                            SAT_CLIENT.api_put(
+                                "/hosts/{}/parameters/{}".format(host["id"], param_id),
+                                json.dumps(payload)
+                            )
+                        else:
+                            LOGGER.error("Parameter '{}' for host '{}' already exists "
+                                "and updating values has not been enabled!".format(
+                                    setting, host["name"]
+                                )
+                            )
+                    else:
+                        LOGGER.debug("Host '{}' ==> CREATE parameter/value: {}/{}".format(
+                            host["name"], setting, required_settings[setting]
+                            )
+                        )
+                        #add parameter
+                        SAT_CLIENT.api_post("/hosts/{}/parameters".format(
+                            host["id"]),
+                            json.dumps(payload)
+                        )
+
     except ValueError as err:
         LOGGER.error("Unable to populate virtualization data: '{}'".format(err))
-
-
-
-def populate_mon():
-    """
-    Retrieves information from a monitoring system and tries to merge data
-    with Foreman/Katello.
-    """
-    print "TODO: populate_mon"
 
 
 
@@ -125,6 +193,10 @@ def parse_options(args=None):
     fman_opts.add_argument("-s", "--foreman-server", \
     dest="foreman_server", metavar="SERVER", default="localhost", \
     help="defines the Foreman server to use (default: localhost)")
+    #-u / --update
+    fman_opts.add_argument("-u", "--update", dest="foreman_update", \
+    action="store_true", default=False, help="Updates pre-existing host " \
+    "parameters (default: no)")
 
     #VIRTUALIZATION ARGUMENTS
     virt_opts.add_argument("--virt-uri", dest="virt_uri", \
@@ -193,8 +265,6 @@ def main(options, args):
         else:
             #libvirt
             VIRT_CLIENT = LibvirtClient(options.virt_uri, virt_user, virt_pass)
-        #populate from virtualization host
-        populate_virt()
 
     #get monitoring host credentials
     if options.mon_skip == False:
@@ -211,8 +281,10 @@ def main(options, args):
             MON_CLIENT = BasicIcinga2APIClient(
                 options.mon_url, mon_user, mon_pass
             )
-        #populate from monitoring host
-        populate_mon()
+
+    #populate _all_ the things
+    populate(options)
+
 
 
 def cli():

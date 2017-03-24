@@ -28,4 +28,4 @@ If you plan to execute maintenance tasks, katprep triggers (*`katprep_maintenanc
 
 As a result, patching big system landscapes becomes less time-consuming with katprep: it's only executing three commands - independent whether you are patching 1 host or 1000 hosts.
 
-To make the installation even easier, an auto-discover functionality is [currently under development](https://github.com/stdevel/katprep/issues/8). This feature will automatically scan your monitoring systems and hypervisors and link gathered information with Foreman/Katello and Red Hat Satellite.
+To make the installation even easier, an auto-discover functionality can scan your monitoring systems and hypervisors and link gathered information with Foreman/Katello and Red Hat Satellite automatically (``katprep_populate``).

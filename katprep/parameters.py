@@ -62,7 +62,7 @@ def list_params():
 
 
 
-def change_param(host, mode="add", dry_run=True):
+def change_param(options, host, mode="add", dry_run=True):
     """
     Adds/updates/removes parameters for a particular host. For this, a
     host result object and a mode need to be specified.
@@ -135,7 +135,7 @@ def change_param(host, mode="add", dry_run=True):
 
 
 
-def manage_params():
+def manage_params(options):
     """
     Adds/removes/displays/updates parameter definitions.
     """
@@ -154,11 +154,11 @@ def manage_params():
         )
         #execute action
         if options.action_add or options.action_addopt:
-            change_param(entry, "add", options.dry_run)
+            change_param(options, entry, "add", options.dry_run)
         elif options.action_update:
-            change_param(entry, "update", options.dry_run)
+            change_param(options, entry, "update", options.dry_run)
         elif options.action_remove:
-            change_param(entry, "del", options.dry_run)
+            change_param(options, entry, "del", options.dry_run)
         else:
             LOGGER.debug("Displaying parameter values...")
 
@@ -323,7 +323,7 @@ def main(options, args):
         validate_filters(options, SAT_CLIENT)
 
         #do the stuff
-        manage_params()
+        manage_params(options)
 
 
 def cli():

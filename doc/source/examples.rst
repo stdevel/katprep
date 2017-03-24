@@ -10,7 +10,7 @@ The following example consists of:
  * a Nagios server monitoring those VMs
  * snapshot protection for all VMs
 
-...
+**TODO**: add graph/notes/instructions
 
 --------------
 Advanced setup
@@ -22,4 +22,4 @@ The following example consists of:
   * VM and Monitoring names differing from the FQDN
   * snapshot protection for some VMs
 
-...
+**TODO**: add graph/notes/instructions

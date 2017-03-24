@@ -223,7 +223,7 @@ class LibvirtClient:
         try:
             #get all VMs
             vms = self.SESSION.listDefinedDomains()
-            result = {}
+            result = []
 
             #scan _all_ the VMs
             for vm in vms:
@@ -232,8 +232,9 @@ class LibvirtClient:
                 target_hostname = target_vm.hostname()
                 #lookup IP
                 target_ip = socket.gethostbyname(target_hostname)
-                result[vm] = {}
-                result[vm] = {"hostname": target_hostname, "ip": target_ip}
+                result.append(
+                    {"hostname": target_hostname, "ip": target_ip}
+                )
             return result
         except libvirt.libvirtError as err:
             LOGGER.error("Unable to get VM IP information: '{}'".format(err))

@@ -385,3 +385,20 @@ class ForemanAPIClient:
 
         except ValueError as err:
             LOGGER.error(err)
+
+
+
+    def get_host_params(self, host):
+        """
+        Returns all parameters for a particular host.
+
+        :param host: Forenam host name
+        :type host: str
+        """
+        try:
+            result_obj = json.loads(
+                self.api_get("/hosts/{}/parameters".format(host))
+            )
+            return result_obj["results"]
+        except ValueError as err:
+            LOGGER.error(err)
