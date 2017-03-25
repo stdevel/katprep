@@ -73,11 +73,9 @@ class AuthContainer:
         This function stores the changed authentication container to disk.
         """
         try:
-            target = open(self.FILENAME, 'w')
-            target.write(
-                json.dumps(self.CREDENTIALS)
-            )
-            target.close()
+            with open(self.FILENAME, 'w') as target:
+                target.write(json.dumps(self.CREDENTIALS))
+
             #setting the good perms
             os.chmod(self.FILENAME, 0600)
         except IOError as err:

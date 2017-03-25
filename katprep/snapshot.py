@@ -184,11 +184,8 @@ def create_report():
     """Creates a JSON report including errata information of all hosts."""
 
     try:
-        target = open(OUTPUT_FILE, 'w')
-        target.write(
-            json.dumps(SYSTEM_ERRATA)
-        )
-        target.close()
+        with open(OUTPUT_FILE, 'w') as target:
+            target.write(json.dumps(SYSTEM_ERRATA))
     except IOError as err:
         LOGGER.error("Unable to store report: '{}'".format(err))
     else:
