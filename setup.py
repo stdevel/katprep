@@ -61,6 +61,7 @@ setup(
         'pyyaml',
         # TODO: specify libvirt?
     ],
+    # Remember to insert the requirements into requirements.txt!
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

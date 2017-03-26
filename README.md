@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/stdevel/katprep.svg?branch=master)](https://travis-ci.org/stdevel/katprep)
+
 # katprep
 **katprep** is a Python toolkit for automating system maintenance and generating patch reports for systems managed with [Foreman](http://www.theforeman.org/)/[Katello](http://www.katello.org/) or [Red Hat Satellite 6.x](http://www.redhat.com/products/enterprise-linux/satellite/).
 
