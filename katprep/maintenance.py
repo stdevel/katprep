@@ -181,11 +181,8 @@ def set_verification_value(host, setting, value):
         REPORT[host]["verification"][setting] = value
 
         #store file
-        target = open(options.report[0], 'w')
-        target.write(
-            json.dumps(REPORT)
-        )
-        target.close()
+        with open(options.report[0], 'w') as target:
+            target.write(json.dumps(REPORT))
     except IOError as err:
         LOGGER.error("Unable to store report: '{}'".format(err))
     except ValueError as err:

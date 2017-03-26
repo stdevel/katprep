@@ -109,7 +109,7 @@ http://github.com/stdevel/katprep'''
 
 
 
-def scan_systems():
+def scan_systems(options):
     """Scans all systems that were selected for errata counters."""
 
     try:
@@ -184,11 +184,8 @@ def create_report():
     """Creates a JSON report including errata information of all hosts."""
 
     try:
-        target = open(OUTPUT_FILE, 'w')
-        target.write(
-            json.dumps(SYSTEM_ERRATA)
-        )
-        target.close()
+        with open(OUTPUT_FILE, 'w') as target:
+            target.write(json.dumps(SYSTEM_ERRATA))
     except IOError as err:
         LOGGER.error("Unable to store report: '{}'".format(err))
     else:
@@ -229,7 +226,7 @@ def main(options, args):
         validate_filters(options, SAT_CLIENT)
 
         #scan systems and create report
-        scan_systems()
+        scan_systems(options)
         create_report()
     else:
         LOGGER.error("Directory '{}' is not writable!".format(OUTPUT_FILE))
