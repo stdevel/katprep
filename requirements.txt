@@ -1,1 +1,3 @@
-lxml pyvmomi pyyaml
+lxml
+pyvmomi
+pyyaml
