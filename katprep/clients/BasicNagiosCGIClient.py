@@ -29,14 +29,6 @@ class BasicNagiosCGIClient:
     """
     str: Nagios/Icinga URL
     """
-    USERNAME = ""
-    """
-    str: API username
-    """
-    PASSWORD = ""
-    """
-    str: API password
-    """
     SESSION = None
     """
     session: API session

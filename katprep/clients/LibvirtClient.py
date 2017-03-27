@@ -15,14 +15,6 @@ class LibvirtClient:
     """
 .. class:: LibvirtClient
     """
-    USERNAME = ""
-    """
-    str: libvirt API username
-    """
-    PASSWORD = ""
-    """
-    str: libvirt API password
-    """
     URI = ""
     """
     str: libvirt URI

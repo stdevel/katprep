@@ -42,14 +42,6 @@ class ForemanAPIClient:
     """
     str: Foreman API hostname
     """
-    USERNAME = ""
-    """
-    str: Foreman API username
-    """
-    PASSWORD = ""
-    """
-    str: Foreman API password
-    """
     URL = ""
     """
     str: Foreman API base URL
