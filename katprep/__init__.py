@@ -229,3 +229,21 @@ def get_required_hosts_by_report(report, key):
             LOGGER.info("Key '{}' not found for host '{}'".format(key, host))
             pass
     return hosts
+
+
+
+def get_host_params_by_report(report, host):
+    """
+    Retrieves all parameters for a particular host from a report.
+
+    :param report: report dictionary
+    :type report: dict
+    :param host: hostname
+    :type host: str
+    """
+    try:
+        for entry in report:
+            return report[entry]["params"]
+    except KeyError:
+            LOGGER.info("Parameters not found for host '{}'".format(host))
+            pass

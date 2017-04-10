@@ -114,7 +114,7 @@ class LibvirtClient:
 
 
     def __manage_snapshot(
-            self, vm_name, snapshot_title, snapshot_text, remove_snapshot=False
+            self, vm_name, snapshot_title, snapshot_text, action="create"
         ):
         """
         Creates/removes a snapshot for a particular virtual machine.
@@ -134,10 +134,14 @@ class LibvirtClient:
 
         try:
             target_vm = self.SESSION.lookupByName(vm_name)
-            if remove_snapshot:
+            if action.lower() == "remove":
                 #remove snapshot
                 target_snap = target_vm.snapshotLookupByName(snapshot_title, 0)
                 return target_snap.delete(0)
+            elif action.lower() == "revert":
+                #revert snapshot
+                target_snap = target_vm.snapshotLookupByName(snapshot_title, 0)
+                return target_vm.revertToSnapshot(target_snap)
             else:
                 #create snapshot
                 snap_xml = """<domainsnapshot><name>{}</name><description>{}
@@ -146,10 +150,9 @@ class LibvirtClient:
                     )
                 return target_vm.snapshotCreateXML(snap_xml, 0)
         except libvirt.libvirtError as err:
-            if remove_snapshot:
-                LOGGER.error("Unable to remove snapshot: '{}'".format(err))
-            else:
-                LOGGER.error("Unable to create snapshot: '{}'".format(err))
+            LOGGER.error("Unable to {} snapshot: '{}'".format(
+                action.lower(), err)
+            )
 
 
 
@@ -179,7 +182,21 @@ class LibvirtClient:
         :type snapshot_title: str
         """
         return self.__manage_snapshot(
-            vm_name, snapshot_title, "", remove_snapshot=True
+            vm_name, snapshot_title, "", action="remove"
+        )
+
+    def revert_snapshot(self, vm_name, snapshot_title):
+        """
+        Reverts to  a snapshot for a particular virtual machine.
+        This requires specifying a VM and a comment title.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        :param snapshot_title: Snapshot title
+        :type snapshot_title: str
+        """
+        return self.__manage_snapshot(
+            vm_name, snapshot_title, "", action="revert"
         )
 
 

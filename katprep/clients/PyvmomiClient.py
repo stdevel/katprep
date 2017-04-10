@@ -56,6 +56,7 @@ class PyvmomiClient:
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
+        print self.HOSTNAME
         self.__connect()
 
 
@@ -98,7 +99,7 @@ class PyvmomiClient:
 
 
     def __manage_snapshot(
-            self, vm_name, snapshot_title, snapshot_text, remove_snapshot=False
+            self, vm_name, snapshot_title, snapshot_text, action="create"
         ):
         """
         Creates/removes a snapshot for a particular virtual machine.
@@ -122,19 +123,28 @@ class PyvmomiClient:
         try:
             content = self.SESSION.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
-            if remove_snapshot:
+            if action.lower() != "create":
                 #get _all_ the snapshots
                 snapshots = self.__get_snapshots(vm_name)
                 for snapshot in snapshots:
                     childs = snapshot.childSnapshotList
                     if snapshot.name == snapshot_title:
-                        #remove snapshot
-                        snapshot.snapshot.RemoveSnapshot_Task(True)
+                        if action.lower() == "remove":
+                            #remove snapshot
+                            snapshot.snapshot.RemoveSnapshot_Task(True)
+                        else:
+                            #revert snapshot
+                            snapshot.snapshot.RevertToSnapshot_Task(True)
                     if childs:
                         #also iterate through childs
                         for child in childs:
                             if child.name == snapshot_title:
-                                child.snapshot.RemoveSnapshot_Task(True)
+                                if action.lower() == "remove":
+                                    #remove snapshot
+                                    child.snapshot.RemoveSnapshot_Task(True)
+                                else:
+                                    #revert snapshot
+                                    child.snapshot.RevertToSnapshot_Task(True)
             else:
                 #only create snapshot if not already existing
                 if not self.has_snapshot(vm_name, snapshot_title):
@@ -165,7 +175,9 @@ class PyvmomiClient:
         :param snapshot_text: Snapshot text
         :type snapshot_text: str
         """
-        return self.__manage_snapshot(vm_name, snapshot_title, snapshot_text)
+        return self.__manage_snapshot(
+            vm_name, snapshot_title, snapshot_text, action="create"
+        )
 
     def remove_snapshot(self, vm_name, snapshot_title):
         """
@@ -178,7 +190,21 @@ class PyvmomiClient:
         :type snapshot_title: str
         """
         return self.__manage_snapshot(
-            vm_name, snapshot_title, "", remove_snapshot=True
+            vm_name, snapshot_title, "", action="remove"
+        )
+
+    def revert_snapshot(self, vm_name, snapshot_title):
+        """
+        Reverts to  a snapshot for a particular virtual machine.
+        This requires specifying a VM and a comment title.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        :param snapshot_title: Snapshot title
+        :type snapshot_title: str
+        """
+        return self.__manage_snapshot(
+            vm_name, snapshot_title, "", action="revert"
         )
 
 
@@ -217,16 +243,20 @@ class PyvmomiClient:
         content = self.SESSION.RetrieveContent()
         #get _all_ the snapshots
         snapshots = self.__get_snapshots(vm_name)
-        for snapshot in snapshots:
-            childs = snapshot.childSnapshotList
-            if snapshot.name == snapshot_title:
-                return True
-            #also check childs
-            elif childs:
-                for child in childs:
-                    if child.name == snapshot_title:
-                        return True
-        return False
+        try:
+            for snapshot in snapshots:
+                childs = snapshot.childSnapshotList
+                if snapshot.name == snapshot_title:
+                    return True
+                #also check childs
+                elif childs:
+                    for child in childs:
+                        if child.name == snapshot_title:
+                            return True
+            return False
+        except TypeError:
+            #no snapshots
+            return False
 
 
 

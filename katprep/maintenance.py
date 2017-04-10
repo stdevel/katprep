@@ -13,9 +13,10 @@ import json
 import time
 import os
 from . import is_valid_report, get_json, get_credentials, \
-get_required_hosts_by_report
+get_required_hosts_by_report, get_host_params_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
+from .clients.PyvmomiClient import PyvmomiClient
 from .clients.BasicNagiosCGIClient import BasicNagiosCGIClient
 from .clients.BasicIcinga2APIClient import BasicIcinga2APIClient
 
@@ -31,17 +32,9 @@ SAT_CLIENT = None
 """
 ForemanAPIClient: Foreman API client handle
 """
-VIRT_CLIENT = None
-"""
-LibvirtClient: libvirt API client handle
-"""
 VIRT_CLIENTS = {}
 """
 dict: libvirt API client handles
-"""
-MON_CLIENT = None
-"""
-BasicNagiosCGIClient: Nagios CGI client handle
 """
 MON_CLIENTS = {}
 """
@@ -75,7 +68,7 @@ def get_host_param_from_report(report, host, param):
 
 
 
-def manage_host_preparation(host, cleanup=False):
+def manage_host_preparation(options, host, cleanup=False):
     """
     This function prepares or cleans up maintenance tasks for a particular
     host. This includes creating/removing snapshots and scheduled downtimes.
@@ -116,12 +109,12 @@ def manage_host_preparation(host, cleanup=False):
         else:
             if cleanup:
                 #remove snapshot
-                VIRT_CLIENT.remove_snapshot(
+                VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].remove_snapshot(
                     vm_name, "katprep_{}".format(REPORT_PREFIX)
                 )
             else:
                 #create snapshot
-                VIRT_CLIENT.create_snapshot(
+                VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].create_snapshot(
                     vm_name, "katprep_{}".format(REPORT_PREFIX),
                     "Snapshot created automatically by katprep"
                 )
@@ -152,16 +145,16 @@ def manage_host_preparation(host, cleanup=False):
         else:
             if cleanup:
                 #remove downtime
-                MON_CLIENT.remove_downtime(mon_name)
+                MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].remove_downtime(mon_name)
             else:
                 #schedule downtime
-                MON_CLIENT.schedule_downtime(
+                MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].schedule_downtime(
                     mon_name, "host", hours=options.mon_downtime
                 )
 
 
 
-def set_verification_value(host, setting, value):
+def set_verification_value(options, host, setting, value):
     """
     This function stores verification data in a snapshot report. This is done
     by altering the host information dictionary and storing the changes in the
@@ -192,7 +185,7 @@ def set_verification_value(host, setting, value):
 
 
 
-def prepare(args):
+def prepare(options, args):
     """
     This function prepares maintenance tasks, which might include creating
     snapshots and scheduling downtime.
@@ -206,7 +199,7 @@ def prepare(args):
             LOGGER.debug("Preparing host '{}'...".format(host))
 
             #prepare host
-            manage_host_preparation(host)
+            manage_host_preparation(options, host)
 
             #verify preparation
             if not options.generic_dry_run:
@@ -217,7 +210,7 @@ def prepare(args):
 
 
 
-def execute(args):
+def execute(options, args):
     """
     This function executes maintenance tasks, which might include applying
     errata.
@@ -259,7 +252,7 @@ def execute(args):
 
 
 
-def revert(args):
+def revert(options, args):
     """
     This function reverts maintenance tasks, which might include removing
     errata or restoring virtual machine snapshots.
@@ -271,7 +264,7 @@ def revert(args):
 
 
 
-def verify(args):
+def verify(options, args):
     """
     This function verifies maintenance tasks (such as creating snapshots and
     installing errata) and stores status information in a verification log.
@@ -297,11 +290,13 @@ def verify(args):
                 else:
                     #FQDN
                     vm_name = host
-                if VIRT_CLIENT.has_snapshot(
+                #print "Trying to find virt server for host {}".format(host)
+                #print get_host_param_from_report(REPORT, host, "katprep_virt")
+                if VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].has_snapshot(
                     vm_name, "katprep_{}".format(REPORT_PREFIX)
                     ):
                     #set flag
-                    set_verification_value(host, "virt_snapshot", 1)
+                    set_verification_value(options, host, "virt_snapshot", 1)
                     LOGGER.info("Snapshot for host '{}' found.".format(host))
 
             #check downtime
@@ -317,12 +312,12 @@ def verify(args):
                     #FQDN
                     mon_name = host
                 #check scheduled downtime
-                if MON_CLIENT.has_downtime(mon_name):
+                if MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].has_downtime(mon_name):
                     #set flag
-                    set_verification_value(host, "mon_downtime", 1)
+                    set_verification_value(options, host, "mon_downtime", 1)
                     LOGGER.info("Snapshot for host '{}' found.".format(host))
                 #check critical services
-                crit_services = MON_CLIENT.get_services(mon_name)
+                crit_services = MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].get_services(mon_name)
                 if len(crit_services) > 0:
                     services = ""
                     for service in crit_services:
@@ -330,8 +325,12 @@ def verify(args):
                             services, service.keys()[0], service.values()[0]
                         )
                     #add status to verfication values
-                    set_verification_value(host, "mon_status", services)
+                    set_verification_value(options, host, "mon_status", services)
 
+    except KeyError:
+        #host with either no virt/mon
+        pass
+        #TODO: seems not to work...
     except ValueError as err:
         LOGGER.error("Error verifying host: '{}'".format(err))
 
@@ -351,7 +350,7 @@ def cleanup(args):
             LOGGER.debug("Cleaning-up host '{}'...".format(host))
 
             #clean-up host
-            manage_host_preparation(host, True)
+            manage_host_preparation(options, host, True)
 
     except ValueError as err:
         LOGGER.error("Error cleaning-up maintenance: '{}'".format(err))
@@ -512,7 +511,7 @@ def parse_options(args=None):
 
 def main(options, args):
     """Main function, starts the logic based on parameters."""
-    global REPORT, REPORT_PREFIX, SAT_CLIENT, VIRT_CLIENT, MON_CLIENT
+    global REPORT, REPORT_PREFIX, SAT_CLIENT
     global VIRT_CLIENTS, MON_CLIENTS
 
     LOGGER.debug("Options: {0}".format(options))
@@ -551,7 +550,12 @@ def main(options, args):
                 "Virtualization {}".format(host),
                 host, options.generic_auth_container
             )
-            VIRT_CLIENTS[host] = LibvirtClient(host, virt_user, virt_pass)
+            #create client based on type
+            host_params = get_host_params_by_report(REPORT, host)
+            if host_params["katprep_virt_type"] == "pyvmomi":
+                VIRT_CLIENTS[host] = PyvmomiClient(host, virt_user, virt_pass)
+            else:
+                VIRT_CLIENTS[host] = LibvirtClient(host, virt_user, virt_pass)
 
     #get monitoring host credentials
     if options.mon_skip_downtime == False:
@@ -561,8 +565,8 @@ def main(options, args):
                 "Monitoring {}".format(host),
                 host, options.generic_auth_container
             )
-            #TODO: store type in parameter?
-            if options.mon_type == "nagios":
+            host_params = get_host_params_by_report(REPORT, host)
+            if host_params["katprep_mon_type"] == "nagios":
                 #Yet another legacy installation
                 MON_CLIENTS[host] = BasicNagiosCGIClient(
                     host, mon_user, mon_pass
@@ -574,7 +578,7 @@ def main(options, args):
                 )
 
     #start action
-    options.func(options.func)
+    options.func(options, options.func)
 
 
 def cli():
