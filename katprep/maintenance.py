@@ -315,7 +315,11 @@ def verify(options, args):
                 if MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].has_downtime(mon_name):
                     #set flag
                     set_verification_value(options, host, "mon_downtime", 1)
-                    LOGGER.info("Snapshot for host '{}' found.".format(host))
+                    LOGGER.info("Downtime for host '{}' found.".format(host))
+                else:
+                    #set flag
+                    set_verification_value(options, host, "mon_cleanup", 1)
+                    LOGGER.info("No downtime for host '{}' found, probably cleaned-up.".format(host))
                 #check critical services
                 crit_services = MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].get_services(mon_name)
                 if len(crit_services) > 0:
@@ -325,7 +329,10 @@ def verify(options, args):
                             services, service.keys()[0], service.values()[0]
                         )
                     #add status to verfication values
-                    set_verification_value(options, host, "mon_status", services)
+                    set_verification_value(options, host, "mon_status", "Warning/Critical")
+                    set_verification_value(options, host, "mon_status_detail", services)
+                else:
+                    set_verification_value(options, host, "mon_status", "Ok")
 
     except KeyError:
         #host with either no virt/mon

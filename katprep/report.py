@@ -157,7 +157,7 @@ def get_older_file(file_a, file_b):
 
 
 
-def analyze_reports():
+def analyze_reports(options):
     """
     Finds and loads report data. This function compares the two report files
     passed as arguments and assigns them to dedicated dictionaries (*older and
@@ -199,12 +199,13 @@ def get_errata_by_host(report, hostname):
 
 
 
-def create_delta():
+def create_delta(options):
     """
     Creats delta YAML reports per system. This is done by comparing the two
     snapshot reports passed as arguments.
     """
     global REPORT_OLD
+    now = datetime.datetime.now()
     #open old report and remove entries from newer report
     for host in REPORT_OLD:
         LOGGER.debug("Analyzing changes for host '{}'".format(host))
@@ -215,8 +216,15 @@ def create_delta():
                         erratum["summary"], erratum["errata_id"]
                     ))
                 del REPORT_OLD[host]["errata"][i]
+        #add date and time
+        #TODO: date format based on locale?
+        REPORT_OLD[host]["params"]["date"] = now.strftime("%Y-%m-%d")
+        REPORT_OLD[host]["params"]["time"] = now.strftime("%H:%M")
+
+        #Integrate verify data
+        REPORT_OLD[host]["verification"] = REPORT_NEW[host]["verification"]
+
         #store delta report
-        #TODO: Integrate verify data - use first snapshot report!
         timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
             get_newer_file(options.reports[0], options.reports[1])
         )).strftime('%Y%m%d')
@@ -230,7 +238,7 @@ def create_delta():
 
 
 
-def create_reports():
+def create_reports(options):
     """
     Creates patch reports per system. This is done by translating the
     YAML reports created previously into the desired format using ``pandoc``.
@@ -289,11 +297,11 @@ def main(options, args):
         "not readable".format(options.template_file))
     elif is_writable(options.output_path):
         #find reports
-        analyze_reports()
+        analyze_reports(options)
 
         #create delta and reports
-        create_delta()
-        create_reports()
+        create_delta(options)
+        create_reports(options)
 
 
 def cli():

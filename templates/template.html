@@ -46,27 +46,27 @@ table tr:nth-child(odd) {
 </tr>
 <tr>
 <td>Snapshot created</td>
-<td>$if(params.system_snapshot)$yes$else$no$endif$</td>
+<td>$if(verification.virt_snapshot)$yes$else$no$endif$</td>
 <td>$if(params.system_physical)$physical system$endif$</td>
 </tr>
 <tr>
 <td>Monitoring disabled</td>
-<td>$if(params.monitoring_disabled)$yes$else$no$endif$</td>
+<td>$if(verification.mon_downtime)$yes$else$no$endif$</td>
 <td>$if(params.environment)$$params.environment$ lifecycle$endif$</td>
 </tr>
 <tr>
 <td>System rebooted</td>
-<td>$if(params.system_rebooted)$yes$else$no$endif$</td>
+<td>$if(verification.system_reboot)$yes$else$no$endif$</td>
 <td></td>
 </tr>
 <tr>
 <td>Monitoring status</td>
-<td>$if(params.monitoring_status)$$params.monitoring_status$$endif$</td>
-<td>$if(params.monitoring_status_detail)$$params.monitoring_status_detail$$endif$</td>
+<td>$if(verification.mon_status)$$verification.mon_status$$endif$</td>
+<td>$if(verification.mon_status_detail)$$verification.mon_status_detail$$endif$</td>
 </tr>
 <tr>
 <td>Monitoring enabled</td>
-<td>$if(params.monitoring_enabled)$$params.monitoring_enabled$$endif$</td>
+<td>$if(verification.mon_cleanup)$yes$else$no$endif$</td>
 <td>$if(params.environment)$$params.environment$ lifecycle$endif$</td>
 </tr>
 </table>
