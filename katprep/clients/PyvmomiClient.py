@@ -56,7 +56,6 @@ class PyvmomiClient:
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
-        print self.HOSTNAME
         self.__connect()
 
 

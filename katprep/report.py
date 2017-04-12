@@ -265,7 +265,7 @@ def main(options, args):
     """Main function, starts the logic based on parameters."""
     #set template
     if options.template_file == "":
-        options.template_file = "./template.html"
+        options.template_file = "./templates/template.html"
     if "." in options.template_file:
         #set extension as output type
         options.output_type = \

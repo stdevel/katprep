@@ -203,7 +203,7 @@ def prepare(options, args):
 
             #verify preparation
             if not options.generic_dry_run:
-                verify(args)
+                verify(options, args)
 
     except ValueError as err:
         LOGGER.error("Error preparing maintenance: '{}'".format(err))
@@ -526,7 +526,6 @@ def set_filter(options, report):
     :param report: report data
     :type report: JSON data
     """
-    #print "TODO"
     remove = []
     for host in report:
         #removing filtered/blacklisted hosts
@@ -546,7 +545,7 @@ def set_filter(options, report):
         elif host in options.filter_exclude:
             LOGGER.debug("Removing '{0}'".format(host))
             remove.append(host)
-    #print myreport
+    #remove entries
     for entry in remove:
         del report[entry]
     return report
@@ -582,12 +581,12 @@ def main(options, args):
         LOGGER.warn("You decided to skip scheduling downtimes - happy flodding!")
 
     #initialize APIs
-        (fman_user, fman_pass) = get_credentials(
-            "Foreman", options.foreman_server, options.generic_auth_container
-        )
-        SAT_CLIENT = ForemanAPIClient(
-            options.foreman_server, fman_user, fman_pass
-        )
+    (fman_user, fman_pass) = get_credentials(
+        "Foreman", options.foreman_server, options.generic_auth_container
+    )
+    SAT_CLIENT = ForemanAPIClient(
+        options.foreman_server, fman_user, fman_pass
+    )
 
     #get virtualization host credentials
     if options.virt_skip_snapshot == False:
