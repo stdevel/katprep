@@ -477,20 +477,20 @@ def parse_options(args=None):
     #FILTER ARGUMENTS
     #-l / --location
     filter_opts_excl.add_argument("-l", "--location", action="store", \
-    default="", dest="filter_location", metavar="NAME|ID", \
+    default="", dest="filter_location", metavar="NAME", \
     help="filters by a particular location (default: no)")
     #-o / --organization
     filter_opts_excl.add_argument("-o", "--organization", action="store", \
-    default="", dest="filter_organization", metavar="NAME|ID", \
+    default="", dest="filter_organization", metavar="NAME", \
     help="filters by an particular organization (default: no)")
-    #-g / --hostgroup
-    filter_opts_excl.add_argument("-g", "--hostgroup", action="store", \
-    default="", dest="filter_hostgroup", metavar="NAME|ID", \
-    help="filters by a particular hostgroup (default: no)")
     #-e / --environment
     filter_opts_excl.add_argument("-e", "--environment", action="store", \
-    default="", dest="filter_environment", metavar="NAME|ID", \
+    default="", dest="filter_environment", metavar="NAME", \
     help="filters by an particular environment (default: no)")
+    #-E / --exclude
+    fman_opts.add_argument("-E", "--exclude", action="append", default=[], \
+    type=str, dest="filter_exclude", metavar="NAME", \
+    help="excludes particular hosts (default: no)")
 
     #COMMANDS
     subparsers = parser.add_subparsers(title='commands', \
@@ -516,6 +516,43 @@ def parse_options(args=None):
 
 
 
+def set_filter(options, report):
+    """
+    This function filters a report's hosts by organization, location
+    or environment. Also, it evaluates exclude filters.
+
+    :param options: argparse options dictionary containing parameters
+    :type options: argparse options dict
+    :param report: report data
+    :type report: JSON data
+    """
+    #print "TODO"
+    remove = []
+    for host in report:
+        #removing filtered/blacklisted hosts
+        params = report[host]["params"]
+        if options.filter_organization != "" and \
+            params["organization_name"] != options.filter_organization:
+            LOGGER.debug("Removing '{0}'".format(host))
+            remove.append(host)
+        elif options.filter_location != "" and \
+            params["location_name"] != options.filter_location:
+            LOGGER.debug("Removing '{0}'".format(host))
+            remove.append(host)
+        elif options.filter_environment != "" and \
+            params["environment_name"] != options.filter_environment:
+            LOGGER.debug("Removing '{0}'".format(host))
+            remove.append(host)
+        elif host in options.filter_exclude:
+            LOGGER.debug("Removing '{0}'".format(host))
+            remove.append(host)
+    #print myreport
+    for entry in remove:
+        del report[entry]
+    return report
+
+
+
 def main(options, args):
     """Main function, starts the logic based on parameters."""
     global REPORT, REPORT_PREFIX, SAT_CLIENT
@@ -534,6 +571,9 @@ def main(options, args):
             os.path.getmtime(options.report[0])
         )
     )
+
+    #set filter
+    REPORT = set_filter(options, REPORT)
 
     #warn if user tends to do something stupid
     if options.virt_skip_snapshot:
@@ -559,9 +599,10 @@ def main(options, args):
             )
             #create client based on type
             host_params = get_host_params_by_report(REPORT, host)
-            if host_params["katprep_virt_type"] == "pyvmomi":
+            if "katprep_virt_type" in host_params and \
+                host_params["katprep_virt_type"] == "pyvmomi":
                 VIRT_CLIENTS[host] = PyvmomiClient(host, virt_user, virt_pass)
-            else:
+            elif "katprep_virt_type" in host_params:
                 VIRT_CLIENTS[host] = LibvirtClient(host, virt_user, virt_pass)
 
     #get monitoring host credentials
@@ -573,12 +614,13 @@ def main(options, args):
                 host, options.generic_auth_container
             )
             host_params = get_host_params_by_report(REPORT, host)
-            if host_params["katprep_mon_type"] == "nagios":
+            if "katprep_mon_type" in host_params and \
+                host_params["katprep_mon_type"] == "nagios":
                 #Yet another legacy installation
                 MON_CLIENTS[host] = BasicNagiosCGIClient(
                     host, mon_user, mon_pass
                 )
-            else:
+            elif "katprep_mon_type" in host_params:
                 #Icinga 2, yay!
                 MON_CLIENTS[host] = BasicIcinga2APIClient(
                     host, mon_user, mon_pass

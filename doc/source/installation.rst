@@ -97,6 +97,10 @@ In case you want to install the toolkit only for your current user (*e.g. becaus
 
    $ python setup.py install --user
 
+If you're a developer and want to contribute, you might prefer to install katprep in developer mode within your user context::
+
+   $ python setup.py develop --user
+
 ---------
 Build RPM
 ---------
