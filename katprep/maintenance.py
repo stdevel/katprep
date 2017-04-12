@@ -343,7 +343,7 @@ def verify(options, args):
 
 
 
-def cleanup(args):
+def cleanup(options, args):
     """
     This function cleans things up after executing maintenance tasks. This
     might include removing snapshots and scheduled downtimes.
