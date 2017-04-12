@@ -248,7 +248,7 @@ def execute(options, args):
                     )
 
     except ValueError as err:
-        LOGGER.error("Error verifying host: '{}'".format(err))
+        LOGGER.error("Error maintaining host: '{}'".format(err))
 
 
 
@@ -290,14 +290,16 @@ def verify(options, args):
                 else:
                     #FQDN
                     vm_name = host
-                #print "Trying to find virt server for host {}".format(host)
-                #print get_host_param_from_report(REPORT, host, "katprep_virt")
                 if VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].has_snapshot(
                     vm_name, "katprep_{}".format(REPORT_PREFIX)
                     ):
                     #set flag
                     set_verification_value(options, host, "virt_snapshot", 1)
                     LOGGER.info("Snapshot for host '{}' found.".format(host))
+                else:
+                    #set flag
+                    set_verification_value(options, host, "virt_cleanup", 1)
+                    LOGGER.info("No snapshot for host '{}' found, probably cleaned-up.".format(host))
 
             #check downtime
             if not options.mon_skip_downtime:
