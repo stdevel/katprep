@@ -443,9 +443,12 @@ def parse_options(args=None):
     dest="foreman_server", metavar="SERVER", default="localhost", \
     help="defines the Foreman server to use (default: localhost)")
     #-r / --reboot-systems
-    gen_opts.add_argument("-r", "--reboot-systems", dest="foreman_reboot", \
+    fman_opts.add_argument("-r", "--reboot-systems", dest="foreman_reboot", \
     default=False, action="store_true", \
     help="reboot systems after successful errata installation (default: no)")
+    #--insecure
+    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
+    action="store_false", help="Disables SSL verification (default: no)")
 
     #VIRTUALIZATION ARGUMENTS
     #--virt-uri
@@ -587,7 +590,7 @@ def main(options, args):
         "Foreman", options.foreman_server, options.generic_auth_container
     )
     SAT_CLIENT = ForemanAPIClient(
-        options.foreman_server, fman_user, fman_pass
+        options.foreman_server, fman_user, fman_pass, options.ssl_verify
     )
 
     #get virtualization host credentials

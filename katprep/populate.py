@@ -197,6 +197,9 @@ def parse_options(args=None):
     fman_opts.add_argument("-u", "--update", dest="foreman_update", \
     action="store_true", default=False, help="Updates pre-existing host " \
     "parameters (default: no)")
+    #--insecure
+    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
+    action="store_false", help="Disables SSL verification (default: no)")
 
     #VIRTUALIZATION ARGUMENTS
     virt_opts.add_argument("--virt-uri", dest="virt_uri", \
@@ -244,6 +247,9 @@ def main(options, args):
     elif not options.virt_skip and options.virt_uri == "":
         LOGGER.error("Please specify a virt URI or set --skip-virt")
         exit(1)
+    elif options.mon_skip and options.virt_skip:
+        LOGGER.error("Yeah, very funny...")
+        exit(1)
 
     if options.generic_dry_run:
         LOGGER.info("This is just a SIMULATION - no changes will be made.")
@@ -252,7 +258,9 @@ def main(options, args):
     (fman_user, fman_pass) = get_credentials(
         "Foreman", options.foreman_server, options.generic_auth_container
     )
-    SAT_CLIENT = ForemanAPIClient(options.foreman_server, fman_user, fman_pass)
+    SAT_CLIENT = ForemanAPIClient(
+        options.foreman_server, fman_user, fman_pass, options.ssl_verify
+    )
 
     #get virtualization host credentials
     if options.virt_skip == False:

@@ -223,15 +223,18 @@ def parse_options(args=None):
     #-n / --dry-run
     gen_opts.add_argument("-n", "--dry-run", dest="dry_run", default=False, \
     action="store_true", help="only simulate what would be done (default: no)")
-
-    #SERVER ARGUMENTS
     #-C / --auth-container
     gen_opts.add_argument("-C", "--auth-container", default="", \
     dest="auth_container", action="store", help="defines an " \
     "authentication container file (default: no)")
+
+    #SERVER ARGUMENTS
     #-s / --server
     srv_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
     default="localhost", help="defines the server to use (default: localhost)")
+    #--insecure
+    srv_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
+    action="store_false", help="Disables SSL verification (default: no)")
 
     #FILTER ARGUMENTS
     #-l / --location
@@ -317,7 +320,9 @@ def main(options, args):
         (sat_user, sat_pass) = get_credentials(
             "Satellite", options.server, options.auth_container
         )
-        SAT_CLIENT = ForemanAPIClient(options.server, sat_user, sat_pass)
+        SAT_CLIENT = ForemanAPIClient(
+            options.server, sat_user, sat_pass, options.ssl_verify
+        )
 
         #validate filters
         validate_filters(options, SAT_CLIENT)

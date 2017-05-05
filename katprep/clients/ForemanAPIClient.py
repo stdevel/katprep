@@ -50,8 +50,12 @@ class ForemanAPIClient:
     """
     Session: HTTP session to Foreman host
     """
+    VERIFY = True
+    """
+    bool: Boolean whether force SSL verification
+    """
 
-    def __init__(self, hostname, username, password):
+    def __init__(self, hostname, username, password, verify=True, prefix=""):
         """
         Constructor, creating the class. It requires specifying a
         hostname, username and password to access the API. After
@@ -63,14 +67,20 @@ class ForemanAPIClient:
         :type username: str
         :param password: corresponding password
         :type password: str
+        :param verify: force SSL verification
+        :type verify: bool
+        :param prefix: API prefix (e.g. /katello)
+        :type prefix: str
         """
         self.HOSTNAME = self.validate_hostname(hostname)
         self.USERNAME = username
         self.PASSWORD = password
-        self.URL = "https://{0}/api/v2".format(self.HOSTNAME)
-        #start session and check API version
+        self.VERIFY = verify
+        self.URL = "https://{0}{1}/api/v2".format(self.HOSTNAME, prefix)
+        #start session and check API version if Foreman API
         self.__connect()
-        self.validate_api_support()
+        if prefix == "":
+            self.validate_api_support()
 
 
 
@@ -127,26 +137,26 @@ class ForemanAPIClient:
                 #PUT
                 result = self.SESSION.put(
                     "{}{}".format(self.URL, sub_url),
-                    data=payload, headers=my_headers
+                    data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "delete":
                 #DELETE
                 result = self.SESSION.delete(
                     "{}{}".format(self.URL, sub_url),
-                    data=payload, headers=my_headers
+                    data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "post":
                 #POST
                 result = self.SESSION.post(
                     "{}{}".format(self.URL, sub_url),
-                    data=payload, headers=my_headers
+                    data=payload, headers=my_headers, verify=self.VERIFY
                 )
             else:
                 #GET
                 result = self.SESSION.get(
                     "{}{}?per_page={}&page={}".format(
                         self.URL, sub_url, hits, page),
-                    headers=self.HEADERS
+                    headers=self.HEADERS, verify=self.VERIFY
                 )
             if "unable to authenticate" in result.text.lower():
                 raise ValueError("Unable to authenticate")
