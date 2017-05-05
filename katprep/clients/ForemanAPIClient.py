@@ -9,6 +9,7 @@ import logging
 import requests
 import json
 import socket
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 LOGGER = logging.getLogger('ForemanAPIClient')
 
@@ -72,6 +73,9 @@ class ForemanAPIClient:
         :param prefix: API prefix (e.g. /katello)
         :type prefix: str
         """
+        #disable SSL warning outputs
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        #set connection information
         self.HOSTNAME = self.validate_hostname(hostname)
         self.USERNAME = username
         self.PASSWORD = password
