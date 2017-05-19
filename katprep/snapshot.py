@@ -75,8 +75,8 @@ http://github.com/stdevel/katprep'''
     " for reports (default: current directory)")
     #-C / --auth-container
     gen_opts.add_argument("-C", "--auth-container", default="", \
-    dest="auth_container", action="store", help="defines an " \
-    "authentication container file (default: no)")
+    dest="auth_container", action="store", metavar="FILE", \
+    help="defines an authentication container file (default: no)")
 
     #SERVER ARGUMENTS
     #-s / --server

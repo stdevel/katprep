@@ -89,49 +89,52 @@ def change_param(options, host, mode="add", dry_run=True):
         my_params = PARAMETERS
     #add _all_ the params
     for param in my_params:
-        if dry_run:
-            LOGGER.info(
-                "Host '{}' (#{}) --> {} parameter '{}'".format(
-                    host["name"], host["id"], mode, param
+        if VALUES[param] != "":
+            if dry_run:
+                LOGGER.info(
+                    "Host '{}' (#{}) --> {} parameter '{}'".format(
+                        host["name"], host["id"], mode, param
+                    )
                 )
-            )
+            else:
+                #get ID of parameter
+                if mode.lower() != "add":
+                    param_id = SAT_CLIENT.get_hostparam_id_by_name(
+                        host["id"], param
+                    )
+
+                #set payload
+                payload = {}
+                if mode.lower() == "delete":
+                    #set parameter ID
+                    payload["parameter"] = {"id": param_id}
+                else:
+                    #set parameter name/value
+                    payload["parameter"] = {
+                        "name": param, "value": VALUES[param]
+                    }
+                LOGGER.debug(
+                    "JSON payload: {}".format(json.dumps(payload))
+                )
+    
+                #send request
+                if mode.lower() == "del":
+                    #delete parameter
+                    SAT_CLIENT.api_delete(
+                        "/hosts/{}/parameters/{}".format(host["id"], param_id),
+                        json.dumps(payload))
+                elif mode.lower() == "update":
+                    #update parameter
+                    SAT_CLIENT.api_put(
+                        "/hosts/{}/parameters/{}".format(host["id"], param_id),
+                        json.dumps(payload))
+                else:
+                    #add parameter
+                    SAT_CLIENT.api_post("/hosts/{}/parameters".format(
+                        host["id"]
+                    ), json.dumps(payload))
         else:
-            #get ID of parameter
-            if mode.lower() != "add":
-                param_id = SAT_CLIENT.get_hostparam_id_by_name(
-                    host["id"], param
-                )
-
-            #set payload
-            payload = {}
-            if mode.lower() == "delete":
-                #set parameter ID
-                payload["parameter"] = {"id": param_id}
-            else:
-                #set parameter name/value
-                payload["parameter"] = {
-                    "name": param, "value": VALUES[param]
-                }
-            LOGGER.debug(
-                "JSON payload: {}".format(json.dumps(payload))
-            )
-
-            #send request
-            if mode.lower() == "del":
-                #delete parameter
-                SAT_CLIENT.api_delete(
-                    "/hosts/{}/parameters/{}".format(host["id"], param_id),
-                    json.dumps(payload))
-            elif mode.lower() == "update":
-                #update parameter
-                SAT_CLIENT.api_put(
-                    "/hosts/{}/parameters/{}".format(host["id"], param_id),
-                    json.dumps(payload))
-            else:
-                #add parameter
-                SAT_CLIENT.api_post("/hosts/{}/parameters".format(
-                    host["id"]
-                ), json.dumps(payload))
+            LOGGER.debug("Empty value for '{}', not changing anything!".format(param))
 
 
 
@@ -225,8 +228,8 @@ def parse_options(args=None):
     action="store_true", help="only simulate what would be done (default: no)")
     #-C / --auth-container
     gen_opts.add_argument("-C", "--auth-container", default="", \
-    dest="auth_container", action="store", help="defines an " \
-    "authentication container file (default: no)")
+    dest="auth_container", action="store", metavar="FILE", \
+    help="defines an authentication container file (default: no)")
 
     #SERVER ARGUMENTS
     #-s / --server
@@ -307,12 +310,12 @@ def main(options, args):
         for param in PARAMETERS:
             #prompt for _all_ the parameters
             user_input = ""
-            while user_input == "":
-                user_input = raw_input(
-                    "Enter value for '{}' (hint: {}): ".format(
-                        param, PARAMETERS[param]
-                    )
+            #while user_input == "":
+            user_input = raw_input(
+                "Enter value for '{}' (hint: {}): ".format(
+                    param, PARAMETERS[param]
                 )
+            )
             VALUES[param] = user_input
 
     if not options.action_list:

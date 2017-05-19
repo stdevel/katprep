@@ -427,8 +427,8 @@ def parse_options(args=None):
     help="only simulate what would be done (default: no)")
     #-C / --auth-container
     gen_opts.add_argument("-C", "--auth-container", default="", \
-    dest="generic_auth_container", action="store", help="defines an " \
-    "authentication container file (default: no)")
+    dest="generic_auth_container", action="store", metavar="FILE", \
+    help="defines an authentication container file (default: no)")
     #-c / --config
     gen_opts.add_argument("-c", "--config", dest="config", default="", \
     action="store", metavar="FILE", \
