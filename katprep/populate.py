@@ -17,8 +17,8 @@ get_required_hosts_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
-from .clients.BasicNagiosCGIClient import BasicNagiosCGIClient
-from .clients.BasicIcinga2APIClient import BasicIcinga2APIClient
+from .clients.NagiosCGIClient import NagiosCGIClient
+from .clients.Icinga2APIClient import Icinga2APIClient
 
 __version__ = "0.0.1"
 """
@@ -38,7 +38,7 @@ LibvirtClient: libvirt API client handle
 """
 MON_CLIENT = None
 """
-BasicNagiosCGIClient: Nagios CGI client handle
+NagiosCGIClient: Nagios CGI client handle
 """
 
 
@@ -281,12 +281,12 @@ def main(options, args):
         )
         if options.mon_type == "nagios":
             #Yet another legacy installation
-            MON_CLIENT = BasicNagiosCGIClient(
+            MON_CLIENT = NagiosCGIClient(
                 options.mon_url, mon_user, mon_pass
             )
         else:
             #Icinga 2, yay!
-            MON_CLIENT = BasicIcinga2APIClient(
+            MON_CLIENT = Icinga2APIClient(
                 options.mon_url, mon_user, mon_pass
             )
 

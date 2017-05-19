@@ -4,7 +4,7 @@ katprep Package
 :mod:`katprep` Package
 ----------------------
 
-.. automodule:: katprep.__init__
+.. automodule:: katprep
     :members:
     :undoc-members:
     :show-inheritance:

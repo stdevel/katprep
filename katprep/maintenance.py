@@ -17,8 +17,8 @@ get_required_hosts_by_report, get_host_params_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
-from .clients.BasicNagiosCGIClient import BasicNagiosCGIClient
-from .clients.BasicIcinga2APIClient import BasicIcinga2APIClient
+from .clients.NagiosCGIClient import NagiosCGIClient
+from .clients.Icinga2APIClient import Icinga2APIClient
 
 __version__ = "0.0.1"
 """
@@ -621,12 +621,12 @@ def main(options, args):
             if "katprep_mon_type" in host_params and \
                 host_params["katprep_mon_type"] == "nagios":
                 #Yet another legacy installation
-                MON_CLIENTS[host] = BasicNagiosCGIClient(
+                MON_CLIENTS[host] = NagiosCGIClient(
                     host, mon_user, mon_pass
                 )
             elif "katprep_mon_type" in host_params:
                 #Icinga 2, yay!
-                MON_CLIENTS[host] = BasicIcinga2APIClient(
+                MON_CLIENTS[host] = Icinga2APIClient(
                     host, mon_user, mon_pass
                 )
 

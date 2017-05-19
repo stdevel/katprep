@@ -15,9 +15,9 @@ from datetime import datetime, timedelta
 
 
 
-class BasicIcinga2APIClient:
+class Icinga2APIClient:
     """
-.. class:: BasicIcinga2APIClient
+.. class:: Icinga2APIClient
     """
     HEADERS = {
         'User-Agent': 'katprep (https://github.com/stdevel/katprep)',
@@ -31,7 +31,7 @@ class BasicIcinga2APIClient:
     """
     session: API session
     """
-    LOGGER = logging.getLogger('BasicIcinga2APIClient')
+    LOGGER = logging.getLogger('Icinga2APIClient')
     """
     logging: Logger instance
     """

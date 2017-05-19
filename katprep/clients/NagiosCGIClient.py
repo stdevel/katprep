@@ -13,13 +13,13 @@ from datetime import datetime, timedelta
 import re
 from lxml import html
 
-LOGGER = logging.getLogger('BasicNagiosCGIClient')
+LOGGER = logging.getLogger('NagiosCGIClient')
 
 
 
-class BasicNagiosCGIClient:
+class NagiosCGIClient:
     """
-.. class:: BasicNagiosCGIClient
+.. class:: NagiosCGIClient
     """
     HEADERS = {'User-Agent': 'katprep (https://github.com/stdevel/katprep)'}
     """
