@@ -11,12 +11,15 @@ The following example consists of:
  * a Nagios server monitoring those VMs (``nagios.localdomain.loc``)
  * snapshot protection for all VMs
 
-**TODO**: add graph
+.. figure:: _static/example_1.png
+    :alt: alternate text
 
 
 Create users
 ============
-The first step is to create appropriate service users within VMware ESXi and Nagios. These users are used to manage snapshots and downtimes. This process is described under XYZ...
+The first step is to create appropriate service users within VMware ESXi and Nagios. These users are used to manage snapshots and downtimes. This process is described under Installation_.
+
+.. _Installation: installation.html#api-users
 
 Authentication
 ==============
@@ -72,8 +75,6 @@ VM snapshot flags are not set automatically using ``katprep_populate`` - we need
 
   $ katprep_parameters ...
 
-**TODO**: issue empty inputs
-
 System maintenance
 ==================
 In order to automate system maintenance we need to utilize the ``katprep_snapshot`` and ``katprep_maintenance`` commands. The first step is to create a snapshot report containing information about managed hosts, available errata, hypervisor/monitoring information and so on::
@@ -91,10 +92,10 @@ Afterwards, a JSON file is created. Know, we can prepare maintenance using the `
   INFO:katprep_maintenance:Host 'pinkepank.test.loc' --> create snapshot (katprep_20170412@pinkepank.test.loc)
 
 Good - two snapshots will be created. There is no need to schedule downtimes as there is no need to reboot the systems - katprep automatically detects whether a patch requires a system reboot.
-**TODO**: verify this!!
+
 The next step is to actually prepare maintenance - so, just omit the ``--dry-run`` parameter and run the command again::
 
-  $ katprep.....
+  $ katprep -C mycontainer.auth -S foreman.localdomain.loc errata-snapshot-*.json prepare
 
 Now it's time to patch all the systems. Again, let's see what would happen::
 
@@ -105,9 +106,32 @@ Now it's time to patch all the systems. Again, let's see what would happen::
 
 Several errata will be installed on the systems. Now, go ahead and omit the simulation parameter. If we want to automatically reboot the systems after installing errata, we also need to supply the ``-r`` / ``--reboot-systems`` parameter::
 
-  $ ...
+  $ katprep_maintenance -C mycontainer.auth -S foreman.localdomain.loc errata-snapshot-*.json -r execute
 
-Once the systems have been patched and rebooted, it's time to check...
+Once the systems have been patched (*and maybe also rebooted*), it's time to check whether the monitoring status is fine, again::
+
+  $ katprep_maintenance -C mycontainer.auth -S foreman.localdomian.loc errata-snapshot-*.json verify
+
+After testing the systems (*e.g. by your end-users*), the downtimes and snapshots can be cleaned up - let's simulate it, first::
+
+  $ katprep_maintenance -C mycontainer.auth -S foreman.localdomian.loc errata-snapshot-*.json -n cleanup
+  INFO:katprep_maintenance:This is just a SIMULATION - no changes will be made.
+  INFO:katprep_maintenance:Host 'giertz.stankowic.loc' --> remove snapshot (katprep_20170412@giertz.stankowic.loc)
+  INFO:katprep_maintenance:Host 'pinkepank.test.loc' --> remove snapshot (katprep_20170412@pinkepank.test.loc)
+
+Re-execute the command without ``-n`` to remove the snapshots::
+
+  $ katprep_maintenance -C mycontainer.auth -S foreman.localdomian.loc errata-snapshot-*.json cleanup
+
+Verify the system status again to store the information, that we removed snapshots (*and downtimes*)::
+
+  $ katprep_maintenance -C mycontainer.auth -S foreman.localdomian.loc errata-snapshot-*.json verify
+  ERROR:PyvmomiClient:Unable to get snapshots: ''NoneType' object has no attribute 'rootSnapshotList''
+  INFO:katprep_maintenance:No snapshot for host 'giertz.stankowic.loc' found, probably cleaned-up.
+  ERROR:PyvmomiClient:Unable to get snapshots: ''NoneType' object has no attribute 'rootSnapshotList''
+  INFO:katprep_maintenance:No snapshot for host 'pinkepank.test.loc' found, probably cleaned-up.
+
+
 
 --------------
 Advanced setup
@@ -119,7 +143,9 @@ The following example consists of:
   * VM and Monitoring names differing from the FQDN (e.g. ``myhost`` instead of ``myhost.localdomain.loc``)
   * snapshot protection for some VMs
 
-**TODO**: add graph
+.. figure:: _static/example_2.png
+    :alt: alternate text
+
 
 Users are installed and auto-discovery is executed as metioned above.
 

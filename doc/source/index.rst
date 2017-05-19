@@ -18,6 +18,8 @@ Contents:
    Customizing reports <reports>
    Parameter overview <parameter_overview>
    Implementation examples <examples>
+   Common issues <issues>
+   Debugging and getting help <debug>
 
 
 ..   Module details<modules>
