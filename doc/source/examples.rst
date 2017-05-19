@@ -71,9 +71,19 @@ In this example, two hosts (``giertz.stankowic.loc`` and ``pinkepank.test.loc``)
 
 Configuration
 =============
-VM snapshot flags are not set automatically using ``katprep_populate`` - we need to bulk set this flag with ``katprep_parameters``::
+VM snapshot flags are not set automatically using ``katprep_populate`` - we need to bulk set this flag with ``katprep_parameters``. Basically, another simulation might be a good idea. The script will ask for values for all basic katprep parameters. Entering no values will ignore changing this value. As we only want to change the ``katprep_virt_snapshot`` parameter, we will just skip all other parameters::
 
-  $ katprep_parameters ...
+  $ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U -n
+  INFO:katprep_parameters:This is just a SIMULATION - no changes will be made.
+  Enter value for 'katprep_virt' (hint: Virtualization URL of the system):
+  Enter value for 'katprep_mon' (hint: URL of the monitoring system):
+  Enter value for 'katprep_virt_snapshot' (hint: Boolean whether system needs to be protected by a snapshot before maintenance): 1
+  INFO:katprep_parameters:Host 'giertz.stankowic.loc' (#1) --> update parameter 'katprep_virt_snapshot'
+  INFO:katprep_parameters:Host 'pinkepank.test.loc' (#2) --> update parameter 'katprep_virt_snapshot'
+
+To actually set these parameters, we just omit the ``-n`` parameter and run the command again::
+
+  $ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U
 
 System maintenance
 ==================
@@ -137,11 +147,12 @@ Verify the system status again to store the information, that we removed snapsho
 Advanced setup
 --------------
 The following example consists of:
+  * an Foreman/Katello host managing hosts (``foreman.localdomain.loc``)
   * an ESXi cluster of two nodes hosting some VMs (``esxi01.localdomain.loc`` and ``esxi02.localdomain.loc``)
   * a vCenter Server installation managing the cluster (``vcenter.localdomain.loc``)
   * an Icinga2 and Nagios server monitoring those VMs (``icinga.localdomain.loc`` and ``nagios.localdomain.loc``)
   * VM and Monitoring names differing from the FQDN (e.g. ``myhost`` instead of ``myhost.localdomain.loc``)
-  * snapshot protection for some VMs
+  * snapshot protection for some VMs depending on the Puppet environment (``production`` is protected while other are not protected)
 
 .. figure:: _static/example_2.png
     :alt: alternate text
@@ -151,4 +162,54 @@ Users are installed and auto-discovery is executed as metioned above.
 
 Configuration
 =============
-**TODO**: add notes/instructions, parameters, auth_container
+The first step is to set-up the authentication container. As a vCenter Server instance is used, we don't need to enter ESXi host credentials::
+
+   $ katprep_authconfig mycontainer.auth add -H foreman.localdomain.loc -u svc-katprep
+   foreman.localdomain.loc Password:
+   Verify foreman.localdomain.loc Password:
+   $ katprep_authconfig mycontainer.auth add -H vcenter.localdomain.loc -u svc-katprep@vsphere.local
+   vcenter.localdomain.loc Password:
+   Verify vcenter.localdomain.loc Password:
+   $ katprep_authconfig mycontainer.auth add -H nagios.localdomain.loc -u svc-katprep
+   nagios.localdomain.loc Password:
+   Verify nagios.localdomain.loc Password:
+   $ katprep_authconfig mycontainer.auth add -H icinga.localdomain.loc:5665 -u svc-katprep
+   icinga.localdomain.loc Password:
+   Verify icinga.localdomain.loc Password:
+
+Note that the Icinga2 host entry also contains the used API port.
+The next step is to auto-discover hosts managed by Foreman/Katello configured in Nagios and within the hypervisor - simulate it, first::
+
+  $ katprep_populate -C mycontainer.auth -s foreman.localdomain.loc --virt-uri vcenter.localdomain.loc --virt-type pyvmomi --mon-url http://nagios.localdomain.loc --mon-type nagios -n
+  katprep_populate:This is just a SIMULATION - no changes will be made.
+  INFO:katprep_populate:Host 'giertz.stankowic.loc' ==> set/update parameter/value: katprep_virt/vcenter.localdomain.loc
+  INFO:katprep_populate:Host 'giertz.stankowic.loc' ==> set/update parameter/value: katprep_mon_type/nagios
+  INFO:katprep_populate:Host 'giertz.stankowic.loc' ==> set/update parameter/value: katprep_mon/http://nagios.localdomain.loc
+  INFO:katprep_populate:Host 'giertz.stankowic.loc' ==> set/update parameter/value: katprep_virt_type/pyvmomi
+
+If the result looks reasonable to you, omit the ``-n`` parameter::
+
+  $ katprep_populate -C mycontainer.auth -s foreman.localdomain.loc --virt-uri vcenter.localdomain.loc --virt-type pyvmomi --mon-url http://nagios.localdomain.loc --mon-type nagios -n
+
+Now, go ahead with the Icinga2 system - again, simulation is king::
+
+  $ katprep_populate -C mycontainer.auth -s foreman.localdomain.loc --virt-uri vcenter.localdomain.loc --virt-type pyvmomi --mon-url https://icinga.localdomain.loc:5665 -n
+  katprep_populate:This is just a SIMULATION - no changes will be made.
+  INFO:katprep_populate:Host 'pinkepank.test.loc' ==> set/update parameter/value: katprep_virt/vcenter.localdomain.loc
+  INFO:katprep_populate:Host 'pinkepank.test.loc' ==> set/update parameter/value: katprep_mon/http://icinga.localdomain.loc
+  INFO:katprep_populate:Host 'pinkepank.test.loc' ==> set/update parameter/value: katprep_virt_type/pyvmomi
+
+As only VMs of the ``production`` Puppet environment are protected by snapshots, the ``katprep_virt_snapshot`` setting is only set for these hosts::
+
+  $ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U -e production -n
+  INFO:katprep_parameters:This is just a SIMULATION - no changes will be made.
+  Enter value for 'katprep_virt' (hint: Virtualization URL of the system):
+  Enter value for 'katprep_mon' (hint: URL of the monitoring system):
+  Enter value for 'katprep_virt_snapshot' (hint: Boolean whether system needs to be protected by a snapshot before maintenance): 1
+  INFO:katprep_parameters:Host 'giertz.stankowic.loc' (#1) --> update parameter 'katprep_virt_snapshot'
+
+To actually change settings, omit the ``-n`` parameter::
+
+  $ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U -e production -n
+
+For system maintenance, refer to the previous example.
