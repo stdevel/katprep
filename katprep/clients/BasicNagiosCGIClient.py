@@ -267,6 +267,26 @@ class BasicNagiosCGIClient:
 
 
     @staticmethod
+    def __regexp_matches(text, regexp):
+        """
+        Returns whether a text matches a particular regular expression.
+        Used internally - isn't that funny outside get_services() or get_hosts().
+
+        :param text: text
+        :type text: str
+        :param regexp: regular expression
+        :type regexp: str
+
+        """
+        pattern = re.compile(regexp)
+        if pattern.match(text):
+            return True
+        else:
+            return False
+
+
+
+    @staticmethod
     def __is_blacklisted(text):
         """
         Returns whether a text received when parsing service information is
@@ -292,8 +312,8 @@ class BasicNagiosCGIClient:
         if text not in blacklist:
             #compile _all_ the regexps!
             for item in blacklist_regex:
-                pattern = re.compile(item)
-                if pattern.match(text):
+                result = __regexp_matches(text, item)
+                if result:
                     return True
             #good boy
             return False
@@ -350,3 +370,52 @@ class BasicNagiosCGIClient:
                 counter = counter + 2
             return services
         return hits
+
+
+
+    def get_hosts(self):
+        """
+        Returns hosts by their name and IP.
+        """
+
+        #set-up URL
+        url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
+        #retrieve data
+        result = self.__api_get(url)
+        tree = html.fromstring(result)
+        data = tree.xpath(
+        "//td[@class='statusHOSTPENDING']//a/text() |"
+        "//td[@class='statusHOSTDOWNTIME']//a/text() |"
+        "//td[@class='statusHOSTUP']//a/text() |"
+        "//td[@class='statusHOSTDOWN']//a/text() |"
+        "//td[@class='statusHOSTDOWNACK']//a/text() |"
+        "//td[@class='statusHOSTDOWNSCHED']//a/text() |"
+        "//td[@class='statusHOSTUNREACHABLE']//a/text() |"
+        "//td[@class='statusHOSTUNREACHABLEACK']//a/text() |"
+        "//td[@class='statusHOSTUNREACHABLESCHED']//a/text()"
+        )
+        
+        hosts = []
+        for host in data:
+            #get services per host
+
+            #set-up URL
+            url = "/cgi-bin/extinfo.cgi?type=1&host={}".format(host)
+            #retrieve data
+            result = self.__api_get(url)
+            #set-up xpath
+            tree = html.fromstring(result)
+            data = tree.xpath(
+            "//div[@class='data']/text()"
+            )
+
+            #iterate through services
+            ip = ""
+            for entry in data:
+                ip_regexp = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+                if self.__regexp_matches(entry, ip_regexp):
+                    #entry is an IP
+                    ip = entry
+            this_host = {"name": host, "ip": ip}
+            hosts.append(this_host)
+        return hosts
