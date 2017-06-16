@@ -7,12 +7,17 @@ Class for sending requests to libvirt
 import libvirt
 import logging
 
+
+
 LOGGER = logging.getLogger('LibvirtClient')
-
-
+"""
+logging: Logger instance
+"""
 
 class LibvirtClient:
     """
+    Class for communicating with libvirt
+
 .. class:: LibvirtClient
     """
     URI = ""
@@ -43,7 +48,7 @@ class LibvirtClient:
         if self.validate_uri(uri):
             self.URI = uri
         else:
-            raise ValueError("Invalid URI string specified!")
+            raise SessionException("Invalid URI string specified!")
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
@@ -84,7 +89,7 @@ class LibvirtClient:
         #authenticate
         self.SESSION = libvirt.openAuth(self.URI, auth, 0)
         if self.SESSION == None:
-            LOGGER.error("Unable to establish connection to hypervisor!")
+            raise SessionException("Unable to establish connection to hypervisor!")
 
 
 
@@ -150,7 +155,7 @@ class LibvirtClient:
                     )
                 return target_vm.snapshotCreateXML(snap_xml, 0)
         except libvirt.libvirtError as err:
-            LOGGER.error("Unable to {} snapshot: '{}'".format(
+            raise SessionException("Unable to {} snapshot: '{}'".format(
                 action.lower(), err)
             )
 
@@ -219,6 +224,7 @@ class LibvirtClient:
                 return True
         except libvirt.libvirtError as err:
             LOGGER.error("Unable to determine snapshot: '{}'".format(err))
+            raise SessionException(err)
         except Exception as err:
             raise err
 
@@ -246,7 +252,7 @@ class LibvirtClient:
                 )
             return result
         except libvirt.libvirtError as err:
-            LOGGER.error("Unable to get VM IP information: '{}'".format(err))
+            raise SessionException("Unable to get VM IP information: '{}'".format(err))
 
 
 

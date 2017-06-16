@@ -11,23 +11,16 @@ import json
 import socket
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+
+
 LOGGER = logging.getLogger('ForemanAPIClient')
-
-
-
-class APILevelNotSupportedException(Exception):
-    """
-    Dummy class for unsupported API levels
-
-.. class:: APILevelNotSupportedException
-    """
-    pass
-
-
+"""
+logging: Logger instance
+"""
 
 class ForemanAPIClient:
     """
-    Class for communicating with the Foreman API.
+    Class for communicating with the Foreman API
 
 .. class:: ForemanAPIClient
     """
@@ -127,7 +120,7 @@ class ForemanAPIClient:
         try:
             if method.lower() not in ["get", "post", "delete", "put"]:
                 #going home
-                raise ValueError("Illegal method '{}' specified".format(method))
+                raise SessionException("Illegal method '{}' specified".format(method))
 
             #setting headers
             my_headers = self.HEADERS
@@ -163,9 +156,9 @@ class ForemanAPIClient:
                     headers=self.HEADERS, verify=self.VERIFY
                 )
             if "unable to authenticate" in result.text.lower():
-                raise ValueError("Unable to authenticate")
+                raise SessionException("Unable to authenticate")
             if result.status_code not in [200, 201, 202]:
-                raise ValueError("{}: HTTP operation not successful {}".format(
+                raise SessionException("{}: HTTP operation not successful {}".format(
                     result.status_code, result.text))
             else:
                 #return result
@@ -176,6 +169,7 @@ class ForemanAPIClient:
 
         except ValueError as err:
             LOGGER.error(err)
+            raise SessionException(err)
             pass
 
     #Aliases
@@ -253,6 +247,7 @@ class ForemanAPIClient:
                 )
         except ValueError as err:
             LOGGER.error(err)
+            raise APILevelNotSupportedException("Unable to verify API version")
 
 
 
@@ -323,6 +318,7 @@ class ForemanAPIClient:
                     return result_obj["name"]
         except ValueError as err:
             LOGGER.error(err)
+            raise SessionException(err)
 
 
 
@@ -362,6 +358,7 @@ class ForemanAPIClient:
                         return entry["id"]
         except ValueError as err:
             LOGGER.error(err)
+            raise SessionException(err)
 
 
 
@@ -391,6 +388,7 @@ class ForemanAPIClient:
 
         except ValueError as err:
             LOGGER.error(err)
+            raise SessionException(err)
 
 
 
@@ -408,3 +406,4 @@ class ForemanAPIClient:
             return result_obj["results"]
         except ValueError as err:
             LOGGER.error(err)
+            raise SessionException(err)

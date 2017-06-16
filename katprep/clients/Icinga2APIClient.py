@@ -15,8 +15,15 @@ from datetime import datetime, timedelta
 
 
 
+LOGGER = logging.getLogger('Icinga2APIClient')
+"""
+logging: Logger instance
+"""
+
 class Icinga2APIClient:
     """
+    Class for communicating with the Icinga2 API
+
 .. class:: Icinga2APIClient
     """
     HEADERS = {
@@ -30,10 +37,6 @@ class Icinga2APIClient:
     SESSION = None
     """
     session: API session
-    """
-    LOGGER = logging.getLogger('Icinga2APIClient')
-    """
-    logging: Logger instance
     """
     VERIFY_SSL = False
     """
@@ -98,7 +101,7 @@ class Icinga2APIClient:
         try:
             if method.lower() not in ["get", "post"]:
                 #going home
-                raise ValueError("Illegal method '{}' specified".format(method))
+                raise SessionException("Illegal method '{}' specified".format(method))
 
             #execute request
             if method.lower() == "post":
@@ -115,7 +118,7 @@ class Icinga2APIClient:
                     )
 
             if result.status_code != 200:
-                raise ValueError("{}: HTTP operation not successful".format(
+                raise SessionException("{}: HTTP operation not successful".format(
                     result.status_code))
             else:
                 #return result
@@ -126,7 +129,7 @@ class Icinga2APIClient:
 
         except ValueError as err:
             self.LOGGER.error(err)
-            raise
+            raise SessionException(err)
 
     #Aliases
     def __api_get(self, sub_url):
@@ -314,18 +317,18 @@ class Icinga2APIClient:
         :param only_failed: True will only report failed services
         :type only_failed: bool
         """
-
+        #retrieve result
         result = self.__api_get("/objects/services?host={}".format(
             object_name)
         )
         data = json.loads(result)
         services = []
         for result in data["results"]:
+            #get all the service information
             service = result["attrs"]["display_name"]
             state = result["attrs"]["state"]
-            #print "Service: {}".format(result["attrs"]["display_name"])
-            #print "  State: {}".format(result["attrs"]["state"])
             if only_failed == False or state == 0:
+                #append service if ok or all states
                 this_service = {"name": service, "state": state}
                 services.append(this_service)
         return services
@@ -336,11 +339,12 @@ class Icinga2APIClient:
         """
         Returns hosts by their name and IP.
         """
-
+        #retrieve result
         result = self.__api_get("/objects/hosts")
         data = json.loads(result)
         hosts = []
         for result in data["results"]:
+            #get all the host information
             host = result["attrs"]["display_name"]
             ip = result["attrs"]["address"]
             this_host = {"name": host, "ip": ip}

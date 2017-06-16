@@ -13,9 +13,12 @@ from datetime import datetime, timedelta
 import re
 from lxml import html
 
+
+
 LOGGER = logging.getLogger('NagiosCGIClient')
-
-
+"""
+logging: Logger instance
+"""
 
 class NagiosCGIClient:
     """
@@ -89,7 +92,7 @@ class NagiosCGIClient:
         try:
             if method.lower() not in ["get", "post"]:
                 #going home
-                raise ValueError("Illegal method '{}' specified".format(method))
+                raise SessionException("Illegal method '{}' specified".format(method))
 
             #execute request
             if method.lower() == "post":
@@ -106,9 +109,9 @@ class NagiosCGIClient:
                     )
 
             if "error" in result.text.lower():
-                raise ValueError("Unable to authenticate")
+                raise SessionException("Unable to authenticate")
             if result.status_code != 200:
-                raise ValueError("{}: HTTP operation not successful".format(
+                raise SessionException("{}: HTTP operation not successful".format(
                     result.status_code))
             else:
                 #return result

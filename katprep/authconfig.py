@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 A script which maintains entries in a authentication container.
@@ -94,6 +95,33 @@ def remove(options):
 
 
 
+def set_password(options):
+    """
+    This function sets/changes/removes the authentication container password.
+    """
+    #get password and build new container
+    if options.file_password:
+        new_pass = options.file_password
+    else:
+        new_pass = getpass.getpass("New file password (max. 32 chars): ")
+    confirm=""
+    while confirm != new_pass:
+        confirm = getpass.getpass("Confirm password: ")
+    new_container = AuthContainer(options.container[0], new_pass)
+
+    #encrypt/change _all_ the passwords!
+    for hostname in CONTAINER.get_hostnames():
+        #get credentials
+        credentials = CONTAINER.get_credential(hostname)
+        #add new entry
+        new_container.add_credentials(
+            hostname, credentials[0], credentials[1]
+        )
+    #save new container
+    new_container.save()
+
+
+
 def parse_options(args=None):
     """Parses options and arguments."""
     desc = '''%(prog)s is used for creating, modifying and
@@ -136,18 +164,24 @@ def parse_options(args=None):
     cmd_list.set_defaults(func=list)
 
     cmd_add = subparsers.add_parser("add", help="adding/modifying entries")
-    cmd_add.set_defaults(func=add)
     cmd_add.add_argument("-H", "--hostname", action="store", default="", \
     dest="entry_hostname", metavar="HOSTNAME", help="hostname entry")
     cmd_add.add_argument("-u", "--username", action="store", default="", \
     dest="entry_username", metavar="USERNAME", help="username")
     cmd_add.add_argument("-p", "--password", action="store", default="", \
     dest="entry_password", metavar="PASSWORD", help="corresponding password")
+    cmd_add.set_defaults(func=add)
 
     cmd_remove = subparsers.add_parser("remove", help="removing entries")
     cmd_remove.add_argument("-H", "--hostname", action="store", default="", \
     dest="entry_hostname", metavar="HOSTNAME", help="hostname entry")
     cmd_remove.set_defaults(func=remove)
+
+    cmd_password = subparsers.add_parser("password", help="add/change/remove " \
+    "encryption password")
+    cmd_password.add_argument("-p", "--password", action="store", \
+    dest="file_password", metavar="PASSWORD", help="password")
+    cmd_password.set_defaults(func=set_password)
 
     #parse options and arguments
     options = parser.parse_args()
@@ -162,8 +196,12 @@ def main(options, args):
     LOGGER.debug("Options: {0}".format(options))
     LOGGER.debug("Arguments: {0}".format(args))
 
+    #prompt for password
+    container_pass = "JaHaloIBimsDiPaulaPinkePank#Ohman"
+    while len(container_pass) > 32:
+        container_pass = getpass.getpass("File password (max. 32 chars): ")
     #load container
-    CONTAINER = AuthContainer(options.container[0])
+    CONTAINER = AuthContainer(options.container[0], container_pass)
 
     #start action
     options.func(options)

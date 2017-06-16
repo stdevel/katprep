@@ -13,6 +13,10 @@ from urlparse import urlparse
 
 
 
+LOGGER = logging.getLogger('PyvmomiClient')
+"""
+logging: Logger instance
+"""
 
 class PyvmomiClient:
     """
@@ -21,10 +25,6 @@ class PyvmomiClient:
     SESSION = None
     """
     session: pyvmomi session
-    """
-    LOGGER = logging.getLogger('PyvmomiClient')
-    """
-    logging: Logger instance
     """
 
     def __init__(self, hostname, username, password):
@@ -226,6 +226,7 @@ class PyvmomiClient:
                     return snapshots
         except Exception as err:
             self.LOGGER.error("Unable to get snapshots: '{}'".format(err))
+            raise SessionException(err)
 
 
 
@@ -285,6 +286,7 @@ class PyvmomiClient:
             return result
         except Exception as err:
             self.LOGGER.error("Unable to get VM IP information: '{}'".format(err))
+            raise SessionException(err)
 
 
 
@@ -308,3 +310,4 @@ class PyvmomiClient:
             return result
         except ValueError as err:
             self.LOGGER.error("Unable to get VM hypervisor information: '{}'".format(err))
+            raise SessionException(err)

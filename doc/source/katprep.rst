@@ -25,6 +25,14 @@ katprep Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`exceptions` Module
+------------------------
+
+.. automodule:: katprep.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`maintenance` Module
 -------------------------
 

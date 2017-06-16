@@ -12,6 +12,8 @@ import json
 from . import get_credentials, validate_filters, get_filter
 from .clients.ForemanAPIClient import ForemanAPIClient
 
+
+
 __version__ = "0.0.1"
 """
 str: Program version
@@ -331,6 +333,7 @@ def main(options, args):
         validate_filters(options, SAT_CLIENT)
 
         #do the stuff
+        raise SessionException("blah")
         manage_params(options)
 
 

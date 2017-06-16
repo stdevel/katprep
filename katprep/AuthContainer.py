@@ -4,10 +4,21 @@
 Class for managing multiple authentication credentials
 """
 
+import logging
 import os
 import stat
 import json
+import base64
 from urlparse import urlparse
+from cryptography.fernet import Fernet
+from cryptography.fernet import InvalidToken
+
+
+
+LOGGER = logging.getLogger('AuthContainer')
+"""
+logging: Logger instance
+"""
 
 
 
@@ -23,8 +34,12 @@ class AuthContainer:
     """
     dict: authentication credentials
     """
+    KEY = ""
+    """
+    str: encryption key
+    """
 
-    def __init__(self, filename):
+    def __init__(self, filename, key=""):
         """
         Constructor, creating the class. It requires specifying a filename.
         If the file already exists, already existing entries are imported.
@@ -32,11 +47,44 @@ class AuthContainer:
         :param filename: filename
         :type filename: str
         """
+        #set key if defined
+        if key:
+            self.set_key(key)
+        #set filename and import data
         self.FILENAME = filename
         try:
             self.__import()
         except ValueError:
             pass
+
+
+
+    def set_key(self, key):
+        """
+        This function set or changes the key used for encryption/decryption.
+
+        :param key: key
+        :type key: str
+        """
+        try:
+            #fill up to 32 chars
+            key = key.zfill(32)[-32:]
+            #set key
+            self.KEY = base64.b64encode(key)
+        except ValueError as err:
+            LOGGER.error("Empty password specified")
+
+
+
+    def is_encrypted(self):
+        """
+        This functions returns whether the authentication container is
+        encrypted.
+        """
+        if self.KEY:
+            return True
+        else:
+            return False
 
 
 
@@ -66,6 +114,7 @@ class AuthContainer:
             return json_data
         except IOError as err:
             LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
+
 
 
     def save(self):
@@ -114,7 +163,16 @@ class AuthContainer:
                 #add entry
                 self.CREDENTIALS[hostname] = {}
                 self.CREDENTIALS[hostname]["username"] = username
-                self.CREDENTIALS[hostname]["password"] = password
+                #add encrypted or plain password
+                if self.KEY:
+                    crypto = Fernet(self.KEY)
+                    self.CREDENTIALS[hostname]["password"] = "s/{0}".format(
+                        crypto.encrypt(password.encode()))
+                else:
+                    self.CREDENTIALS[hostname]["password"] = password
+        except InvalidToken:
+            LOGGER.error("Invalid password specified!")
+            exit(1)
         except KeyError:
             pass
 
@@ -176,9 +234,20 @@ class AuthContainer:
         """
         hostname = self.cut_hostname(hostname)
         try:
-            return (
-                self.CREDENTIALS[hostname]["username"],
-                self.CREDENTIALS[hostname]["password"]
-                )
+            if self.KEY:
+                crypto = Fernet(self.KEY)
+                return (
+                    self.CREDENTIALS[hostname]["username"],
+                    crypto.decrypt(self.CREDENTIALS[hostname]["password"][2:].encode())
+                    )
+            else:
+                #return plain information
+                return (
+                    self.CREDENTIALS[hostname]["username"],
+                    self.CREDENTIALS[hostname]["password"]
+                    )
+        except InvalidToken:
+            LOGGER.error("Invalid password specified!")
+            exit(1)
         except KeyError:
             pass
