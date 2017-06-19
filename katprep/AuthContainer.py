@@ -15,6 +15,16 @@ from cryptography.fernet import InvalidToken
 
 
 
+class ContainerException(Exception):
+    """
+    Dummy class for authentication container errors
+
+.. class:: ContainerException
+    """
+    pass
+
+
+
 class AuthContainer:
     """
 .. class:: AuthContainer
@@ -129,7 +139,7 @@ class AuthContainer:
             #setting the good perms
             os.chmod(self.FILENAME, 0600)
         except IOError as err:
-            raise err
+            raise ContainerException(err)
 
 
 
@@ -172,8 +182,7 @@ class AuthContainer:
                 else:
                     self.CREDENTIALS[hostname]["password"] = password
         except InvalidToken:
-            self.LOGGER.error("Invalid password specified!")
-            exit(1)
+            raise ContainerException("Invalid password specified!")
         except KeyError:
             pass
 
@@ -248,7 +257,6 @@ class AuthContainer:
                     self.CREDENTIALS[hostname]["password"]
                     )
         except InvalidToken:
-            self.LOGGER.error("Invalid password specified!")
-            exit(1)
+            raise ContainerException("Invalid password specified!")
         except KeyError:
             pass

@@ -9,6 +9,16 @@ import logging
 
 
 
+class SessionException(Exception):
+    """
+    Dummy class for session errors
+
+.. class:: SessionException
+    """
+    pass
+
+
+
 class LibvirtClient:
     """
     Class for communicating with libvirt
@@ -229,7 +239,7 @@ class LibvirtClient:
             self.LOGGER.error("Unable to determine snapshot: '{}'".format(err))
             raise SessionException(err)
         except Exception as err:
-            raise err
+            raise SessionException(err)
 
 
 

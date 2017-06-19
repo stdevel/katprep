@@ -339,7 +339,6 @@ def main(options, args):
         validate_filters(options, SAT_CLIENT)
 
         #do the stuff
-        raise SessionException("blah")
         manage_params(options)
 
 

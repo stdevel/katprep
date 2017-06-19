@@ -12,7 +12,7 @@ import os
 import stat
 import json
 import argparse
-from .AuthContainer import AuthContainer
+from .AuthContainer import AuthContainer, ContainerException
 
 LOGGER = logging.getLogger('katprep_shared')
 """
@@ -52,6 +52,9 @@ def get_credentials(prefix, hostname=None, auth_container=None):
                 return (s_creds[0], s_creds[1])
             else:
                 raise TypeError("Invalid response")
+        except ContainerException as e:
+            LOGGER.error(e)
+            exit(1)
         except TypeError:
             LOGGER.warning(
                 "Login information for '{}' not found in container!".format(

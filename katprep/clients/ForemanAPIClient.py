@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This file contains the ForemanAPIClient and
-APILevelNotSupportedExceptrion classes
+APILevelNotSupportedException and SessionException classes
 """
 
 import logging
@@ -10,6 +10,26 @@ import requests
 import json
 import socket
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+
+
+class APILevelNotSupportedException(Exception):
+    """
+    Dummy class for unsupported API levels
+
+.. class:: APILevelNotSupportedException
+    """
+    pass
+
+
+
+class SessionException(Exception):
+    """
+    Dummy class for session errors
+
+.. class:: SessionException
+    """
+    pass
 
 
 
