@@ -62,7 +62,7 @@ http://github.com/stdevel/katprep'''
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
-    srv_opts = parser.add_argument_group("server arguments")
+    fman_opts = parser.add_argument_group("Foreman arguments")
     filter_opts = parser.add_argument_group("filter arguments")
     filter_opts_excl = filter_opts.add_mutually_exclusive_group()
 
@@ -85,10 +85,10 @@ http://github.com/stdevel/katprep'''
 
     #SERVER ARGUMENTS
     #-s / --server
-    srv_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
+    fman_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
     default="localhost", help="defines the server to use (default: localhost)")
     #--insecure
-    srv_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
+    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
     action="store_false", help="Disables SSL verification (default: no)")
 
     #SNAPSHOT FILTER ARGUMENTS
@@ -108,6 +108,10 @@ http://github.com/stdevel/katprep'''
     filter_opts_excl.add_argument("-e", "--environment", action="store", \
     default="", dest="environment", metavar="NAME|ID", help="filters by an" \
     " particular environment (default: no)")
+    #-E / --exclude
+    fman_opts.add_argument("-E", "--exclude", action="append", default=[], \
+    type=str, dest="filter_exclude", metavar="NAME", \
+    help="excludes particular hosts (default: no)")
 
 
 
@@ -130,6 +134,11 @@ def scan_systems(options):
 
         #get errata per system
         for system in result_obj["results"]:
+            if system["name"] in options.filter_exclude:
+                #ignore blacklisted system
+                LOGGER.info(
+                    "Ignoring exlucded system '{}'".format(system["name"]))
+                continue
             LOGGER.info("Checking system '{}' (#{})...".format(system["name"], \
             system["id"]))
             errata_counter = system["content_facet_attributes"]["errata_counts"]
