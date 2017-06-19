@@ -13,21 +13,20 @@ from urlparse import urlparse
 
 
 
-LOGGER = logging.getLogger('PyvmomiClient')
-"""
-logging: Logger instance
-"""
-
 class PyvmomiClient:
     """
 .. class:: PyvmomiClient
+    """
+    LOGGER = logging.getLogger('PyvmomiClient')
+    """
+    logging: Logger instance
     """
     SESSION = None
     """
     session: pyvmomi session
     """
 
-    def __init__(self, hostname, username, password):
+    def __init__(self, log_level, hostname, username, password):
         """
         Constructor, creating the class. It requires specifying a URI and
         a username and password for communicating with the hypervisor.
@@ -35,6 +34,8 @@ class PyvmomiClient:
         was specified. After initialization, a connection is established
         automatically.
 
+        :param log_level: log level
+        :type log_level: logging
         :param hostname: hostname
         :type hostname: str
         :param username: API username
@@ -43,7 +44,7 @@ class PyvmomiClient:
         :type password: str
         """
         #set logging
-        self.LOGGER.setLevel(logging.ERROR)
+        self.LOGGER.setLevel(log_level)
         #set custom port
         parsed_uri = urlparse(hostname)
         host = '{uri.path}'.format(uri=parsed_uri)

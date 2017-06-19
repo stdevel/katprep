@@ -17,6 +17,10 @@ LOGGER = logging.getLogger('katprep_authconfig')
 """
 logging: Logger instance
 """
+LOG_LEVEL = None
+"""
+logging: Logger level
+"""
 CONTAINER = None
 """
 AuthContainer: authentication container file
@@ -107,7 +111,7 @@ def set_password(options):
     confirm=""
     while confirm != new_pass:
         confirm = getpass.getpass("Confirm password: ")
-    new_container = AuthContainer(options.container[0], new_pass)
+    new_container = AuthContainer(LOG_LEVEL, options.container[0], new_pass)
 
     #encrypt/change _all_ the passwords!
     for hostname in CONTAINER.get_hostnames():
@@ -201,22 +205,24 @@ def main(options, args):
     while len(container_pass) > 32:
         container_pass = getpass.getpass("File password (max. 32 chars): ")
     #load container
-    CONTAINER = AuthContainer(options.container[0], container_pass)
+    CONTAINER = AuthContainer(LOG_LEVEL, options.container[0], container_pass)
 
     #start action
     options.func(options)
 
 
 def cli():
+    global LOG_LEVEL
     (options, args) = parse_options()
 
     #set logging level
     logging.basicConfig()
     if options.generic_debug:
-        LOGGER.setLevel(logging.DEBUG)
+        LOG_LEVEL = logging.DEBUG
     elif options.generic_quiet:
-        LOGGER.setLevel(logging.ERROR)
+        LOG_LEVEL = logging.ERROR
     else:
-        LOGGER.setLevel(logging.INFO)
+        LOG_LEVEL = logging.INFO
+    LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)

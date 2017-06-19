@@ -28,6 +28,10 @@ LOGGER = logging.getLogger('katprep_maintenance')
 """
 logging: Logger instance
 """
+LOG_LEVEL = None
+"""
+logging: Logger level
+"""
 SAT_CLIENT = None
 """
 ForemanAPIClient: Foreman API client handle
@@ -590,7 +594,8 @@ def main(options, args):
         "Foreman", options.foreman_server, options.generic_auth_container
     )
     SAT_CLIENT = ForemanAPIClient(
-        options.foreman_server, fman_user, fman_pass, options.ssl_verify
+        LOG_LEVEL, options.foreman_server, fman_user,
+        fman_pass, options.ssl_verify
     )
 
     #get virtualization host credentials
@@ -605,9 +610,12 @@ def main(options, args):
             host_params = get_host_params_by_report(REPORT, host)
             if "katprep_virt_type" in host_params and \
                 host_params["katprep_virt_type"] == "pyvmomi":
-                VIRT_CLIENTS[host] = PyvmomiClient(host, virt_user, virt_pass)
+                #VIRT_CLIENTS[host] = PyvmomiClient(host, virt_user, virt_pass)
+                VIRT_CLIENTS[host] = PyvmomiClient(
+                    LOG_LEVEL, host, virt_user, virt_pass)
             elif "katprep_virt_type" in host_params:
-                VIRT_CLIENTS[host] = LibvirtClient(host, virt_user, virt_pass)
+                VIRT_CLIENTS[host] = LibvirtClient(
+                    LOG_LEVEL, host, virt_user, virt_pass)
 
     #get monitoring host credentials
     if options.mon_skip_downtime == False:
@@ -622,12 +630,12 @@ def main(options, args):
                 host_params["katprep_mon_type"] == "nagios":
                 #Yet another legacy installation
                 MON_CLIENTS[host] = NagiosCGIClient(
-                    host, mon_user, mon_pass
+                    LOG_LEVEL, host, mon_user, mon_pass
                 )
             elif "katprep_mon_type" in host_params:
                 #Icinga 2, yay!
                 MON_CLIENTS[host] = Icinga2APIClient(
-                    host, mon_user, mon_pass
+                    LOG_LEVEL, host, mon_user, mon_pass
                 )
 
     #start action
@@ -635,15 +643,17 @@ def main(options, args):
 
 
 def cli():
+    global LOG_LEVEL
     (options, args) = parse_options()
 
     #set logging level
     logging.basicConfig()
     if options.generic_debug:
-        LOGGER.setLevel(logging.DEBUG)
+        LOG_LEVEL = logging.DEBUG
     elif options.generic_quiet:
-        LOGGER.setLevel(logging.ERROR)
+        LOG_LEVEL = logging.ERROR
     else:
-        LOGGER.setLevel(logging.INFO)
+        LOG_LEVEL = logging.INFO
+    LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)

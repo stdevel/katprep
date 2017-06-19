@@ -15,14 +15,13 @@ from lxml import html
 
 
 
-LOGGER = logging.getLogger('NagiosCGIClient')
-"""
-logging: Logger instance
-"""
-
 class NagiosCGIClient:
     """
 .. class:: NagiosCGIClient
+    """
+    LOGGER = logging.getLogger('NagiosCGIClient')
+    """
+    logging: Logger instance
     """
     HEADERS = {'User-Agent': 'katprep (https://github.com/stdevel/katprep)'}
     """
@@ -37,12 +36,14 @@ class NagiosCGIClient:
     session: API session
     """
 
-    def __init__(self, url, username="", password=""):
+    def __init__(self, log_level, url, username="", password=""):
         """
         Constructor, creating the class. It requires specifying a
         URL. Optionally you can specify a username and password to access
         the API using HTTP Basic authentication.
 
+        :param log_level: log level
+        :type log_level: logging
         :param url: Nagios/Icinga URL
         :type url: str
         :param username: API username
@@ -50,6 +51,8 @@ class NagiosCGIClient:
         :param password: corresponding password
         :type password: str
         """
+        #set logging
+        self.LOGGER.setLevel(log_level)
         if url[len(url)-1:] != "/":
             #add trailing slash
             url = "{}/".format(url)
@@ -121,7 +124,7 @@ class NagiosCGIClient:
                     return True
 
         except ValueError as err:
-            LOGGER.error(err)
+            self.LOGGER.error(err)
             raise
 
     #Aliases

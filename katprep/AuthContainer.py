@@ -15,16 +15,13 @@ from cryptography.fernet import InvalidToken
 
 
 
-LOGGER = logging.getLogger('AuthContainer')
-"""
-logging: Logger instance
-"""
-
-
-
 class AuthContainer:
     """
 .. class:: AuthContainer
+    """
+    LOGGER = logging.getLogger('AuthContainer')
+    """
+    logging: Logger instance
     """
     FILENAME = ""
     """
@@ -39,14 +36,18 @@ class AuthContainer:
     str: encryption key
     """
 
-    def __init__(self, filename, key=""):
+    def __init__(self, log_level, filename, key=""):
         """
         Constructor, creating the class. It requires specifying a filename.
         If the file already exists, already existing entries are imported.
 
+        :param log_level: log level
+        :type log_level: logging
         :param filename: filename
         :type filename: str
         """
+        #set logging
+        self.LOGGER.setLevel(log_level)
         #set key if defined
         if key:
             self.set_key(key)
@@ -72,7 +73,7 @@ class AuthContainer:
             #set key
             self.KEY = base64.b64encode(key)
         except ValueError as err:
-            LOGGER.error("Empty password specified")
+            self.LOGGER.error("Empty password specified")
 
 
 
@@ -113,7 +114,7 @@ class AuthContainer:
                 json_data = json_file.read().replace("\n", "")
             return json_data
         except IOError as err:
-            LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
+            self.LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
 
 
 
@@ -171,7 +172,7 @@ class AuthContainer:
                 else:
                     self.CREDENTIALS[hostname]["password"] = password
         except InvalidToken:
-            LOGGER.error("Invalid password specified!")
+            self.LOGGER.error("Invalid password specified!")
             exit(1)
         except KeyError:
             pass
@@ -247,7 +248,7 @@ class AuthContainer:
                     self.CREDENTIALS[hostname]["password"]
                     )
         except InvalidToken:
-            LOGGER.error("Invalid password specified!")
+            self.LOGGER.error("Invalid password specified!")
             exit(1)
         except KeyError:
             pass

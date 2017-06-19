@@ -9,16 +9,15 @@ import logging
 
 
 
-LOGGER = logging.getLogger('LibvirtClient')
-"""
-logging: Logger instance
-"""
-
 class LibvirtClient:
     """
     Class for communicating with libvirt
 
 .. class:: LibvirtClient
+    """
+    LOGGER = logging.getLogger('LibvirtClient')
+    """
+    logging: Logger instance
     """
     URI = ""
     """
@@ -29,7 +28,7 @@ class LibvirtClient:
     session: libvirt session
     """
 
-    def __init__(self, uri, username, password):
+    def __init__(self, log_level, uri, username, password):
         """
         Constructor, creating the class. It requires specifying a URI and
         a username and password for communicating with the hypervisor.
@@ -37,6 +36,8 @@ class LibvirtClient:
         was specified. After initialization, a connection is established
         automatically.
 
+        :param log_level: log level
+        :type log_level: logging
         :param uri: libvirt URI
         :type uri: str
         :param username: API username
@@ -44,6 +45,8 @@ class LibvirtClient:
         :param password: corresponding password
         :type password: str
         """
+        #set logging
+        self.LOGGER.setLevel(log_level)
         #validate and set URI
         if self.validate_uri(uri):
             self.URI = uri
@@ -223,7 +226,7 @@ class LibvirtClient:
             if snapshot_title in target_snapshots:
                 return True
         except libvirt.libvirtError as err:
-            LOGGER.error("Unable to determine snapshot: '{}'".format(err))
+            self.LOGGER.error("Unable to determine snapshot: '{}'".format(err))
             raise SessionException(err)
         except Exception as err:
             raise err

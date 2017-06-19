@@ -13,16 +13,15 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 
 
-LOGGER = logging.getLogger('ForemanAPIClient')
-"""
-logging: Logger instance
-"""
-
 class ForemanAPIClient:
     """
     Class for communicating with the Foreman API
 
 .. class:: ForemanAPIClient
+    """
+    LOGGER = logging.getLogger('ForemanAPIClient')
+    """
+    logging: Logger instance
     """
     API_MIN = 2
     """
@@ -49,12 +48,15 @@ class ForemanAPIClient:
     bool: Boolean whether force SSL verification
     """
 
-    def __init__(self, hostname, username, password, verify=True, prefix=""):
+    def __init__(
+        self, log_level, hostname, username, password, verify=True, prefix=""):
         """
         Constructor, creating the class. It requires specifying a
         hostname, username and password to access the API. After
         initialization, a connected is established.
 
+        :param log_level: log level
+        :type log_level: logging
         :param hostname: Foreman host
         :type hostname: str
         :param username: API username
@@ -66,6 +68,8 @@ class ForemanAPIClient:
         :param prefix: API prefix (e.g. /katello)
         :type prefix: str
         """
+        #set logging
+        self.LOGGER.setLevel(log_level)
         #disable SSL warning outputs
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         #set connection information
@@ -168,7 +172,7 @@ class ForemanAPIClient:
                     return True
 
         except ValueError as err:
-            LOGGER.error(err)
+            self.LOGGER.error(err)
             raise SessionException(err)
             pass
 
@@ -237,7 +241,7 @@ class ForemanAPIClient:
             result_obj = json.loads(
                 self.api_get("/status")
             )
-            LOGGER.debug("API version {} found.".format(
+            self.LOGGER.debug("API version {} found.".format(
                 result_obj["api_version"]))
             if result_obj["api_version"] != self.API_MIN:
                 raise APILevelNotSupportedException(
@@ -246,7 +250,7 @@ class ForemanAPIClient:
                     " software!".format(result_obj["api_version"], self.API_MIN)
                 )
         except ValueError as err:
-            LOGGER.error(err)
+            self.LOGGER.error(err)
             raise APILevelNotSupportedException("Unable to verify API version")
 
 
@@ -305,7 +309,7 @@ class ForemanAPIClient:
                     self.api_get("/{}s/{}".format(api_object, object_id))
                 )
                 if result_obj["id"] == object_id:
-                    LOGGER.debug(
+                    self.LOGGER.debug(
                         "I think I found {} #{}...".format(
                             api_object, object_id
                         )
@@ -317,7 +321,7 @@ class ForemanAPIClient:
                 else:
                     return result_obj["name"]
         except ValueError as err:
-            LOGGER.error(err)
+            self.LOGGER.error(err)
             raise SessionException(err)
 
 
@@ -350,14 +354,14 @@ class ForemanAPIClient:
                 #TODO: nicer way than looping? numpy? Direct URL?
                 for entry in result_obj["results"]:
                     if entry["name"].lower() == name.lower():
-                        LOGGER.debug(
+                        self.LOGGER.debug(
                             "{} {} seems to have ID #{}".format(
                                 api_object, name, entry["id"]
                             )
                         )
                         return entry["id"]
         except ValueError as err:
-            LOGGER.error(err)
+            self.LOGGER.error(err)
             raise SessionException(err)
 
 
@@ -379,7 +383,7 @@ class ForemanAPIClient:
             #TODO allow/return multiple IDs to reduce overhead?
             for entry in result_obj["results"]:
                 if entry["name"].lower() == param_name.lower():
-                    LOGGER.debug(
+                    self.LOGGER.debug(
                         "Found relevant parameter '{}' with ID #{}".format(
                             entry["name"], entry["id"]
                         )
@@ -387,7 +391,7 @@ class ForemanAPIClient:
                     return entry["id"]
 
         except ValueError as err:
-            LOGGER.error(err)
+            self.LOGGER.error(err)
             raise SessionException(err)
 
 
@@ -405,5 +409,5 @@ class ForemanAPIClient:
             )
             return result_obj["results"]
         except ValueError as err:
-            LOGGER.error(err)
+            self.LOGGER.error(err)
             raise SessionException(err)

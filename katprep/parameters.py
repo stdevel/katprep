@@ -22,6 +22,10 @@ LOGGER = logging.getLogger('katprep_parameters')
 """
 logging: Logger instance
 """
+LOG_LEVEL = None
+"""
+logging: Logger level
+"""
 SAT_CLIENT = None
 """
 ForemanAPIClient: Foreman API client handle
@@ -220,10 +224,11 @@ def parse_options(args=None):
 
     #GENERIC ARGUMENTS
     #-q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true", dest="quiet", \
-    default=False, help="don't print status messages to stdout (default: no)")
+    gen_opts.add_argument("-q", "--quiet", action="store_true", \
+    dest="generic_quiet", default=False, help="don't print status messages " \
+    "to stdout (default: no)")
     #-d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="debug", default=False, \
+    gen_opts.add_argument("-d", "--debug", dest="generic_debug", default=False, \
     action="store_true", help="enable debugging outputs (default: no)")
     #-n / --dry-run
     gen_opts.add_argument("-n", "--dry-run", dest="dry_run", default=False, \
@@ -326,7 +331,8 @@ def main(options, args):
             "Satellite", options.server, options.auth_container
         )
         SAT_CLIENT = ForemanAPIClient(
-            options.server, sat_user, sat_pass, options.ssl_verify
+            LOG_LEVEL, options.server, sat_user,
+            sat_pass, options.ssl_verify
         )
 
         #validate filters
@@ -338,15 +344,17 @@ def main(options, args):
 
 
 def cli():
+    global LOG_LEVEL
     (options, args) = parse_options()
 
     #set logging level
     logging.basicConfig()
-    if options.debug:
-        LOGGER.setLevel(logging.DEBUG)
-    elif options.quiet:
-        LOGGER.setLevel(logging.ERROR)
+    if options.generic_debug:
+        LOG_LEVEL = logging.DEBUG
+    elif options.generic_quiet:
+        LOG_LEVEL = logging.ERROR
     else:
-        LOGGER.setLevel(logging.INFO)
+        LOG_LEVEL = logging.INFO
+    LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)

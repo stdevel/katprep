@@ -28,6 +28,10 @@ LOGGER = logging.getLogger('katprep_populate')
 """
 logging: Logger instance
 """
+LOG_LEVEL = None
+"""
+logging: Logger level
+"""
 SAT_CLIENT = None
 """
 ForemanAPIClient: Foreman API client handle
@@ -259,7 +263,8 @@ def main(options, args):
         "Foreman", options.foreman_server, options.generic_auth_container
     )
     SAT_CLIENT = ForemanAPIClient(
-        options.foreman_server, fman_user, fman_pass, options.ssl_verify
+        LOG_LEVEL, options.foreman_server, fman_user,
+        fman_pass, options.ssl_verify
     )
 
     #get virtualization host credentials
@@ -269,10 +274,12 @@ def main(options, args):
         )
         if options.virt_type == "pyvmomi":
             #vSphere Python API
-            VIRT_CLIENT = PyvmomiClient(options.virt_uri, virt_user, virt_pass)
+            VIRT_CLIENT = PyvmomiClient(
+                LOG_LEVEL, options.virt_uri, virt_user, virt_pass)
         else:
             #libvirt
-            VIRT_CLIENT = LibvirtClient(options.virt_uri, virt_user, virt_pass)
+            VIRT_CLIENT = LibvirtClient(
+                LOG_LEVEL, options.virt_uri, virt_user, virt_pass)
 
     #get monitoring host credentials
     if options.mon_skip == False:
@@ -282,12 +289,12 @@ def main(options, args):
         if options.mon_type == "nagios":
             #Yet another legacy installation
             MON_CLIENT = NagiosCGIClient(
-                options.mon_url, mon_user, mon_pass
+                LOG_LEVEL, options.mon_url, mon_user, mon_pass
             )
         else:
             #Icinga 2, yay!
             MON_CLIENT = Icinga2APIClient(
-                options.mon_url, mon_user, mon_pass
+                LOG_LEVEL, options.mon_url, mon_user, mon_pass
             )
 
     #populate _all_ the things
@@ -296,15 +303,17 @@ def main(options, args):
 
 
 def cli():
+    global LOG_LEVEL
     (options, args) = parse_options()
 
     #set logging level
     logging.basicConfig()
     if options.generic_debug:
-        LOGGER.setLevel(logging.DEBUG)
+        LOG_LEVEL = logging.DEBUG
     elif options.generic_quiet:
-        LOGGER.setLevel(logging.ERROR)
+        LOG_LEVEL = logging.ERROR
     else:
-        LOGGER.setLevel(logging.INFO)
+        LOG_LEVEL = logging.INFO
+    LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)

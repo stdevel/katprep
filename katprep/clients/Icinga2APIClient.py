@@ -15,16 +15,15 @@ from datetime import datetime, timedelta
 
 
 
-LOGGER = logging.getLogger('Icinga2APIClient')
-"""
-logging: Logger instance
-"""
-
 class Icinga2APIClient:
     """
     Class for communicating with the Icinga2 API
 
 .. class:: Icinga2APIClient
+    """
+    LOGGER = logging.getLogger('Icinga2APIClient')
+    """
+    logging: Logger instance
     """
     HEADERS = {
         'User-Agent': 'katprep (https://github.com/stdevel/katprep)',
@@ -43,11 +42,14 @@ class Icinga2APIClient:
     bool: Setting whether to check SSL certificate
     """
 
-    def __init__(self, url, username="", password="", verify_ssl=False):
+    def __init__(
+        self, log_level, url, username="", password="", verify_ssl=False):
         """
         Constructor, creating the class. It requires specifying a
         URL, an username and password to access the API.
 
+        :param log_level: log level
+        :type log_level: logging
         :param url: Icinga URL
         :type url: str
         :param username: API username
@@ -56,7 +58,7 @@ class Icinga2APIClient:
         :type password: str
         """
         #set logging
-        self.LOGGER.setLevel(logging.ERROR)
+        self.LOGGER.setLevel(log_level)
 
         #set connection data
         if "/v1" in url:

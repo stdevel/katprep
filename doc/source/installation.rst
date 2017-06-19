@@ -74,6 +74,7 @@ katprep needs to be able to read datacenter/cluster/host/vm information and crea
   * Snapshot management
    * Create Snapshot
    * Remove Snapshot
+   * Revert Snapshot
 
 It is a common procedure to define permissions at a global vCenter Server level.
 

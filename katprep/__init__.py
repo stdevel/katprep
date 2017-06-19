@@ -39,10 +39,13 @@ def get_credentials(prefix, hostname=None, auth_container=None):
         LOGGER.debug("Using authentication container")
         container_pass = "JaHaloIBimsDiPaulaPinkePank#Ohman"
         while len(container_pass) > 32:
-            container_pass = getpass.getpass("File password (max. 32 chars): ")
+            container_pass = getpass.getpass(
+                "File password ('{}'@'{}'): ".format(prefix, hostname)
+            )
         #container = AuthContainer(auth_container)
         try:
-            container = AuthContainer(auth_container, container_pass)
+            container = AuthContainer(
+                logging.ERROR, auth_container, container_pass)
             s_creds = None
             s_creds = container.get_credential(hostname)
             if len(s_creds) == 2:
