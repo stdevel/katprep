@@ -68,8 +68,8 @@ class ForemanAPIClient:
     bool: Boolean whether force SSL verification
     """
 
-    def __init__(
-        self, log_level, hostname, username, password, verify=True, prefix=""):
+    def __init__(self, log_level, hostname,
+        username, password, verify=True, prefix=""):
         """
         Constructor, creating the class. It requires specifying a
         hostname, username and password to access the API. After

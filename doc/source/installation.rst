@@ -71,6 +71,9 @@ katprep needs to be able to read datacenter/cluster/host/vm information and crea
  * Virtual machine
   * Interaction
    * Consolidate hard disks
+   * Power On
+   * Power Off
+   * Reset
   * Snapshot management
    * Create Snapshot
    * Remove Snapshot

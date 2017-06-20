@@ -275,3 +275,31 @@ class LibvirtClient:
         current connection.
         """
         print "TODO: get_vm_hosts"
+
+
+
+    def restart_vm(self, vm_name, force=False):
+        """
+        Restarts a particular VM (default: soft reboot using guest tools).
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        :param force: Flag whether a hard reboot is requested
+        :type force: bool
+        """
+        try:
+            target_vm = self.SESSION.lookupByName(vm_name)
+            if force:
+                #kill it with fire
+                target_vm.reboot(1)
+            else:
+                #killing me softly
+                target_vm.reboot(0)
+        except libvirt.libvirtError as err:
+            if "unsupported flags" in err.message.lower():
+                #trying hypervisor default
+                target_vm.reboot(0)
+                self.LOGGER.error(
+                    "Forcing reboot impossible, trying hypervisor default")
+            else:
+                raise SessionException("Unable to restart VM: '{}'".format(err))

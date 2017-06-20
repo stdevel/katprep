@@ -42,8 +42,8 @@ class Icinga2APIClient:
     bool: Setting whether to check SSL certificate
     """
 
-    def __init__(
-        self, log_level, url, username="", password="", verify_ssl=False):
+    def __init__(self, log_level, url,
+        username="", password="", verify_ssl=False):
         """
         Constructor, creating the class. It requires specifying a
         URL, an username and password to access the API.

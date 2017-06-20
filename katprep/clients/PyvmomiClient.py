@@ -10,6 +10,17 @@ from pyVmomi import vim
 import logging
 import ssl
 from urlparse import urlparse
+import sys
+
+
+
+class SessionException(Exception):
+    """
+    Dummy class for session errors
+
+.. class:: SessionException
+    """
+    pass
 
 
 
@@ -112,8 +123,8 @@ class PyvmomiClient:
         :type snapshot_title: str
         :param snapshot_text: Snapshot text
         :type snapshot_text: str
-        :param remove_snapshot: Removes a snapshot if set to True
-        :type remove_snapshot: bool
+        :param action: action (create, remove)
+        :type remove_snapshot: str
 
         """
         #make sure to quiesce and not dump memory
@@ -145,6 +156,7 @@ class PyvmomiClient:
                                 else:
                                     #revert snapshot
                                     child.snapshot.RevertToSnapshot_Task(True)
+            #TODO: implement revert
             else:
                 #only create snapshot if not already existing
                 if not self.has_snapshot(vm_name, snapshot_title):
@@ -203,6 +215,7 @@ class PyvmomiClient:
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
+        #TODO: implement revert
         return self.__manage_snapshot(
             vm_name, snapshot_title, "", action="revert"
         )
@@ -265,6 +278,9 @@ class PyvmomiClient:
         """
         Returns a list of VMs and their IPs available through the current 
         connection.
+
+        :param hide_empty: hide VMs without network information
+        :type hide_empty: bool
         """
         try:
             #get _all_ the VMs
@@ -312,3 +328,30 @@ class PyvmomiClient:
         except ValueError as err:
             self.LOGGER.error("Unable to get VM hypervisor information: '{}'".format(err))
             raise SessionException(err)
+
+
+
+    def restart_vm(self, vm_name, force=False):
+        """
+        Restarts a particular VM (default: soft reboot using guest tools).
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        :param force: Flag whether a hard reboot is requested
+        :type force: bool
+        """
+        try:
+            #get VM
+            content = self.SESSION.RetrieveContent()
+            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
+
+            if force:
+                #kill it with fire
+                vm.ResetVM_Task()
+            else:
+                #killing me softly
+                vm.RebootGuest()
+        except:
+            raise SessionException("Unable to restart VM: '{}'".format(
+                sys.exc_info()[0]
+            ))
