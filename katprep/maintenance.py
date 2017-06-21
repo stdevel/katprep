@@ -124,20 +124,24 @@ def manage_host_preparation(options, host, cleanup=False):
                     "Snapshot created automatically by katprep"
                 )
 
+    #get errata reboot flags
+    errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
-    if options.mon_skip_downtime == False and \
-        get_host_param_from_report(REPORT, host, "katprep_monitoring") \
-        not in [None, "", "fixmepls"]:
+    if (options.mon_skip_downtime == False and \
+        get_host_param_from_report(REPORT, host, "katprep_mon") \
+        not in [None, "", "fixmepls"]) or \
+        (options.mon_suggested and True in errata_reboot):
         LOGGER.debug(
             "Downtime needs to be scheduled for host '{}'".format(
                 host)
         )
         #use customized monitoring name if applicable
-        if get_host_param_from_report(REPORT, host, "katprep_monitoring_name") \
+        if get_host_param_from_report(REPORT, host, "katprep_mon_name") \
         not in ["", None]:
             mon_name = get_host_param_from_report(
-                REPORT, host, "katprep_monitoring_name"
+                REPORT, host, "katprep_mon_name"
             )
         else:
             mon_name = host
@@ -241,16 +245,36 @@ def execute(options, args):
                     json.dumps({"errata_ids": errata_target})
                 )
 
-            if options.foreman_reboot:
-                if options.generic_dry_run:
-                    LOGGER.info("Host '{}' --> reboot".format(host))
+            #get errata reboot flags
+            errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+            if options.foreman_reboot or True in errata_reboot:
+                #trigger workaround if VM
+                if get_host_param_from_report(REPORT, host, "katprep_virt") \
+                    not in ["", None]:
+                    #use customized VM name if applicable
+                    if get_host_param_from_report(REPORT, host, "katprep_virt_name") \
+                        not in ["", None]:
+                        vm_name = get_host_param_from_report(
+                            REPORT, host, "katprep_virt_name"
+                        )
+                    else:
+                        vm_name = host
+                    #reboot VM
+                    if options.generic_dry_run:
+                        LOGGER.info("Host '{}' --> reboot VM".format(host))
+                    else:
+                        VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].reboot(vm_name)
                 else:
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/power".format(
-                            SAT_CLIENT.get_id_by_name(host, "host")
-                        ),
-                        json.dumps({"power_action": "soft"})
-                    )
+                    #physical host
+                    if options.generic_dry_run:
+                        LOGGER.info("Host '{}' --> reboot host".format(host))
+                    else:
+                        SAT_CLIENT.api_put(
+                            "/hosts/{}/power".format(
+                                SAT_CLIENT.get_id_by_name(host, "host")
+                            ),
+                            json.dumps({"power_action": "soft"})
+                        )
 
     except ValueError as err:
         LOGGER.error("Error maintaining host: '{}'".format(err))
@@ -309,11 +333,11 @@ def verify(options, args):
             #check downtime
             if not options.mon_skip_downtime:
                 if get_host_param_from_report(
-                    REPORT, host, "katprep_monitoring_name"
+                    REPORT, host, "katprep_mon_name"
                 ) not in ["", None]:
                     #customized name
                     mon_name = get_host_param_from_report(
-                        REPORT, host, "katprep_monitoring_name"
+                        REPORT, host, "katprep_mon_name"
                     )
                 else:
                     #FQDN
@@ -450,7 +474,8 @@ def parse_options(args=None):
     #-r / --reboot-systems
     fman_opts.add_argument("-r", "--reboot-systems", dest="foreman_reboot", \
     default=False, action="store_true", \
-    help="reboot systems after successful errata installation (default: no)")
+    help="always reboot systems after successful errata installation " \
+    "(default: no)")
     #--insecure
     fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
     action="store_false", help="Disables SSL verification (default: no)")
@@ -479,6 +504,10 @@ def parse_options(args=None):
     mon_opts.add_argument("-K", "--skip-downtime", dest="mon_skip_downtime", \
     action="store_true", default=False, \
     help="skips scheduling downtimes (default: no)")
+    #-S / --mon-suggested
+    mon_opts.add_argument("-S", "--mon-suggested", dest="mon_suggested", \
+    action="store_true", default=False, help="only schedules downtime if " \
+    "suggested (default: no)")
     #-t / --mon-downtime
     mon_opts.add_argument("-t", "--mon-downtime", dest="mon_downtime", \
     metavar="HOURS", action="store", type=int, default=8, \
