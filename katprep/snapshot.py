@@ -125,16 +125,16 @@ http://github.com/stdevel/katprep'''
 def scan_systems(options):
     """Scans all systems that were selected for errata counters."""
 
-    try:
-        #get all the hosts depending on the filter
-        filter_url = get_filter(options, "host")
-        LOGGER.debug("Filter URL will be '{}'".format(filter_url))
-        result_obj = json.loads(
-            SAT_CLIENT.api_get("{}".format(filter_url))
-        )
+    #get all the hosts depending on the filter
+    filter_url = get_filter(options, "host")
+    LOGGER.debug("Filter URL will be '{}'".format(filter_url))
+    result_obj = json.loads(
+        SAT_CLIENT.api_get("{}".format(filter_url))
+    )
 
-        #get errata per system
-        for system in result_obj["results"]:
+    #get errata per system
+    for system in result_obj["results"]:
+        try:
             if system["name"] in options.filter_exclude:
                 #ignore blacklisted system
                 LOGGER.info(
@@ -191,10 +191,14 @@ def scan_systems(options):
                     SAT_CLIENT.api_get("/hosts/{}/errata".format(system["id"]))
                 )
                 SYSTEM_ERRATA[system["name"]]["errata"] = result_obj["results"]
-    except KeyError as err:
-        LOGGER.error("Unable to get system information, check filter options!")
-    except ValueError as err:
-        LOGGER.info("Unable to get data: '{}'".format(err))
+        except KeyError as err:
+            #LOGGER.error("Unable to get system information, check filter options!")
+            LOGGER.error(
+                "Unable to get system information for '{}', " \
+                "dropping system!".format(system["name"]))
+            pass
+        except ValueError as err:
+            LOGGER.info("Unable to get data: '{}'".format(err))
 
 
 
