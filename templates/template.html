@@ -83,10 +83,12 @@ table tr:nth-child(odd) {
 $for(errata)$
 <tr>
 <td>$if(errata.type)$$errata.type$$endif$</td>
-<td>$if(errata.summary)$$errata.summary$$endif$</td>
+<td>$if(errata.errata_id)$$errata.errata_id$$endif$</td>
 <td>$if(errata.issued)$$errata.issued$$endif$</td>
 <td>$if(errata.description)$$errata.description$$endif$</td>
-<td>$if(errata.reboot_suggested)$yes$else$no$endif$</td>
+<!-- <td>$if(errata.reboot_suggested)$yes$else$no$endif$</td> -->
+<!-- Pandoc is not able to check strings/values, so we need to simply display the value -->
+<td>$errata.reboot_suggested$</td>
 </tr>
 $endfor$
 </table>

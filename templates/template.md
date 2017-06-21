@@ -18,7 +18,7 @@ Monitoring enabled | $if(verification.mon_cleanup)$yes$else$no$endif$ | $if(para
 Type | Name | Date | Description | Reboot required?
 ---- | ---- | ---- | ----------- | ----------------
 $for(errata)$
-$if(errata.type)$$errata.type$$endif$ | $if(errata.summary)$$errata.summary$$endif$ | $if(errata.issued)$$errata.issued$$endif$ | $if(errata.description)$$errata.description$$endif$ | $if(errata.reboot_suggested)$yes$else$no$endif$
+$if(errata.type)$$errata.type$$endif$ | $if(errata.errata_id)$$errata.errata_id$$endif$ | $if(errata.issued)$$errata.issued$$endif$ | $if(errata.description)$$errata.description$$endif$ | $if(errata.reboot_suggested)$$errata.reboot_suggested$$endif$
 $endfor$
 
 *This report was created automatically by [katprep](https://github.com/stdevel/katprep)*

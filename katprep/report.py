@@ -235,12 +235,17 @@ def create_delta(options):
             get_newer_file(options.reports[0], options.reports[1])
         )).strftime('%Y%m%d')
 
-        #store YAML files
-        with open("{}errata-diff-{}-{}.yml".format(options.output_path, \
-            host, timestamp), "w") as json_file:
-            yaml.dump(yaml.load(json.dumps(REPORT_OLD[host])), json_file, \
-            default_flow_style=False, explicit_start=True, \
-            explicit_end=True, default_style="'")
+        #store YAML files if at least 1 erratum installed
+        if len(REPORT_OLD[host]["errata"]) > len(REPORT_NEW[host]["errata"]):
+            with open("{}errata-diff-{}-{}.yml".format(options.output_path, \
+                host, timestamp), "w") as json_file:
+                yaml.dump(yaml.load(json.dumps(REPORT_OLD[host])), json_file, \
+                default_flow_style=False, explicit_start=True, \
+                explicit_end=True, default_style="'")
+        else:
+            LOGGER.debug("Host '{}' has not been patched #ohman".format(
+                host)
+            )
 
 
 
@@ -250,20 +255,24 @@ def create_reports(options):
     YAML reports created previously into the desired format using ``pandoc``.
     """
     for host in REPORT_OLD:
-        LOGGER.debug("Creating report for host '{}'".format(host))
-        timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
-            get_newer_file(options.reports[0], options.reports[1])
-        )).strftime('%Y%m%d')
-        filename = "{}errata-diff-{}-{}".format(
-            options.output_path, host, timestamp
-        )
-        LOGGER.debug("{}.yml".format(filename))
-        #TODO: figure out why pypandoc doesn't work at this point
-        os.system("pandoc {}.yml --template {} -o {}.{}".format(filename, \
-            options.template_file, filename, options.output_type))
-        if not options.preserve_yaml:
-            #Remove file
-            os.remove("{}.yml".format(filename))
+            timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
+                get_newer_file(options.reports[0], options.reports[1])
+            )).strftime('%Y%m%d')
+            filename = "{}errata-diff-{}-{}".format(
+                options.output_path, host, timestamp
+            )
+            if os.path.isfile("{}.yml".format(filename)):
+                LOGGER.debug("Creating report for host '{}'".format(host))
+                LOGGER.debug("{}.yml".format(filename))
+                #TODO: figure out why pypandoc doesn't work at this point
+                os.system("pandoc {}.yml --template {} -o {}.{}".format(filename, \
+                    options.template_file, filename, options.output_type))
+                if not options.preserve_yaml:
+                    #Remove file
+                    os.remove("{}.yml".format(filename))
+            else:
+                LOGGER.debug("Non-existing report template: " \
+                    "'{}.yml'".format(filename))
 
 
 
