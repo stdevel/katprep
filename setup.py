@@ -84,7 +84,7 @@ setup(
     # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files # noqa
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
     # TODO: add config.yml later
-    data_files=[('etc/katprep/', ['templates/template.css', 'templates/template.html', 'templates/template.md'])],
+    data_files=[('etc/katprep/', ['templates/template.html', 'templates/template.md'])],
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow

@@ -180,7 +180,7 @@ def scan_systems(options):
                 SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
 
             #set HW flag
-            if params_obj["facts"]["virt::is_guest"] == True:
+            if params_obj["facts"]["virt::is_guest"].lower() == "true":
                 SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = False
             else:
                 SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
