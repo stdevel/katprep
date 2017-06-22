@@ -10,7 +10,7 @@ import argparse
 import logging
 import json
 import getpass
-from .AuthContainer import AuthContainer
+from .AuthContainer import AuthContainer, ContainerException
 
 __version__ = "0.0.1"
 LOGGER = logging.getLogger('katprep_authconfig')

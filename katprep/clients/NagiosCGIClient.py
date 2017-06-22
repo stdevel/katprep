@@ -15,6 +15,16 @@ from lxml import html
 
 
 
+class SessionException(Exception):
+    """
+    Dummy class for session errors
+
+.. class:: SessionException
+    """
+    pass
+
+
+
 class NagiosCGIClient:
     """
 .. class:: NagiosCGIClient

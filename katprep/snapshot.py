@@ -13,7 +13,7 @@ import json
 import time
 from . import get_credentials, is_writable, validate_filters, \
 get_filter
-from .clients.ForemanAPIClient import ForemanAPIClient
+from .clients.ForemanAPIClient import ForemanAPIClient, SessionException
 
 __version__ = "0.0.1"
 """

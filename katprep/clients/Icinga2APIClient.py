@@ -15,6 +15,16 @@ from datetime import datetime, timedelta
 
 
 
+class SessionException(Exception):
+    """
+    Dummy class for session errors
+
+.. class:: SessionException
+    """
+    pass
+
+
+
 class Icinga2APIClient:
     """
     Class for communicating with the Icinga2 API

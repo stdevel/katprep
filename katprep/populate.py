@@ -16,10 +16,10 @@ import os
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients.LibvirtClient import LibvirtClient
-from .clients.PyvmomiClient import PyvmomiClient
-from .clients.NagiosCGIClient import NagiosCGIClient
-from .clients.Icinga2APIClient import Icinga2APIClient
+from .clients.LibvirtClient import LibvirtClient, SessionException
+from .clients.PyvmomiClient import PyvmomiClient, SessionException
+from .clients.NagiosCGIClient import NagiosCGIClient, SessionException
+from .clients.Icinga2APIClient import Icinga2APIClient, SessionException
 
 __version__ = "0.0.1"
 """
@@ -53,6 +53,8 @@ def populate(options):
     Retrieves information from a virtualization system and tries to merge
     data with Foreman/Katello.
     """
+    LOGGER.info("Gathering host inventory information. " \
+        "This *WILL* take some time - please be patient.")
     try:
         #retrieve host information
         hosts = params_obj = json.loads(SAT_CLIENT.api_get("/hosts"))

@@ -11,7 +11,7 @@ import argparse
 import logging
 import json
 from . import get_credentials, validate_filters, get_filter
-from .clients.ForemanAPIClient import ForemanAPIClient
+from .clients.ForemanAPIClient import ForemanAPIClient, SessionException
 
 
 
