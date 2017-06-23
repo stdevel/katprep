@@ -56,6 +56,6 @@ To add basic katprep-relevant parameters, use the ``--add-parameters`` parameter
    $ katprep_parameters --update-parameters -C pinkepank.auth
    Enter value for 'katprep_virt' (hint: Virtualization URL of the system): 
    Enter value for 'katprep_virt' (hint: Virtualization URL of the system): qemu:///system
-   Enter value for 'katprep_mon' (hint: URL of the monitoring system): http://bigbrother.stankowic.loc^
+   Enter value for 'katprep_mon' (hint: URL of the monitoring system): http://bigbrother.stankowic.loc
 
 It is also possible to limit actions to particular organizations (``--organization``), locations (``--location``), hostgroups (``--hosrgroup``) or Puppet environments (``--environment``).

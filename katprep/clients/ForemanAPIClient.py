@@ -359,6 +359,10 @@ class ForemanAPIClient:
             "hostgroup", "location", "organization", "environment",
             "host"
         ]
+        filter_object = {
+            "hostgroup" : "title", "location": "name", "host" : "name", 
+            "organization" : "title", "environment" : "name"
+        }
         try:
             if api_object.lower() not in valid_objects:
                 #invalid type
@@ -373,7 +377,7 @@ class ForemanAPIClient:
                 )
                 #TODO: nicer way than looping? numpy? Direct URL?
                 for entry in result_obj["results"]:
-                    if entry["name"].lower() == name.lower():
+                    if entry[filter_object[api_object]].lower() == name.lower():
                         self.LOGGER.debug(
                             "{} {} seems to have ID #{}".format(
                                 api_object, name, entry["id"]
