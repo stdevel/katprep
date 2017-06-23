@@ -210,6 +210,6 @@ As only VMs of the ``production`` Puppet environment are protected by snapshots,
 
 To actually change settings, omit the ``-n`` parameter::
 
-  $ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U -e production -n
+  $ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U -e production
 
 For system maintenance, refer to the previous example.
