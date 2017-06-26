@@ -211,8 +211,8 @@ def prepare(options, args):
             manage_host_preparation(options, host)
 
             #verify preparation
-            if not options.generic_dry_run:
-                verify(options, args)
+            #if not options.generic_dry_run:
+                #verify(options, args)
 
     except ValueError as err:
         LOGGER.error("Error preparing maintenance: '{}'".format(err))
@@ -263,7 +263,7 @@ def execute(options, args):
                     if options.generic_dry_run:
                         LOGGER.info("Host '{}' --> reboot VM".format(host))
                     else:
-                        VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].reboot(vm_name)
+                        VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].restart_vm(vm_name)
                 else:
                     #physical host
                     if options.generic_dry_run:
@@ -323,11 +323,11 @@ def verify(options, args):
                     vm_name, "katprep_{}".format(REPORT_PREFIX)
                     ):
                     #set flag
-                    set_verification_value(options, host, "virt_snapshot", 1)
+                    set_verification_value(options, host, "virt_snapshot", True)
                     LOGGER.info("Snapshot for host '{}' found.".format(host))
                 else:
                     #set flag
-                    set_verification_value(options, host, "virt_cleanup", 1)
+                    set_verification_value(options, host, "virt_cleanup", True)
                     LOGGER.info("No snapshot for host '{}' found, probably cleaned-up.".format(host))
 
             #check downtime
@@ -345,11 +345,11 @@ def verify(options, args):
                 #check scheduled downtime
                 if MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].has_downtime(mon_name):
                     #set flag
-                    set_verification_value(options, host, "mon_downtime", 1)
+                    set_verification_value(options, host, "mon_downtime", True)
                     LOGGER.info("Downtime for host '{}' found.".format(host))
                 else:
                     #set flag
-                    set_verification_value(options, host, "mon_cleanup", 1)
+                    set_verification_value(options, host, "mon_cleanup", True)
                     LOGGER.info("No downtime for host '{}' found, probably cleaned-up.".format(host))
                 #check critical services
                 crit_services = MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].get_services(mon_name)

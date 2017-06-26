@@ -215,37 +215,37 @@ def create_delta(options):
     #open old report and remove entries from newer report
     for host in REPORT_OLD:
         LOGGER.debug("Analyzing changes for host '{}'".format(host))
-        for i, erratum in enumerate(REPORT_OLD[host]["errata"]):
-            if erratum["errata_id"] in get_errata_by_host(REPORT_NEW, host):
-                LOGGER.debug("Dropping erratum '{}' (#{}) as it seems not to" \
-                    " be installed".format(
-                        erratum["summary"], erratum["errata_id"]
-                    ))
-                del REPORT_OLD[host]["errata"][i]
-        #add date and time
-        #TODO: date format based on locale?
-        REPORT_OLD[host]["params"]["date"] = now.strftime("%Y-%m-%d")
-        REPORT_OLD[host]["params"]["time"] = now.strftime("%H:%M")
-
-        #Integrate verify data
-        REPORT_OLD[host]["verification"] = REPORT_NEW[host]["verification"]
-
-        #store delta report
-        timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
-            get_newer_file(options.reports[0], options.reports[1])
-        )).strftime('%Y%m%d')
-
-        #store YAML files if at least 1 erratum installed
-        if len(REPORT_OLD[host]["errata"]) > len(REPORT_NEW[host]["errata"]):
-            with open("{}errata-diff-{}-{}.yml".format(options.output_path, \
-                host, timestamp), "w") as json_file:
-                yaml.dump(yaml.load(json.dumps(REPORT_OLD[host])), json_file, \
-                default_flow_style=False, explicit_start=True, \
-                explicit_end=True, default_style="'")
-        else:
-            LOGGER.debug("Host '{}' has not been patched #ohman".format(
-                host)
-            )
+        try:
+            for i, erratum in enumerate(REPORT_OLD[host]["errata"]):
+                if erratum["errata_id"] in get_errata_by_host(REPORT_NEW, host):
+                    LOGGER.debug("Dropping erratum '{}' (#{}) as it seems not to" \
+                        " be installed".format(
+                            erratum["summary"], erratum["errata_id"]
+                        ))
+                    del REPORT_OLD[host]["errata"][i]
+            #add date and time
+            #TODO: date format based on locale?
+            REPORT_OLD[host]["params"]["date"] = now.strftime("%Y-%m-%d")
+            REPORT_OLD[host]["params"]["time"] = now.strftime("%H:%M")
+    
+            #store delta report
+            timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
+                get_newer_file(options.reports[0], options.reports[1])
+            )).strftime('%Y%m%d')
+    
+            #store YAML files if at least 1 erratum installed
+            if len(REPORT_OLD[host]["errata"]) > len(REPORT_NEW[host]["errata"]):
+                with open("{}errata-diff-{}-{}.yml".format(options.output_path, \
+                    host, timestamp), "w") as json_file:
+                    yaml.dump(yaml.load(json.dumps(REPORT_OLD[host])), json_file, \
+                    default_flow_style=False, explicit_start=True, \
+                    explicit_end=True, default_style="'")
+            else:
+                LOGGER.debug("Host '{}' has not been patched #ohman".format(
+                    host)
+                )
+        except KeyError:
+            LOGGER.debug("Unable to find changes for host '{}'".format(host))
 
 
 

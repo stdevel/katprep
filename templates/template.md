@@ -8,11 +8,11 @@ $if(params.ip)$$params.ip$$endif$ | $if(params.date)$$params.date$$endif$ | $if(
 ## Task checklist
 Task | Status | Description/Notes
 ---- | ------ | -----------------
-Snapshot created | $if(verification.virt_snapshot)$yes$else$no$endif$ | $if(params.system_physical)$physical system$endif$
-Monitoring disabled | $if(verification.mon_downtime)$yes$else$no$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
-System rebooted | $if(verification.system_reboot)$yes$else$no$endif$ | 
+Snapshot created | $if(verification.virt_snapshot)$$verification.virt_snapshot$$endif$ | $if(params.system_physical)$physical system$endif$
+Monitoring disabled | $if(verification.mon_downtime)$$verification.mon_downtime$$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
+System rebooted | $if(verification.system_reboot)$$verification.system_reboot$$endif$ | 
 Monitoring status | $if(verification.mon_status)$$verification.mon_status$$endif$ | $if(verification.mon_status_detail)$$verification.mon_status_detail$$endif$
-Monitoring enabled | $if(verification.mon_cleanup)$yes$else$no$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
+Monitoring enabled | $if(verification.mon_cleanup)$$verification.mon_cleanup$$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
 
 ## Patch list
 Type | Name | Date | Description | Reboot required?

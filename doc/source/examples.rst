@@ -114,7 +114,7 @@ Now it's time to patch all the systems. Again, let's see what would happen::
   INFO:katprep_maintenance:Host 'giertz.stankowic.loc' --> install: FEDORA-EPEL-2017-9d4f011d75, FEDORA-EPEL-2017-a04a2240d8
   INFO:katprep_maintenance:Host 'pinkepank.test.loc' --> install: FEDORA-EPEL-2017-9d4f011d75
 
-Several errata will be installed on the systems. Now, go ahead and omit the simulation parameter. If we want to automatically reboot the systems after installing errata, we also need to supply the ``-r`` / ``--reboot-systems`` parameter::
+Several errata will be installed on the systems. Now, go ahead and omit the simulation parameter. By default, the system will only reboot if an installed erratum requires this. If we want to automatically reboot the systems after installing errata (*regardless if an erratum requires this*), we also need to supply the ``-r`` / ``--reboot-systems`` parameter::
 
   $ katprep_maintenance -C mycontainer.auth -S foreman.localdomain.loc errata-snapshot-*.json -r execute
 

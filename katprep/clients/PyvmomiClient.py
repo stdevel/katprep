@@ -238,6 +238,9 @@ class PyvmomiClient:
                 if c.name == vm_name:
                     snapshots = c.snapshot.rootSnapshotList
                     return snapshots
+        except AttributeError:
+            #no snapshots found, go ahead
+            pass
         except Exception as err:
             self.LOGGER.error("Unable to get snapshots: '{}'".format(err))
             raise SessionException(err)
