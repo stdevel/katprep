@@ -358,3 +358,54 @@ class PyvmomiClient:
             raise SessionException("Unable to restart VM: '{}'".format(
                 sys.exc_info()[0]
             ))
+
+
+
+    def __manage_power(
+            self, vm_name, action="poweroff"
+        ):
+        """
+        Powers a particual virtual machine on/off forcefully.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        :param action: action (poweroff, poweron)
+        :type action: str
+
+        """
+        try:
+            content = self.SESSION.RetrieveContent()
+            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
+            if action.lower() == "poweroff":
+                #get down with the vickness
+                task = vm.PowerOff()
+            else:
+                #fire it up
+                task = vm.PowerOn()
+        except ValueError as err:
+            self.LOGGER.error("Unable to manage power state: '{}'".format(err))
+
+
+
+    #Aliases
+    def poweroff_vm(self, vm_name):
+        """
+        Turns off a particual virtual machine forcefully.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        """
+        return self.__manage_power(
+            vm_name
+        )
+
+    def poweron_vm(self, vm_name):
+        """
+        Turns on a particual virtual machine forcefully.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        """
+        return self.__manage_power(
+            vm_name, action="poweron"
+        )

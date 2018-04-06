@@ -303,3 +303,44 @@ class LibvirtClient:
                     "Forcing reboot impossible, trying hypervisor default")
             else:
                 raise SessionException("Unable to restart VM: '{}'".format(err))
+
+
+
+    def __manage_power(
+            self, vm_name, action="poweroff"
+        ):
+        """
+        Powers a particual virtual machine on/off forcefully.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        :param action: action (poweroff, poweron)
+        :type action: str
+
+        """
+        print "TODO: manager_power"
+
+
+
+    #Aliases
+    def poweroff_vm(self, vm_name):
+        """
+        Turns off a particual virtual machine forcefully.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        """
+        return self.__manage_power(
+            vm_name
+        )
+
+    def poweron_vm(self, vm_name):
+        """
+        Turns on a particual virtual machine forecully.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+        """
+        return self.__manage_power(
+            vm_name, action="poweron"
+        )
