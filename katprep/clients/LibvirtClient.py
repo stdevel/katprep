@@ -306,6 +306,18 @@ class LibvirtClient:
 
 
 
+    def powerstate_vm(self, vm_name):
+        """
+        Returns the power state of a particular virtual machine.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+
+        """
+        print "TODO: powerstate_vm"
+
+
+
     def __manage_power(
             self, vm_name, action="poweroff"
         ):
@@ -318,7 +330,7 @@ class LibvirtClient:
         :type action: str
 
         """
-        print "TODO: manager_power"
+        print "TODO: manage_power"
 
 
 

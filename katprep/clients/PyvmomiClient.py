@@ -361,6 +361,26 @@ class PyvmomiClient:
 
 
 
+    def powerstate_vm(self, vm_name):
+        """
+        Returns the power state of a particular virtual machine.
+
+        :param vm_name: Name of a virtual machine
+        :type vm_name: str
+
+        """
+        try:
+            content = self.SESSION.RetrieveContent()
+            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
+            if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
+                return "poweredOn"
+            elif vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOff:
+                return "poweredOff"
+        except ValueError as err:
+            self.LOGGER.error("Unable to get power state: '{}'".format(err))
+
+
+
     def __manage_power(
             self, vm_name, action="poweroff"
         ):
