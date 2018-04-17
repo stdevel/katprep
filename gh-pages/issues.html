@@ -1,0 +1,145 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Common Issues &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
+    <link rel="next" title="Debugging and getting help" href="debug.html" />
+    <link rel="prev" title="Examples" href="examples.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="debug.html" title="Debugging and getting help"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="common-issues">
+<h1>Common Issues<a class="headerlink" href="#common-issues" title="Permalink to this headline">¶</a></h1>
+<p>This page shows some common issues and how to fix them.</p>
+<div class="section" id="error-messages">
+<h2>Error messages<a class="headerlink" href="#error-messages" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="no-connection-adapters-were-found-for-hostname-domain-loc-v1-objects-hosts">
+<h3>No connection adapters were found for &#8216;hostname.domain.loc/v1/objects/hosts&#8217;<a class="headerlink" href="#no-connection-adapters-were-found-for-hostname-domain-loc-v1-objects-hosts" title="Permalink to this headline">¶</a></h3>
+<p>When using katprep along with an Icinga2 instance, you&#8217;re receiving an error like this:</p>
+<div class="highlight-python"><pre>ERROR:BasicIcinga2APIClient:No connection adapters were found for 'hostname.domain.loc/v1/objects/hosts'</pre>
+</div>
+<p><strong>Reason:</strong> You forgot to specify a correct Icinga2 URL, protocol and port are missing. Use a value like <tt class="docutils literal"><span class="pre">https://hostname.domain.loc:5665</span></tt></p>
+</div>
+<div class="section" id="ssl-certificate-verify-failed">
+<h3>SSL: CERTIFICATE_VERIFY_FAILED<a class="headerlink" href="#ssl-certificate-verify-failed" title="Permalink to this headline">¶</a></h3>
+<p>When accessing the Foreman/Katello API, the following error is displayed:</p>
+<div class="highlight-python"><pre>File "/usr/lib/python2.7/site-packages/requests/sessions.py", line 576, in send r = adapter.send(request,
+**kwargs) File "/usr/lib/python2.7/site-packages/requests/adapters.py", line 431, in send raise SSLError(e,
+request=request) requests.exceptions.SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed
+(_ssl.c:579)</pre>
+</div>
+<p><strong>Reason:</strong> Your Foreman/Katello server is using a self-signed certificate, use the <tt class="docutils literal"><span class="pre">--insecure</span></tt> parameter to ignore this error.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Common Issues</a><ul>
+<li><a class="reference internal" href="#error-messages">Error messages</a><ul>
+<li><a class="reference internal" href="#no-connection-adapters-were-found-for-hostname-domain-loc-v1-objects-hosts">No connection adapters were found for &#8216;hostname.domain.loc/v1/objects/hosts&#8217;</a></li>
+<li><a class="reference internal" href="#ssl-certificate-verify-failed">SSL: CERTIFICATE_VERIFY_FAILED</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="previous chapter">Examples</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="debug.html"
+                        title="next chapter">Debugging and getting help</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/issues.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="debug.html" title="Debugging and getting help"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
