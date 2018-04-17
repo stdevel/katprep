@@ -14,7 +14,7 @@ katprep can automate the following infrastructure tasks:
 This software is a complete rewrite of my other toolkit [**satprep**](https://github.com/stdevel/satprep).
 
 # Documentation and contribution
-The project documentation is created automatically using [Sphinx](http://www.sphinx-doc.org) - it can be found in the **doc** folder of this repository. Check-out [**this website**](http://katprep.st-devel.net/doc/latest) for an online mirror.
+The project documentation is created automatically using [Sphinx](http://www.sphinx-doc.org) - it can be found in the **doc** folder of this repository. Check-out [**this website**](https://stdevel.github.io/katprep/) for an online mirror.
 
 You want to contribute? That's great! Please check-out the [**Issues**](https://github.com/stdevel/katprep/issues) tab of this project and share your thoughts/ideas in a new issue - also, pull requests are welcome!
 
