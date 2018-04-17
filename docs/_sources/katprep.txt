@@ -1,7 +1,7 @@
-katprep Package
+Package
 ===============
 
-:mod:`katprep` Package
+:mod:` Package
 ----------------------
 
 .. automodule:: katprep
@@ -12,7 +12,7 @@ katprep Package
 :mod:`AuthContainer` Module
 ---------------------------
 
-.. automodule:: katprep.AuthContainer
+.. automodule:: AuthContainer
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ katprep Package
 :mod:`authconfig` Module
 ------------------------
 
-.. automodule:: katprep.authconfig
+.. automodule:: authconfig
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ katprep Package
 :mod:`exceptions` Module
 ------------------------
 
-.. automodule:: katprep.exceptions
+.. automodule:: exceptions
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,7 +36,7 @@ katprep Package
 :mod:`maintenance` Module
 -------------------------
 
-.. automodule:: katprep.maintenance
+.. automodule:: maintenance
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,7 +44,7 @@ katprep Package
 :mod:`parameters` Module
 ------------------------
 
-.. automodule:: katprep.parameters
+.. automodule:: parameters
     :members:
     :undoc-members:
     :show-inheritance:
@@ -52,7 +52,7 @@ katprep Package
 :mod:`populate` Module
 ----------------------
 
-.. automodule:: katprep.populate
+.. automodule:: populate
     :members:
     :undoc-members:
     :show-inheritance:
@@ -60,7 +60,7 @@ katprep Package
 :mod:`report` Module
 --------------------
 
-.. automodule:: katprep.report
+.. automodule:: report
     :members:
     :undoc-members:
     :show-inheritance:
@@ -68,7 +68,7 @@ katprep Package
 :mod:`snapshot` Module
 ----------------------
 
-.. automodule:: katprep.snapshot
+.. automodule:: snapshot
     :members:
     :undoc-members:
     :show-inheritance:
@@ -78,5 +78,5 @@ Subpackages
 
 .. toctree::
 
-    katprep.clients
+    clients
 

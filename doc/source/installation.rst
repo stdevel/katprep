@@ -97,7 +97,7 @@ Proceed with the following steps::
 
    $ python setup.py install
 
-In case you want to install the toolkit only for your current user (*e.g. because of file system restrictions*), use the **--user-- parameter**::
+In case you want to install the toolkit only for your current user (*e.g. because of file system restrictions*), use the **--user parameter**::
 
    $ python setup.py install --user
 

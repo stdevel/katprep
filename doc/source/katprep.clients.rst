@@ -4,7 +4,7 @@ clients Package
 :mod:`ForemanAPIClient` Module
 ------------------------------
 
-.. automodule:: katprep.clients.ForemanAPIClient
+.. automodule:: clients.ForemanAPIClient
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ clients Package
 :mod:`Icinga2APIClient` Module
 ------------------------------
 
-.. automodule:: katprep.clients.Icinga2APIClient
+.. automodule:: clients.Icinga2APIClient
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ clients Package
 :mod:`LibvirtClient` Module
 ---------------------------
 
-.. automodule:: katprep.clients.LibvirtClient
+.. automodule:: clients.LibvirtClient
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ clients Package
 :mod:`NagiosCGIClient` Module
 -----------------------------
 
-.. automodule:: katprep.clients.NagiosCGIClient
+.. automodule:: clients.NagiosCGIClient
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,7 +36,7 @@ clients Package
 :mod:`PyvmomiClient` Module
 ---------------------------
 
-.. automodule:: katprep.clients.PyvmomiClient
+.. automodule:: clients.PyvmomiClient
     :members:
     :undoc-members:
     :show-inheritance:

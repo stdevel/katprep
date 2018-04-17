@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>clients.Icinga2APIClient &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">katprep 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for clients.Icinga2APIClient</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Class for sending some very basic commands to Icinga 2.x</span>
+<span class="sd">monitoring systems.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">requests.auth</span> <span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+
+
+<div class="viewcode-block" id="SessionException"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.SessionException">[docs]</a><span class="k">class</span> <span class="nc">SessionException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dummy class for session errors</span>
+
+<span class="sd">.. class:: SessionException</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+
+</div>
+<div class="viewcode-block" id="Icinga2APIClient"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.Icinga2APIClient">[docs]</a><span class="k">class</span> <span class="nc">Icinga2APIClient</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for communicating with the Icinga2 API</span>
+
+<span class="sd">.. class:: Icinga2APIClient</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;Icinga2APIClient&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    logging: Logger instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s">&#39;katprep (https://github.com/stdevel/katprep)&#39;</span><span class="p">,</span>
+        <span class="s">&#39;Accept&#39;</span><span class="p">:</span> <span class="s">&#39;application/json&#39;</span><span class="p">,</span>
+        <span class="s">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s">&quot;application/json&quot;</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    dict: Default headers set for every HTTP request</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SESSION</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    session: API session</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">VERIFY_SSL</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    bool: Setting whether to check SSL certificate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span>
+        <span class="n">username</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">verify_ssl</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor, creating the class. It requires specifying a</span>
+<span class="sd">        URL, an username and password to access the API.</span>
+
+<span class="sd">        :param log_level: log level</span>
+<span class="sd">        :type log_level: logging</span>
+<span class="sd">        :param url: Icinga URL</span>
+<span class="sd">        :type url: str</span>
+<span class="sd">        :param username: API username</span>
+<span class="sd">        :type username: str</span>
+<span class="sd">        :param password: corresponding password</span>
+<span class="sd">        :type password: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#set logging</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+
+        <span class="c">#set connection data</span>
+        <span class="k">if</span> <span class="s">&quot;/v1&quot;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">URL</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">URL</span> <span class="o">=</span> <span class="s">&quot;{}/v1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">USERNAME</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PASSWORD</span> <span class="o">=</span> <span class="n">password</span>
+
+        <span class="c">#set SSL information and connect</span>
+        <span class="k">if</span> <span class="n">verify_ssl</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">VERIFY_SSL</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__connect</span><span class="p">()</span>
+
+
+
+    <span class="k">def</span> <span class="nf">__connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function establishes a connection to the Icinga2 API.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">USERNAME</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">USERNAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PASSWORD</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span> <span class="nf">__api_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a HTTP request to the Nagios/Icinga API. This function requires</span>
+<span class="sd">        a valid HTTP method and a sub-URL (such as /cgi-bin/status.cgi).</span>
+<span class="sd">        Optionally, you can also specify payload (for POST).</span>
+<span class="sd">        There are also alias functions available.</span>
+
+<span class="sd">        :param method: HTTP request method (GET, POST)</span>
+<span class="sd">        :type method: str</span>
+<span class="sd">        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)</span>
+<span class="sd">        :type sub_url: str</span>
+<span class="sd">        :param payload: payload for POST requests</span>
+<span class="sd">        :type payload: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#send request to API</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;get&quot;</span><span class="p">,</span> <span class="s">&quot;post&quot;</span><span class="p">]:</span>
+                <span class="c">#going home</span>
+                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Illegal method &#39;{}&#39; specified&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+
+            <span class="c">#execute request</span>
+            <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;post&quot;</span><span class="p">:</span>
+                <span class="c">#POST</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                    <span class="s">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">URL</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">),</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VERIFY_SSL</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#GET</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">URL</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">),</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VERIFY_SSL</span>
+                    <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;{}: HTTP operation not successful&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#return result</span>
+                <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;get&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">text</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+    <span class="c">#Aliases</span>
+    <span class="k">def</span> <span class="nf">__api_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a HTTP GET request to the Nagios/Icinga API. This function</span>
+<span class="sd">        requires a sub-URL (such as /cgi-bin/status.cgi).</span>
+
+<span class="sd">        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)</span>
+<span class="sd">        :type sub_url: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_request</span><span class="p">(</span><span class="s">&quot;get&quot;</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__api_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a HTTP POST request to the Nagios/Icinga API. This function</span>
+<span class="sd">        requires a sub-URL (such as /cgi-bin/status.cgi).</span>
+
+<span class="sd">        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)</span>
+<span class="sd">        :type sub_url: str</span>
+<span class="sd">        :param payload: payload data</span>
+<span class="sd">        :type payload: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_request</span><span class="p">(</span><span class="s">&quot;post&quot;</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span> <span class="nf">__calculate_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hours</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the time range for POST requests in the format the</span>
+<span class="sd">        Icinga 2.x API requires. For this, the current time/date</span>
+<span class="sd">        is chosen and the specified amount of hours is added.</span>
+
+<span class="sd">        :param hours: Amount of hours for the time range</span>
+<span class="sd">        :type hours: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">format</span><span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hours</span><span class="p">)),</span>
+            <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">current_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span> <span class="nf">__manage_downtime</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">hours</span><span class="p">,</span> <span class="n">comment</span><span class="p">,</span> <span class="n">remove_downtime</span>
+        <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds or removes scheduled downtime for a host or hostgroup.</span>
+<span class="sd">        For this, a object name and type are required.</span>
+<span class="sd">        You can also specify a comment and downtime period.</span>
+
+<span class="sd">        :param object_name: Hostname or hostgroup name</span>
+<span class="sd">        :type object_name: str</span>
+<span class="sd">        :param object_type: host or hostgroup</span>
+<span class="sd">        :type object_type: str</span>
+<span class="sd">        :param hours: Amount of hours for the downtime</span>
+<span class="sd">        :type hours: int</span>
+<span class="sd">        :param comment: Downtime comment</span>
+<span class="sd">        :type comment: str</span>
+<span class="sd">        :param remove_downtime: Removes a previously scheduled downtime</span>
+<span class="sd">        :type remove_downtime: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#calculate timerange</span>
+        <span class="p">(</span><span class="n">current_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__calculate_time</span><span class="p">(</span><span class="n">hours</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">object_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;hostgroup&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">remove_downtime</span><span class="p">:</span>
+                <span class="c">#remove hostgroup downtime</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;foobar&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;filter&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">{}</span><span class="se">\&quot;</span><span class="s"> in host.groups&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">object_name</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#create hostgroup downtime</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;foobar&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;filter&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">{}</span><span class="se">\&quot;</span><span class="s"> in host.groups&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">object_name</span><span class="p">),</span>
+                    <span class="s">&quot;start_time&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_time</span><span class="p">),</span>
+                    <span class="s">&quot;end_time&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">end_time</span><span class="p">),</span>
+                    <span class="s">&quot;fixed&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&quot;author&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">USERNAME</span><span class="p">,</span>
+                    <span class="s">&quot;comment&quot;</span><span class="p">:</span> <span class="n">comment</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">remove_downtime</span><span class="p">:</span>
+                <span class="c">#remove host downtime</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;foobar&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;filter&quot;</span><span class="p">:</span> <span class="s">&quot;host.name==</span><span class="se">\&quot;</span><span class="s">{}</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">object_name</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#create host downtime</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;foobar&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;filter&quot;</span><span class="p">:</span> <span class="s">&quot;host.name==</span><span class="se">\&quot;</span><span class="s">{}</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">object_name</span><span class="p">),</span>
+                    <span class="s">&quot;start_time&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_time</span><span class="p">),</span>
+                    <span class="s">&quot;end_time&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">end_time</span><span class="p">),</span>
+                    <span class="s">&quot;fixed&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&quot;author&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">USERNAME</span><span class="p">,</span>
+                    <span class="s">&quot;comment&quot;</span><span class="p">:</span> <span class="n">comment</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="c">#send POST</span>
+        <span class="k">if</span> <span class="n">remove_downtime</span><span class="p">:</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Host&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/remove-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Service&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/remove-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Host&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/schedule-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Service&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/schedule-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+
+
+
+<div class="viewcode-block" id="Icinga2APIClient.schedule_downtime"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.Icinga2APIClient.schedule_downtime">[docs]</a>    <span class="k">def</span> <span class="nf">schedule_downtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">hours</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> \
+        <span class="n">comment</span><span class="o">=</span><span class="s">&quot;Downtime managed by katprep&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds scheduled downtime for a host or hostgroup.</span>
+<span class="sd">        For this, a object name and type are required.</span>
+<span class="sd">        Optionally, you can specify a customized comment and downtime</span>
+<span class="sd">        period (the default is 8 hours).</span>
+
+<span class="sd">        :param object_name: Hostname or hostgroup name</span>
+<span class="sd">        :type object_name: str</span>
+<span class="sd">        :param object_type: host or hostgroup</span>
+<span class="sd">        :type object_type: str</span>
+<span class="sd">        :param hours: Amount of hours for the downtime (default: 8 hours)</span>
+<span class="sd">        :type hours: int</span>
+<span class="sd">        :param comment: Downtime comment</span>
+<span class="sd">        :type comment: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__manage_downtime</span><span class="p">(</span><span class="n">object_name</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">hours</span><span class="p">,</span> \
+            <span class="n">comment</span><span class="p">,</span> <span class="n">remove_downtime</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+</div>
+<div class="viewcode-block" id="Icinga2APIClient.remove_downtime"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.Icinga2APIClient.remove_downtime">[docs]</a>    <span class="k">def</span> <span class="nf">remove_downtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes scheduled downtime for a host or hostgroup</span>
+<span class="sd">        For this, a object name is required.</span>
+
+<span class="sd">        :param object_name: Hostname or hostgroup name</span>
+<span class="sd">        :type object_name: str</span>
+<span class="sd">        :param object_type: host or hostgroup</span>
+<span class="sd">        :type object_type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__manage_downtime</span><span class="p">(</span><span class="n">object_name</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">hours</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> \
+            <span class="n">comment</span><span class="o">=</span><span class="s">&quot;Downtime managed by katprep&quot;</span><span class="p">,</span> <span class="n">remove_downtime</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+
+</div>
+<div class="viewcode-block" id="Icinga2APIClient.has_downtime"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.Icinga2APIClient.has_downtime">[docs]</a>    <span class="k">def</span> <span class="nf">has_downtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="s">&quot;host&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns whether a particular object (host, hostgroup) is currently in</span>
+<span class="sd">        scheduled downtime. This required specifying an object name and type.</span>
+
+<span class="sd">        :param object_name: Hostname or hostgroup name</span>
+<span class="sd">        :type object_name: str</span>
+<span class="sd">        :param object_type: Host or hostgroup (default: host)</span>
+<span class="sd">        :type object_type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#retrieve and load data</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&quot;/objects/{}s?host={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+           <span class="n">object_type</span><span class="p">,</span> <span class="n">object_name</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c">#check if downtime</span>
+        <span class="c">#TODO: how to do this for hostgroups?!</span>
+        <span class="k">if</span> <span class="n">object_type</span> <span class="o">==</span> <span class="s">&quot;host&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;downtime_depth&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+
+</div>
+<div class="viewcode-block" id="Icinga2APIClient.get_services"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.Icinga2APIClient.get_services">[docs]</a>    <span class="k">def</span> <span class="nf">get_services</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">only_failed</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all or failed services for a particular host.</span>
+
+<span class="sd">        :param object_name:</span>
+<span class="sd">        :type object_name: str</span>
+<span class="sd">        :param only_failed: True will only report failed services</span>
+<span class="sd">        :type only_failed: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#retrieve result</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&quot;/objects/services?host={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">object_name</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">services</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
+            <span class="c">#get all the service information</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;display_name&quot;</span><span class="p">]</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;state&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">only_failed</span> <span class="o">==</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c">#append service if ok or all states</span>
+                <span class="n">this_service</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">service</span><span class="p">,</span> <span class="s">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">}</span>
+                <span class="n">services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_service</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">services</span>
+
+
+</div>
+<div class="viewcode-block" id="Icinga2APIClient.get_hosts"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.Icinga2APIClient.get_hosts">[docs]</a>    <span class="k">def</span> <span class="nf">get_hosts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns hosts by their name and IP.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#retrieve result</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&quot;/objects/hosts&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">hosts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
+            <span class="c">#get all the host information</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;display_name&quot;</span><span class="p">]</span>
+            <span class="n">ip</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;address&quot;</span><span class="p">]</span>
+            <span class="n">this_host</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;ip&quot;</span><span class="p">:</span> <span class="n">ip</span><span class="p">}</span>
+            <span class="n">hosts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_host</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hosts</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">katprep 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>katprep Package &mdash; katprep 0.0.1 documentation</title>
+    <title>Package &mdash; katprep 0.0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -34,6 +34,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -43,19 +46,684 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="katprep-package">
-<h1>katprep Package<a class="headerlink" href="#katprep-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">katprep</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="package">
+<h1>Package<a class="headerlink" href="#package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mod-package">
+<h2>:mod:` Package<a class="headerlink" href="#mod-package" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="authcontainer-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">AuthContainer</span></tt> Module<a class="headerlink" href="#authcontainer-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-AuthContainer">
+<span id="authcontainer-module"></span><h2><a class="reference internal" href="#module-AuthContainer" title="AuthContainer"><tt class="xref py py-mod docutils literal"><span class="pre">AuthContainer</span></tt></a> Module<a class="headerlink" href="#module-AuthContainer" title="Permalink to this headline">¶</a></h2>
+<p>Class for managing multiple authentication credentials</p>
+<dl class="class">
+<dt id="AuthContainer.AuthContainer">
+<em class="property">class </em><tt class="descclassname">AuthContainer.</tt><tt class="descname">AuthContainer</tt><big>(</big><em>log_level</em>, <em>filename</em>, <em>key=''</em><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="class">
+<dt id="AuthContainer.AuthContainer.AuthContainer">
+<em class="property">class </em><tt class="descname">AuthContainer</tt><a class="headerlink" href="#AuthContainer.AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="AuthContainer.AuthContainer.CREDENTIALS">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">CREDENTIALS</tt><em class="property"> = {}</em><a class="headerlink" href="#AuthContainer.AuthContainer.CREDENTIALS" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict: authentication credentials</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="AuthContainer.AuthContainer.FILENAME">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">FILENAME</tt><em class="property"> = ''</em><a class="headerlink" href="#AuthContainer.AuthContainer.FILENAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: correspending file</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="AuthContainer.AuthContainer.KEY">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">KEY</tt><em class="property"> = ''</em><a class="headerlink" href="#AuthContainer.AuthContainer.KEY" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: encryption key</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="AuthContainer.AuthContainer.LOGGER">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x24b64d0&gt;</em><a class="headerlink" href="#AuthContainer.AuthContainer.LOGGER" title="Permalink to this definition">¶</a></dt>
+<dd><p>logging: Logger instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.add_credentials">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">add_credentials</tt><big>(</big><em>hostname</em>, <em>username</em>, <em>password</em><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.add_credentials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.add_credentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds credentials to the authentication container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hostname</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; hostname</li>
+<li><strong>username</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; username</li>
+<li><strong>password</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; corresponding password</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AuthContainer.AuthContainer.cut_hostname">
+<em class="property">static </em><tt class="descclassname">AuthContainer.</tt><tt class="descname">cut_hostname</tt><big>(</big><em>snippet</em><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.cut_hostname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.cut_hostname" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function removes protocol pre- and postfix data in order to
+find/create generic authentication information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>snippet</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; connection string, URI/URL,...</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.get_credential">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">get_credential</tt><big>(</big><em>hostname</em><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_credential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_credential" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns credentials for a particular hostname.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; hostname</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.get_hostnames">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">get_hostnames</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_hostnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_hostnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns hostnames</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.get_json">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">get_json</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a JSON file and returns the whole content as one-liner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the JSON filename</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.is_encrypted">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">is_encrypted</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.is_encrypted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.is_encrypted" title="Permalink to this definition">¶</a></dt>
+<dd><p>This functions returns whether the authentication container is
+encrypted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.remove_credentials">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">remove_credentials</tt><big>(</big><em>hostname</em><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.remove_credentials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.remove_credentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes credentials from the authentication container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; hostname</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.save">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">save</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function stores the changed authentication container to disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AuthContainer.AuthContainer.set_key">
+<tt class="descclassname">AuthContainer.</tt><tt class="descname">set_key</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.set_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.set_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function set or changes the key used for encryption/decryption.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; key</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="AuthContainer.ContainerException">
+<em class="property">exception </em><tt class="descclassname">AuthContainer.</tt><tt class="descname">ContainerException</tt><a class="reference internal" href="_modules/AuthContainer.html#ContainerException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.ContainerException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
+<blockquote>
+<div>Dummy class for authentication container errors</div></blockquote>
+<dl class="class">
+<dt id="AuthContainer.ContainerException.ContainerException">
+<em class="property">class </em><tt class="descname">ContainerException</tt><a class="headerlink" href="#AuthContainer.ContainerException.ContainerException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="authconfig-module">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">authconfig</span></tt> Module<a class="headerlink" href="#authconfig-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="exceptions-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">exceptions</span></tt> Module<a class="headerlink" href="#exceptions-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-exceptions">
+<span id="exceptions-module"></span><h2><a class="reference internal" href="#module-exceptions" title="exceptions"><tt class="xref py py-mod docutils literal"><span class="pre">exceptions</span></tt></a> Module<a class="headerlink" href="#module-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Python&#8217;s standard exception class hierarchy.</p>
+<p>Exceptions found here are defined both in the exceptions module and the
+built-in namespace.  It is recommended that user-defined exceptions
+inherit from Exception.  See the documentation for the exception
+inheritance hierarchy.</p>
+<dl class="exception">
+<dt id="exceptions.ArithmeticError">
+<em class="property">exception </em><tt class="descname">ArithmeticError</tt><a class="headerlink" href="#exceptions.ArithmeticError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Base class for arithmetic errors.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.AssertionError">
+<em class="property">exception </em><tt class="descname">AssertionError</tt><a class="headerlink" href="#exceptions.AssertionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Assertion failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.AttributeError">
+<em class="property">exception </em><tt class="descname">AttributeError</tt><a class="headerlink" href="#exceptions.AttributeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Attribute not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.BaseException">
+<em class="property">exception </em><tt class="descname">BaseException</tt><a class="headerlink" href="#exceptions.BaseException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<p>Common base class for all exceptions</p>
+<dl class="attribute">
+<dt id="exceptions.BaseException.args">
+<tt class="descname">args</tt><a class="headerlink" href="#exceptions.BaseException.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.BaseException.message">
+<tt class="descname">message</tt><a class="headerlink" href="#exceptions.BaseException.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.BufferError">
+<em class="property">exception </em><tt class="descname">BufferError</tt><a class="headerlink" href="#exceptions.BufferError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Buffer error.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.BytesWarning">
+<em class="property">exception </em><tt class="descname">BytesWarning</tt><a class="headerlink" href="#exceptions.BytesWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about bytes and buffer related problems, mostly
+related to conversion from str or comparing to str.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.DeprecationWarning">
+<em class="property">exception </em><tt class="descname">DeprecationWarning</tt><a class="headerlink" href="#exceptions.DeprecationWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about deprecated features.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.EOFError">
+<em class="property">exception </em><tt class="descname">EOFError</tt><a class="headerlink" href="#exceptions.EOFError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Read beyond end of file.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.EnvironmentError">
+<em class="property">exception </em><tt class="descname">EnvironmentError</tt><a class="headerlink" href="#exceptions.EnvironmentError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Base class for I/O related errors.</p>
+<dl class="attribute">
+<dt id="exceptions.EnvironmentError.errno">
+<tt class="descname">errno</tt><a class="headerlink" href="#exceptions.EnvironmentError.errno" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception errno</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.EnvironmentError.filename">
+<tt class="descname">filename</tt><a class="headerlink" href="#exceptions.EnvironmentError.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception filename</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.EnvironmentError.strerror">
+<tt class="descname">strerror</tt><a class="headerlink" href="#exceptions.EnvironmentError.strerror" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception strerror</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.Exception">
+<em class="property">exception </em><tt class="descname">Exception</tt><a class="headerlink" href="#exceptions.Exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.BaseException</span></tt></a></p>
+<p>Common base class for all non-exit exceptions.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.FloatingPointError">
+<em class="property">exception </em><tt class="descname">FloatingPointError</tt><a class="headerlink" href="#exceptions.FloatingPointError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.ArithmeticError" title="exceptions.ArithmeticError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.ArithmeticError</span></tt></a></p>
+<p>Floating point operation failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.FutureWarning">
+<em class="property">exception </em><tt class="descname">FutureWarning</tt><a class="headerlink" href="#exceptions.FutureWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about constructs that will change semantically
+in the future.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.GeneratorExit">
+<em class="property">exception </em><tt class="descname">GeneratorExit</tt><a class="headerlink" href="#exceptions.GeneratorExit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.BaseException</span></tt></a></p>
+<p>Request that a generator exit.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.IOError">
+<em class="property">exception </em><tt class="descname">IOError</tt><a class="headerlink" href="#exceptions.IOError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.EnvironmentError" title="exceptions.EnvironmentError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.EnvironmentError</span></tt></a></p>
+<p>I/O operation failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ImportError">
+<em class="property">exception </em><tt class="descname">ImportError</tt><a class="headerlink" href="#exceptions.ImportError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Import can&#8217;t find module, or can&#8217;t find name in module.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ImportWarning">
+<em class="property">exception </em><tt class="descname">ImportWarning</tt><a class="headerlink" href="#exceptions.ImportWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about probable mistakes in module imports</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.IndentationError">
+<em class="property">exception </em><tt class="descname">IndentationError</tt><a class="headerlink" href="#exceptions.IndentationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.SyntaxError" title="exceptions.SyntaxError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.SyntaxError</span></tt></a></p>
+<p>Improper indentation.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.IndexError">
+<em class="property">exception </em><tt class="descname">IndexError</tt><a class="headerlink" href="#exceptions.IndexError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.LookupError" title="exceptions.LookupError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.LookupError</span></tt></a></p>
+<p>Sequence index out of range.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.KeyError">
+<em class="property">exception </em><tt class="descname">KeyError</tt><a class="headerlink" href="#exceptions.KeyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.LookupError" title="exceptions.LookupError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.LookupError</span></tt></a></p>
+<p>Mapping key not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.KeyboardInterrupt">
+<em class="property">exception </em><tt class="descname">KeyboardInterrupt</tt><a class="headerlink" href="#exceptions.KeyboardInterrupt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.BaseException</span></tt></a></p>
+<p>Program interrupted by user.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.LookupError">
+<em class="property">exception </em><tt class="descname">LookupError</tt><a class="headerlink" href="#exceptions.LookupError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Base class for lookup errors.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.MemoryError">
+<em class="property">exception </em><tt class="descname">MemoryError</tt><a class="headerlink" href="#exceptions.MemoryError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Out of memory.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.NameError">
+<em class="property">exception </em><tt class="descname">NameError</tt><a class="headerlink" href="#exceptions.NameError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Name not found globally.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.NotImplementedError">
+<em class="property">exception </em><tt class="descname">NotImplementedError</tt><a class="headerlink" href="#exceptions.NotImplementedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.RuntimeError</span></tt></a></p>
+<p>Method or function hasn&#8217;t been implemented yet.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.OSError">
+<em class="property">exception </em><tt class="descname">OSError</tt><a class="headerlink" href="#exceptions.OSError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.EnvironmentError" title="exceptions.EnvironmentError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.EnvironmentError</span></tt></a></p>
+<p>OS system call failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.OverflowError">
+<em class="property">exception </em><tt class="descname">OverflowError</tt><a class="headerlink" href="#exceptions.OverflowError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.ArithmeticError" title="exceptions.ArithmeticError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.ArithmeticError</span></tt></a></p>
+<p>Result too large to be represented.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.PendingDeprecationWarning">
+<em class="property">exception </em><tt class="descname">PendingDeprecationWarning</tt><a class="headerlink" href="#exceptions.PendingDeprecationWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about features which will be deprecated
+in the future.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ReferenceError">
+<em class="property">exception </em><tt class="descname">ReferenceError</tt><a class="headerlink" href="#exceptions.ReferenceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Weak ref proxy used after referent went away.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.RuntimeError">
+<em class="property">exception </em><tt class="descname">RuntimeError</tt><a class="headerlink" href="#exceptions.RuntimeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Unspecified run-time error.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.RuntimeWarning">
+<em class="property">exception </em><tt class="descname">RuntimeWarning</tt><a class="headerlink" href="#exceptions.RuntimeWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about dubious runtime behavior.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.StandardError">
+<em class="property">exception </em><tt class="descname">StandardError</tt><a class="headerlink" href="#exceptions.StandardError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
+<p>Base class for all standard Python exceptions that do not represent
+interpreter exiting.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.StopIteration">
+<em class="property">exception </em><tt class="descname">StopIteration</tt><a class="headerlink" href="#exceptions.StopIteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
+<p>Signal the end from iterator.next().</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SyntaxError">
+<em class="property">exception </em><tt class="descname">SyntaxError</tt><a class="headerlink" href="#exceptions.SyntaxError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Invalid syntax.</p>
+<dl class="attribute">
+<dt id="exceptions.SyntaxError.filename">
+<tt class="descname">filename</tt><a class="headerlink" href="#exceptions.SyntaxError.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception filename</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.SyntaxError.lineno">
+<tt class="descname">lineno</tt><a class="headerlink" href="#exceptions.SyntaxError.lineno" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception lineno</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.SyntaxError.msg">
+<tt class="descname">msg</tt><a class="headerlink" href="#exceptions.SyntaxError.msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception msg</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.SyntaxError.offset">
+<tt class="descname">offset</tt><a class="headerlink" href="#exceptions.SyntaxError.offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception offset</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.SyntaxError.print_file_and_line">
+<tt class="descname">print_file_and_line</tt><a class="headerlink" href="#exceptions.SyntaxError.print_file_and_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception print_file_and_line</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.SyntaxError.text">
+<tt class="descname">text</tt><a class="headerlink" href="#exceptions.SyntaxError.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception text</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SyntaxWarning">
+<em class="property">exception </em><tt class="descname">SyntaxWarning</tt><a class="headerlink" href="#exceptions.SyntaxWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about dubious syntax.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SystemError">
+<em class="property">exception </em><tt class="descname">SystemError</tt><a class="headerlink" href="#exceptions.SystemError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Internal error in the Python interpreter.</p>
+<p>Please report this to the Python maintainer, along with the traceback,
+the Python version, and the hardware/OS platform and version.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SystemExit">
+<em class="property">exception </em><tt class="descname">SystemExit</tt><a class="headerlink" href="#exceptions.SystemExit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.BaseException</span></tt></a></p>
+<p>Request to exit from the interpreter.</p>
+<dl class="attribute">
+<dt id="exceptions.SystemExit.code">
+<tt class="descname">code</tt><a class="headerlink" href="#exceptions.SystemExit.code" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception code</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.TabError">
+<em class="property">exception </em><tt class="descname">TabError</tt><a class="headerlink" href="#exceptions.TabError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.IndentationError" title="exceptions.IndentationError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.IndentationError</span></tt></a></p>
+<p>Improper mixture of spaces and tabs.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.TypeError">
+<em class="property">exception </em><tt class="descname">TypeError</tt><a class="headerlink" href="#exceptions.TypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Inappropriate argument type.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnboundLocalError">
+<em class="property">exception </em><tt class="descname">UnboundLocalError</tt><a class="headerlink" href="#exceptions.UnboundLocalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.NameError" title="exceptions.NameError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.NameError</span></tt></a></p>
+<p>Local name referenced but not bound to a value.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeDecodeError">
+<em class="property">exception </em><tt class="descname">UnicodeDecodeError</tt><a class="headerlink" href="#exceptions.UnicodeDecodeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.UnicodeError" title="exceptions.UnicodeError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.UnicodeError</span></tt></a></p>
+<p>Unicode decoding error.</p>
+<dl class="attribute">
+<dt id="exceptions.UnicodeDecodeError.encoding">
+<tt class="descname">encoding</tt><a class="headerlink" href="#exceptions.UnicodeDecodeError.encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception encoding</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeDecodeError.end">
+<tt class="descname">end</tt><a class="headerlink" href="#exceptions.UnicodeDecodeError.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception end</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeDecodeError.object">
+<tt class="descname">object</tt><a class="headerlink" href="#exceptions.UnicodeDecodeError.object" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeDecodeError.reason">
+<tt class="descname">reason</tt><a class="headerlink" href="#exceptions.UnicodeDecodeError.reason" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception reason</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeDecodeError.start">
+<tt class="descname">start</tt><a class="headerlink" href="#exceptions.UnicodeDecodeError.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception start</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeEncodeError">
+<em class="property">exception </em><tt class="descname">UnicodeEncodeError</tt><a class="headerlink" href="#exceptions.UnicodeEncodeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.UnicodeError" title="exceptions.UnicodeError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.UnicodeError</span></tt></a></p>
+<p>Unicode encoding error.</p>
+<dl class="attribute">
+<dt id="exceptions.UnicodeEncodeError.encoding">
+<tt class="descname">encoding</tt><a class="headerlink" href="#exceptions.UnicodeEncodeError.encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception encoding</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeEncodeError.end">
+<tt class="descname">end</tt><a class="headerlink" href="#exceptions.UnicodeEncodeError.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception end</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeEncodeError.object">
+<tt class="descname">object</tt><a class="headerlink" href="#exceptions.UnicodeEncodeError.object" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeEncodeError.reason">
+<tt class="descname">reason</tt><a class="headerlink" href="#exceptions.UnicodeEncodeError.reason" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception reason</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeEncodeError.start">
+<tt class="descname">start</tt><a class="headerlink" href="#exceptions.UnicodeEncodeError.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception start</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeError">
+<em class="property">exception </em><tt class="descname">UnicodeError</tt><a class="headerlink" href="#exceptions.UnicodeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.ValueError</span></tt></a></p>
+<p>Unicode related error.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeTranslateError">
+<em class="property">exception </em><tt class="descname">UnicodeTranslateError</tt><a class="headerlink" href="#exceptions.UnicodeTranslateError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.UnicodeError" title="exceptions.UnicodeError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.UnicodeError</span></tt></a></p>
+<p>Unicode translation error.</p>
+<dl class="attribute">
+<dt id="exceptions.UnicodeTranslateError.encoding">
+<tt class="descname">encoding</tt><a class="headerlink" href="#exceptions.UnicodeTranslateError.encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception encoding</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeTranslateError.end">
+<tt class="descname">end</tt><a class="headerlink" href="#exceptions.UnicodeTranslateError.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception end</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeTranslateError.object">
+<tt class="descname">object</tt><a class="headerlink" href="#exceptions.UnicodeTranslateError.object" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeTranslateError.reason">
+<tt class="descname">reason</tt><a class="headerlink" href="#exceptions.UnicodeTranslateError.reason" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception reason</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="exceptions.UnicodeTranslateError.start">
+<tt class="descname">start</tt><a class="headerlink" href="#exceptions.UnicodeTranslateError.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception start</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeWarning">
+<em class="property">exception </em><tt class="descname">UnicodeWarning</tt><a class="headerlink" href="#exceptions.UnicodeWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings about Unicode related problems, mostly
+related to conversion problems.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UserWarning">
+<em class="property">exception </em><tt class="descname">UserWarning</tt><a class="headerlink" href="#exceptions.UserWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Warning" title="exceptions.Warning"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></a></p>
+<p>Base class for warnings generated by user code.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ValueError">
+<em class="property">exception </em><tt class="descname">ValueError</tt><a class="headerlink" href="#exceptions.ValueError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.StandardError</span></tt></a></p>
+<p>Inappropriate argument value (of correct type).</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.Warning">
+<em class="property">exception </em><tt class="descname">Warning</tt><a class="headerlink" href="#exceptions.Warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
+<p>Base class for warning categories.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ZeroDivisionError">
+<em class="property">exception </em><tt class="descname">ZeroDivisionError</tt><a class="headerlink" href="#exceptions.ZeroDivisionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exceptions.ArithmeticError" title="exceptions.ArithmeticError"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.ArithmeticError</span></tt></a></p>
+<p>Second argument to a division or modulo operation was zero.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="maintenance-module">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">maintenance</span></tt> Module<a class="headerlink" href="#maintenance-module" title="Permalink to this headline">¶</a></h2>
@@ -75,15 +743,7 @@
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="katprep.clients.html">clients Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#foremanapiclient-module"><tt class="docutils literal"><span class="pre">ForemanAPIClient</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#icinga2apiclient-module"><tt class="docutils literal"><span class="pre">Icinga2APIClient</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#libvirtclient-module"><tt class="docutils literal"><span class="pre">LibvirtClient</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#nagioscgiclient-module"><tt class="docutils literal"><span class="pre">NagiosCGIClient</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#pyvmomiclient-module"><tt class="docutils literal"><span class="pre">PyvmomiClient</span></tt> Module</a></li>
-</ul>
-</li>
+<ul class="simple">
 </ul>
 </div>
 </div>
@@ -97,11 +757,11 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">katprep Package</a><ul>
-<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">katprep</span></tt> Package</a></li>
-<li><a class="reference internal" href="#authcontainer-module"><tt class="docutils literal"><span class="pre">AuthContainer</span></tt> Module</a></li>
+<li><a class="reference internal" href="#">Package</a><ul>
+<li><a class="reference internal" href="#mod-package">:mod:` Package</a></li>
+<li><a class="reference internal" href="#module-AuthContainer"><tt class="docutils literal"><span class="pre">AuthContainer</span></tt> Module</a></li>
 <li><a class="reference internal" href="#authconfig-module"><tt class="docutils literal"><span class="pre">authconfig</span></tt> Module</a></li>
-<li><a class="reference internal" href="#exceptions-module"><tt class="docutils literal"><span class="pre">exceptions</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-exceptions"><tt class="docutils literal"><span class="pre">exceptions</span></tt> Module</a></li>
 <li><a class="reference internal" href="#maintenance-module"><tt class="docutils literal"><span class="pre">maintenance</span></tt> Module</a></li>
 <li><a class="reference internal" href="#parameters-module"><tt class="docutils literal"><span class="pre">parameters</span></tt> Module</a></li>
 <li><a class="reference internal" href="#populate-module"><tt class="docutils literal"><span class="pre">populate</span></tt> Module</a></li>
@@ -142,11 +802,14 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2017, Christian Stankowic.
+        &copy; Copyright 2018, Christian Stankowic.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
