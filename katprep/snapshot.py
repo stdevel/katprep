@@ -127,7 +127,7 @@ def scan_systems(options):
 
     #get all the hosts depending on the filter
     filter_url = get_filter(options, "host")
-    LOGGER.debug("Filter URL will be '{}'".format(filter_url))
+    LOGGER.debug("Filter URL will be '%s'", filter_url)
     result_obj = json.loads(
         SAT_CLIENT.api_get("{}".format(filter_url))
     )
@@ -138,18 +138,19 @@ def scan_systems(options):
             if system["name"] in options.filter_exclude:
                 #ignore blacklisted system
                 LOGGER.info(
-                    "Ignoring exlucded system '{}'".format(system["name"]))
+                    "Ignoring exlucded system '%s'", system["name"])
                 continue
-            LOGGER.info("Checking system '{}' (#{})...".format(system["name"], \
-            system["id"]))
+            LOGGER.info(
+                "Checking system '%s' (#%s)...", system["name"], system["id"])
             errata_counter = system["content_facet_attributes"]["errata_counts"]
-            LOGGER.debug("System errata counter: security={}, bugfix={}," \
-            " enhancement={}, total={}".format(
+            LOGGER.debug(
+                "System errata counter: security=%s, bugfix=%s," \
+                " enhancement=%s, total=%s",
                 errata_counter["security"],
                 errata_counter["bugfix"],
                 errata_counter["enhancement"],
                 errata_counter["total"]
-            ))
+            )
             #add columns
             SYSTEM_ERRATA[system["name"]] = {
                 "errata": {},
@@ -180,7 +181,7 @@ def scan_systems(options):
                 SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
 
             #set HW flag
-            if params_obj["facts"]["virt::is_guest"].lower() == "true":
+            if params_obj["facts"]["is_virtual"].lower() == "true":
                 SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = False
             else:
                 SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
@@ -192,13 +193,12 @@ def scan_systems(options):
                 )
                 SYSTEM_ERRATA[system["name"]]["errata"] = result_obj["results"]
         except KeyError as err:
-            #LOGGER.error("Unable to get system information, check filter options!")
             LOGGER.error(
-                "Unable to get system information for '{}', " \
-                "dropping system!".format(system["name"]))
+                "Unable to get system information for '%s', " \
+                "dropping system!", system["name"])
             pass
         except ValueError as err:
-            LOGGER.info("Unable to get data: '{}'".format(err))
+            LOGGER.info("Unable to get data: '%s'", err)
 
 
 
@@ -209,9 +209,9 @@ def create_report():
         with open(OUTPUT_FILE, 'w') as target:
             target.write(json.dumps(SYSTEM_ERRATA))
     except IOError as err:
-        LOGGER.error("Unable to store report: '{}'".format(err))
+        LOGGER.error("Unable to store report: '%s'", err)
     else:
-        LOGGER.info("Report '{}' created.".format(OUTPUT_FILE))
+        LOGGER.info("Report '%s' created.", OUTPUT_FILE)
 
 
 
@@ -219,8 +219,8 @@ def main(options, args):
     """Main function, starts the logic based on parameters."""
     global SAT_CLIENT, OUTPUT_FILE
 
-    LOGGER.debug("Options: {0}".format(options))
-    LOGGER.debug("Arguments: {0}".format(args))
+    LOGGER.debug("Options: %s", options)
+    LOGGER.debug("Arguments: %s", args)
 
     #set output file
     if options.output_path == "":
@@ -234,7 +234,7 @@ def main(options, args):
         options.server.split('.')[0],
         time.strftime("%Y%m%d-%H%M")
     )
-    LOGGER.debug("Output file will be: '{}'".format(OUTPUT_FILE))
+    LOGGER.debug("Output file will be: '%s'", OUTPUT_FILE)
 
     #check if we can read and write before digging
     if is_writable(OUTPUT_FILE):
@@ -254,10 +254,13 @@ def main(options, args):
         scan_systems(options)
         create_report()
     else:
-        LOGGER.error("Directory '{}' is not writable!".format(OUTPUT_FILE))
+        LOGGER.error("Directory '%s' is not writable!", OUTPUT_FILE)
 
 
 def cli():
+    """
+    This functions initializes the CLI interface
+    """
     global LOG_LEVEL
     (options, args) = parse_options()
 
