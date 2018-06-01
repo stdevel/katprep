@@ -9,10 +9,10 @@ from __future__ import absolute_import
 
 import argparse
 import logging
-import yaml
 import json
 import time
 import os
+import yaml
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report, get_host_params_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
@@ -84,12 +84,11 @@ def manage_host_preparation(options, host, cleanup=False):
     :type cleanup: bool
     """
     #create snapshot if applicable
-    if options.virt_skip_snapshot == False and \
+    if not options.virt_skip_snapshot and \
         get_host_param_from_report(REPORT, host, "katprep_virt_snapshot") \
         not in [None, "", "fixmepls"]:
         LOGGER.debug(
-            "Host '{}' needs to be protected by a snapshot".format(
-                host)
+            "Host '%s' needs to be protected by a snapshot", host
         )
         #use customized VM name if applicable
         if get_host_param_from_report(REPORT, host, "katprep_virt_name") \
@@ -103,13 +102,13 @@ def manage_host_preparation(options, host, cleanup=False):
         if options.generic_dry_run:
             if cleanup:
                 LOGGER.info(
-                    "Host '{}' --> remove snapshot (katprep_{}@{})".format(
-                        host, REPORT_PREFIX, vm_name)
+                    "Host '%s' --> remove snapshot (katprep_%s@%s)", \
+                    host, REPORT_PREFIX, vm_name
                 )
             else:
                 LOGGER.info(
-                    "Host '{}' --> create snapshot (katprep_{}@{})".format(
-                        host, REPORT_PREFIX, vm_name)
+                    "Host '%s' --> create snapshot (katprep_%s@%s)", \
+                    host, REPORT_PREFIX, vm_name
                 )
         else:
             if cleanup:
@@ -129,13 +128,12 @@ def manage_host_preparation(options, host, cleanup=False):
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
-    if (options.mon_skip_downtime == False and \
+    if (not options.mon_skip_downtime and \
         get_host_param_from_report(REPORT, host, "katprep_mon") \
         not in [None, "", "fixmepls"]) or \
         (options.mon_suggested and True in errata_reboot):
         LOGGER.debug(
-            "Downtime needs to be scheduled for host '{}'".format(
-                host)
+            "Downtime needs to be scheduled for host '%s'", host
         )
         #use customized monitoring name if applicable
         if get_host_param_from_report(REPORT, host, "katprep_mon_name") \
@@ -148,9 +146,9 @@ def manage_host_preparation(options, host, cleanup=False):
 
         if options.generic_dry_run:
             if cleanup:
-                LOGGER.info("Host '{}' --> remove downtime".format(host))
+                LOGGER.info("Host '%s' --> remove downtime", host)
             else:
-                LOGGER.info("Host '{}' --> schedule downtime".format(host))
+                LOGGER.info("Host '%s' --> schedule downtime", host)
         else:
             if cleanup:
                 #remove downtime
@@ -186,10 +184,10 @@ def set_verification_value(options, host, setting, value):
         with open(options.report[0], 'w') as target:
             target.write(json.dumps(REPORT))
     except IOError as err:
-        LOGGER.error("Unable to store report: '{}'".format(err))
+        LOGGER.error("Unable to store report: '%s'", err)
     except ValueError as err:
         LOGGER.error(
-            "Unable to set verification setting '{}={}'".format(setting, value)
+            "Unable to set verification setting '%s=%s'", setting, value
         )
 
 
@@ -205,7 +203,7 @@ def prepare(options, args):
     #create snapshot/downtime per host
     try:
         for host in REPORT:
-            LOGGER.debug("Preparing host '{}'...".format(host))
+            LOGGER.debug("Preparing host '%s'...", host)
 
             #prepare host
             manage_host_preparation(options, host)
@@ -215,7 +213,7 @@ def prepare(options, args):
                 #verify(options, args)
 
     except ValueError as err:
-        LOGGER.error("Error preparing maintenance: '{}'".format(err))
+        LOGGER.error("Error preparing maintenance: '%s'", err)
 
 
 
@@ -228,26 +226,30 @@ def execute(options, args):
     :type args: argparse options dict
     """
     try:
-         for host in REPORT:
-            LOGGER.debug("Patching host '{}'...".format(host))
+        for host in REPORT:
+            LOGGER.debug("Patching host '%s'...", host)
             errata_target = [x["errata_id"] for x in REPORT[host]["errata"]]
             errata_target = [x.encode('utf-8') for x in errata_target]
-            if options.generic_dry_run:
-                LOGGER.info("Host '{}' --> install: {}".format(
-                        host, ", ".join(errata_target)
+            if len(errata_target) > 0:
+                #errata found
+                if options.generic_dry_run:
+                    LOGGER.info(
+                        "Host '%s' --> install: %s", host, ", ".join(errata_target)
                     )
-                )
+                else:
+                    SAT_CLIENT.api_put(
+                        "/hosts/{}/errata/apply".format(
+                            SAT_CLIENT.get_id_by_name(host, "host")
+                        ),
+                        json.dumps({"errata_ids": errata_target})
+                    )
             else:
-                SAT_CLIENT.api_put(
-                    "/hosts/{}/errata/apply".format(
-                        SAT_CLIENT.get_id_by_name(host, "host")
-                    ),
-                    json.dumps({"errata_ids": errata_target})
-                )
+                LOGGER.info("No errata for host %s available", host)
 
             #get errata reboot flags
             errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
-            if options.foreman_reboot or True in errata_reboot:
+            if options.foreman_reboot or \
+                (True in errata_reboot and not options.foreman_no_reboot):
                 #trigger workaround if VM
                 if get_host_param_from_report(REPORT, host, "katprep_virt") \
                     not in ["", None]:
@@ -261,13 +263,13 @@ def execute(options, args):
                         vm_name = host
                     #reboot VM
                     if options.generic_dry_run:
-                        LOGGER.info("Host '{}' --> reboot VM".format(host))
+                        LOGGER.info("Host '%s' --> reboot VM", host)
                     else:
                         VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].restart_vm(vm_name)
                 else:
                     #physical host
                     if options.generic_dry_run:
-                        LOGGER.info("Host '{}' --> reboot host".format(host))
+                        LOGGER.info("Host '%s' --> reboot host", host)
                     else:
                         SAT_CLIENT.api_put(
                             "/hosts/{}/power".format(
@@ -277,7 +279,7 @@ def execute(options, args):
                         )
 
     except ValueError as err:
-        LOGGER.error("Error maintaining host: '{}'".format(err))
+        LOGGER.error("Error maintaining host: '%s'", err)
 
 
 
@@ -305,12 +307,12 @@ def verify(options, args):
     #verify snapshot/downtime per host
     try:
         for host in REPORT:
-            LOGGER.debug("Verifying host '{}'...".format(host))
+            LOGGER.debug("Verifying host '%s'...", host)
 
             #check snapshot
             if not options.virt_skip_snapshot:
                 if get_host_param_from_report(
-                    REPORT, host, "katprep_virt_name"
+                        REPORT, host, "katprep_virt_name"
                 ) not in ["", None]:
                     #customized name
                     vm_name = get_host_param_from_report(
@@ -320,20 +322,20 @@ def verify(options, args):
                     #FQDN
                     vm_name = host
                 if VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].has_snapshot(
-                    vm_name, "katprep_{}".format(REPORT_PREFIX)
+                        vm_name, "katprep_{}".format(REPORT_PREFIX)
                     ):
                     #set flag
                     set_verification_value(options, host, "virt_snapshot", True)
-                    LOGGER.info("Snapshot for host '{}' found.".format(host))
+                    LOGGER.info("Snapshot for host '%s' found.", host)
                 else:
                     #set flag
                     set_verification_value(options, host, "virt_cleanup", True)
-                    LOGGER.info("No snapshot for host '{}' found, probably cleaned-up.".format(host))
+                    LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
 
             #check downtime
             if not options.mon_skip_downtime:
                 if get_host_param_from_report(
-                    REPORT, host, "katprep_mon_name"
+                        REPORT, host, "katprep_mon_name"
                 ) not in ["", None]:
                     #customized name
                     mon_name = get_host_param_from_report(
@@ -346,11 +348,11 @@ def verify(options, args):
                 if MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].has_downtime(mon_name):
                     #set flag
                     set_verification_value(options, host, "mon_downtime", True)
-                    LOGGER.info("Downtime for host '{}' found.".format(host))
+                    LOGGER.info("Downtime for host '%s' found.", host)
                 else:
                     #set flag
                     set_verification_value(options, host, "mon_cleanup", True)
-                    LOGGER.info("No downtime for host '{}' found, probably cleaned-up.".format(host))
+                    LOGGER.info("No downtime for host '%s' found, probably cleaned-up.", host)
                 #check critical services
                 crit_services = MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].get_services(mon_name)
                 if len(crit_services) > 0:
@@ -370,7 +372,7 @@ def verify(options, args):
         pass
         #TODO: seems not to work...
     except ValueError as err:
-        LOGGER.error("Error verifying host: '{}'".format(err))
+        LOGGER.error("Error verifying host: '%s'", err)
 
 
 
@@ -385,13 +387,13 @@ def cleanup(options, args):
     #remove snapshot/downtime per host
     try:
         for host in REPORT:
-            LOGGER.debug("Cleaning-up host '{}'...".format(host))
+            LOGGER.debug("Cleaning-up host '%s'...", host)
 
             #clean-up host
             manage_host_preparation(options, host, True)
 
     except ValueError as err:
-        LOGGER.error("Error cleaning-up maintenance: '{}'".format(err))
+        LOGGER.error("Error cleaning-up maintenance: '%s'", err)
 
 
 
@@ -412,7 +414,7 @@ def load_configuration(config_file, options):
         #TODO: load configuration
         print "TODO: load_configuration"
     except ValueError as err:
-        LOGGER.debug("Error: '{}'".format(err))
+        LOGGER.debug("Error: '%s'", err)
     return options
 
 
@@ -475,7 +477,11 @@ def parse_options(args=None):
     fman_opts.add_argument("-r", "--reboot-systems", dest="foreman_reboot", \
     default=False, action="store_true", \
     help="always reboot systems after successful errata installation " \
-    "(default: no)")
+    "(default: no, only if reboot_suggested set)")
+    #suppress reboot
+    fman_opts.add_argument("-R", "--no-reboot", dest="foreman_no_reboot", \
+    default=True, action="store_false", help="suppresses rebooting the " \
+    "system under any circumstances (default: no)")
     #--insecure
     fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
     action="store_false", help="Disables SSL verification (default: no)")
@@ -571,18 +577,18 @@ def set_filter(options, report):
         params = report[host]["params"]
         if options.filter_organization != "" and \
             params["organization_name"] != options.filter_organization:
-            LOGGER.debug("Removing '{0}'".format(host))
+            LOGGER.debug("Removing '%s'", host)
             remove.append(host)
         elif options.filter_location != "" and \
             params["location_name"] != options.filter_location:
-            LOGGER.debug("Removing '{0}'".format(host))
+            LOGGER.debug("Removing '%s'", host)
             remove.append(host)
         elif options.filter_environment != "" and \
             params["environment_name"] != options.filter_environment:
-            LOGGER.debug("Removing '{0}'".format(host))
+            LOGGER.debug("Removing '%s'", host)
             remove.append(host)
         elif host in options.filter_exclude:
-            LOGGER.debug("Removing '{0}'".format(host))
+            LOGGER.debug("Removing '%s'", host)
             remove.append(host)
     #remove entries
     for entry in remove:
@@ -596,8 +602,8 @@ def main(options, args):
     global REPORT, REPORT_PREFIX, SAT_CLIENT
     global VIRT_CLIENTS, MON_CLIENTS
 
-    LOGGER.debug("Options: {0}".format(options))
-    LOGGER.debug("Arguments: {0}".format(args))
+    LOGGER.debug("Options: %s", options)
+    LOGGER.debug("Arguments: %s", args)
 
     if options.generic_dry_run:
         LOGGER.info("This is just a SIMULATION - no changes will be made.")
@@ -629,7 +635,7 @@ def main(options, args):
     )
 
     #get virtualization host credentials
-    if options.virt_skip_snapshot == False:
+    if not options.virt_skip_snapshot:
         required_virt = get_required_hosts_by_report(REPORT, "katprep_virt")
         for host in required_virt:
             (virt_user, virt_pass) = get_credentials(
@@ -648,7 +654,7 @@ def main(options, args):
                     LOG_LEVEL, host, virt_user, virt_pass)
 
     #get monitoring host credentials
-    if options.mon_skip_downtime == False:
+    if not options.mon_skip_downtime:
         required_mon = get_required_hosts_by_report(REPORT, "katprep_mon")
         for host in required_mon:
             (mon_user, mon_pass) = get_credentials(
@@ -673,6 +679,10 @@ def main(options, args):
 
 
 def cli():
+    """
+    This functions initializes the CLI interface
+    """
+
     global LOG_LEVEL
     (options, args) = parse_options()
 
