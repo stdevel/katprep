@@ -230,17 +230,21 @@ def execute(options, args):
             LOGGER.debug("Patching host '%s'...", host)
             errata_target = [x["errata_id"] for x in REPORT[host]["errata"]]
             errata_target = [x.encode('utf-8') for x in errata_target]
-            if options.generic_dry_run:
-                LOGGER.info(
-                    "Host '%s' --> install: %s", host, ", ".join(errata_target)
-                )
+            if len(errata_target) > 0:
+                #errata found
+                if options.generic_dry_run:
+                    LOGGER.info(
+                        "Host '%s' --> install: %s", host, ", ".join(errata_target)
+                    )
+                else:
+                    SAT_CLIENT.api_put(
+                        "/hosts/{}/errata/apply".format(
+                            SAT_CLIENT.get_id_by_name(host, "host")
+                        ),
+                        json.dumps({"errata_ids": errata_target})
+                    )
             else:
-                SAT_CLIENT.api_put(
-                    "/hosts/{}/errata/apply".format(
-                        SAT_CLIENT.get_id_by_name(host, "host")
-                    ),
-                    json.dumps({"errata_ids": errata_target})
-                )
+                LOGGER.info("No errata for host %s available", host)
 
             #get errata reboot flags
             errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
