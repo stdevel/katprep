@@ -11,6 +11,7 @@ import logging
 import ssl
 from urlparse import urlparse
 import sys
+from katprep_shared import is_ipv4, is_ipv6
 
 
 
@@ -277,13 +278,15 @@ class PyvmomiClient:
 
 
 
-    def get_vm_ips(self, hide_empty=True):
+    def get_vm_ips(self, hide_empty=True, ipv6_only=False):
         """
         Returns a list of VMs and their IPs available through the current 
         connection.
 
         :param hide_empty: hide VMs without network information
         :type hide_empty: bool
+        :param ipv6_only: use IPv6 addresses only
+        :type ipv6_only: bool
         """
         try:
             #get _all_ the VMs
@@ -296,11 +299,58 @@ class PyvmomiClient:
             )
             for obj in object_view.view:
                 if not hide_empty or obj.summary.guest.ipAddress != None:
+                    #try to find the best IP
+                    target_ip=""
+                    self.LOGGER.debug("Trying to find best IP for VM '%s'", obj.name)
+                    if ipv6_only:
+                        self.LOGGER.debug("Filtering for IPv6")
+                        while not is_ipv6(target_ip):
+                            #primary guest address
+                            target_ip = obj.summary.guest.ipAddress
+                            self.LOGGER.debug(
+                                "Primary guest address: '%s'", target_ip
+                            )
+                            #other NICs
+                            for nic in obj.guest.net:
+                                for address in nic.ipConfig.ipAddress:
+                                    if is_ipv6(address.ipAddress):
+                                        target_ip = address.ipAddress
+                                        self.LOGGER.debug(
+                                            "NIC address: '%s'", target_ip
+                                        )
+                            #meh
+                            break
+                        self.LOGGER.debug(
+                            "Set IP address to '%s'", target_ip
+                        )
+                    else:
+                        self.LOGGER.debug("Filtering for IPv4")
+                        while not is_ipv4(target_ip):
+                            #primary guest address
+                            target_ip = obj.summary.guest.ipAddress
+                            self.LOGGER.debug(
+                                "Primary guest address: '%s'", target_ip
+                            )
+                            #other NICs
+                            for nic in obj.guest.net:
+                                for address in nic.ipConfig.ipAddress:
+                                    if is_ipv4(address.ipAddress):
+                                        target_ip = address.ipAddress
+                                        self.LOGGER.debug(
+                                            "NIC address: '%s'", target_ip
+                                        )
+                            #meh
+                            break
+                        self.LOGGER.debug(
+                            "Set IP address to '%s'", target_ip
+                        )
+
+                    #Adding result
                     result.append(
                     {
                         "object_name": obj.config.name,
                         "hostname": obj.summary.guest.hostName,
-                        "ip": obj.summary.guest.ipAddress
+                        "ip": target_ip
                     }
                     )
             return result

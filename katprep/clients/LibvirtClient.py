@@ -259,6 +259,7 @@ class LibvirtClient:
                 target_vm = self.SESSION.lookupByName(vm)
                 target_hostname = target_vm.hostname()
                 #lookup IP
+                #TODO: IPv6 only?
                 target_ip = socket.gethostbyname(target_hostname)
                 result.append(
                     {"hostname": target_hostname, "ip": target_ip}

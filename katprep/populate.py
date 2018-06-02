@@ -62,7 +62,7 @@ def populate(options):
 
         #retrieve VM/IP information
         if not options.virt_skip:
-            vm_hosts = VIRT_CLIENT.get_vm_ips()
+            vm_hosts = VIRT_CLIENT.get_vm_ips(ipv6_only=options.ipv6_only)
             #print vm_hosts
             for host in vm_hosts:
                 LOGGER.debug("HYPERVISOR: Found VM '{}' with IP '{}'".format(
@@ -71,16 +71,20 @@ def populate(options):
 
         #retrieve monitoring information
         if not options.mon_skip:
-            mon_hosts = MON_CLIENT.get_hosts()
+            mon_hosts = MON_CLIENT.get_hosts(ipv6_only=options.ipv6_only)
             for host in mon_hosts:
                 LOGGER.debug("MONITORING: Found host '{}' with IP '{}'".format(
                     host["name"], host["ip"])
                 )
 
         #check _all_ the hosts
+        if options.ipv6_only:
+            ip_filter = "ip6"
+        else:
+            ip_filter = "ip"
         for host in hosts["results"]:
             LOGGER.debug("SATELLITE: Found host '{}' with IP '{}'".format(
-                host["name"], host["ip"])
+                host["name"], host[ip_filter])
             )
 
             #check if host parameters set appropriately
@@ -194,6 +198,9 @@ def parse_options(args=None):
     gen_opts.add_argument("-C", "--auth-container", default="", metavar="FILE", \
     dest="generic_auth_container", action="store", help="defines an " \
     "authentication container file (default: no)")
+    #--ip-filter
+    gen_opts.add_argument("--ipv6-only", dest="ipv6_only", default=False, \
+    action="store_true", help="Filters for IPv6-only addresses (default: no)")
 
     #FOREMAN ARGUMENTS
     #-s / --foreman-server

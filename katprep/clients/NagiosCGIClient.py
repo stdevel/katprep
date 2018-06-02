@@ -389,11 +389,13 @@ class NagiosCGIClient:
 
 
 
-    def get_hosts(self):
+    def get_hosts(self, ipv6_only=False):
         """
         Returns hosts by their name and IP.
-        """
 
+        :param ipv6_only: use IPv6 addresses only
+        :type ipv6_only: bool
+        """
         #set-up URL
         url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
         #retrieve data
@@ -426,6 +428,7 @@ class NagiosCGIClient:
             )
 
             #iterate through services
+            #TODO: Use IPv6 only?
             ip = ""
             for entry in data:
                 ip_regexp = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";

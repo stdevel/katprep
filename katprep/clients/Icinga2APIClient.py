@@ -347,9 +347,12 @@ class Icinga2APIClient:
 
 
 
-    def get_hosts(self):
+    def get_hosts(self, ipv6_only=False):
         """
         Returns hosts by their name and IP.
+
+        :param ipv6_only: use IPv6 addresses only
+        :type ipv6_only: bool
         """
         #retrieve result
         result = self.__api_get("/objects/hosts")
@@ -358,7 +361,10 @@ class Icinga2APIClient:
         for result in data["results"]:
             #get all the host information
             host = result["attrs"]["display_name"]
-            ip = result["attrs"]["address"]
+            if ipv6_only:
+                ip = result["attrs"]["address6"]
+            else:
+                ip = result["attrs"]["address"]
             this_host = {"name": host, "ip": ip}
             hosts.append(this_host)
         return hosts
