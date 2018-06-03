@@ -303,47 +303,31 @@ class PyvmomiClient:
                     target_ip=""
                     self.LOGGER.debug("Trying to find best IP for VM '%s'", obj.name)
                     if ipv6_only:
+                        is_valid_address = is_ipv6
                         self.LOGGER.debug("Filtering for IPv6")
-                        while not is_ipv6(target_ip):
-                            #primary guest address
-                            target_ip = obj.summary.guest.ipAddress
-                            self.LOGGER.debug(
-                                "Primary guest address: '%s'", target_ip
-                            )
-                            #other NICs
-                            for nic in obj.guest.net:
-                                for address in nic.ipConfig.ipAddress:
-                                    if is_ipv6(address.ipAddress):
-                                        target_ip = address.ipAddress
-                                        self.LOGGER.debug(
-                                            "NIC address: '%s'", target_ip
-                                        )
-                            #meh
-                            break
-                        self.LOGGER.debug(
-                            "Set IP address to '%s'", target_ip
-                        )
                     else:
+                        is_valid_address = is_ipv4
                         self.LOGGER.debug("Filtering for IPv4")
-                        while not is_ipv4(target_ip):
-                            #primary guest address
-                            target_ip = obj.summary.guest.ipAddress
-                            self.LOGGER.debug(
-                                "Primary guest address: '%s'", target_ip
-                            )
-                            #other NICs
-                            for nic in obj.guest.net:
-                                for address in nic.ipConfig.ipAddress:
-                                    if is_ipv4(address.ipAddress):
-                                        target_ip = address.ipAddress
-                                        self.LOGGER.debug(
-                                            "NIC address: '%s'", target_ip
-                                        )
-                            #meh
-                            break
+
+                    while not is_valid_address(target_ip):
+                        #primary guest address
+                        target_ip = obj.summary.guest.ipAddress
                         self.LOGGER.debug(
-                            "Set IP address to '%s'", target_ip
+                            "Primary guest address: '%s'", target_ip
                         )
+                        #other NICs
+                        for nic in obj.guest.net:
+                            for address in nic.ipConfig.ipAddress:
+                                if is_valid_address(address.ipAddress):
+                                    target_ip = address.ipAddress
+                                    self.LOGGER.debug(
+                                        "NIC address: '%s'", target_ip
+                                    )
+                        #meh
+                        break
+                    self.LOGGER.debug(
+                        "Set IP address to '%s'", target_ip
+                    )
 
                     #Adding result
                     result.append(
