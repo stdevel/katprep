@@ -324,6 +324,9 @@ class PyvmomiClient:
                                     )
                                     break
 
+                            if is_valid_address(address.ipAddress):
+                                break
+
                     self.LOGGER.debug(
                         "Set IP address to '%s'", target_ip
                     )
