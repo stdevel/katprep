@@ -308,13 +308,12 @@ class PyvmomiClient:
                         is_valid_address = is_ipv4
                         self.LOGGER.debug("Filtering for IPv4")
 
-                    target_ip = ""
+                    target_ip = obj.summary.guest.ipAddress
+                    self.LOGGER.debug(
+                        "Primary guest address: '%s'", target_ip
+                    )
+
                     while not is_valid_address(target_ip):
-                        #primary guest address
-                        target_ip = obj.summary.guest.ipAddress
-                        self.LOGGER.debug(
-                            "Primary guest address: '%s'", target_ip
-                        )
                         #other NICs
                         for nic in obj.guest.net:
                             for address in nic.ipConfig.ipAddress:
