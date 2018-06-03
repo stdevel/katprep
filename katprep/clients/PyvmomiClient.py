@@ -313,8 +313,8 @@ class PyvmomiClient:
                         "Primary guest address: '%s'", target_ip
                     )
 
-                    while not is_valid_address(target_ip):
-                        #other NICs
+                    if not is_valid_address(target_ip):
+                        # other NICs
                         for nic in obj.guest.net:
                             for address in nic.ipConfig.ipAddress:
                                 if is_valid_address(address.ipAddress):
@@ -323,8 +323,7 @@ class PyvmomiClient:
                                         "NIC address: '%s'", target_ip
                                     )
                                     break
-                        #meh
-                        break
+
                     self.LOGGER.debug(
                         "Set IP address to '%s'", target_ip
                     )
