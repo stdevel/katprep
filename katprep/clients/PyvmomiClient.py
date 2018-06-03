@@ -322,6 +322,7 @@ class PyvmomiClient:
                                     self.LOGGER.debug(
                                         "NIC address: '%s'", target_ip
                                     )
+                                    break
                         #meh
                         break
                     self.LOGGER.debug(
