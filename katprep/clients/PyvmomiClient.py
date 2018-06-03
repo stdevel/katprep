@@ -300,7 +300,6 @@ class PyvmomiClient:
             for obj in object_view.view:
                 if not hide_empty or obj.summary.guest.ipAddress != None:
                     #try to find the best IP
-                    target_ip=""
                     self.LOGGER.debug("Trying to find best IP for VM '%s'", obj.name)
                     if ipv6_only:
                         is_valid_address = is_ipv6
@@ -309,6 +308,7 @@ class PyvmomiClient:
                         is_valid_address = is_ipv4
                         self.LOGGER.debug("Filtering for IPv4")
 
+                    target_ip = ""
                     while not is_valid_address(target_ip):
                         #primary guest address
                         target_ip = obj.summary.guest.ipAddress
