@@ -5,12 +5,12 @@ Class for sending some very basic commands to Nagios/Icinga 1.x legacy
 monitoring systems.
 """
 
-import logging
-import requests
-from requests.auth import HTTPBasicAuth
 import time
+import logging
 from datetime import datetime, timedelta
 import re
+import requests
+from requests.auth import HTTPBasicAuth
 from lxml import html
 
 
@@ -37,11 +37,11 @@ class NagiosCGIClient:
     """
     dict: Default headers set for every HTTP request
     """
-    URL = ""
+    url = ""
     """
     str: Nagios/Icinga URL
     """
-    SESSION = None
+    session = None
     """
     session: API session
     """
@@ -67,9 +67,9 @@ class NagiosCGIClient:
             #add trailing slash
             url = "{}/".format(url)
         #set connection details and connect
-        self.URL = url
-        self.USERNAME = username
-        self.PASSWORD = password
+        self.url = url
+        self.username = username
+        self.password = password
         self.connect()
 
 
@@ -78,9 +78,9 @@ class NagiosCGIClient:
         """
         This function establishes a connection to Nagios/Icinga.
         """
-        self.SESSION = requests.Session()
-        if self.USERNAME != "":
-            self.SESSION.auth = HTTPBasicAuth(self.USERNAME, self.PASSWORD)
+        self.session = requests.Session()
+        if self.username != "":
+            self.session.auth = HTTPBasicAuth(self.username, self.password)
 
 
 
@@ -110,14 +110,14 @@ class NagiosCGIClient:
             #execute request
             if method.lower() == "post":
                 #POST
-                result = self.SESSION.post(
-                    "{}{}".format(self.URL, sub_url),
+                result = self.session.post(
+                    "{}{}".format(self.url, sub_url),
                     headers=self.HEADERS, data=payload
                     )
             else:
                 #GET
-                result = self.SESSION.get(
-                    "{}{}".format(self.URL, sub_url),
+                result = self.session.get(
+                    "{}{}".format(self.url, sub_url),
                     headers=self.HEADERS
                     )
 
@@ -162,7 +162,8 @@ class NagiosCGIClient:
 
 
 
-    def calculate_time(self, hours):
+    @staticmethod
+    def calculate_time(hours):
         """
         Calculates the time range for POST requests in the format the
         Nagios/Icinga 1.x API requires. For this, the current time/date
@@ -209,7 +210,7 @@ class NagiosCGIClient:
                 'com_data': comment, 'trigger': '0', 'fixed': '1',
                 'hours': hours, 'minutes': '0', 'start_time': current_time,
                 'end_time': end_time, 'btnSubmit': 'Commit',
-                'com_author': self.USERNAME, 'childoptions': '0', 'ahas': 'on'}
+                'com_author': self.username, 'childoptions': '0', 'ahas': 'on'}
         else:
             if remove_downtime:
                 payload = {
@@ -221,7 +222,7 @@ class NagiosCGIClient:
                     'com_data': comment, 'trigger': '0', 'fixed': '1',
                     'hours': hours, 'minutes': '0', 'start_time': current_time,
                     'end_time': end_time, 'btnSubmit': 'Commit',
-                    'com_author': self.USERNAME, 'childoptions': '0'}
+                    'com_author': self.username, 'childoptions': '0'}
 
         #send POST
         return self.__api_post("/cgi-bin/cmd.cgi", payload)
@@ -260,7 +261,9 @@ class NagiosCGIClient:
         :param object_name: Hostname or hostgroup name
         :type object_name: str
         """
-        return __manage_downtime(object_name, "host", remove_downtime=True)
+        return self.__manage_downtime(
+            object_name, "host", hours=1, comment="", remove_downtime=True
+        )
 
 
 
@@ -275,10 +278,11 @@ class NagiosCGIClient:
         #send GET
         result = self.__api_get(
             "/cgi-bin/status.cgi?host=all&hostprops=1&style=hostdetail")
-        if object_name.lower() in str(result).lower():
-            return True
-        else:
-            return False
+        #if object_name.lower() in str(result).lower():
+        #    return True
+        #else:
+        #    return False
+        return bool(object_name.lower() in str(result).lower())
 
 
 
@@ -295,10 +299,11 @@ class NagiosCGIClient:
 
         """
         pattern = re.compile(regexp)
-        if pattern.match(text):
-            return True
-        else:
-            return False
+        #if pattern.match(text):
+        #    return True
+        #else:
+        #    return False
+        return bool(pattern.match(text))
 
 
 
@@ -314,21 +319,21 @@ class NagiosCGIClient:
         """
         #blacklisted strings
         blacklist = {"\n"}
-        """
-        blacklisted with regex:
-        1.Last check
-        2.State duration
-        3.Retries
-        """
+
+        #blacklisted with regex:
+        #1.Last check
+        #2.State duration
+        #3.Retries
         blacklist_regex = {
-            "[0-9]{4}-[0-9]{2}-[0-9]{2}\s+[0-9]{2}:[0-9]{2}:[0-9]{2}",
-            "[0-9]{1,}d\s+[0-9]{1,}h\s+[0-9]{1,}m\s+[0-9]{1,}s",
-            "[0-9]{1,3}/[0-9]{1,3}"
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}\s+[0-9]{2}:[0-9]{2}:[0-9]{2}",
+            r"[0-9]{1,}d\s+[0-9]{1,}h\s+[0-9]{1,}m\s+[0-9]{1,}s",
+            r"[0-9]{1,3}/[0-9]{1,3}"
         }
         if text not in blacklist:
             #compile _all_ the regexps!
             for item in blacklist_regex:
-                result = __regexp_matches(text, item)
+                #result = __regexp_matches(text, item)
+                result = re.match(item, text)
                 if result:
                     return True
             #good boy
@@ -357,19 +362,19 @@ class NagiosCGIClient:
         tree = html.fromstring(result)
         if only_failed:
             data = tree.xpath(
-            "//td[@class='statusBGCRITICAL']/text() | "
-            "//td[@class='statusBGCRITICAL']//a/text()"
+                "//td[@class='statusBGCRITICAL']/text() | "
+                "//td[@class='statusBGCRITICAL']//a/text()"
             )
         else:
             #TODO: To ensure that this makes sense we need to add status
             #information to the result set...
             data = tree.xpath(
-            "//td[@class='statusOdd']/text() | "
-            "//td[@class='statusOdd']//a/text() | "
-            "//td[@class='statusEven']/text() | "
-            "//td[@class='statusEven']//a/text() | "
-            "//td[@class='statusBGCRITICAL']/text() | "
-            "//td[@class='statusBGCRITICAL']//a/text()"
+                "//td[@class='statusOdd']/text() | "
+                "//td[@class='statusOdd']//a/text() | "
+                "//td[@class='statusEven']/text() | "
+                "//td[@class='statusEven']//a/text() | "
+                "//td[@class='statusBGCRITICAL']/text() | "
+                "//td[@class='statusBGCRITICAL']//a/text()"
             )
 
         #only return service and extended status
@@ -402,17 +407,17 @@ class NagiosCGIClient:
         result = self.__api_get(url)
         tree = html.fromstring(result)
         data = tree.xpath(
-        "//td[@class='statusHOSTPENDING']//a/text() |"
-        "//td[@class='statusHOSTDOWNTIME']//a/text() |"
-        "//td[@class='statusHOSTUP']//a/text() |"
-        "//td[@class='statusHOSTDOWN']//a/text() |"
-        "//td[@class='statusHOSTDOWNACK']//a/text() |"
-        "//td[@class='statusHOSTDOWNSCHED']//a/text() |"
-        "//td[@class='statusHOSTUNREACHABLE']//a/text() |"
-        "//td[@class='statusHOSTUNREACHABLEACK']//a/text() |"
-        "//td[@class='statusHOSTUNREACHABLESCHED']//a/text()"
+            "//td[@class='statusHOSTPENDING']//a/text() |"
+            "//td[@class='statusHOSTDOWNTIME']//a/text() |"
+            "//td[@class='statusHOSTUP']//a/text() |"
+            "//td[@class='statusHOSTDOWN']//a/text() |"
+            "//td[@class='statusHOSTDOWNACK']//a/text() |"
+            "//td[@class='statusHOSTDOWNSCHED']//a/text() |"
+            "//td[@class='statusHOSTUNREACHABLE']//a/text() |"
+            "//td[@class='statusHOSTUNREACHABLEACK']//a/text() |"
+            "//td[@class='statusHOSTUNREACHABLESCHED']//a/text()"
         )
-        
+
         hosts = []
         for host in data:
             #get services per host
@@ -424,17 +429,21 @@ class NagiosCGIClient:
             #set-up xpath
             tree = html.fromstring(result)
             data = tree.xpath(
-            "//div[@class='data']/text()"
+                "//div[@class='data']/text()"
             )
 
             #iterate through services
-            #TODO: Use IPv6 only?
-            ip = ""
+            target_ip = ""
+            #NOTE: Nagios does not support IPv6, so we don't utilize the flag
+            if ipv6_only:
+                self.LOGGER.debug("IPv6 is not supported by Nagios/Icinga 1.x")
             for entry in data:
-                ip_regexp = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+                ip_regexp = r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]" \
+                    r"|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]" \
+                    r"[0-9]|25[0-5])$"
                 if self.__regexp_matches(entry, ip_regexp):
                     #entry is an IP
-                    ip = entry
-            this_host = {"name": host, "ip": ip}
+                    target_ip = entry
+            this_host = {"name": host, "ip": target_ip}
             hosts.append(this_host)
         return hosts
