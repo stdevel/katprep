@@ -181,7 +181,7 @@ def scan_systems(options):
 
             #add some additional information required for katprep_report
             params = {
-                "name", "ip", "organization_name", "location_name",
+                "name", "ip", "ip6", "organization_name", "location_name",
                 "environment_name", "operatingsystem_name"
             }
             for param in params:
