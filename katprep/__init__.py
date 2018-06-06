@@ -22,7 +22,7 @@ logging: Logger instance
 
 
 
-def get_credentials(prefix, hostname=None, auth_container=None):
+def get_credentials(prefix, hostname=None, auth_container=None, auth_pass=None):
     """
     Retrieves credentials for a particular external system (e.g. Satellite).
     This function checks whether a hostname is part of an authentication
@@ -35,18 +35,14 @@ def get_credentials(prefix, hostname=None, auth_container=None):
     :type hostname: str
     :param auth_container: authentication container file name
     :type auth_container: str
+    :param auth_pass: authentication container password
+    :type auth_pass: str
     """
     if auth_container:
         LOGGER.debug("Using authentication container")
-        container_pass = "JaHaloIBimsDiPaulaPinkePank#Ohman"
-        while len(container_pass) > 32:
-            container_pass = getpass.getpass(
-                "File password ('{}'@'{}'): ".format(prefix, hostname)
-            )
-        #container = AuthContainer(auth_container)
         try:
             container = AuthContainer(
-                logging.ERROR, auth_container, container_pass)
+                logging.ERROR, auth_container, auth_pass)
             s_creds = None
             s_creds = container.get_credential(hostname)
             if len(s_creds) == 2:

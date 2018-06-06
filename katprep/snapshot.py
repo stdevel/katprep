@@ -11,6 +11,7 @@ import argparse
 import logging
 import json
 import time
+import getpass
 from . import get_credentials, is_writable, validate_filters, \
 get_filter
 from .clients.ForemanAPIClient import ForemanAPIClient, SessionException
@@ -83,6 +84,11 @@ http://github.com/stdevel/katprep'''
     gen_opts.add_argument("-C", "--auth-container", default="", \
     dest="auth_container", action="store", metavar="FILE", \
     help="defines an authentication container file (default: no)")
+    #-P / --auth-password
+    gen_opts.add_argument("-P", "--auth-password", default="empty", \
+    dest="auth_password", action="store", metavar="PASSWORD", \
+    help="defines the authentication container password in case you don't " \
+    "want to enter it manually (useful for scripted automation)")
 
     #SERVER ARGUMENTS
     #-s / --server
@@ -118,6 +124,11 @@ http://github.com/stdevel/katprep'''
 
     #parse options and arguments
     options = parser.parse_args()
+    #set password
+    while options.auth_password == "empty" or len(options.auth_password) > 32:
+        options.auth_password = getpass.getpass(
+            "Authentication container password: "
+        )
     return (options, args)
 
 
@@ -240,7 +251,8 @@ def main(options, args):
     if is_writable(OUTPUT_FILE):
         #initalize Foreman connection and scan systems
         (sat_user, sat_pass) = get_credentials(
-            "Foreman", options.server, options.auth_container
+            "Foreman", options.server, options.auth_container,
+            options.auth_password
         )
         SAT_CLIENT = ForemanAPIClient(
             LOG_LEVEL, options.server, sat_user,

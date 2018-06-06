@@ -13,6 +13,7 @@ import json
 import time
 import os
 import yaml
+import getpass
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report, get_host_params_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
@@ -460,6 +461,11 @@ def parse_options(args=None):
     gen_opts.add_argument("-C", "--auth-container", default="", \
     dest="generic_auth_container", action="store", metavar="FILE", \
     help="defines an authentication container file (default: no)")
+    #-P / --auth-password
+    gen_opts.add_argument("-P", "--auth-password", default="empty", \
+    dest="auth_password", action="store", metavar="PASSWORD", \
+    help="defines the authentication container password in case you don't " \
+    "want to enter it manually (useful for scripted automation)")
     #-c / --config
     gen_opts.add_argument("-c", "--config", dest="config", default="", \
     action="store", metavar="FILE", \
@@ -557,6 +563,11 @@ def parse_options(args=None):
     if options.config != "":
         options = load_configuration(options.config, options)
         options = parser.parse_args()
+    #set password
+    while options.auth_password == "empty" or len(options.auth_password) > 32:
+        options.auth_password = getpass.getpass(
+            "Authentication container password: "
+        )
     return (options, args)
 
 

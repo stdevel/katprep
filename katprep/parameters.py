@@ -10,6 +10,7 @@ from __future__ import absolute_import
 import argparse
 import logging
 import json
+import getpass
 from . import get_credentials, validate_filters, get_filter
 from .clients.ForemanAPIClient import ForemanAPIClient, SessionException
 
@@ -238,6 +239,11 @@ def parse_options(args=None):
     gen_opts.add_argument("-C", "--auth-container", default="", \
     dest="auth_container", action="store", metavar="FILE", \
     help="defines an authentication container file (default: no)")
+    #-P / --auth-password
+    gen_opts.add_argument("-P", "--auth-password", default="empty", \
+    dest="auth_password", action="store", metavar="PASSWORD", \
+    help="defines the authentication container password in case you don't " \
+    "want to enter it manually (useful for scripted automation)")
 
     #SERVER ARGUMENTS
     #-s / --server
@@ -295,6 +301,10 @@ def parse_options(args=None):
 
     #parse options and arguments
     options = parser.parse_args()
+    while options.auth_password == "empty" or len(options.auth_password) > 32:
+        options.auth_password = getpass.getpass(
+            "Authentication container password: "
+        )
     return (options, args)
 
 
