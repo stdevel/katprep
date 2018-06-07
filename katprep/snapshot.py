@@ -154,6 +154,17 @@ def scan_systems(options):
             LOGGER.info(
                 "Checking system '%s' (#%s)...", system["name"], system["id"])
             errata_counter = system["content_facet_attributes"]["errata_counts"]
+            if not errata_counter:
+                #unable to read errata
+                LOGGER.info(
+                    "Unable to read errata counters for system '%s' - check " \
+                    "system! (Hint: unregistered content host?)"
+                )
+                errata_counter = {}
+                errata_counter[u"security"] = 0
+                errata_counter[u"bugfix"] = 0
+                errata_counter[u"enhancement"] = 0
+                errata_counter[u"total"] = 0
             LOGGER.debug(
                 "System errata counter: security=%s, bugfix=%s," \
                 " enhancement=%s, total=%s",
@@ -185,7 +196,11 @@ def scan_systems(options):
                 "environment_name", "operatingsystem_name"
             }
             for param in params:
-                SYSTEM_ERRATA[system["name"]]["params"][param] = params_obj[param]
+                try:
+                    SYSTEM_ERRATA[system["name"]]["params"][param] = params_obj[param]
+                except KeyError as err:
+                    LOGGER.error("Missing key: %s", err)
+                    pass
 
             #get owner
             SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
