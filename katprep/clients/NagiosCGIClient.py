@@ -41,12 +41,16 @@ class NagiosCGIClient:
     """
     str: Nagios/Icinga URL
     """
+    verify = True
+    """
+    bool: SSL verification
+    """
     session = None
     """
     session: API session
     """
 
-    def __init__(self, log_level, url, username="", password=""):
+    def __init__(self, log_level, url, username, password, verify=True):
         """
         Constructor, creating the class. It requires specifying a
         URL. Optionally you can specify a username and password to access
@@ -70,6 +74,7 @@ class NagiosCGIClient:
         self.url = url
         self.username = username
         self.password = password
+        self.verify = verify
         self.connect()
 
 
@@ -115,15 +120,16 @@ class NagiosCGIClient:
                 #POST
                 result = self.session.post(
                     "{}{}".format(self.url, sub_url),
-                    headers=self.HEADERS, data=payload
+                    headers=self.HEADERS, data=payload, verify=self.verify
                     )
             else:
                 #GET
                 result = self.session.get(
                     "{}{}".format(self.url, sub_url),
-                    headers=self.HEADERS
+                    headers=self.HEADERS, verify=self.verify
                     )
 
+            self.LOGGER.debug("HTML output: %s", result.text)
             if "error" in result.text.lower():
                 raise SessionException("Unable to authenticate")
             if result.status_code != 200:
@@ -218,14 +224,16 @@ class NagiosCGIClient:
             if remove_downtime:
                 payload = {
                     'cmd_typ': '171', 'cmd_mod': '2', 'host': object_name,
-                    'btnSubmit': 'Commit'}
+                    'btnSubmit': 'Commit'
+                }
             else:
                 payload = {
                     'cmd_typ': '86', 'cmd_mod': '2', 'host': object_name,
                     'com_data': comment, 'trigger': '0', 'fixed': '1',
                     'hours': hours, 'minutes': '0', 'start_time': current_time,
                     'end_time': end_time, 'btnSubmit': 'Commit',
-                    'com_author': self.username, 'childoptions': '0'}
+                    'com_author': self.username, 'childoptions': '0'
+                }
 
         #send POST
         return self.__api_post("/cgi-bin/cmd.cgi", payload)
