@@ -25,6 +25,16 @@ class SessionException(Exception):
 
 
 
+class UnsupportedRequest(Exception):
+    """
+    Dummy class for unsupported requests
+
+.. class:: UnsupportedRequest
+    """
+    pass
+
+
+
 class NagiosCGIClient:
     """
 .. class:: NagiosCGIClient
@@ -40,6 +50,10 @@ class NagiosCGIClient:
     url = ""
     """
     str: Nagios/Icinga URL
+    """
+    OBSOLETE = False
+    """
+    bool: Nagios system
     """
     verify = True
     """
@@ -72,12 +86,27 @@ class NagiosCGIClient:
             url = "{}/".format(url)
         #set connection details and connect
         self.url = url
+        if "nagios" in self.url.lower():
+            self.LOGGER.debug(
+                "The 90s called, they want their monitoring system back"
+            )
+            self.set_nagios(True)
         self.username = username
         self.password = password
         self.verify = verify
         self.connect()
 
 
+
+    def set_nagios(self, flag):
+        """
+        This function sets a flag for Nagios systems as there are CGI
+        differences between Nagios and Icinga 1.x.
+
+        :param flag: boolean whether Nagios system
+        :type flag: bool
+        """
+        self.OBSOLETE = flag
 
     def connect(self):
         """
@@ -212,31 +241,53 @@ class NagiosCGIClient:
         (current_time, end_time) = self.calculate_time(hours)
 
         #set-up payload
+        payload = {}
         if object_type.lower() == "hostgroup":
-            #there is now way to unschedule downtime for a complete hostgroup
-            payload = {
-                'cmd_typ': '85', 'cmd_mod': '2', 'hostgroup': object_name,
-                'com_data': comment, 'trigger': '0', 'fixed': '1',
-                'hours': hours, 'minutes': '0', 'start_time': current_time,
-                'end_time': end_time, 'btnSubmit': 'Commit',
-                'com_author': self.username, 'childoptions': '0', 'ahas': 'on'}
+            if remove_downtime:
+                #there is now way to unschedule downtime for a whole hostgroup
+                raise UnsupportedRequest(
+                    "Unscheduling downtimes for whole hostgroups is not " \
+                    "supported with Nagios/Icinga 1.x!"
+                )
+            else:
+                payload[0] = {
+                    'cmd_typ': '85', 'cmd_mod': '2', 'hostgroup': object_name,
+                    'com_data': comment, 'trigger': '0', 'fixed': '1',
+                    'hours': hours, 'minutes': '0', 'start_time': current_time,
+                    'end_time': end_time, 'btnSubmit': 'Commit',
+                    'com_author': self.username, 'childoptions': '0',
+                    'ahas': 'on'
+                }
         else:
             if remove_downtime:
-                payload = {
-                    'cmd_typ': '171', 'cmd_mod': '2', 'host': object_name,
-                    'btnSubmit': 'Commit'
-                }
+                if self.OBSOLETE:
+                    #you really like old stuff don't you
+                    raise UnsupportedRequest(
+                        "Unscheduling downtimes is not supported with Nagios!"
+                    )
+                else:
+                    payload[0] = {
+                        'cmd_typ': '171', 'cmd_mod': '2', 'host': object_name,
+                        'btnSubmit': 'Commit'
+                    }
             else:
-                payload = {
+                payload[0] = {
                     'cmd_typ': '86', 'cmd_mod': '2', 'host': object_name,
                     'com_data': comment, 'trigger': '0', 'fixed': '1',
                     'hours': hours, 'minutes': '0', 'start_time': current_time,
                     'end_time': end_time, 'btnSubmit': 'Commit',
                     'com_author': self.username, 'childoptions': '0'
                 }
+                if self.OBSOLETE:
+                    #we need to make two calls as legacy hurts twice
+                    payload[1] = payload[0].copy()
+                    payload[1]['cmd_typ'] = '55'
 
         #send POST
-        return self.__api_post("/cgi-bin/cmd.cgi", payload)
+        result = ""
+        for req in payload:
+            result = self.__api_post("/cgi-bin/cmd.cgi", payload[req])
+        return result
 
 
 
