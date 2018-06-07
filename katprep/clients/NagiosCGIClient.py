@@ -51,7 +51,7 @@ class NagiosCGIClient:
     """
     str: Nagios/Icinga URL
     """
-    OBSOLETE = False
+    obsolete = False
     """
     bool: Nagios system
     """
@@ -106,7 +106,7 @@ class NagiosCGIClient:
         :param flag: boolean whether Nagios system
         :type flag: bool
         """
-        self.OBSOLETE = flag
+        self.obsolete = flag
 
     def connect(self):
         """
@@ -260,7 +260,7 @@ class NagiosCGIClient:
                 }
         else:
             if remove_downtime:
-                if self.OBSOLETE:
+                if self.obsolete:
                     #you really like old stuff don't you
                     raise UnsupportedRequest(
                         "Unscheduling downtimes is not supported with Nagios!"
@@ -278,13 +278,13 @@ class NagiosCGIClient:
                     'end_time': end_time, 'btnSubmit': 'Commit',
                     'com_author': self.username, 'childoptions': '0'
                 }
-                if self.OBSOLETE:
+                if self.obsolete:
                     #we need to make two calls as legacy hurts twice
                     payload[1] = payload[0].copy()
                     payload[1]['cmd_typ'] = '55'
 
         #send POST
-        result = ""
+        result = None
         for req in payload:
             result = self.__api_post("/cgi-bin/cmd.cgi", payload[req])
         return result
@@ -421,7 +421,7 @@ class NagiosCGIClient:
         }
         for code in codes:
             if code in state[:8].lower():
-                return codes[code] 
+                return codes[code]
 
 
 
@@ -477,15 +477,7 @@ class NagiosCGIClient:
                     "state": self.__get_state(hits[counter+1])
                 })
                 counter = counter + 2
-            print services
-        #if len(hits)%2 == 0:
-        #    services = []
-        #    counter = 0
-        #    while counter < len(hits):
-        #        services.append({hits[counter] : hits[counter+1]})
-        #        counter = counter + 2
-        #    return services
-        #return hits
+            return services
 
 
 
