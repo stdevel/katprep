@@ -102,6 +102,9 @@ class NagiosCGIClient:
 .. seealso:: __api_post()
         """
         #send request to API
+        self.LOGGER.debug(
+            "%s request to URL '%s', payload='%s'", method, sub_url, payload
+        )
         try:
             if method.lower() not in ["get", "post"]:
                 #going home
@@ -218,7 +221,7 @@ class NagiosCGIClient:
                     'btnSubmit': 'Commit'}
             else:
                 payload = {
-                    'cmd_typ': '55', 'cmd_mod': '2', 'host': object_name,
+                    'cmd_typ': '86', 'cmd_mod': '2', 'host': object_name,
                     'com_data': comment, 'trigger': '0', 'fixed': '1',
                     'hours': hours, 'minutes': '0', 'start_time': current_time,
                     'end_time': end_time, 'btnSubmit': 'Commit',
