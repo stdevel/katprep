@@ -473,6 +473,9 @@ def parse_options(args=None):
     #snapshot reports
     gen_opts.add_argument('report', metavar='FILE', nargs=1, \
     help='A snapshot report', type=is_valid_report)
+    #--insecure
+    gen_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
+    action="store_false", help="Disables SSL verification (default: no)")
 
     #FOREMAN ARGUMENTS
     #-s / --foreman-server
@@ -488,9 +491,6 @@ def parse_options(args=None):
     fman_opts.add_argument("-R", "--no-reboot", dest="foreman_no_reboot", \
     default=True, action="store_false", help="suppresses rebooting the " \
     "system under any circumstances (default: no)")
-    #--insecure
-    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
-    action="store_false", help="Disables SSL verification (default: no)")
 
     #VIRTUALIZATION ARGUMENTS
     #--virt-uri
@@ -677,7 +677,8 @@ def main(options, args):
                 host_params["katprep_mon_type"] == "nagios":
                 #Yet another legacy installation
                 MON_CLIENTS[host] = NagiosCGIClient(
-                    LOG_LEVEL, host, mon_user, mon_pass
+                    LOG_LEVEL, host, mon_user, mon_pass, \
+                    verify=options.ssl_verify
                 )
             elif "katprep_mon_type" in host_params:
                 #Icinga 2, yay!

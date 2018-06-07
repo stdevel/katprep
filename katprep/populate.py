@@ -207,6 +207,9 @@ def parse_options(args=None):
     #--ip-filter
     gen_opts.add_argument("--ipv6-only", dest="ipv6_only", default=False, \
     action="store_true", help="Filters for IPv6-only addresses (default: no)")
+    #--insecure
+    gen_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
+    action="store_false", help="Disables SSL verification (default: no)")
 
     #FOREMAN ARGUMENTS
     #-s / --foreman-server
@@ -217,9 +220,6 @@ def parse_options(args=None):
     fman_opts.add_argument("-u", "--update", dest="foreman_update", \
     action="store_true", default=False, help="Updates pre-existing host " \
     "parameters (default: no)")
-    #--insecure
-    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
-    action="store_false", help="Disables SSL verification (default: no)")
 
     #VIRTUALIZATION ARGUMENTS
     virt_opts.add_argument("--virt-uri", dest="virt_uri", \
@@ -309,7 +309,8 @@ def main(options, args):
         if options.mon_type == "nagios":
             #Yet another legacy installation
             MON_CLIENT = NagiosCGIClient(
-                LOG_LEVEL, options.mon_url, mon_user, mon_pass
+                LOG_LEVEL, options.mon_url, mon_user, mon_pass, \
+                verify=options.ssl_verify
             )
         else:
             #Icinga 2, yay!
