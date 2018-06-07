@@ -128,8 +128,8 @@ class NagiosCGIClient:
                     "{}{}".format(self.url, sub_url),
                     headers=self.HEADERS, verify=self.verify
                     )
-
-            self.LOGGER.debug("HTML output: %s", result.text)
+            #this really breaks shit
+            #self.LOGGER.debug("HTML output: %s", result.text)
             if "error" in result.text.lower():
                 raise SessionException("Unable to authenticate")
             if result.status_code != 200:
