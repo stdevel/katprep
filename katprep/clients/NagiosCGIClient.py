@@ -380,7 +380,10 @@ class NagiosCGIClient:
 
         """
         #blacklisted strings
-        blacklist = {"\n"}
+        blacklist = {
+            "",
+            "\n"
+        }
 
         #blacklisted with regex:
         #1.Last check
@@ -402,6 +405,23 @@ class NagiosCGIClient:
             return False
         else:
             return True
+
+
+
+    @staticmethod
+    def __get_state(state):
+        """
+        Returns a numeric plugin return code based on the state
+
+        :param state: plugin return string
+        :type state: str
+        """
+        codes = {
+            "unknown": 3.0, "critical": 2.0, "warning": 1.0, "ok": 0.0
+        }
+        for code in codes:
+            if code in state[:8].lower():
+                return codes[code] 
 
 
 
@@ -428,8 +448,6 @@ class NagiosCGIClient:
                 "//td[@class='statusBGCRITICAL']//a/text()"
             )
         else:
-            #TODO: To ensure that this makes sense we need to add status
-            #information to the result set...
             data = tree.xpath(
                 "//td[@class='statusOdd']/text() | "
                 "//td[@class='statusOdd']//a/text() | "
@@ -442,17 +460,32 @@ class NagiosCGIClient:
         #only return service and extended status
         hits = []
         for item in data:
+            item = item.lstrip()
             if not self.__is_blacklisted(item):
                 hits.append(item)
+        print hits
         #try building a beautiful array of dicts
-        if len(hits)%2 == 0:
+        if len(hits)%2 != 0:
             services = []
-            counter = 0
+            counter = 1
             while counter < len(hits):
-                services.append({hits[counter] : hits[counter+1]})
+                self.LOGGER.debug(
+                    "Service '%s' has state '%s'", hits[counter], hits[counter+1]
+                )
+                services.append({
+                    "name": hits[counter],
+                    "state": self.__get_state(hits[counter+1])
+                })
                 counter = counter + 2
-            return services
-        return hits
+            print services
+        #if len(hits)%2 == 0:
+        #    services = []
+        #    counter = 0
+        #    while counter < len(hits):
+        #        services.append({hits[counter] : hits[counter+1]})
+        #        counter = counter + 2
+        #    return services
+        #return hits
 
 
 
@@ -498,7 +531,9 @@ class NagiosCGIClient:
             target_ip = ""
             #NOTE: Nagios does not support IPv6, so we don't utilize the flag
             if ipv6_only:
-                self.LOGGER.debug("IPv6 is not supported by Nagios/Icinga 1.x")
+                raise UnsupportedRequest(
+                    "IPv6 is not supported by Nagios/Icinga 1.x"
+                )
             for entry in data:
                 ip_regexp = r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]" \
                     r"|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]" \
