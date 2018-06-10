@@ -7,6 +7,7 @@ Unit tests for Spacewalk API integration
 import os
 import unittest
 import logging
+import ssl
 from SpacewalkAPIClient import SpacewalkAPIClient, \
 InvalidCredentialsException, APILevelNotSupportedException
 
@@ -96,6 +97,8 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         """
         Ensure that old Spacewalk APIs are refused
         """
+        #we really need to skip SSL verification for old versions
+        ssl._create_default_https_context = ssl._create_unverified_context
         with self.assertRaises(APILevelNotSupportedException):
             self.api_spacewalk = SpacewalkAPIClient(
                 logging.DEBUG, self.LEGACY_HOSTNAME,

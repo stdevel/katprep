@@ -71,7 +71,7 @@ class SpacewalkAPIClient(object):
     """
     logging: Logger instance
     """
-    API_MIN = "11.1"
+    API_MIN = 14.0
     """
     int: Minimum supported API version.
     """
@@ -176,7 +176,7 @@ class SpacewalkAPIClient(object):
         try:
             #check whether API is supported
             api_level = self.api_session.api.getVersion()
-            if api_level < self.API_MIN:
+            if float(api_level) < self.API_MIN:
                 raise APILevelNotSupportedException(
                     "Your API version ({0}) does not support the required calls. "
                     "You'll need API version ({1}) or higher!".format(
