@@ -41,6 +41,16 @@ class InvalidHostnameFormatException(Exception):
 
 
 
+class InvalidCredentialsException(Exception):
+    """
+    Dummy class for invalid credentials
+
+.. class:: InvalidCredentialsException
+    """
+    pass
+
+
+
 class UnsupportedFilterException(Exception):
     """
     Dummy class for unsupported filters
@@ -142,8 +152,18 @@ class SpacewalkAPIClient(object):
         This function establishes a connection to Spacewalk.
         """
         #set api session and key
-        self.api_session = xmlrpclib.Server(self.url)
-        self.api_key = self.api_session.auth.login(self.username, self.password)
+        try:
+            self.api_session = xmlrpclib.Server(self.url)
+            self.api_key = self.api_session.auth.login(self.username, self.password)
+        except xmlrpclib.Fault as err:
+            if err.faultCode == 2950:
+                raise InvalidCredentialsException(
+                    "Wrong credentials supplied: '%s'", err.faultString
+                )
+            else:
+                raise SessionException(
+                    "Generic remote communication error: '%s'", err.faultString
+                )
 
 
 
@@ -204,3 +224,11 @@ class SpacewalkAPIClient(object):
         Returns the configured URL of the object instance.
         """
         return self.url
+
+
+
+    def get_hostname(self):
+        """
+        Returns the configured hostname of the objecti nstance.
+        """
+        return self.hostname
