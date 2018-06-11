@@ -35,7 +35,7 @@ class UnsupportedRequest(Exception):
 
 
 
-class NagiosCGIClient:
+class NagiosCGIClient(object):
     """
 .. class:: NagiosCGIClient
     """
@@ -108,6 +108,8 @@ class NagiosCGIClient:
         """
         self.obsolete = flag
 
+
+
     def connect(self):
         """
         This function establishes a connection to Nagios/Icinga.
@@ -118,7 +120,7 @@ class NagiosCGIClient:
 
 
 
-    def api_request(self, method, sub_url, payload=""):
+    def __api_request(self, method, sub_url, payload=""):
         """
         Sends a HTTP request to the Nagios/Icinga API. This function requires
         a valid HTTP method and a sub-URL (such as /cgi-bin/status.cgi).
@@ -161,9 +163,14 @@ class NagiosCGIClient:
             #self.LOGGER.debug("HTML output: %s", result.text)
             if "error" in result.text.lower():
                 raise SessionException("Unable to authenticate")
-            if result.status_code != 200:
-                raise SessionException("{}: HTTP operation not successful".format(
-                    result.status_code))
+            if result.status_code in [401, 403]:
+                raise SessionException("Unauthorized")
+            elif result.status_code != 200:
+                raise SessionException(
+                    "{}: HTTP operation not successful".format(
+                        result.status_code
+                    )
+                )
             else:
                 #return result
                 if method.lower() == "get":
@@ -184,7 +191,7 @@ class NagiosCGIClient:
         :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
         :type sub_url: str
         """
-        return self.api_request("get", sub_url)
+        return self.__api_request("get", sub_url)
 
     def __api_post(self, sub_url, payload):
         """
@@ -196,12 +203,12 @@ class NagiosCGIClient:
         :param payload: payload data
         :type payload: str
         """
-        return self.api_request("post", sub_url, payload)
+        return self.__api_request("post", sub_url, payload)
 
 
 
     @staticmethod
-    def calculate_time(hours):
+    def __calculate_time(hours):
         """
         Calculates the time range for POST requests in the format the
         Nagios/Icinga 1.x API requires. For this, the current time/date
@@ -238,7 +245,7 @@ class NagiosCGIClient:
         :type remove_downtime: bool
         """
         #calculate timerange
-        (current_time, end_time) = self.calculate_time(hours)
+        (current_time, end_time) = self.__calculate_time(hours)
 
         #set-up payload
         payload = {}
@@ -361,10 +368,6 @@ class NagiosCGIClient:
 
         """
         pattern = re.compile(regexp)
-        #if pattern.match(text):
-        #    return True
-        #else:
-        #    return False
         return bool(pattern.match(text))
 
 
@@ -445,7 +448,9 @@ class NagiosCGIClient:
         if only_failed:
             data = tree.xpath(
                 "//td[@class='statusBGCRITICAL']/text() | "
-                "//td[@class='statusBGCRITICAL']//a/text()"
+                "//td[@class='statusBGCRITICAL']//a/text() | "
+                "//td[@class='statusBGCRITICALSCHED']//text() | "
+                "//td[@class='statusBGCRITICALSCHED']//a/text()"
             )
         else:
             data = tree.xpath(
@@ -454,7 +459,9 @@ class NagiosCGIClient:
                 "//td[@class='statusEven']/text() | "
                 "//td[@class='statusEven']//a/text() | "
                 "//td[@class='statusBGCRITICAL']/text() | "
-                "//td[@class='statusBGCRITICAL']//a/text()"
+                "//td[@class='statusBGCRITICAL']//a/text() | "
+                "//td[@class='statusBGCRITICALSCHED']//text() | "
+                "//td[@class='statusBGCRITICALSCHED']//a/text()"
             )
 
         #only return service and extended status
@@ -463,7 +470,6 @@ class NagiosCGIClient:
             item = item.lstrip()
             if not self.__is_blacklisted(item):
                 hits.append(item)
-        print hits
         #try building a beautiful array of dicts
         if len(hits)%2 != 0:
             services = []
@@ -494,15 +500,15 @@ class NagiosCGIClient:
         result = self.__api_get(url)
         tree = html.fromstring(result)
         data = tree.xpath(
-            "//td[@class='statusHOSTPENDING']//a/text() |"
-            "//td[@class='statusHOSTDOWNTIME']//a/text() |"
-            "//td[@class='statusHOSTUP']//a/text() |"
-            "//td[@class='statusHOSTDOWN']//a/text() |"
-            "//td[@class='statusHOSTDOWNACK']//a/text() |"
-            "//td[@class='statusHOSTDOWNSCHED']//a/text() |"
-            "//td[@class='statusHOSTUNREACHABLE']//a/text() |"
-            "//td[@class='statusHOSTUNREACHABLEACK']//a/text() |"
-            "//td[@class='statusHOSTUNREACHABLESCHED']//a/text()"
+            "//td[@class='statusHOSTPENDING']//a/text() | "
+            "//td[@class='statusHOSTDOWNTIME']//a/text() | "
+            "//td[@class='statusHOSTUP']//a/text() | "
+            "//td[@class='statusHOSTDOWN']//a/text() | "
+            "//td[@class='statusHOSTDOWNACK']//a/text() | "
+            "//td[@class='statusHOSTDOWNSCHED']//a/text() | "
+            "//td[@class='statusHOSTUNREACHABLE']//a/text() | "
+            "//td[@class='statusHOSTUNREACHABLEACK']//a/text() | "
+            "//td[@class='statusEven']//td[@class='statusEven']/a/text()"
         )
 
         hosts = []
@@ -526,10 +532,10 @@ class NagiosCGIClient:
                 raise UnsupportedRequest(
                     "IPv6 is not supported by Nagios/Icinga 1.x"
                 )
+            ip_regexp = r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]" \
+                r"|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]" \
+                r"[0-9]|25[0-5])$"
             for entry in data:
-                ip_regexp = r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]" \
-                    r"|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]" \
-                    r"[0-9]|25[0-5])$"
                 if self.__regexp_matches(entry, ip_regexp):
                     #entry is an IP
                     target_ip = entry
