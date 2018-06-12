@@ -153,7 +153,7 @@ def manage_host_preparation(options, host, cleanup=False):
         else:
             if cleanup:
                 #remove downtime
-                MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].remove_downtime(mon_name)
+                MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].remove_downtime(mon_name, "host")
             else:
                 #schedule downtime
                 MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].schedule_downtime(
