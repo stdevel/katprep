@@ -251,33 +251,15 @@ def execute(options, args):
             errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
             if options.foreman_reboot or \
                 (True in errata_reboot and not options.foreman_no_reboot):
-                #trigger workaround if VM
-                if get_host_param_from_report(REPORT, host, "katprep_virt") \
-                    not in ["", None]:
-                    #use customized VM name if applicable
-                    if get_host_param_from_report(REPORT, host, "katprep_virt_name") \
-                        not in ["", None]:
-                        vm_name = get_host_param_from_report(
-                            REPORT, host, "katprep_virt_name"
-                        )
-                    else:
-                        vm_name = host
-                    #reboot VM
-                    if options.generic_dry_run:
-                        LOGGER.info("Host '%s' --> reboot VM", host)
-                    else:
-                        VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].restart_vm(vm_name)
-                else:
-                    #physical host
-                    if options.generic_dry_run:
-                        LOGGER.info("Host '%s' --> reboot host", host)
-                    else:
-                        SAT_CLIENT.api_put(
-                            "/hosts/{}/power".format(
-                                SAT_CLIENT.get_id_by_name(host, "host")
-                            ),
-                            json.dumps({"power_action": "soft"})
-                        )
+               if options.generic_dry_run:
+                    LOGGER.info("Host '%s' --> reboot host", host)
+               else:
+                    SAT_CLIENT.api_put(
+                        "/hosts/{}/power".format(
+                            SAT_CLIENT.get_id_by_name(host, "host")
+                        ),
+                        json.dumps({"power_action": "soft"})
+                    )
 
     except ValueError as err:
         LOGGER.error("Error maintaining host: '%s'", err)
