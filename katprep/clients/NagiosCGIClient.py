@@ -320,7 +320,7 @@ class NagiosCGIClient(object):
 
 
 
-    def remove_downtime(self, object_name):
+    def remove_downtime(self, object_name, object_type="host"):
         """
         Removes scheduled downtime for a host.
         For this, a object name is required.
