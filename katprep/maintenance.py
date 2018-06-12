@@ -12,8 +12,8 @@ import logging
 import json
 import time
 import os
-import yaml
 import getpass
+import yaml
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report, get_host_params_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
@@ -251,9 +251,9 @@ def execute(options, args):
             errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
             if options.foreman_reboot or \
                 (True in errata_reboot and not options.foreman_no_reboot):
-               if options.generic_dry_run:
+                if options.generic_dry_run:
                     LOGGER.info("Host '%s' --> reboot host", host)
-               else:
+                else:
                     SAT_CLIENT.api_put(
                         "/hosts/{}/power".format(
                             SAT_CLIENT.get_id_by_name(host, "host")
