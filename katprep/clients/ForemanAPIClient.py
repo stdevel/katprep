@@ -93,7 +93,7 @@ class ForemanAPIClient:
         #disable SSL warning outputs
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         #set connection information
-        self.HOSTNAME = self.validate_hostname(hostname)
+        self.HOSTNAME = self.__validate_hostname(hostname)
         self.USERNAME = username
         self.PASSWORD = password
         self.VERIFY = verify
@@ -276,7 +276,7 @@ class ForemanAPIClient:
 
 
     @staticmethod
-    def validate_hostname(hostname):
+    def __validate_hostname(hostname):
         """
         Validates that the Foreman API uses a FQDN as hostname.
         Also looks up the "real" hostname if "localhost" is specified.
@@ -399,6 +399,7 @@ class ForemanAPIClient:
         :param param_name: host parameter name
         :type param_name: str
         """
+        #TODO: Move to get_id_by_name
         try:
             result_obj = json.loads(
                 self.api_get("/hosts/{}/parameters".format(host))
