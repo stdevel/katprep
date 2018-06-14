@@ -15,7 +15,7 @@ import getpass
 from . import get_credentials, is_writable, validate_filters, \
 get_filter
 from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients import SessionException
+from .clients import *
 
 __version__ = "0.0.1"
 """
