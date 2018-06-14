@@ -9,7 +9,8 @@ import unittest
 import logging
 import json
 import random
-from katprep.clients.ForemanAPIClient import ForemanAPIClient, SessionException
+from katprep.clients.ForemanAPIClient import ForemanAPIClient
+from katprep.clients import InvalidCredentialsException, SessionException
 
 class ForemanAPIClientTest(unittest.TestCase):
     """
@@ -32,6 +33,55 @@ class ForemanAPIClientTest(unittest.TestCase):
     """
     int: ID of temporary bookmark
     """
+
+
+
+    def test_resolve_localhost(self):
+        """
+        Ensure that 'localhost' is resolved to a FQDN
+        """
+        self.api_foreman = ForemanAPIClient(
+            logging.DEBUG, "localhost",
+            self.config["config"]["api_user"],
+            self.config["config"]["api_pass"]
+        )
+        #Ensure that we have two dots in the hostname
+        hostname = self.api_foreman.get_hostname()
+        self.assertTrue(
+            hostname.count('.') == 2 and hostname != "localhost"
+        )
+
+    def test_resolve_shortname(self):
+        """
+        Ensure that short names are resolved to FQDNs
+        """
+        host_snip=self.config["config"]["hostname"]
+        self.api_foreman = ForemanAPIClient(
+            logging.DEBUG, host_snip[:host_snip.find('.')],
+            self.config["config"]["api_user"],
+            self.config["config"]["api_pass"]
+        )
+        #Ensure that we have two dots in the hostname
+        hostname = self.api_foreman.get_hostname()
+        self.assertTrue(
+            hostname.count('.') == 2
+        )
+
+    def test_accept_fqdn(self):
+        """
+        Ensure that FQDNs are accepted
+        """
+        self.api_foreman = ForemanAPIClient(
+            logging.DEBUG,
+            self.config["config"]["hostname"],
+            self.config["config"]["api_user"],
+            self.config["config"]["api_pass"]
+        )
+        #Ensure that we have two dots in the hostname
+        hostname = self.api_foreman.get_hostname()
+        self.assertTrue(
+            hostname.count('.') == 2
+        )
 
 
 

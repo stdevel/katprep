@@ -10,7 +10,7 @@ import unittest
 import logging
 import json
 from katprep.clients.NagiosCGIClient import NagiosCGIClient, SessionException, \
-UnsupportedRequest
+UnsupportedRequestException
 
 class NagiosCGIClientTest(unittest.TestCase):
     """
@@ -185,7 +185,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         Ensure unsupported calls on Nagios will die in a fire
         """
-        with self.assertRaises(UnsupportedRequest):
+        with self.assertRaises(UnsupportedRequestException):
             #try to remove downtime
             self.cgi_nagios.remove_downtime("dummy")
 

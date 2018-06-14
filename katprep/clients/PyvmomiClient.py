@@ -12,16 +12,7 @@ import ssl
 from urlparse import urlparse
 import sys
 from katprep_shared import is_ipv4, is_ipv6
-
-
-
-class SessionException(Exception):
-    """
-    Dummy class for session errors
-
-.. class:: SessionException
-    """
-    pass
+from katprep.clients import SessionException
 
 
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This file contains the ForemanAPIClient and
-APILevelNotSupportedException and SessionException classes
+This file contains the ForemanAPIClient class
 """
 
 import logging
@@ -10,26 +9,8 @@ import requests
 import json
 import socket
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-
-
-class APILevelNotSupportedException(Exception):
-    """
-    Dummy class for unsupported API levels
-
-.. class:: APILevelNotSupportedException
-    """
-    pass
-
-
-
-class SessionException(Exception):
-    """
-    Dummy class for session errors
-
-.. class:: SessionException
-    """
-    pass
+from katprep.clients import InvalidCredentialsException, SessionException, \
+APILevelNotSupportedException
 
 
 
@@ -69,7 +50,7 @@ class ForemanAPIClient:
     """
 
     def __init__(self, log_level, hostname,
-        username, password, verify=True, prefix=""):
+                 username, password, verify=True, prefix=""):
         """
         Constructor, creating the class. It requires specifying a
         hostname, username and password to access the API. After
@@ -106,10 +87,20 @@ class ForemanAPIClient:
 
 
     def __connect(self):
-        """This function establishes a connection to Foreman."""
+        """
+        This function establishes a connection to Foreman.
+        """
         global SESSION
         self.SESSION = requests.Session()
         self.SESSION.auth = (self.USERNAME, self.PASSWORD)
+
+
+
+    def get_hostname(self):
+        """
+        Returns the configured hostname of the object instance.
+        """
+        return self.HOSTNAME
 
 
 
@@ -180,7 +171,7 @@ class ForemanAPIClient:
                     headers=self.HEADERS, verify=self.VERIFY
                 )
             if "unable to authenticate" in result.text.lower():
-                raise SessionException("Unable to authenticate")
+                raise InvalidCredentialsException("Unable to authenticate")
             if result.status_code not in [200, 201, 202]:
                 raise SessionException("{}: HTTP operation not successful {}".format(
                     result.status_code, result.text))
@@ -285,14 +276,20 @@ class ForemanAPIClient:
         :param hostname: the hostname to validate
         :type hostname: str
         """
-        if hostname == "localhost":
-            #get real hostname
-            hostname = socket.gethostname()
-        else:
-            #convert to FQDN if possible:
-            fqdn = socket.gethostbyaddr(hostname)
-            if "." in fqdn[0]:
-                hostname = fqdn[0]
+        try:
+            if hostname == "localhost":
+                #get real hostname
+                hostname = socket.gethostname()
+            if hostname.count('.') != 2:
+                #get convert to FQDN if possible
+                hostname = socket.getaddrinfo(
+                    socket.getfqdn(hostname), 0, 0, 0, 0,
+                    socket.AI_CANONNAME
+                )[0][3]
+        except socket.gaierror:
+            raise InvalidHostnameFormatException(
+                "Unable to find FQDN for host '{}'".format(hostname)
+            )
         return hostname
 
 

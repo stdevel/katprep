@@ -9,7 +9,10 @@ import time
 import unittest
 import logging
 import json
-from katprep.clients.Icinga2APIClient import Icinga2APIClient, SessionException
+from katprep.clients.Icinga2APIClient import Icinga2APIClient
+from katprep.clients import SessionException
+
+
 
 class Icinga2APIClientTest(unittest.TestCase):
     """

@@ -12,16 +12,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import time
 from datetime import datetime, timedelta
-
-
-
-class SessionException(Exception):
-    """
-    Dummy class for session errors
-
-.. class:: SessionException
-    """
-    pass
+from katprep.clients import SessionException
 
 
 
