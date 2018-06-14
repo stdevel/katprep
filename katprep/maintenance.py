@@ -57,6 +57,17 @@ str: Date prefix for snapshots and downtimes
 
 
 
+def is_blacklisted(host, blacklist):
+    """
+    This function checks whether a host is matched by an exclude pattern
+    """
+    for entry in blacklist:
+        if entry.replace("*", "").replace("%", "") in host:
+            return True
+    return False
+
+
+
 def get_host_param_from_report(report, host, param):
     """
     This function retrieves a host parameter value from a report.
@@ -580,7 +591,7 @@ def set_filter(options, report):
             params["environment_name"] != options.filter_environment:
             LOGGER.debug("Removing '%s'", host)
             remove.append(host)
-        elif host in options.filter_exclude:
+        elif is_blacklisted(host, options.filter_exclude):
             LOGGER.debug("Removing '%s'", host)
             remove.append(host)
     #remove entries
