@@ -9,8 +9,8 @@ import time
 import unittest
 import logging
 import json
-from katprep.clients.NagiosCGIClient import NagiosCGIClient, SessionException, \
-UnsupportedRequestException
+from katprep.clients.NagiosCGIClient import NagiosCGIClient
+from katprep.clients import *
 
 class NagiosCGIClientTest(unittest.TestCase):
     """

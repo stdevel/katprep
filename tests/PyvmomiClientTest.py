@@ -9,7 +9,8 @@ import time
 import unittest
 import logging
 import json
-from katprep.clients.PyvmomiClient import PyvmomiClient, SessionException
+from katprep.clients.PyvmomiClient import PyvmomiClient
+from katprep.clients import *
 
 class PyvmomiClientTest(unittest.TestCase):
     """

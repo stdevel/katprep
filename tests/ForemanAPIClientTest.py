@@ -10,7 +10,7 @@ import logging
 import json
 import random
 from katprep.clients.ForemanAPIClient import ForemanAPIClient
-from katprep.clients import InvalidCredentialsException, SessionException
+from katprep.clients import *
 
 class ForemanAPIClientTest(unittest.TestCase):
     """
