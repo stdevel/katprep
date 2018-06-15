@@ -10,6 +10,8 @@ The following tests are available:
 | `NagiosCGIClientTest.py` | Unit test | Nagios/Icinga 1.x CGI integration |
 | `PyvmomiClient.py` | Unit test | Pyvmomi integration |
 
+Each test has an appropriate JSON configuration file specifying connection details and objects used for the particular tests.
+
 # ForemanAPIClientTest
 This test checks:
 - will follow
@@ -24,6 +26,14 @@ For this test, you will need:
   - hostgroup
   - location
   - organization
+  
+# SpacewalkAPIClientTest
+This test checks:
+- will follow
+
+## Preparation
+For this test, you will need:
+- will follow
 
 # Icinga2ClientTest
 This test checks:
