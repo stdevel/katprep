@@ -6,11 +6,11 @@ This file contains the ForemanAPIClient class
 
 import logging
 import requests
-import json
 import socket
+import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from katprep.clients import InvalidCredentialsException, SessionException, \
-APILevelNotSupportedException
+from katprep.clients import SessionException, InvalidCredentialsException, \
+APILevelNotSupportedException, InvalidHostnameFormatException
 
 
 
@@ -252,13 +252,12 @@ class ForemanAPIClient:
             result_obj = json.loads(
                 self.api_get("/status")
             )
-            self.LOGGER.debug("API version {} found.".format(
-                result_obj["api_version"]))
+            self.LOGGER.debug("API version %s found", result_obj["api_version"])
             if result_obj["api_version"] != self.API_MIN:
                 raise APILevelNotSupportedException(
-                    "Your API version ({}) does not support the required calls."
-                    "You'll need API version {} - stop using historic"
-                    " software!".format(result_obj["api_version"], self.API_MIN)
+                    "Your API version (%s) does not support the required calls."
+                    "You'll need API version %s - stop using historic"
+                    " software!", result_obj["api_version"], self.API_MIN
                 )
         except ValueError as err:
             self.LOGGER.error(err)
@@ -327,9 +326,7 @@ class ForemanAPIClient:
                 )
                 if result_obj["id"] == object_id:
                     self.LOGGER.debug(
-                        "I think I found {} #{}...".format(
-                            api_object, object_id
-                        )
+                        "I think I found %s #%s...", api_object, object_id
                     )
                 if api_object.lower() == "user":
                     return "{} {}".format(
@@ -357,7 +354,7 @@ class ForemanAPIClient:
             "host"
         ]
         filter_object = {
-            "hostgroup" : "title", "location": "name", "host" : "name", 
+            "hostgroup" : "title", "location": "name", "host" : "name",
             "organization" : "title", "environment" : "name"
         }
         try:
@@ -376,9 +373,8 @@ class ForemanAPIClient:
                 for entry in result_obj["results"]:
                     if entry[filter_object[api_object]].lower() == name.lower():
                         self.LOGGER.debug(
-                            "{} {} seems to have ID #{}".format(
-                                api_object, name, entry["id"]
-                            )
+                            "%s %s seems to have ID #%s",
+                            api_object, name, entry["id"]
                         )
                         return entry["id"]
         except ValueError as err:
@@ -406,9 +402,8 @@ class ForemanAPIClient:
             for entry in result_obj["results"]:
                 if entry["name"].lower() == param_name.lower():
                     self.LOGGER.debug(
-                        "Found relevant parameter '{}' with ID #{}".format(
-                            entry["name"], entry["id"]
-                        )
+                        "Found relevant parameter '%s' with ID #%s",
+                        entry["name"], entry["id"]
                     )
                     return entry["id"]
 

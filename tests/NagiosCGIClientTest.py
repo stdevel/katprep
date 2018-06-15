@@ -10,7 +10,7 @@ import unittest
 import logging
 import json
 from katprep.clients.NagiosCGIClient import NagiosCGIClient
-from katprep.clients import *
+from katprep.clients import SessionException, UnsupportedRequestException
 
 class NagiosCGIClientTest(unittest.TestCase):
     """

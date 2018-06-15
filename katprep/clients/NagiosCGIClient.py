@@ -312,7 +312,7 @@ class NagiosCGIClient(object):
         :type object_name: str
         """
         return self.__manage_downtime(
-            object_name, "host", hours=1, comment="", remove_downtime=True
+            object_name, object_type, hours=1, comment="", remove_downtime=True
         )
 
 

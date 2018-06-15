@@ -10,7 +10,7 @@ import unittest
 import logging
 import json
 from katprep.clients.Icinga2APIClient import Icinga2APIClient
-from katprep.clients import *
+from katprep.clients import SessionException
 
 
 

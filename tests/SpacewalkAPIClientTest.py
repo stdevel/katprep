@@ -10,7 +10,8 @@ import logging
 import json
 import ssl
 from katprep.clients.SpacewalkAPIClient import SpacewalkAPIClient
-from katprep.clients import *
+from katprep.clients import APILevelNotSupportedException, \
+InvalidCredentialsException
 
 class SpacewalkAPIClientTest(unittest.TestCase):
     """
@@ -46,7 +47,7 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         except IOError as err:
             self.LOGGER.error(
                 "Unable to read configuration file: '%s'", err
-        )
+            )
 
 
 
@@ -71,7 +72,7 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         """
         Ensure that short names are resolved to FQDNs
         """
-        host_snip=self.config["config"]["hostname"]
+        host_snip = self.config["config"]["hostname"]
         self.api_spacewalk = SpacewalkAPIClient(
             logging.DEBUG, host_snip[:host_snip.find('.')],
             self.config["config"]["api_user"],
@@ -94,7 +95,7 @@ class SpacewalkAPIClientTest(unittest.TestCase):
             logging.DEBUG,
             self.config["config"]["hostname"],
             self.config["config"]["api_user"],
-            self.config["config"]["api_pass"] 
+            self.config["config"]["api_pass"]
         )
         #Ensure that we have two dots in the hostname
         hostname = self.api_spacewalk.get_hostname()
@@ -125,8 +126,10 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         ssl._create_default_https_context = ssl._create_unverified_context
         with self.assertRaises(APILevelNotSupportedException):
             self.api_spacewalk = SpacewalkAPIClient(
-                logging.DEBUG, self.LEGACY_HOSTNAME,
-                self.API_USER, self.API_PASS
+                logging.DEBUG,
+                self.config["config"]["hostname_legacy"],
+                self.config["config"]["api_user"],
+                self.config["config"]["api_pass"],
             )
 
 

@@ -44,3 +44,22 @@ class UnsupportedRequestException(Exception):
     """
     pass
 
+
+
+class InvalidHostnameFormatException(Exception):
+    """
+    Dummy class for invalid hostname formats (non-FQDN)
+
+.. class:: InvalidHostnameFormatException
+    """
+    pass
+
+
+
+class UnsupportedFilterException(Exception):
+    """
+    Dummy class for unsupported filters
+
+.. class:: UnsupportedFilterException
+    """
+    pass

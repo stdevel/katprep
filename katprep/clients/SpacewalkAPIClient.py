@@ -8,56 +8,8 @@ depending exception classes
 import logging
 import socket
 import xmlrpclib
-
-
-
-class APILevelNotSupportedException(Exception):
-    """
-    Dummy class for unsupported API levels
-
-.. class:: APILevelNotSupportedException
-    """
-    pass
-
-
-
-class SessionException(Exception):
-    """
-    Dummy class for session errors
-
-.. class:: SessionException
-    """
-    pass
-
-
-
-class InvalidHostnameFormatException(Exception):
-    """
-    Dummy class for invalid hostname formats (non-FQDN)
-
-.. class:: InvalidHostnameFormatException
-    """
-    pass
-
-
-
-class InvalidCredentialsException(Exception):
-    """
-    Dummy class for invalid credentials
-
-.. class:: InvalidCredentialsException
-    """
-    pass
-
-
-
-class UnsupportedFilterException(Exception):
-    """
-    Dummy class for unsupported filters
-
-.. class:: UnsupportedFilterException
-    """
-    pass
+from katprep.clients import SessionException, InvalidCredentialsException, \
+APILevelNotSupportedException, InvalidHostnameFormatException
 
 
 
