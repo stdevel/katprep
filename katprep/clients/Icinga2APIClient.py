@@ -334,7 +334,11 @@ class Icinga2APIClient:
                 #append service if ok or all states
                 this_service = {"name": service, "state": state}
                 services.append(this_service)
-        return services
+        if len(services) == 0:
+            #empty set
+            raise SessionException("Not found")
+        else:
+            return services
 
 
 

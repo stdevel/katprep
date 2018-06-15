@@ -377,6 +377,8 @@ class ForemanAPIClient:
                             api_object, name, entry["id"]
                         )
                         return entry["id"]
+                #not found
+                raise SessionException("Object not found")
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)

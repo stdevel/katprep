@@ -102,7 +102,7 @@ class Icinga2APIClientTest(unittest.TestCase):
         """
         with self.assertRaises(SessionException):
             self.api_icinga.schedule_downtime(
-                self.config["valid_objects"]["host"], "host"
+                "giertz.pinkepank.loc", "host"
             )
 
 
