@@ -7,9 +7,10 @@ Unit tests for Spacewalk API integration
 import os
 import unittest
 import logging
+import json
 import ssl
-from SpacewalkAPIClient import SpacewalkAPIClient, \
-InvalidCredentialsException, APILevelNotSupportedException
+from katprep.clients.SpacewalkAPIClient import SpacewalkAPIClient
+from katprep.clients import *
 
 class SpacewalkAPIClientTest(unittest.TestCase):
     """
@@ -19,29 +20,44 @@ class SpacewalkAPIClientTest(unittest.TestCase):
     """
     SpacewalkAPIClient: Spacewalk API client
     """
-    HOSTNAME = os.environ["HOSTNAME"]
+    LOGGER = logging.getLogger('SpacewalkAPIClientTest')
     """
-    str: FQDN of a Spacewalk system
+    logging: Logger instance
     """
-    LEGACY_HOSTNAME = os.environ["LEGACY_HOSTNAME"]
+    config = None
     """
-    str: FQDN of an old Spacewalk system
+    str: JSON object containing valid hosts and services
     """
-    API_USER = os.environ["API_USER"]
-    """
-    str: API username
-    """
-    API_PASS = os.environ["API_PASS"]
-    """
-    str: API self.assertTrue(True)word
-    """
+
+
+
+    def setUp(self):
+        """
+        Connecting the interfaces
+        """
+        #instance logging
+        logging.basicConfig()
+        self.LOGGER.setLevel(logging.DEBUG)
+        #reading configuration
+        try:
+            with open("spw_config.json", "r") as json_file:
+                json_data = json_file.read().replace("\n", "")
+            self.config = json.loads(json_data)
+        except IOError as err:
+            self.LOGGER.error(
+                "Unable to read configuration file: '%s'", err
+        )
+
+
 
     def test_resolve_localhost(self):
         """
         Ensure that 'localhost' is resolved to a FQDN
         """
         self.api_spacewalk = SpacewalkAPIClient(
-            logging.DEBUG, "localhost", self.API_USER, self.API_PASS
+            logging.DEBUG, "localhost",
+            self.config["config"]["api_user"],
+            self.config["config"]["api_pass"]
         )
         #Ensure that we have two dots in the hostname
         hostname = self.api_spacewalk.get_hostname()
@@ -55,9 +71,12 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         """
         Ensure that short names are resolved to FQDNs
         """
+        host_snip=self.config["config"]["hostname"]
         self.api_spacewalk = SpacewalkAPIClient(
-            logging.DEBUG, self.HOSTNAME[:self.HOSTNAME.find('.')],
-            self.API_USER, self.API_PASS
+            logging.DEBUG, host_snip[:host_snip.find('.')],
+            self.config["config"]["api_user"],
+            self.config["config"]["api_pass"]
+
         )
         #Ensure that we have two dots in the hostname
         hostname = self.api_spacewalk.get_hostname()
@@ -72,7 +91,10 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         Ensure that FQDNs are accepted
         """
         self.api_spacewalk = SpacewalkAPIClient(
-            logging.DEBUG, self.HOSTNAME, self.API_USER, self.API_PASS
+            logging.DEBUG,
+            self.config["config"]["hostname"],
+            self.config["config"]["api_user"],
+            self.config["config"]["api_pass"] 
         )
         #Ensure that we have two dots in the hostname
         hostname = self.api_spacewalk.get_hostname()
@@ -88,7 +110,9 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         """
         with self.assertRaises(InvalidCredentialsException):
             self.api_spacewalk = SpacewalkAPIClient(
-                logging.DEBUG, self.HOSTNAME, "giertz", "paulapinkepank"
+                logging.DEBUG,
+                self.config["config"]["hostname"],
+                "giertz", "paulapinkepank"
             )
 
 
@@ -108,4 +132,11 @@ class SpacewalkAPIClientTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    #start tests or die in a fire
+    if not os.path.isfile("spw_config.json"):
+        print "Please create configuration file spw_config.json!"
+        exit(1)
+    else:
+        #do not sort test cases as there are dependencies
+        unittest.sortTestMethodsUsing = None
+        unittest.main()
