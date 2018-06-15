@@ -14,6 +14,9 @@ The following tests are available:
 
 Each test has an appropriate JSON configuration file specifying connection details and objects used for the particular tests. Copy a template file (*`*.json.tmpl`*) and customize it.
 
+## Continuous Integration
+will follow
+
 # ForemanAPIClientTest
 This test checks:
 - hostname verification
