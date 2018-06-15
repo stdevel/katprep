@@ -12,7 +12,8 @@ import logging
 import json
 import getpass
 from . import get_credentials, validate_filters, get_filter
-from .clients.ForemanAPIClient import ForemanAPIClient, SessionException
+from .clients.ForemanAPIClient import ForemanAPIClient
+from .clients import *
 
 
 

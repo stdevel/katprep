@@ -12,26 +12,7 @@ import re
 import requests
 from requests.auth import HTTPBasicAuth
 from lxml import html
-
-
-
-class SessionException(Exception):
-    """
-    Dummy class for session errors
-
-.. class:: SessionException
-    """
-    pass
-
-
-
-class UnsupportedRequest(Exception):
-    """
-    Dummy class for unsupported requests
-
-.. class:: UnsupportedRequest
-    """
-    pass
+from katprep.clients import SessionException, UnsupportedRequestException
 
 
 
@@ -252,7 +233,7 @@ class NagiosCGIClient(object):
         if object_type.lower() == "hostgroup":
             if remove_downtime:
                 #there is now way to unschedule downtime for a whole hostgroup
-                raise UnsupportedRequest(
+                raise UnsupportedRequestException(
                     "Unscheduling downtimes for whole hostgroups is not " \
                     "supported with Nagios/Icinga 1.x!"
                 )
@@ -269,7 +250,7 @@ class NagiosCGIClient(object):
             if remove_downtime:
                 if self.obsolete:
                     #you really like old stuff don't you
-                    raise UnsupportedRequest(
+                    raise UnsupportedRequestException(
                         "Unscheduling downtimes is not supported with Nagios!"
                     )
                 else:
@@ -529,7 +510,7 @@ class NagiosCGIClient(object):
             target_ip = ""
             #NOTE: Nagios does not support IPv6, so we don't utilize the flag
             if ipv6_only:
-                raise UnsupportedRequest(
+                raise UnsupportedRequestException(
                     "IPv6 is not supported by Nagios/Icinga 1.x"
                 )
             ip_regexp = r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]" \

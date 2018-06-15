@@ -17,10 +17,11 @@ import getpass
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients.LibvirtClient import LibvirtClient, SessionException
-from .clients.PyvmomiClient import PyvmomiClient, SessionException
-from .clients.NagiosCGIClient import NagiosCGIClient, SessionException
-from .clients.Icinga2APIClient import Icinga2APIClient, SessionException
+from .clients.LibvirtClient import LibvirtClient
+from .clients.PyvmomiClient import PyvmomiClient
+from .clients.NagiosCGIClient import NagiosCGIClient
+from .clients.Icinga2APIClient import Icinga2APIClient
+from .clients import *
 
 __version__ = "0.0.1"
 """

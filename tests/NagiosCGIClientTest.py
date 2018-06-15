@@ -8,12 +8,17 @@ import os
 import time
 import unittest
 import logging
-from NagiosCGIClient import NagiosCGIClient, SessionException, \
-UnsupportedRequest
+import json
+from katprep.clients.NagiosCGIClient import NagiosCGIClient
+from katprep.clients import *
 
 class NagiosCGIClientTest(unittest.TestCase):
     """
     NagiosCGIClient test cases
+    """
+    LOGGER = logging.getLogger('NagiosCGIClientTest')
+    """
+    logging: Logger instance
     """
     cgi_icinga = None
     """
@@ -23,37 +28,9 @@ class NagiosCGIClientTest(unittest.TestCase):
     """
     NagiosCGIClient: Nagios CGI client (for legacy)
     """
-    HOSTNAME = os.environ["HOSTNAME"]
+    config = None
     """
-    str: FQDN of a Icinga system
-    """
-    LEGACY_HOSTNAME = os.environ["LEGACY_HOSTNAME"]
-    """
-    str: FQDN of a Nagios system
-    """
-    CGI_USER = os.environ["API_USER"]
-    """
-    str: CGI username
-    """
-    CGI_PASS = os.environ["API_PASS"]
-    """
-    str: CGI password
-    """
-    HOST = os.environ["HOST"]
-    """
-    str: host for scheduling/removing downtimes
-    """
-    HOST_SERVICE = os.environ["HOST_SERVICE"]
-    """
-    str: existing service for a particular host
-    """
-    HOST_SERVICES = int(os.environ["HOST_SERVICES"])
-    """
-    int: amount of services monitored
-    """
-    HOSTGROUP = os.environ["HOSTGROUP"]
-    """
-    str: hostgroup for scheduling downtimes
+    str: JSON object containing valid hosts and services
     """
 
 
@@ -62,16 +39,30 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         Connecting the interfaces
         """
+        #instance logging
+        logging.basicConfig()
+        self.LOGGER.setLevel(logging.DEBUG)
+        #reading configuration
+        try:
+            with open("nagios_config.json", "r") as json_file:
+                json_data = json_file.read().replace("\n", "")
+            self.config = json.loads(json_data)
+        except IOError as err:
+            self.LOGGER.error(
+                "Unable to read configuration file: '%s'", err
+            )
         #Legacy
         self.cgi_nagios = NagiosCGIClient(
-            logging.DEBUG, self.LEGACY_HOSTNAME,
-            self.CGI_USER, self.CGI_PASS,
+            logging.ERROR, self.config["config"]["hostname_legacy"],
+            self.config["config"]["cgi_user"],
+            self.config["config"]["cgi_pass"],
             verify=False
         )
         #Icinga
         self.cgi_icinga = NagiosCGIClient(
-            logging.DEBUG, self.HOSTNAME,
-            self.CGI_USER, self.CGI_PASS,
+            logging.ERROR, self.config["config"]["hostname"],
+            self.config["config"]["cgi_user"],
+            self.config["config"]["cgi_pass"],
             verify=False
         )
 
@@ -102,7 +93,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         with self.assertRaises(SessionException):
             cgi_dummy = NagiosCGIClient(
-                logging.DEBUG, self.HOSTNAME,
+                logging.ERROR, self.config["config"]["hostname"],
                 "giertz", "paulapinkepank",
                 verify=False
             )
@@ -115,7 +106,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         with self.assertRaises(SessionException):
             cgi_dummy = NagiosCGIClient(
-                logging.DEBUG, self.HOSTNAME,
+                logging.ERROR, self.config["config"]["hostname_legacy"],
                 "giertz", "paulapinkepank",
                 verify=False
             )
@@ -129,25 +120,31 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure that downtimes can be scheduled
         """
         #schedule downtime
-        self.cgi_icinga.schedule_downtime(self.HOST, "host")
+        self.cgi_icinga.schedule_downtime(
+            self.config["valid_objects"]["host"], "host"
+        )
         #wait as it might take some time to see downtime in CGI
-        time.sleep(10)
+        time.sleep(30)
 
     def test_schedule_downtime_host_leg(self):
         """
         Ensure that downtimes can be scheduled, even on ancient systems
         """
         #schedule downtime
-        self.cgi_nagios.schedule_downtime(self.HOST, "host")
+        self.cgi_nagios.schedule_downtime(
+            self.config["valid_objects"]["host"], "host"
+        )
         #wait as it might take some time to see downtime in CGI
-        time.sleep(10)
+        time.sleep(30)
 
     def test_has_downtime(self):
         """
         Ensure that checking downtime is working
         """
         self.assertTrue(
-            self.cgi_icinga.has_downtime(self.HOST)
+            self.cgi_icinga.has_downtime(
+                self.config["valid_objects"]["host"]
+            )
         )
 
     def test_has_downtimeleg(self):
@@ -155,17 +152,21 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure that checking downtime is working
         """
         self.assertTrue(
-            self.cgi_nagios.has_downtime(self.HOST)
+            self.cgi_nagios.has_downtime(
+                self.config["valid_objects"]["host"]
+            )
         )
 
 
 
-    def test_unschedule_downtime_host(self):
+    def test_unsched_downtime_host(self):
         """
         Ensure that unscheduling downtimes for hosts is working
         """
         self.assertTrue(
-            self.cgi_icinga.remove_downtime(self.HOST)
+            self.cgi_icinga.remove_downtime(
+                self.config["valid_objects"]["host"]
+            )
         )
 
     def test_schedule_downtime_hostgrp(self):
@@ -173,7 +174,9 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure that scheduling downtimes for hostgroups is working
         """
         self.assertTrue(
-            self.cgi_icinga.schedule_downtime(self.HOSTGROUP, "hostgroup")
+            self.cgi_icinga.schedule_downtime(
+                self.config["valid_objects"]["hostgroup"], "hostgroup"
+            )
         )
 
 
@@ -182,7 +185,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         Ensure unsupported calls on Nagios will die in a fire
         """
-        with self.assertRaises(UnsupportedRequest):
+        with self.assertRaises(UnsupportedRequestException):
             #try to remove downtime
             self.cgi_nagios.remove_downtime("dummy")
 
@@ -194,7 +197,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         hosts = self.cgi_icinga.get_hosts()
         self.assertTrue(
-            self.HOST in str(hosts)
+            self.config["valid_objects"]["host"] in str(hosts)
         )
 
     def test_get_hostsleg(self):
@@ -203,7 +206,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         hosts = self.cgi_nagios.get_hosts()
         self.assertTrue(
-            self.HOST in str(hosts)
+            self.config["valid_objects"]["host"] in str(hosts)
         )
 
 
@@ -213,12 +216,12 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure that hosts include existing services
         """
         services = self.cgi_icinga.get_services(
-            self.HOST, only_failed=False
+            self.config["valid_objects"]["host"], only_failed=False
         )
         self.assertTrue(
             bool(
-                self.HOST_SERVICE in str(services) and \
-                len(services) == self.HOST_SERVICES
+                self.config["valid_objects"]["host_service"] in str(services) and \
+                len(services) == self.config["valid_objects"]["host_services"]
             )
         )
 
@@ -227,11 +230,11 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure that hosts include existing services
         """
         services = self.cgi_nagios.get_services(
-            self.HOST, only_failed=False
+            self.config["valid_objects"]["host"], only_failed=False
         )
         self.assertTrue(
-            self.HOST_SERVICE in str(services) and \
-            len(services) == self.HOST_SERVICES
+            self.config["valid_objects"]["host_service"] in str(services) and \
+            len(services) == self.config["valid_objects"]["host_services"]
         )
 
     #def test_get_failed_services(self):
@@ -239,6 +242,11 @@ class NagiosCGIClientTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #do not sort test cases as there are dependencies
-    unittest.sortTestMethodsUsing = None
-    unittest.main()
+    #start tests or die in a fire
+    if not os.path.isfile("nagios_config.json"):
+        print "Please create configuration file nagios_config.json!"
+        exit(1)
+    else:
+        #do not sort test cases as there are dependencies
+        unittest.sortTestMethodsUsing = None
+        unittest.main()

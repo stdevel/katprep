@@ -6,16 +6,7 @@ Class for sending requests to libvirt
 
 import libvirt
 import logging
-
-
-
-class SessionException(Exception):
-    """
-    Dummy class for session errors
-
-.. class:: SessionException
-    """
-    pass
+from katprep.clients import SessionException
 
 
 
