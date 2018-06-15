@@ -53,16 +53,16 @@ class NagiosCGIClientTest(unittest.TestCase):
             )
         #Legacy
         self.cgi_nagios = NagiosCGIClient(
-            logging.ERROR, self.config["config"]["hostname_legacy"],
-            self.config["config"]["cgi_user"],
-            self.config["config"]["cgi_pass"],
+            logging.ERROR, self.config["legacy"]["hostname"],
+            self.config["legacy"]["cgi_user"],
+            self.config["legacy"]["cgi_pass"],
             verify=False
         )
         #Icinga
         self.cgi_icinga = NagiosCGIClient(
-            logging.ERROR, self.config["config"]["hostname"],
-            self.config["config"]["cgi_user"],
-            self.config["config"]["cgi_pass"],
+            logging.ERROR, self.config["main"]["hostname"],
+            self.config["main"]["cgi_user"],
+            self.config["main"]["cgi_pass"],
             verify=False
         )
 
@@ -76,14 +76,14 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure exceptions on valid logins
         """
         #dummy call
-        self.cgi_icinga.get_hosts()
+        self.cgi_icinga.dummy_call()
 
     def test_valid_loginleg(self):
         """
         Ensure exceptions on valid logins
         """
         #dummy call
-        self.cgi_nagios.get_hosts()
+        self.cgi_icinga.dummy_call()
 
 
 
@@ -93,7 +93,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         with self.assertRaises(SessionException):
             cgi_dummy = NagiosCGIClient(
-                logging.ERROR, self.config["config"]["hostname"],
+                logging.ERROR, self.config["main"]["hostname"],
                 "giertz", "paulapinkepank",
                 verify=False
             )
@@ -106,7 +106,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         with self.assertRaises(SessionException):
             cgi_dummy = NagiosCGIClient(
-                logging.ERROR, self.config["config"]["hostname_legacy"],
+                logging.ERROR, self.config["legacy"]["hostname"],
                 "giertz", "paulapinkepank",
                 verify=False
             )
@@ -121,7 +121,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         #schedule downtime
         self.cgi_icinga.schedule_downtime(
-            self.config["valid_objects"]["host"], "host"
+            self.config["main"]["host"], "host"
         )
         #wait as it might take some time to see downtime in CGI
         time.sleep(30)
@@ -132,7 +132,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         #schedule downtime
         self.cgi_nagios.schedule_downtime(
-            self.config["valid_objects"]["host"], "host"
+            self.config["legacy"]["host"], "host"
         )
         #wait as it might take some time to see downtime in CGI
         time.sleep(30)
@@ -143,7 +143,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         self.assertTrue(
             self.cgi_icinga.has_downtime(
-                self.config["valid_objects"]["host"]
+                self.config["main"]["host"]
             )
         )
 
@@ -153,7 +153,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         self.assertTrue(
             self.cgi_nagios.has_downtime(
-                self.config["valid_objects"]["host"]
+                self.config["legacy"]["host"]
             )
         )
 
@@ -165,7 +165,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         self.assertTrue(
             self.cgi_icinga.remove_downtime(
-                self.config["valid_objects"]["host"]
+                self.config["main"]["host"]
             )
         )
 
@@ -175,7 +175,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         self.assertTrue(
             self.cgi_icinga.schedule_downtime(
-                self.config["valid_objects"]["hostgroup"], "hostgroup"
+                self.config["legacy"]["hostgroup"], "hostgroup"
             )
         )
 
@@ -197,7 +197,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         hosts = self.cgi_icinga.get_hosts()
         self.assertTrue(
-            self.config["valid_objects"]["host"] in str(hosts)
+            self.config["main"]["host"] in str(hosts)
         )
 
     def test_get_hostsleg(self):
@@ -206,7 +206,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         hosts = self.cgi_nagios.get_hosts()
         self.assertTrue(
-            self.config["valid_objects"]["host"] in str(hosts)
+            self.config["legacy"]["host"] in str(hosts)
         )
 
 
@@ -216,12 +216,12 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure that hosts include existing services
         """
         services = self.cgi_icinga.get_services(
-            self.config["valid_objects"]["host"], only_failed=False
+            self.config["main"]["host"], only_failed=False
         )
         self.assertTrue(
             bool(
-                self.config["valid_objects"]["host_service"] in str(services) and \
-                len(services) == self.config["valid_objects"]["host_services"]
+                self.config["main"]["host_service"] in str(services) and \
+                len(services) == self.config["main"]["host_services"]
             )
         )
 
@@ -230,11 +230,11 @@ class NagiosCGIClientTest(unittest.TestCase):
         Ensure that hosts include existing services
         """
         services = self.cgi_nagios.get_services(
-            self.config["valid_objects"]["host"], only_failed=False
+            self.config["legacy"]["host"], only_failed=False
         )
         self.assertTrue(
-            self.config["valid_objects"]["host_service"] in str(services) and \
-            len(services) == self.config["valid_objects"]["host_services"]
+            self.config["legacy"]["host_service"] in str(services) and \
+            len(services) == self.config["legacy"]["host_services"]
         )
 
     #def test_get_failed_services(self):

@@ -523,3 +523,19 @@ class NagiosCGIClient(object):
             this_host = {"name": host, "ip": target_ip}
             hosts.append(this_host)
         return hosts
+
+
+
+    def dummy_call(self):
+        """
+        This function is used for checking whether authorization succeeded.
+        It simply retrieves status.cgi
+        """
+        #set-up URL
+        url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
+        #retrieve data
+        result = self.__api_get(url)
+        if result != "":
+            return True
+        else:
+            return False
