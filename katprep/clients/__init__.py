@@ -63,3 +63,13 @@ class UnsupportedFilterException(Exception):
 .. class:: UnsupportedFilterException
     """
     pass
+
+
+
+class EmptySetException(Exception):
+    """
+    Dummy class for empty result sets
+
+.. class:: EmptySetException
+    """
+    pass

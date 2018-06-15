@@ -21,7 +21,9 @@ from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
 from .clients.NagiosCGIClient import NagiosCGIClient
 from .clients.Icinga2APIClient import Icinga2APIClient
-from .clients import *
+from .clients import EmptySetException, SessionException, \
+InvalidCredentialsException, UnsupportedRequestException, \
+UnsupportedFilterException
 
 __version__ = "0.0.1"
 """

@@ -5,18 +5,19 @@ Class for sending requests to pyvmomi as libvirt is still
 just an endless pain when managing VMware products
 """
 
-from pyVim.connect import SmartConnect, Disconnect
-from pyVmomi import vim
 import logging
 import ssl
 from urlparse import urlparse
 import sys
-from katprep_shared import is_ipv4, is_ipv6
-from katprep.clients import SessionException
+from katprep.clients.katprep_shared import is_ipv4, is_ipv6
+from katprep.clients import SessionException, InvalidCredentialsException, \
+EmptySetException
+from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
 
 
 
-class PyvmomiClient:
+class PyvmomiClient(object):
     """
 .. class:: PyvmomiClient
     """
@@ -71,10 +72,15 @@ class PyvmomiClient:
         #skip SSL verification for now
         if hasattr(ssl, '_create_unverified_context'):
             context = ssl._create_unverified_context()
-        self.SESSION = SmartConnect(host=self.HOSTNAME,
-            user=self.USERNAME, pwd=self.PASSWORD,
-            port=self.PORT, sslContext=context
-        )
+        #try to connect
+        try:
+            self.SESSION = SmartConnect(
+                host=self.HOSTNAME,
+                user=self.USERNAME, pwd=self.PASSWORD,
+                port=self.PORT, sslContext=context
+            )
+        except vim.fault.InvalidLogin:
+            raise InvalidCredentialsException("Invalid credentials")
 
 
 
@@ -88,7 +94,7 @@ class PyvmomiClient:
         :type vimtype: pyvmomi type
         :param name: object name
         :type name: str
-        """    
+        """
         obj = None
         container = content.viewManager.CreateContainerView(
             content.rootFolder, vimtype, True
@@ -121,7 +127,7 @@ class PyvmomiClient:
         """
         #make sure to quiesce and not dump memory
         #TODO: maybe we should supply an option for this?
-        dumpMemory = False
+        dump_memory = False
         quiesce = True
         try:
             content = self.SESSION.RetrieveContent()
@@ -151,18 +157,34 @@ class PyvmomiClient:
             #TODO: implement revert
             else:
                 #only create snapshot if not already existing
-                if not self.has_snapshot(vm_name, snapshot_title):
-                    task = vm.CreateSnapshot(
-                        snapshot_title, snapshot_text, dumpMemory, quiesce
-                    )
-                else:
-                    raise ValueError(
-                        "Snapshot '{}' for VM '{}' already exists!".format(
-                            snapshot_title, vm_name
+                try:
+                    if not self.has_snapshot(vm_name, snapshot_title):
+                        task = vm.CreateSnapshot(
+                            snapshot_title, snapshot_text, dump_memory, quiesce
                         )
+                    else:
+                        raise ValueError(
+                            "Snapshot '{}' for VM '{}' already exists!".format(
+                                snapshot_title, vm_name
+                            )
+                        )
+                except EmptySetException as err:
+                    task = vm.CreateSnapshot(
+                        snapshot_title, snapshot_text, dump_memory, quiesce
                     )
+
+        except TypeError as err:
+            raise SessionException(
+                "Unable to manage snapshot: '{}'".format(err)
+            )
         except ValueError as err:
-            self.LOGGER.error("Unable to manage snapshot: '{}'".format(err))
+            raise SessionException(
+                "Unable to manage snapshot: '{}'".format(err)
+            )
+        except AttributeError as err:
+            raise SessionException(
+                "Unable to manage snapshot: '{}'".format(err)
+            )
 
 
 
@@ -231,11 +253,7 @@ class PyvmomiClient:
                     snapshots = c.snapshot.rootSnapshotList
                     return snapshots
         except AttributeError:
-            #no snapshots found, go ahead
-            pass
-        except Exception as err:
-            self.LOGGER.error("Unable to get snapshots: '{}'".format(err))
-            raise SessionException(err)
+            raise EmptySetException("No snapshots found")
 
 
 
@@ -249,7 +267,6 @@ class PyvmomiClient:
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
-        content = self.SESSION.RetrieveContent()
         #get _all_ the snapshots
         snapshots = self.__get_snapshots(vm_name)
         try:
@@ -262,16 +279,16 @@ class PyvmomiClient:
                     for child in childs:
                         if child.name == snapshot_title:
                             return True
-            return False
+            raise EmptySetException("No snapshots found")
         except TypeError:
             #no snapshots
-            return False
+            raise EmptySetException("No snapshots found")
 
 
 
     def get_vm_ips(self, hide_empty=True, ipv6_only=False):
         """
-        Returns a list of VMs and their IPs available through the current 
+        Returns a list of VMs and their IPs available through the current
         connection.
 
         :param hide_empty: hide VMs without network information
@@ -281,7 +298,7 @@ class PyvmomiClient:
         """
         try:
             #get _all_ the VMs
-            content = self.SESSION.RetrieveContent() 
+            content = self.SESSION.RetrieveContent()
             #result = {}
             result = []
             #create view cotaining VM objects
@@ -324,15 +341,15 @@ class PyvmomiClient:
 
                     #Adding result
                     result.append(
-                    {
-                        "object_name": obj.config.name,
-                        "hostname": obj.summary.guest.hostName,
-                        "ip": target_ip
-                    }
+                        {
+                            "object_name": obj.config.name,
+                            "hostname": obj.summary.guest.hostName,
+                            "ip": target_ip
+                        }
                     )
             return result
         except Exception as err:
-            self.LOGGER.error("Unable to get VM IP information: '{}'".format(err))
+            self.LOGGER.error("Unable to get VM IP information: '%s'", err)
             raise SessionException(err)
 
 
@@ -344,7 +361,7 @@ class PyvmomiClient:
         """
         try:
             #get _all_ the VMs
-            content = self.SESSION.RetrieveContent() 
+            content = self.SESSION.RetrieveContent()
             result = {}
             #create view cotaining VM objects
             object_view = content.viewManager.CreateContainerView(
@@ -353,10 +370,10 @@ class PyvmomiClient:
             for obj in object_view.view:
                 result[obj.config.name] = {
                     "hypervisor": obj.runtime.host.name
-               }
+                }
             return result
         except ValueError as err:
-            self.LOGGER.error("Unable to get VM hypervisor information: '{}'".format(err))
+            self.LOGGER.error("Unable to get VM hypervisor information: '%s'", err)
             raise SessionException(err)
 
 
@@ -403,8 +420,14 @@ class PyvmomiClient:
                 return "poweredOn"
             elif vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOff:
                 return "poweredOff"
+        except AttributeError as err:
+            raise SessionException(
+                "Unable to get power state: '{}'".format(err)
+            )
         except ValueError as err:
-            self.LOGGER.error("Unable to get power state: '{}'".format(err))
+            raise SessionException(
+                "Unable to get power state: '{}'".format(err)
+            )
 
 
 
@@ -429,8 +452,14 @@ class PyvmomiClient:
             else:
                 #fire it up
                 task = vm.PowerOn()
+        except AttributeError as err:
+            raise SessionException(
+                "Unable to manage power state: '{}'".format(err)
+            )
         except ValueError as err:
-            self.LOGGER.error("Unable to manage power state: '{}'".format(err))
+            raise SessionException(
+                "Unable to manage power state: '{}'".format(err)
+            )
 
 
 
