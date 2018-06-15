@@ -241,6 +241,8 @@ def execute(options, args):
     try:
         for host in REPORT:
             LOGGER.debug("Patching host '%s'...", host)
+
+            #installing errata
             errata_target = [x["errata_id"] for x in REPORT[host]["errata"]]
             errata_target = [x.encode('utf-8') for x in errata_target]
             if len(errata_target) > 0:
@@ -258,6 +260,20 @@ def execute(options, args):
                     )
             else:
                 LOGGER.info("No errata for host %s available", host)
+
+            #install package upgrades
+            if options.upgrade_packages:
+                if options.generic_dry_run:
+                    LOGGER.info(
+                        "Host '%s' --> install package upgrades", host
+                    )
+                else:
+                    SAT_CLIENT.api_put(
+                        "/hosts/{}/packages/upgrade_all".format(
+                            SAT_CLIENT.get_id_by_name(host, "host")
+                        ),
+                        json.dumps({})
+                    )
 
             #get errata reboot flags
             errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
@@ -544,6 +560,9 @@ def parse_options(args=None):
     cmd_prepare.set_defaults(func=prepare)
     cmd_execute = subparsers.add_parser("execute", help="Installing errata")
     cmd_execute.set_defaults(func=execute)
+    cmd_execute.add_argument("-p", "--include-packages", action="store_true", \
+    default=False, dest="upgrade_packages", help="installs available package" \
+    " upgrades (default: no)")
     cmd_revert = subparsers.add_parser("revert", help="Reverting changes")
     cmd_revert.set_defaults(func=revert)
     cmd_verify = subparsers.add_parser("verify", help="Verifying status")
