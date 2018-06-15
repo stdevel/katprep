@@ -200,7 +200,7 @@ def scan_systems(options):
                 try:
                     SYSTEM_ERRATA[system["name"]]["params"][param] = params_obj[param]
                 except KeyError as err:
-                    LOGGER.error("Missing key: %s", err)
+                    LOGGER.debug("Missing key: %s", err)
                     pass
 
             #get owner
