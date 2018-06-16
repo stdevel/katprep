@@ -14,6 +14,7 @@ import stat
 import json
 import argparse
 from .AuthContainer import AuthContainer, ContainerException
+from .clients import SessionException
 
 LOGGER = logging.getLogger('katprep_shared')
 """
@@ -179,18 +180,21 @@ def validate_filters(options, api_client):
     :param api_client: ForemanAPIClient object
     :type api_client: ForemanAPIClient
     """
-    if options.location.isdigit() == False:
-        options.location = api_client.get_id_by_name(
-            options.location, "location")
-    if options.organization.isdigit() == False:
-        options.organization = api_client.get_id_by_name(
-            options.organization, "organization")
-    if options.hostgroup.isdigit() == False:
-        options.hostgroup = api_client.get_id_by_name(
-            options.hostgroup, "hostgroup")
-    if options.environment.isdigit() == False:
-        options.environment = api_client.get_id_by_name(
-            options.environment, "environment")
+    try:
+        if options.location.isdigit() == False:
+            options.location = api_client.get_id_by_name(
+                options.location, "location")
+        if options.organization.isdigit() == False:
+            options.organization = api_client.get_id_by_name(
+                options.organization, "organization")
+        if options.hostgroup.isdigit() == False:
+            options.hostgroup = api_client.get_id_by_name(
+                options.hostgroup, "hostgroup")
+        if options.environment.isdigit() == False:
+            options.environment = api_client.get_id_by_name(
+                options.environment, "environment")
+    except SessionException:
+        pass
 
 
 
