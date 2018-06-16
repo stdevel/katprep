@@ -11,7 +11,7 @@ from urlparse import urlparse
 import sys
 from katprep.clients.katprep_shared import is_ipv4, is_ipv6
 from katprep.clients import SessionException, InvalidCredentialsException, \
-EmptySetException
+EmptySetException, SnapshotExistsException
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
@@ -163,7 +163,7 @@ class PyvmomiClient(object):
                             snapshot_title, snapshot_text, dump_memory, quiesce
                         )
                     else:
-                        raise ValueError(
+                        raise SnapshotExistsException(
                             "Snapshot '{}' for VM '{}' already exists!".format(
                                 snapshot_title, vm_name
                             )

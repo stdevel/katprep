@@ -21,9 +21,9 @@ from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
 from .clients.NagiosCGIClient import NagiosCGIClient
 from .clients.Icinga2APIClient import Icinga2APIClient
-from .clients import EmptySetException, SessionException, \
-InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException
+from .clients import validate_hostname, EmptySetException, \
+SessionException, InvalidCredentialsException, UnsupportedRequestException, \
+UnsupportedFilterException, SnapshotExistsException
 
 __version__ = "0.0.1"
 """
@@ -121,10 +121,13 @@ def manage_host_preparation(options, host, cleanup=False):
                     host, REPORT_PREFIX, vm_name
                 )
             else:
-                LOGGER.info(
-                    "Host '%s' --> create snapshot (katprep_%s@%s)", \
-                    host, REPORT_PREFIX, vm_name
-                )
+                try:
+                    LOGGER.info(
+                        "Host '%s' --> create snapshot (katprep_%s@%s)", \
+                        host, REPORT_PREFIX, vm_name
+                    )
+                except SnapshotExistsException as err:
+                    pass
         else:
             if cleanup:
                 #remove snapshot
@@ -133,10 +136,13 @@ def manage_host_preparation(options, host, cleanup=False):
                 )
             else:
                 #create snapshot
-                VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].create_snapshot(
-                    vm_name, "katprep_{}".format(REPORT_PREFIX),
-                    "Snapshot created automatically by katprep"
-                )
+                try:
+                    VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].create_snapshot(
+                        vm_name, "katprep_{}".format(REPORT_PREFIX),
+                        "Snapshot created automatically by katprep"
+                    )
+                except SnapshotExistsException as err:
+                    pass
 
     #get errata reboot flags
     errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
@@ -578,6 +584,8 @@ def parse_options(args=None):
     if options.config != "":
         options = load_configuration(options.config, options)
         options = parser.parse_args()
+    #validate hostname
+    options.foreman_server = validate_hostname(options.foreman_server)
     #set password
     while options.auth_password == "empty" or len(options.auth_password) > 32:
         options.auth_password = getpass.getpass(
