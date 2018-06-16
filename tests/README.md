@@ -89,11 +89,19 @@ For this test, you will need:
 
 # PyvmomiClient
 This test checks:
-- will follow
+- valid/invalid logins
+- checking/creating/reverting/removing snapshots
+- retrieving VM IP information
+- retrieving VM/cluster node mappings
+- restarting VMs
+- retrieving VM power state information
+- power on/off VMs
 
 ## Preparation
 For this test, you will need:
-- will follow
+- a VMware ESXi or vCenter Server system
+- an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
+- a VM that can be restarted, snapshotted, etc. (**Caution: this VM is very likely to break because of numerous restarts**)
 
 # LibvirtClient
 This test checks:
