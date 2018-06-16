@@ -66,9 +66,6 @@ class NagiosCGIClientTest(unittest.TestCase):
             verify=False
         )
 
-    #TODO
-    #def hostname!!
-
 
 
     def test_valid_login(self):

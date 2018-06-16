@@ -79,7 +79,7 @@ class SpacewalkAPIClient(object):
         )
 
         #set connection information
-        self.hostname = self.validate_hostname(hostname)
+        self.hostname = hostname
         self.LOGGER.debug("Set hostname to '%s'", self.hostname)
         self.username = username
         self.password = password
@@ -140,34 +140,6 @@ class SpacewalkAPIClient(object):
         except ValueError as err:
             self.LOGGER.error(err)
             raise APILevelNotSupportedException("Unable to verify API version")
-
-
-
-    @staticmethod
-    def validate_hostname(hostname):
-        """
-        Validates that the Spacewalk API uses a FQDN as hostname.
-        Also looks up the "real" hostname if "localhost" is specified.
-        Otherwise, SSL won't work.
-
-        :param hostname: the hostname to validate
-        :type hostname: str
-        """
-        try:
-            if hostname == "localhost":
-                #get real hostname
-                hostname = socket.gethostname()
-            if hostname.count('.') != 2:
-                #convert to FQDN if possible:
-                hostname = socket.getaddrinfo(
-                    socket.getfqdn(hostname), 0, 0, 0, 0,
-                    socket.AI_CANONNAME
-                )[0][3]
-        except socket.gaierror:
-            raise InvalidHostnameFormatException(
-                "Unable to find FQDN for host '{}'".format(hostname)
-            )
-        return hostname
 
 
 

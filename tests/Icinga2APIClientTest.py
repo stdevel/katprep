@@ -56,9 +56,6 @@ class Icinga2APIClientTest(unittest.TestCase):
             self.config["config"]["api_pass"]
         )
 
-    #TODO
-    #def hostname!!
-
 
 
     def test_valid_login(self):
