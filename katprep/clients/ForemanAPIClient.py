@@ -6,7 +6,6 @@ This file contains the ForemanAPIClient class
 
 import logging
 import requests
-import socket
 import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from katprep.clients import SessionException, InvalidCredentialsException, \
@@ -74,7 +73,7 @@ class ForemanAPIClient:
         #disable SSL warning outputs
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         #set connection information
-        self.HOSTNAME = self.__validate_hostname(hostname)
+        self.HOSTNAME = hostname
         self.USERNAME = username
         self.PASSWORD = password
         self.VERIFY = verify
@@ -262,34 +261,6 @@ class ForemanAPIClient:
         except ValueError as err:
             self.LOGGER.error(err)
             raise APILevelNotSupportedException("Unable to verify API version")
-
-
-
-    @staticmethod
-    def __validate_hostname(hostname):
-        """
-        Validates that the Foreman API uses a FQDN as hostname.
-        Also looks up the "real" hostname if "localhost" is specified.
-        Otherwise, the picky Foreman API won't connect.
-
-        :param hostname: the hostname to validate
-        :type hostname: str
-        """
-        try:
-            if hostname == "localhost":
-                #get real hostname
-                hostname = socket.gethostname()
-            if hostname.count('.') != 2:
-                #get convert to FQDN if possible
-                hostname = socket.getaddrinfo(
-                    socket.getfqdn(hostname), 0, 0, 0, 0,
-                    socket.AI_CANONNAME
-                )[0][3]
-        except socket.gaierror:
-            raise InvalidHostnameFormatException(
-                "Unable to find FQDN for host '{}'".format(hostname)
-            )
-        return hostname
 
 
 

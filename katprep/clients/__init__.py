@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-A shared library for various exceptions of katprep client libraries
+A shared library for various exceptions and functions
+of katprep client libraries
 """
+
+import socket
 
 
 
@@ -73,3 +76,39 @@ class EmptySetException(Exception):
 .. class:: EmptySetException
     """
     pass
+
+
+
+class SnapshotExistsException(Exception):
+    """
+    Dummy class for existing snapshots
+
+.. class:: SnapshotExistsException
+    """
+    pass
+
+
+
+def validate_hostname(hostname):
+    """
+    Validates using a FQDN rather than a short name as some
+    APIs are very picky and SSL verification might fail.
+
+    :param hostname: the hostname to validate
+    :type hostname: str
+    """
+    try:
+        if hostname == "localhost":
+            #get real hostname
+            hostname = socket.gethostname()
+        if hostname.count('.') != 2:
+            #get convert to FQDN if possible
+            hostname = socket.getaddrinfo(
+                socket.getfqdn(hostname), 0, 0, 0, 0,
+                socket.AI_CANONNAME
+            )[0][3]
+    except socket.gaierror:
+        raise InvalidHostnameFormatException(
+            "Unable to find FQDN for host '{}'".format(hostname)
+        )
+    return hostname
