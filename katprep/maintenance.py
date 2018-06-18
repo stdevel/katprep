@@ -23,7 +23,7 @@ from .clients.NagiosCGIClient import NagiosCGIClient
 from .clients.Icinga2APIClient import Icinga2APIClient
 from .clients import validate_hostname, EmptySetException, \
 SessionException, InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException, SnapshotExistsException
+UnsupportedFilterException, SnapshotExistsException, EmptySetException
 
 __version__ = "0.0.1"
 """
@@ -340,13 +340,18 @@ def verify(options, args):
                 else:
                     #FQDN
                     vm_name = host
-                if VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].has_snapshot(
-                        vm_name, "katprep_{}".format(REPORT_PREFIX)
-                    ):
-                    #set flag
-                    set_verification_value(options, host, "virt_snapshot", True)
-                    LOGGER.info("Snapshot for host '%s' found.", host)
-                else:
+                try:
+                    if VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].has_snapshot(
+                            vm_name, "katprep_{}".format(REPORT_PREFIX)
+                        ):
+                        #set flag
+                        set_verification_value(options, host, "virt_snapshot", True)
+                        LOGGER.info("Snapshot for host '%s' found.", host)
+                    else:
+                        #set flag
+                        set_verification_value(options, host, "virt_cleanup", True)
+                        LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
+                except EmptySetException:
                     #set flag
                     set_verification_value(options, host, "virt_cleanup", True)
                     LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
