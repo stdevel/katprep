@@ -221,6 +221,11 @@ def scan_systems(options):
                     SAT_CLIENT.api_get("/hosts/{}/errata".format(system["id"]))
                 )
                 SYSTEM_ERRATA[system["name"]]["errata"] = result_obj["results"]
+                #remove _all_ the reboot suggested flags as Pandoc is too dump
+                #to check the value
+                for errata in SYSTEM_ERRATA[system["name"]]["errata"]:
+                    if not errata["reboot_suggested"]:
+                        del errata["reboot_suggested"]
         except KeyError as err:
             LOGGER.error(
                 "Unable to get system information for '%s', " \
