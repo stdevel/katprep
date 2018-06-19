@@ -565,6 +565,10 @@ def parse_options(args=None):
     fman_opts.add_argument("-E", "--exclude", action="append", default=[], \
     type=str, dest="filter_exclude", metavar="NAME", \
     help="excludes particular hosts (default: no)")
+    #-I / --include-only
+    fman_opts.add_argument("-I", "--include-only", action="append", default=[], \
+    type=str, dest="filter_include", metavar="NAME", \
+    help="only includes particular hosts (default: no)")
 
     #COMMANDS
     subparsers = parser.add_subparsers(title='commands', \
@@ -629,6 +633,11 @@ def set_filter(options, report):
         elif is_blacklisted(host, options.filter_exclude):
             LOGGER.debug("Removing '%s'", host)
             remove.append(host)
+        elif len(options.filter_include) > 0 and \
+            not host in options.filter_include:
+            LOGGER.debug("Removing '%s'", host)
+            remove.append(host)
+
     #remove entries
     for entry in remove:
         del report[entry]
