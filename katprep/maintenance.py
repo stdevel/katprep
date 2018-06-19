@@ -645,7 +645,7 @@ def set_filter(options, report):
             LOGGER.debug("Removing '%s'", host)
             remove.append(host)
         elif len(options.filter_include) > 0 and \
-            not host in options.filter_include:
+            not is_blacklisted(host, options.filter_include):
             LOGGER.debug("Removing '%s'", host)
             remove.append(host)
 
