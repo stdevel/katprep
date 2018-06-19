@@ -343,7 +343,6 @@ class NagiosCGIClient(object):
         #check whether downtime image was found
         downtime_imgs = ["downtime.gif"]
         for item in data:
-            self.LOGGER.debug(item)
             if os.path.basename(item) in downtime_imgs:
                 return True
         return False
@@ -494,17 +493,11 @@ class NagiosCGIClient(object):
         #retrieve data
         result = self.__api_get(url)
         tree = html.fromstring(result)
+        #make sure to get the nested-nested table of the first table
         data = tree.xpath(
-            "//td[@class='statusHOSTPENDING']//a/text() | "
-            "//td[@class='statusHOSTDOWNTIME']//a/text() | "
-            "//td[@class='statusHOSTUP']//a/text() | "
-            "//td[@class='statusHOSTDOWN']//a/text() | "
-            "//td[@class='statusHOSTDOWNACK']//a/text() | "
-            "//td[@class='statusHOSTDOWNSCHED']//a/text() | "
-            "//td[@class='statusHOSTUNREACHABLE']//a/text() | "
-            "//td[@class='statusHOSTUNREACHABLEACK']//a/text() | "
-            "//td[@class='statusEven']//td[@class='statusEven']/a/text()"
+            "//table[@class='status']//tr//td[1]//table//td//table//td/a/text()"
         )
+        #I want to punish the 'designer' of this 'HTML code'
 
         hosts = []
         for host in data:
