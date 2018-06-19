@@ -23,7 +23,7 @@ from .clients.NagiosCGIClient import NagiosCGIClient
 from .clients.Icinga2APIClient import Icinga2APIClient
 from .clients import validate_hostname, EmptySetException, \
 SessionException, InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException, SnapshotExistsException, EmptySetException
+UnsupportedFilterException, SnapshotExistsException
 
 __version__ = "0.0.1"
 """
@@ -126,23 +126,28 @@ def manage_host_preparation(options, host, cleanup=False):
                         "Host '%s' --> create snapshot (katprep_%s@%s)", \
                         host, REPORT_PREFIX, vm_name
                     )
-                except SnapshotExistsException as err:
+                except SnapshotExistsException:
                     pass
         else:
-            if cleanup:
-                #remove snapshot
-                VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].remove_snapshot(
-                    vm_name, "katprep_{}".format(REPORT_PREFIX)
-                )
-            else:
-                #create snapshot
-                try:
+            try:
+                if cleanup:
+                    #remove snapshot
+                    VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].remove_snapshot(
+                        vm_name, "katprep_{}".format(REPORT_PREFIX)
+                    )
+                else:
+                    #create snapshot
                     VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].create_snapshot(
                         vm_name, "katprep_{}".format(REPORT_PREFIX),
                         "Snapshot created automatically by katprep"
                     )
-                except SnapshotExistsException as err:
-                    pass
+            except InvalidCredentialsException as err:
+                LOGGER.error("Invalid crendentials supplied")
+            except SnapshotExistsException as err:
+                LOGGER.info("Snapshot for host '%s' already exists: %s", host, err)
+                pass
+            except SessionException as err:
+                LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
 
     #get errata reboot flags
     errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
@@ -171,14 +176,20 @@ def manage_host_preparation(options, host, cleanup=False):
             else:
                 LOGGER.info("Host '%s' --> schedule downtime", host)
         else:
-            if cleanup:
-                #remove downtime
-                MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].remove_downtime(mon_name, "host")
-            else:
-                #schedule downtime
-                MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].schedule_downtime(
-                    mon_name, "host", hours=options.mon_downtime
-                )
+            try:
+                if cleanup:
+                    #remove downtime
+                    MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].remove_downtime(mon_name, "host")
+                else:
+                    #schedule downtime
+                    MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].schedule_downtime(
+                        mon_name, "host", hours=options.mon_downtime
+                    )
+            except InvalidCredentialsException as err:
+                LOGGER.error("Unable to maintain downtime: '%s'", err)
+            except UnsupportedRequestException as err:
+                LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host, err)
+                pass
 
 
 
