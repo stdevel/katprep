@@ -10,6 +10,7 @@ import logging
 from datetime import datetime, timedelta
 import re
 import requests
+import os
 from requests.auth import HTTPBasicAuth
 from lxml import html
 from katprep.clients import SessionException, UnsupportedRequestException
@@ -120,7 +121,7 @@ class NagiosCGIClient(object):
         """
         #send request to API
         self.LOGGER.debug(
-            "%s request to URL '%s', payload='%s'", method, sub_url, payload
+            "%s request to URL '%s', payload='%s'", method.upper(), sub_url, payload
         )
         try:
             if method.lower() not in ["get", "post"]:
@@ -143,7 +144,11 @@ class NagiosCGIClient(object):
             #this really breaks shit
             #self.LOGGER.debug("HTML output: %s", result.text)
             if "error" in result.text.lower():
-                raise SessionException("Unable to authenticate")
+                tree = html.fromstring(result.text)
+                data = tree.xpath(
+                    "//div[@class='errorMessage']/text()"
+                )
+                raise SessionException("CGI error: {}".format(data[0]))
             if result.status_code in [401, 403]:
                 raise SessionException("Unauthorized")
             elif result.status_code != 200:
@@ -325,14 +330,22 @@ class NagiosCGIClient(object):
         :param object_name: Hostname or hostgroup name
         :type object_name: str
         """
-        #send GET
+        #retrieve host information
         result = self.__api_get(
-            "/cgi-bin/status.cgi?host=all&hostprops=1&style=hostdetail")
-        #if object_name.lower() in str(result).lower():
-        #    return True
-        #else:
-        #    return False
-        return bool(object_name.lower() in str(result).lower())
+            "/cgi-bin/status.cgi?host={}".format(object_name)
+        )
+        #get _all_ the ugly images
+        tree = html.fromstring(result)
+        data = tree.xpath(
+            "//td/a/img/@src"
+        )
+
+        #check whether downtime image was found
+        downtime_imgs = ["downtime.gif"]
+        for item in data:
+            if os.path.basename(item) in downtime_imgs:
+                return True
+        return False
 
 
 
@@ -480,17 +493,11 @@ class NagiosCGIClient(object):
         #retrieve data
         result = self.__api_get(url)
         tree = html.fromstring(result)
+        #make sure to get the nested-nested table of the first table
         data = tree.xpath(
-            "//td[@class='statusHOSTPENDING']//a/text() | "
-            "//td[@class='statusHOSTDOWNTIME']//a/text() | "
-            "//td[@class='statusHOSTUP']//a/text() | "
-            "//td[@class='statusHOSTDOWN']//a/text() | "
-            "//td[@class='statusHOSTDOWNACK']//a/text() | "
-            "//td[@class='statusHOSTDOWNSCHED']//a/text() | "
-            "//td[@class='statusHOSTUNREACHABLE']//a/text() | "
-            "//td[@class='statusHOSTUNREACHABLEACK']//a/text() | "
-            "//td[@class='statusEven']//td[@class='statusEven']/a/text()"
+            "//table[@class='status']//tr//td[1]//table//td//table//td/a/text()"
         )
+        #I want to punish the 'designer' of this 'HTML code'
 
         hosts = []
         for host in data:
