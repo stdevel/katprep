@@ -51,60 +51,6 @@ class SpacewalkAPIClientTest(unittest.TestCase):
 
 
 
-    def test_resolve_localhost(self):
-        """
-        Ensure that 'localhost' is resolved to a FQDN
-        """
-        self.api_spacewalk = SpacewalkAPIClient(
-            logging.DEBUG, "localhost",
-            self.config["config"]["api_user"],
-            self.config["config"]["api_pass"]
-        )
-        #Ensure that we have two dots in the hostname
-        hostname = self.api_spacewalk.get_hostname()
-        self.assertTrue(
-            hostname.count('.') == 2 and hostname != "localhost"
-        )
-
-
-
-    def test_resolve_shortname(self):
-        """
-        Ensure that short names are resolved to FQDNs
-        """
-        host_snip = self.config["config"]["hostname"]
-        self.api_spacewalk = SpacewalkAPIClient(
-            logging.DEBUG, host_snip[:host_snip.find('.')],
-            self.config["config"]["api_user"],
-            self.config["config"]["api_pass"]
-
-        )
-        #Ensure that we have two dots in the hostname
-        hostname = self.api_spacewalk.get_hostname()
-        self.assertTrue(
-            hostname.count('.') == 2
-        )
-
-
-
-    def test_accept_fqdn(self):
-        """
-        Ensure that FQDNs are accepted
-        """
-        self.api_spacewalk = SpacewalkAPIClient(
-            logging.DEBUG,
-            self.config["config"]["hostname"],
-            self.config["config"]["api_user"],
-            self.config["config"]["api_pass"]
-        )
-        #Ensure that we have two dots in the hostname
-        hostname = self.api_spacewalk.get_hostname()
-        self.assertTrue(
-            hostname.count('.') == 2
-        )
-
-
-
     def test_invalid_login(self):
         """
         Ensure exceptions on invalid logins
