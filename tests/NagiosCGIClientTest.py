@@ -64,7 +64,7 @@ class NagiosCGIClientTest(unittest.TestCase):
         #dummy call
         self.cgi_nagios.dummy_call()
 
-    def test_invalid_loginleg(self):
+    def test_invalid_login(self):
         """
         Ensure exceptions on invalid logins
         """
@@ -123,7 +123,7 @@ class NagiosCGIClientTest(unittest.TestCase):
 
 
 
-    def test_get_servicesleg(self):
+    def test_get_services(self):
         """
         Ensure that hosts include existing services
         """
