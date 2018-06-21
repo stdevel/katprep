@@ -5,8 +5,8 @@ This file contains the ForemanAPIClient class
 """
 
 import logging
-import requests
 import json
+import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from katprep.clients import SessionException, InvalidCredentialsException, \
 APILevelNotSupportedException, InvalidHostnameFormatException
@@ -136,6 +136,10 @@ class ForemanAPIClient:
                 #going home
                 raise SessionException("Illegal method '{}' specified".format(method))
 
+            self.LOGGER.debug(
+                "%s request to %s%s (payload: %s)", method.upper(), self.URL,
+                sub_url, str(payload)
+            )
             #setting headers
             my_headers = self.HEADERS
             if method.lower() != "get":
@@ -401,3 +405,38 @@ class ForemanAPIClient:
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
+
+
+
+    def get_task_by_filter(self, host, task_name, task_date):
+        """
+        Returns host management tasks by filter
+
+        :param host: Foreman host name
+        :type host: str
+        :param task_name: Filter argument
+        :type task_name: str
+        :param task_date: Task date wildcard
+        :type task_date: str
+        """
+        try:
+            #get _all_ the results
+            results = json.loads(
+                self.api_get(
+                    '/../../foreman_tasks/api/tasks?search="{}"' \
+                    '&order="started_at DESC"'.format(task_name)
+                )
+            )
+            my_results = []
+            #print results
+            for result in results["results"]:
+                #validate date and host
+                host_info = result["input"]["host"]
+                if host_info["name"] == host and \
+                    task_date in result["started_at"]:
+                    my_results.append(result)
+            return my_results
+        except KeyError:
+            pass
+        except ValueError as err:
+            self.LOGGER.error(err)
