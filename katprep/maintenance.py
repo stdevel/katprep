@@ -151,7 +151,11 @@ def manage_host_preparation(options, host, cleanup=False):
                 LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
 
     #get errata reboot flags
-    errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+    try:
+        errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+    except KeyError:
+        #no reboot suggested
+        pass
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
@@ -296,7 +300,12 @@ def execute(options, args):
                     )
 
             #get errata reboot flags
-            errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+            try:
+                errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+            except KeyError:
+                #no reboot suggested
+                pass
+
             if options.foreman_reboot or \
                 (True in errata_reboot and not options.foreman_no_reboot):
                 if options.generic_dry_run:
@@ -427,8 +436,8 @@ def status(options, args):
 
             #check maintenance progress
             tasks = {
-                "erratum": "Actions::Katello::Host::Erratum::Install",
-                "package": "Actions::Katello::Host::Update"
+                "Erratum": "Actions::Katello::Host::Erratum::Install",
+                "Package": "Actions::Katello::Host::Update"
             }
             today = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -447,21 +456,21 @@ def status(options, args):
                             )
                             if result["result"].lower() == "success":
                                 LOGGER.info(
-                                    "'%s' task for host '%s' succeeded",
+                                    "%s task for host '%s' succeeded",
                                     task, host
                                 )
                             elif result["result"].lower() == "error":
                                 LOGGER.error(
-                                    "'%s' task for host '%s' FAILED!",
+                                    "%s task for host '%s' FAILED!",
                                     task, host
                                 )
                             else:
                                 LOGGER.info(
-                                    "'%s' task for host '%s' has state '%s'",
+                                    "%s task for host '%s' has state '%s'",
                                     task, host, result["result"]
                                 )
                     else:
-                        LOGGER.error("No '%s' task for '%s' found!", task, host)
+                        LOGGER.error("No %s task for '%s' found!", task.lower(), host)
             except TypeError:
                 pass
 
