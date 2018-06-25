@@ -420,6 +420,7 @@ class ForemanAPIClient:
         :type task_date: str
         """
         try:
+            my_results = []
             #get _all_ the results
             results = json.loads(
                 self.api_get(
@@ -427,7 +428,6 @@ class ForemanAPIClient:
                     '&order="started_at DESC"'.format(task_name)
                 )
             )
-            my_results = []
             #print results
             for result in results["results"]:
                 #validate date and host
@@ -435,8 +435,9 @@ class ForemanAPIClient:
                 if host_info["name"] == host and \
                     task_date in result["started_at"]:
                     my_results.append(result)
-            return my_results
         except KeyError:
             pass
         except ValueError as err:
             self.LOGGER.error(err)
+        finally:
+            return my_results
