@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Changelog &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
+    <link rel="next" title="Requirements" href="installation.html" />
+    <link rel="prev" title="Welcome to katprep’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Requirements"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to katprep’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<p>This page shows changes of the latest releases.</p>
+<div class="section" id="version-0-5-0">
+<h2>Version 0.5.0<a class="headerlink" href="#version-0-5-0" title="Permalink to this headline">¶</a></h2>
+<p>Release date: <strong>yyyy/mm/dd</strong></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Red Hat Satellite 6.x users need to update to version 6.3 in order to enable VM reboots after system maintenance. Also, you will need to ensure that your virtualization infrastructure is registered within Foreman to link VMs to hosts.</p>
+</div>
+<p>Changes since previous development releases:</p>
+<div class="section" id="katprep-maintenance">
+<h3>katprep_maintenance<a class="headerlink" href="#katprep-maintenance" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>added posibility to suppress reboots under any circumstances (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
+<li>changed default reboot behavior to only reboot if erratum suggests it (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
+<li>fixed a bug where errata were tried to install if no errata were applicable (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
+<li>fixed a bug where enabled reboots were executed before gracefully completing errata installation (<a class="reference external" href="https://github.com/stdevel/katprep/issues/40">issue40</a>)</li>
+<li>implemented <tt class="docutils literal"><span class="pre">-p</span></tt> / <tt class="docutils literal"><span class="pre">--include-packages</span></tt> parameters to also include non-erratum package upgrades during maintenance (<a class="reference external" href="https://github.com/stdevel/katprep/issues/33">issue33</a>)</li>
+<li>implemented <tt class="docutils literal"><span class="pre">-E</span></tt> / <tt class="docutils literal"><span class="pre">--exclude</span></tt> parameters to exclude particular hosts by hostname wildcards (<a class="reference external" href="https://github.com/stdevel/katprep/issues/38">issue38</a>)</li>
+<li>fixed bug where non-existent snapshots forced crashes</li>
+<li>implemented <tt class="docutils literal"><span class="pre">-I</span></tt> / <tt class="docutils literal"><span class="pre">--include-only</span></tt> parameters to only include particular hosts by hostname wildcards (<a class="reference external" href="https://github.com/stdevel/katprep/issues/63">issue63</a>)</li>
+</ul>
+</div>
+<div class="section" id="katprep-snapshot">
+<h3>katprep_snapshot<a class="headerlink" href="#katprep-snapshot" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>fixed a bug where detecting physical hosts was not working properly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/44">issue44</a>)</li>
+<li>fixed a bug where unregistered content hosts forced crashes (<a class="reference external" href="https://github.com/stdevel/katprep/issues/52">issue52</a>)</li>
+<li>changed missing key log facility to debug</li>
+<li>fixed a bug where hostnames were not verified</li>
+<li>fixed a bug where <tt class="docutils literal"><span class="pre">reboot_required</span></tt> flags were not set correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</li>
+<li>fixed a bug where physical host/VMs flags were not set correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</li>
+</ul>
+</div>
+<div class="section" id="katprep-populate">
+<h3>katprep_populate<a class="headerlink" href="#katprep-populate" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>implemented a IPv6 filter (<a class="reference external" href="https://github.com/stdevel/katprep/issues/35">issue35</a>)</li>
+</ul>
+</div>
+<div class="section" id="api-integrations">
+<h3>API integrations<a class="headerlink" href="#api-integrations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>All: implemented unit tests for API clients (<a class="reference external" href="https://github.com/stdevel/katprep/issues/13">issue13</a>)</li>
+<li>NagiosCGIClient, Icinga2APIClient, PyvmomiClient: implemented IPv4/6 filters</li>
+<li>NagiosCGIClient: fixed a bug where scheduling downtime for hosts was not possible (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</li>
+<li>NagiosCGIClient: implemented Nagios legacy detection throwing execptions for non-supported actions (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</li>
+<li>NagiosCGIClient: fixed several bugs where web-scraping was not working properly forcing incorrect results (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</li>
+<li>NagiosCGIClient: fixed a bug where scheduling downtimes was not possible</li>
+<li>NagiosCGIClient: made <tt class="docutils literal"><span class="pre">has_downtime()</span></tt> more efficient and overhauled webscraping (<a class="reference external" href="https://github.com/stdevel/katprep/issues/64">issue64</a>)</li>
+<li>SpacewalkAPIClient: first integration stubs</li>
+<li>ForemanAPIClient, SpacewalkAPIClient: Moved hostname verification to shared library</li>
+</ul>
+</div>
+<div class="section" id="shared-library">
+<h3>Shared library<a class="headerlink" href="#shared-library" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>added parameters <tt class="docutils literal"><span class="pre">-P</span></tt> / <tt class="docutils literal"><span class="pre">--auth-password</span></tt> for pre-defining authentication container password (<a class="reference external" href="https://github.com/stdevel/katprep/issues/36">issue36</a>)</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#version-0-5-0">Version 0.5.0</a><ul>
+<li><a class="reference internal" href="#katprep-maintenance">katprep_maintenance</a></li>
+<li><a class="reference internal" href="#katprep-snapshot">katprep_snapshot</a></li>
+<li><a class="reference internal" href="#katprep-populate">katprep_populate</a></li>
+<li><a class="reference internal" href="#api-integrations">API integrations</a></li>
+<li><a class="reference internal" href="#shared-library">Shared library</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to katprep&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Requirements</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/changelog.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Requirements"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to katprep’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

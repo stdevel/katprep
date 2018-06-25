@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
+   Changelog <changelog>
    Basic installation <installation>
    Authentication <authentication>
    Represent your landscape <landscape>
