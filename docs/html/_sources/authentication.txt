@@ -89,7 +89,6 @@ Use the ``password`` sub-command to change the current master password. In the f
 
 It is also possible to utilize the ``-p`` / ``--password`` parameter to specify a container password.
 Use an editor of your choice to have a look at the authentication file - the passwords have been encrypted::
-
     {"myhost": {"username": "giertz", "password": "s/gAAAAABZ..."}}
 
 To remove a master password, simply specify a new empty password::

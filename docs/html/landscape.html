@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Represent your system landscape &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
+    <link rel="next" title="Tested setups" href="tested_setups.html" />
+    <link rel="prev" title="Authentication" href="authentication.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tested_setups.html" title="Tested setups"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="represent-your-system-landscape">
+<h1>Represent your system landscape<a class="headerlink" href="#represent-your-system-landscape" title="Permalink to this headline">¶</a></h1>
+<p>In order to use katprep it is necessary to assign necessary meta information to your hosts managed by Foreman/Katello or Red Hat Satellite. katprep utilizes these information to automate maintenance tasks.</p>
+<p>See <strong>this site</strong> to see a list of available host parameters and how they affect katprep.</p>
+<p>To assign these parameters, katprep offers two utilities:</p>
+<div class="section" id="katprep-populate">
+<h2>katprep_populate<a class="headerlink" href="#katprep-populate" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">katprep_populate</span></tt> retrieves hosts and network information from your monitoring system and hypervisor. Afterwards it tries to link these information with the hosts managed by Foreman/Katello or Red Hat Satellite. In other words, it will discover which of your managed hosts are monitored and also detects virtual machines. Afterwards, these meta information are added host parameters to enable further automation.</p>
+<p>The following example scans a vCenter Server installation (<tt class="docutils literal"><span class="pre">--virt-uri</span></tt>) via the pyVmomi API (<tt class="docutils literal"><span class="pre">virt-type</span></tt>) and an Icinga2 monitoring host (<tt class="docutils literal"><span class="pre">--mon-url</span></tt>). Authentication credentials are retrieved from an authentication container (<tt class="docutils literal"><span class="pre">-C</span></tt>). Changes are not merged into Foreman/Katello, <tt class="docutils literal"><span class="pre">katprep_populate</span></tt> only simulates what would be done (<tt class="docutils literal"><span class="pre">--dry-run</span></tt>):</p>
+<div class="highlight-python"><pre>$ katprep_populate --virt-uri st-vcsa03.stankowic.loc --virt-type pyvmomi --mon-url https://st-mon03.stankowic.loc:5665 -C pinkepank.auth --dry-run
+INFO:katprep_populate:This is just a SIMULATION - no changes will be made.
+INFO:katprep_populate:Host 'giertz.stankowic.loc' ==&gt; set/update parameter/value: katprep_virt/st-vcsa03.stankowic.loc
+INFO:katprep_populate:Host 'giertz.stankowic.loc' ==&gt; set/update parameter/value: katprep_mon_type/icinga
+INFO:katprep_populate:Host 'giertz.stankowic.loc' ==&gt; set/update parameter/value: katprep_mon/https://st-mon03.stankowic.loc:5665
+INFO:katprep_populate:Host 'giertz.stankowic.loc' ==&gt; set/update parameter/value: katprep_virt_type/pyvmomi
+INFO:katprep_populate:Host 'pinkepank.test.loc' ==&gt; set/update parameter/value: katprep_virt/st-vcsa03.stankowic.loc
+INFO:katprep_populate:Host 'pinkepank.test.loc' ==&gt; set/update parameter/value: katprep_mon_type/icinga
+INFO:katprep_populate:Host 'pinkepank.test.loc' ==&gt; set/update parameter/value: katprep_mon/https://st-mon03.stankowic.loc:5665
+INFO:katprep_populate:Host 'pinkepank.test.loc' ==&gt; set/update parameter/value: katprep_virt_type/pyvmomi</pre>
+</div>
+<p>To merge the data, just omit the <tt class="docutils literal"><span class="pre">--dry-run</span></tt> parameter.</p>
+<p>In case, monitoring and virtualization parameters for already existing hosts have changed (<em>e.g. new VM object name or different monitoring system</em>), you can easily update definitions by using the <tt class="docutils literal"><span class="pre">--update</span></tt> parameter.</p>
+</div>
+<div class="section" id="katprep-parameters">
+<h2>katprep_parameters<a class="headerlink" href="#katprep-parameters" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">katprep_parameters</span></tt> on the other hand is used to manually bulk add/remove/modify host parameters. This can be useful if you need to edit <strong>some</strong> host parameters - as it is possible to filter by organization, location, hostgroup or Puppet environment. When discovering VMs with multiple IPs, <tt class="docutils literal"><span class="pre">katprep_populate</span></tt> sometimes becomes inaccurate - <tt class="docutils literal"><span class="pre">katprep_parameters</span></tt> can fix this.</p>
+<p>The following example lists parameters relevant to katprep, than can be set with the utility:</p>
+<div class="highlight-python"><pre>$ katprep_parameters --list-parameters
+INFO:katprep_parameters:Setting 'katprep_virt' will define 'Virtualization URL of the system'
+INFO:katprep_parameters:Setting 'katprep_mon' will define 'URL of the monitoring system'
+INFO:katprep_parameters:Setting 'katprep_virt_snapshot' will define 'Boolean whether system needs to be protected by a snapshot before maintenance'</pre>
+</div>
+<p>The next example simply lists currently defined host parameters - authentication credentials are provided using an authentication container (<tt class="docutils literal"><span class="pre">-C</span></tt>):</p>
+<div class="highlight-python"><pre>$ katprep_parameters --display-parameters -C pinkepank.auth
+INFO:katprep_parameters:Host 'giertz.stankowic.loc' (#9) --&gt; setting 'katprep_virt' has value 'st-vcsa03.stankowic.loc' (created: 2017-03-05 10:16:38 UTC - last updated: 2017-03-05 10:23:30 UTC)
+INFO:katprep_parameters:Host 'giertz.stankowic.loc' (#9) --&gt; setting 'katprep_virt_type' has value 'pyvmomi' (created: 2017-03-05 10:16:38 UTC - last updated: 2017-03-05 10:23:30 UTC)
+INFO:katprep_parameters:Host 'giertz.stankowic.loc' (#9) --&gt; setting 'katprep_mon_type' has value 'https://st-mon03.stankowic.loc:5665' (created: 2017-03-05 10:16:38 UTC - last updated: 2017-03-05 10:23:30 UTC)
+INFO:katprep_parameters:Host 'giertz.stankowic.loc' (#9) --&gt; setting 'katprep_mon_type' has value 'icinga' (created: 2017-03-05 10:16:38 UTC - last updated: 2017-03-05 10:23:30 UTC)
+...</pre>
+</div>
+<p>To add basic katprep-relevant parameters, use the <tt class="docutils literal"><span class="pre">--add-parameters</span></tt> parameter - to remove parameters (<em>e.g. after uninstalling katprep</em>) append <tt class="docutils literal"><span class="pre">--remove-parameters</span></tt>. Values can be updated with the <tt class="docutils literal"><span class="pre">--update-parameters</span></tt>  parameter:</p>
+<div class="highlight-python"><pre>$ katprep_parameters --update-parameters -C pinkepank.auth
+Enter value for 'katprep_virt' (hint: Virtualization URL of the system):
+Enter value for 'katprep_virt' (hint: Virtualization URL of the system): qemu:///system
+Enter value for 'katprep_mon' (hint: URL of the monitoring system): http://bigbrother.stankowic.loc</pre>
+</div>
+<p>It is also possible to limit actions to particular organizations (<tt class="docutils literal"><span class="pre">--organization</span></tt>), locations (<tt class="docutils literal"><span class="pre">--location</span></tt>), hostgroups (<tt class="docutils literal"><span class="pre">--hosrgroup</span></tt>) or Puppet environments (<tt class="docutils literal"><span class="pre">--environment</span></tt>).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Represent your system landscape</a><ul>
+<li><a class="reference internal" href="#katprep-populate">katprep_populate</a></li>
+<li><a class="reference internal" href="#katprep-parameters">katprep_parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="previous chapter">Authentication</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tested_setups.html"
+                        title="next chapter">Tested setups</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/landscape.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tested_setups.html" title="Tested setups"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             >previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

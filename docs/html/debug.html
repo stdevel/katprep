@@ -1,0 +1,144 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Debugging and getting help &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
+    <link rel="prev" title="Common Issues" href="issues.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="issues.html" title="Common Issues"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="debugging-and-getting-help">
+<h1>Debugging and getting help<a class="headerlink" href="#debugging-and-getting-help" title="Permalink to this headline">¶</a></h1>
+<p>This software is at an early stage, so perhaps things might explode. This page describes how to get in touch with the development team to get help.</p>
+<div class="section" id="getting-help">
+<h2>Getting help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Basically, the best idea when having problems is to open an issue on <a class="reference external" href="https://github.com/stdevel/katprep/issues">GitHub</a>. Please supply the following information:</dt>
+<dd><ul class="first last simple">
+<li>the Foreman/Katello or Red Hat Satellite version you are using</li>
+<li>the katprep version you&#8217;re using</li>
+<li>a short description of your landscape (<em>e.g. single Foreman instance with some VMs running on a single ESXi host</em>)</li>
+<li>debugging output of the command you&#8217;re facing errors with (<em>see also Debugging</em>) - please attach a file instead of pasting the console output directly in the issue</li>
+</ul>
+</dd>
+</dl>
+<p>With these information it is easier to reproduce the error you&#8217;re reporting.</p>
+</div>
+<div class="section" id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h2>
+<p>Every katprep command offers a <tt class="docutils literal"><span class="pre">-d</span></tt> / <tt class="docutils literal"><span class="pre">--debug</span></tt> parameter. When investigating on an error, use this parameter to enable debugging outputs. Keep in mind, that the output will be quite long, so using these parameters along with <tt class="docutils literal"><span class="pre">tee</span></tt> is basically a good idea:</p>
+<div class="highlight-python"><pre>$ katprep_snapshot -C mycontainer.auth -s myforeman.giertz.loc -d 2&gt;&amp;1 | tee myerror.log</pre>
+</div>
+<p>This command will dump all standard and error output into a file named <tt class="docutils literal"><span class="pre">myerror.log</span></tt>. When opening an issue on GitHub, please attach this file.</p>
+</div>
+<div class="section" id="common-issues">
+<h2>Common issues<a class="headerlink" href="#common-issues" title="Permalink to this headline">¶</a></h2>
+<p>Please checkout the <a class="reference external" href="issues.html">issues</a> page - it contains some common issues and how to fix them.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Debugging and getting help</a><ul>
+<li><a class="reference internal" href="#getting-help">Getting help</a></li>
+<li><a class="reference internal" href="#debugging">Debugging</a></li>
+<li><a class="reference internal" href="#common-issues">Common issues</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="issues.html"
+                        title="previous chapter">Common Issues</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/debug.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="issues.html" title="Common Issues"
+             >previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

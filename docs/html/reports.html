@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Customizing &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
+    <link rel="next" title="Parameter overview" href="parameter_overview.html" />
+    <link rel="prev" title="Tested setups" href="tested_setups.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parameter_overview.html" title="Parameter overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tested_setups.html" title="Tested setups"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="customizing">
+<h1>Customizing<a class="headerlink" href="#customizing" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">katprep_report</span></tt> utility uses <strong>Pandoc</strong> and special templates in order to automate creating patch reports per host. Default templates are part of every katprep installation - it is also possible to alter these templates to match your company needs (<em>e.g. corporate identity</em>).</p>
+<p>To start over, check-out the <tt class="docutils literal"><span class="pre">templates</span></tt> directory as it contains the basic templates.</p>
+<p>It is basically a good idea to assign the file extension that represents the report file type to your template - e.g. <tt class="docutils literal"><span class="pre">.html</span></tt> for HTML pages, <tt class="docutils literal"><span class="pre">.pdf</span></tt> for PDF documents, etc. Otherwise <tt class="docutils literal"><span class="pre">katprep_report</span></tt> might not auto-discover the appropriate Pandoc type. In this case you need to specify the <tt class="docutils literal"><span class="pre">-o</span></tt> / <tt class="docutils literal"><span class="pre">--output-type</span></tt> parameter:</p>
+<div class="highlight-python"><pre>$ katprep_report *.json -t templates/my_strange.tmp -o html</pre>
+</div>
+<div class="section" id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<p>When creating host reports, a temporary YAML file is created per host. This file contains all the variables that are rendered into a host report using Pandoc. Use <tt class="docutils literal"><span class="pre">katprep_report</span></tt> along with the <tt class="docutils literal"><span class="pre">-x</span></tt> / <tt class="docutils literal"><span class="pre">--preserve-yaml</span></tt> parameter to keep this file. Refer to that file to explore available variables.</p>
+<p>The following tables list commonly used variables:</p>
+<div class="section" id="errata-information">
+<h3>Errata information<a class="headerlink" href="#errata-information" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Explanation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>errata.cves</td>
+<td>Common Vulnerability and Exposure names</td>
+</tr>
+<tr class="row-odd"><td>errata.description</td>
+<td>Erratum description</td>
+</tr>
+<tr class="row-even"><td>errata.errata_id</td>
+<td>Erratum ID (<em>packager naming convention</em>)</td>
+</tr>
+<tr class="row-odd"><td>errata.hosts_applicable_count</td>
+<td>Number of hosts erratum is applicable to</td>
+</tr>
+<tr class="row-even"><td>errata.hosts_available_count</td>
+<td>Number of hosts erratum is available to</td>
+</tr>
+<tr class="row-odd"><td>errata.id</td>
+<td>Katello erratum ID</td>
+</tr>
+<tr class="row-even"><td>errata.installable</td>
+<td>Flag whether installable on this host</td>
+</tr>
+<tr class="row-odd"><td>errata.issued</td>
+<td>Erratum release date</td>
+</tr>
+<tr class="row-even"><td>errata.packages</td>
+<td>Package names relevant to this erratum</td>
+</tr>
+<tr class="row-odd"><td>errata.reboot_suggested</td>
+<td>Flag whether reboot is suggested</td>
+</tr>
+<tr class="row-even"><td>errata.severity</td>
+<td>Erratum severity</td>
+</tr>
+<tr class="row-odd"><td>errata.solution</td>
+<td>Erratum solution description/link</td>
+</tr>
+<tr class="row-even"><td>errata.summary</td>
+<td>Erratum short summary</td>
+</tr>
+<tr class="row-odd"><td>errata.title</td>
+<td>Erratum title</td>
+</tr>
+<tr class="row-even"><td>errata.type</td>
+<td>Erratum type (<em>enhancement, bugfix,...</em>)</td>
+</tr>
+</tbody>
+</table>
+<p>These parameters apply to an particular erratum that is handled within Pandoc in a for-loop - e.g. in the HTML template:</p>
+<div class="highlight-python"><pre>$for(errata)$
+&lt;tr&gt;
+&lt;td&gt;$errata.type$&lt;/td&gt;
+&lt;td&gt;$errata.summary$&lt;/td&gt;
+&lt;td&gt;$errata.issued$&lt;/td&gt;
+&lt;td&gt;$errata.description$&lt;/td&gt;
+&lt;td&gt;$if(errata.reboot_suggested)$yes$else$no$endif$&lt;/td&gt;
+&lt;/tr&gt;
+$endfor$</pre>
+</div>
+</div>
+<div class="section" id="host-parameter-information">
+<h3>Host parameter information<a class="headerlink" href="#host-parameter-information" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Explanation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>params.date</td>
+<td>Maintenance data</td>
+</tr>
+<tr class="row-odd"><td>params.environment_name</td>
+<td>Host puppet environment name</td>
+</tr>
+<tr class="row-even"><td>params.ip</td>
+<td>Host IP address</td>
+</tr>
+<tr class="row-odd"><td>params.katprep_virt</td>
+<td>Virtualization URI</td>
+</tr>
+<tr class="row-even"><td>params.katprep_virt_name</td>
+<td>VM name (<em>if not FQDN</em>)</td>
+</tr>
+<tr class="row-odd"><td>params.katprep_virt_snapshot</td>
+<td>Flag whether VM needs to be protected by a snapshot</td>
+</tr>
+<tr class="row-even"><td>params.katprep_virt_type</td>
+<td>Hypervisor type (<em>libvirt or pyvmomi</em>)</td>
+</tr>
+<tr class="row-odd"><td>params.location_name</td>
+<td>Location name</td>
+</tr>
+<tr class="row-even"><td>params.name</td>
+<td>Host name</td>
+</tr>
+<tr class="row-odd"><td>params.operatingsystem_name</td>
+<td>Operating system name</td>
+</tr>
+<tr class="row-even"><td>params.organization_name</td>
+<td>Organization name</td>
+</tr>
+<tr class="row-odd"><td>params.owner</td>
+<td>System owner</td>
+</tr>
+<tr class="row-even"><td>params.system_physical</td>
+<td>Flag whether physical system</td>
+</tr>
+<tr class="row-odd"><td>params.time</td>
+<td>Maintenance time</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="verification-information">
+<h3>Verification information<a class="headerlink" href="#verification-information" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Explanation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>verification.virt_snapshot</td>
+<td>Flag whether snapshot was created</td>
+</tr>
+<tr class="row-odd"><td>verification.virt_cleanup</td>
+<td>Flag whether snapshot was removed</td>
+</tr>
+<tr class="row-even"><td>verification.mon_downtime</td>
+<td>Flag whether downtime was scheduled</td>
+</tr>
+<tr class="row-odd"><td>verification.mon_cleanup</td>
+<td>Flag whether scheduled downtime was removed</td>
+</tr>
+<tr class="row-even"><td>verification.mon_status</td>
+<td>Monitoring status</td>
+</tr>
+<tr class="row-odd"><td>verification.mon_status_detail</td>
+<td>Detailed monitoring status (<em>if not 0</em>)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Customizing</a><ul>
+<li><a class="reference internal" href="#variables">Variables</a><ul>
+<li><a class="reference internal" href="#errata-information">Errata information</a></li>
+<li><a class="reference internal" href="#host-parameter-information">Host parameter information</a></li>
+<li><a class="reference internal" href="#verification-information">Verification information</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tested_setups.html"
+                        title="previous chapter">Tested setups</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parameter_overview.html"
+                        title="next chapter">Parameter overview</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/reports.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parameter_overview.html" title="Parameter overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tested_setups.html" title="Tested setups"
+             >previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

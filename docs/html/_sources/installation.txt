@@ -5,13 +5,11 @@ In order to install and use katprep, the following requirements need to be met:
 
  * Python 2.7 or newer
  * Python modules:
-
   * simplejson
   * PyYAML
   * PyPandoc
   * Libvirt (*usually part of the libvirt-python package*)
   * PyVmomi (*VMware vSphere Python SDK*)
-
  * Pandoc (*for creating the reports*)
  * System running katprep needs access to the Foreman/Katello host using HTTPS
  * An API user for Foreman/Katello and other management systems (*Monitoring, virtualization host*)
@@ -69,20 +67,14 @@ VMware vCenter
 --------------
 katprep needs to be able to read datacenter/cluster/host/vm information and create/remove snapshots. You can create a dedicated role with the following permissions:
  * Sessions
-
   * Validate sessions
-
  * Virtual machine
-
   * Interaction
-
    * Consolidate hard disks
    * Power On
    * Power Off
    * Reset
-
   * Snapshot management
-
    * Create Snapshot
    * Remove Snapshot
    * Revert Snapshot

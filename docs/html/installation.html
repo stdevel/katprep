@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Requirements &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
+    <link rel="next" title="Authentication" href="authentication.html" />
+    <link rel="prev" title="Welcome to katprep’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to katprep’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="requirements">
+<h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h1>
+<p>In order to install and use katprep, the following requirements need to be met:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Python 2.7 or newer</li>
+<li>Python modules:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>simplejson</li>
+<li>PyYAML</li>
+<li>PyPandoc</li>
+<li>Libvirt (<em>usually part of the libvirt-python package</em>)</li>
+<li>PyVmomi (<em>VMware vSphere Python SDK</em>)</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Pandoc (<em>for creating the reports</em>)</li>
+<li>System running katprep needs access to the Foreman/Katello host using HTTPS</li>
+<li>An API user for Foreman/Katello and other management systems (<em>Monitoring, virtualization host</em>)</li>
+</ul>
+</div></blockquote>
+<p>All these Python modules are available for the most Linux distributions using the package manager or PyPi.</p>
+</div>
+<div class="section" id="api-users">
+<h1>API users<a class="headerlink" href="#api-users" title="Permalink to this headline">¶</a></h1>
+<p>To ensure that katprep is able to control hosts and retrieve data from connected management systems, create appropriate service users:</p>
+<div class="section" id="foreman">
+<h2>Foreman<a class="headerlink" href="#foreman" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Basically, katprep only needs read access to Foreman/Katello - ensure to assign the following roles to your API user:</dt>
+<dd><ul class="first last simple">
+<li>Viewer</li>
+<li>View hosts</li>
+<li>Tasks Reader</li>
+</ul>
+</dd>
+</dl>
+<p>If you want to automate create Puppet host parameters (<em>which can be done by using katprep_parameters and katprep_populate</em>) it is also necessary to assign the <strong>Manager</strong> role.</p>
+</div>
+<div class="section" id="nagios-icinga">
+<h2>Nagios/Icinga<a class="headerlink" href="#nagios-icinga" title="Permalink to this headline">¶</a></h2>
+<p>In order to schedule and remove downtimes, a service user needs to be created for katprep:</p>
+<div class="highlight-python"><pre>define contact {
+    contact_name                   svc-katprep
+    alias                          katprep user
+    use                            generic-contact
+    email                          root@localhost
+}</pre>
+</div>
+<dl class="docutils">
+<dt>Depending on your Nagios/Icinga configuration, it might be necessary to add the new user to the following roles in <strong>cgi.cfg</strong> like this::</dt>
+<dd><ul class="first last simple">
+<li>authorized_for_system_information</li>
+<li>authorized_for_system_commands</li>
+<li>authorized_for_all_services</li>
+<li>authorized_for_all_hosts</li>
+<li>authorized_for_all_service_commands</li>
+<li>authorized_for_all_host_commands</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="icinga2">
+<h2>Icinga2<a class="headerlink" href="#icinga2" title="Permalink to this headline">¶</a></h2>
+<p>To enable scheduling/removing downtimes and reading host configuration from Icinga2, create an API user with the following permissions:</p>
+<div class="highlight-python"><pre>#katprep user
+object ApiUser "svc-katprep" {
+        password = "shittyrobots"
+        permissions = [ "status/query", "objects/query/*", "actions/*" ]
+}</pre>
+</div>
+</div>
+<div class="section" id="vmware-vcenter">
+<h2>VMware vCenter<a class="headerlink" href="#vmware-vcenter" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>katprep needs to be able to read datacenter/cluster/host/vm information and create/remove snapshots. You can create a dedicated role with the following permissions:</dt>
+<dd><ul class="first simple">
+<li>Sessions</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Validate sessions</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Virtual machine</li>
+</ul>
+<blockquote class="last">
+<div><ul class="simple">
+<li>Interaction</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Consolidate hard disks</li>
+<li>Power On</li>
+<li>Power Off</li>
+<li>Reset</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Snapshot management</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Create Snapshot</li>
+<li>Remove Snapshot</li>
+<li>Revert Snapshot</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<p>It is a common procedure to define permissions at a global vCenter Server level.</p>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>To install katprep, you can clone the GitHub repository and install the utility or build a RPM package to install. At a later point, we might also supply pre-built RPM packages:</p>
+<div class="highlight-python"><pre>$ wget https://github.com/stdevel/katprep/archive/master.zip
+$ unzip master.zip
+$ cd katprep-master</pre>
+</div>
+<div class="section" id="manual-installation">
+<h2>Manual installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
+<p>Proceed with the following steps:</p>
+<div class="highlight-python"><pre>$ python setup.py install</pre>
+</div>
+<p>In case you want to install the toolkit only for your current user (<em>e.g. because of file system restrictions</em>), use the <strong>&#8211;user parameter</strong>:</p>
+<div class="highlight-python"><pre>$ python setup.py install --user</pre>
+</div>
+<p>If you&#8217;re a developer and want to contribute, you might prefer to install katprep in developer mode within your user context:</p>
+<div class="highlight-python"><pre>$ python setup.py develop --user</pre>
+</div>
+</div>
+<div class="section" id="build-rpm">
+<h2>Build RPM<a class="headerlink" href="#build-rpm" title="Permalink to this headline">¶</a></h2>
+<p>Ensure to have RPM development utilities installed and proceed with the following steps:</p>
+<div class="highlight-python"><pre>$ python setup.py bdist_rpm
+$ sudo yum localinstall dist/katprep*.rpm</pre>
+</div>
+<p>Specifying the <strong>&#8211;spec-only</strong> parameter will only create a RPM spec file:</p>
+<div class="highlight-python"><pre>$ python setup.py bdist_rpm --spec-only
+$ less dist/katprep.spec</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Requirements</a></li>
+<li><a class="reference internal" href="#api-users">API users</a><ul>
+<li><a class="reference internal" href="#foreman">Foreman</a></li>
+<li><a class="reference internal" href="#nagios-icinga">Nagios/Icinga</a></li>
+<li><a class="reference internal" href="#icinga2">Icinga2</a></li>
+<li><a class="reference internal" href="#vmware-vcenter">VMware vCenter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#manual-installation">Manual installation</a></li>
+<li><a class="reference internal" href="#build-rpm">Build RPM</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to katprep&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="next chapter">Authentication</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/installation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to katprep’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
