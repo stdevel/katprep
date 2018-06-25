@@ -15,8 +15,8 @@ import getpass
 from . import get_credentials, is_writable, validate_filters, \
 get_filter
 from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients import EmptySetException, SessionException, \
-InvalidCredentialsException, UnsupportedRequestException, \
+from .clients import validate_hostname, EmptySetException, \
+SessionException, InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
 
 __version__ = "0.0.1"
@@ -127,6 +127,8 @@ http://github.com/stdevel/katprep'''
 
     #parse options and arguments
     options = parser.parse_args()
+    #validate hostname
+    options.server = validate_hostname(options.server)
     #set password
     while options.auth_password == "empty" or len(options.auth_password) > 32:
         options.auth_password = getpass.getpass(
