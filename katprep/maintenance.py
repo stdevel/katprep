@@ -13,6 +13,7 @@ import json
 import time
 import os
 import getpass
+import datetime
 import yaml
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report, get_host_params_by_report
@@ -150,7 +151,12 @@ def manage_host_preparation(options, host, cleanup=False):
                 LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
 
     #get errata reboot flags
-    errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+    try:
+        errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+    except KeyError:
+        #no reboot suggested
+        errata_reboot = []
+        pass
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
@@ -295,7 +301,13 @@ def execute(options, args):
                     )
 
             #get errata reboot flags
-            errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+            try:
+                errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
+            except KeyError:
+                #no reboot suggested
+                errata_reboot = []
+                pass
+
             if options.foreman_reboot or \
                 (True in errata_reboot and not options.foreman_no_reboot):
                 if options.generic_dry_run:
@@ -409,6 +421,66 @@ def verify(options, args):
     except ValueError as err:
         LOGGER.error("Error verifying host: '%s'", err)
 
+
+
+def status(options, args):
+    """
+    This function shows current Foreman/Katello software maintenance task
+    status.
+
+    :param args: argparse options dictionary containing parameters
+    :type args: argparse options dict
+    """
+    #verify snapshot/downtime per host
+    try:
+        for host in REPORT:
+            LOGGER.debug("Getting '%s' task status...", host)
+
+            #check maintenance progress
+            tasks = {
+                "Erratum": "Actions::Katello::Host::Erratum::Install",
+                "Package": "Actions::Katello::Host::Update"
+            }
+            today = datetime.datetime.now().strftime("%Y-%m-%d")
+
+            try:
+                for task in tasks:
+                    #print task
+                    results = SAT_CLIENT.get_task_by_filter(
+                        host, tasks[task], today
+                    )
+                    if results:
+                        for result in results:
+                            #print result
+                            LOGGER.debug(
+                                "Found '%s' task %s from %s (state %s)", result["label"],
+                                result["id"], result["started_at"], result["result"]
+                            )
+                            if result["result"].lower() == "success":
+                                LOGGER.info(
+                                    "%s task for host '%s' succeeded",
+                                    task, host
+                                )
+                            elif result["result"].lower() == "error":
+                                LOGGER.error(
+                                    "%s task for host '%s' FAILED!",
+                                    task, host
+                                )
+                            else:
+                                LOGGER.info(
+                                    "%s task for host '%s' has state '%s'",
+                                    task, host, result["result"]
+                                )
+                    else:
+                        LOGGER.error("No %s task for '%s' found!", task.lower(), host)
+            except TypeError:
+                pass
+
+    except KeyError:
+        #host with either no virt/mon
+        pass
+    except ValueError as err:
+        LOGGER.error("Error getting '%s' task status...", host)
 
 
 def cleanup(options, args):
@@ -583,7 +655,7 @@ def parse_options(args=None):
 
     #COMMANDS
     subparsers = parser.add_subparsers(title='commands', \
-    description='controlling maintenance stages', help='additional help')
+    description='controlling maintenance stages', help='Additional help')
     cmd_prepare = subparsers.add_parser("prepare", help="Preparing maintenance")
     cmd_prepare.set_defaults(func=prepare)
     cmd_execute = subparsers.add_parser("execute", help="Installing errata")
@@ -591,6 +663,9 @@ def parse_options(args=None):
     cmd_execute.add_argument("-p", "--include-packages", action="store_true", \
     default=False, dest="upgrade_packages", help="installs available package" \
     " upgrades (default: no)")
+    cmd_status = subparsers.add_parser("status", help="Display software " \
+    "maintenance progress")
+    cmd_status.set_defaults(func=status)
     cmd_revert = subparsers.add_parser("revert", help="Reverting changes")
     cmd_revert.set_defaults(func=revert)
     cmd_verify = subparsers.add_parser("verify", help="Verifying status")
