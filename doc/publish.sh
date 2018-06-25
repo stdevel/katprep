@@ -1,4 +1,5 @@
 #!/bin/sh
-make html && mv build/html/ ../docs/
-cp .nojekyll _config.yml ../docs
+rm -Rf ../docs
+make html && mv build/html ../docs
+cp .nojekyll ../docs
 rm -Rf build

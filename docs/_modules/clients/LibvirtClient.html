@@ -57,19 +57,10 @@
 
 <span class="kn">import</span> <span class="nn">libvirt</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">katprep.clients</span> <span class="kn">import</span> <span class="n">SessionException</span>
 
 
 
-<div class="viewcode-block" id="SessionException"><a class="viewcode-back" href="../../katprep.clients.html#clients.LibvirtClient.SessionException">[docs]</a><span class="k">class</span> <span class="nc">SessionException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dummy class for session errors</span>
-
-<span class="sd">.. class:: SessionException</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
-
-
-</div>
 <div class="viewcode-block" id="LibvirtClient"><a class="viewcode-back" href="../../katprep.clients.html#clients.LibvirtClient.LibvirtClient">[docs]</a><span class="k">class</span> <span class="nc">LibvirtClient</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for communicating with libvirt</span>
@@ -310,6 +301,7 @@
                 <span class="n">target_vm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span><span class="o">.</span><span class="n">lookupByName</span><span class="p">(</span><span class="n">vm</span><span class="p">)</span>
                 <span class="n">target_hostname</span> <span class="o">=</span> <span class="n">target_vm</span><span class="o">.</span><span class="n">hostname</span><span class="p">()</span>
                 <span class="c">#lookup IP</span>
+                <span class="c">#TODO: IPv6 only?</span>
                 <span class="n">target_ip</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">target_hostname</span><span class="p">)</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">{</span><span class="s">&quot;hostname&quot;</span><span class="p">:</span> <span class="n">target_hostname</span><span class="p">,</span> <span class="s">&quot;ip&quot;</span><span class="p">:</span> <span class="n">target_ip</span><span class="p">}</span>

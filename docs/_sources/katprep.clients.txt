@@ -9,6 +9,14 @@ clients Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`SpacewalnAPIClient` Module
+--------------------------------
+
+.. automodule:: clients.SpacewalkAPIClient
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`Icinga2APIClient` Module
 ------------------------------
 

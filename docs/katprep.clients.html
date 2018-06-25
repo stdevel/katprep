@@ -50,21 +50,7 @@
 <h1>clients Package<a class="headerlink" href="#clients-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-clients.ForemanAPIClient">
 <span id="foremanapiclient-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">ForemanAPIClient</span></tt> Module<a class="headerlink" href="#module-clients.ForemanAPIClient" title="Permalink to this headline">¶</a></h2>
-<p>This file contains the ForemanAPIClient and
-APILevelNotSupportedException and SessionException classes</p>
-<dl class="exception">
-<dt id="clients.ForemanAPIClient.APILevelNotSupportedException">
-<em class="property">exception </em><tt class="descclassname">clients.ForemanAPIClient.</tt><tt class="descname">APILevelNotSupportedException</tt><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#APILevelNotSupportedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="katprep.html#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
-<blockquote>
-<div>Dummy class for unsupported API levels</div></blockquote>
-<dl class="class">
-<dt id="clients.ForemanAPIClient.APILevelNotSupportedException.APILevelNotSupportedException">
-<em class="property">class </em><tt class="descname">APILevelNotSupportedException</tt><a class="headerlink" href="#clients.ForemanAPIClient.APILevelNotSupportedException.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<p>This file contains the ForemanAPIClient class</p>
 <dl class="class">
 <dt id="clients.ForemanAPIClient.ForemanAPIClient">
 <em class="property">class </em><tt class="descclassname">clients.ForemanAPIClient.</tt><tt class="descname">ForemanAPIClient</tt><big>(</big><em>log_level</em>, <em>hostname</em>, <em>username</em>, <em>password</em>, <em>verify=True</em>, <em>prefix=''</em><big>)</big><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#ForemanAPIClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient" title="Permalink to this definition">¶</a></dt>
@@ -95,7 +81,7 @@ APILevelNotSupportedException and SessionException classes</p>
 
 <dl class="attribute">
 <dt id="clients.ForemanAPIClient.ForemanAPIClient.LOGGER">
-<tt class="descclassname">ForemanAPIClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x368c750&gt;</em><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient.LOGGER" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ForemanAPIClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x7f1badcc5150&gt;</em><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient.LOGGER" title="Permalink to this definition">¶</a></dt>
 <dd><p>logging: Logger instance</p>
 </dd></dl>
 
@@ -210,6 +196,12 @@ sub-URL (such as /hosts/3) and payload data.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="clients.ForemanAPIClient.ForemanAPIClient.get_hostname">
+<tt class="descclassname">ForemanAPIClient.</tt><tt class="descname">get_hostname</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#ForemanAPIClient.get_hostname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient.get_hostname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the configured hostname of the object instance.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="clients.ForemanAPIClient.ForemanAPIClient.get_hostparam_id_by_name">
 <tt class="descclassname">ForemanAPIClient.</tt><tt class="descname">get_hostparam_id_by_name</tt><big>(</big><em>host</em>, <em>param_name</em><big>)</big><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#ForemanAPIClient.get_hostparam_id_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient.get_hostparam_id_by_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a Foreman host parameter&#8217;s internal ID by its name.</p>
@@ -256,6 +248,25 @@ type api_object: str</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="clients.ForemanAPIClient.ForemanAPIClient.get_task_by_filter">
+<tt class="descclassname">ForemanAPIClient.</tt><tt class="descname">get_task_by_filter</tt><big>(</big><em>host</em>, <em>task_name</em>, <em>task_date</em><big>)</big><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#ForemanAPIClient.get_task_by_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient.get_task_by_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns host management tasks by filter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Foreman host name</li>
+<li><strong>task_name</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Filter argument</li>
+<li><strong>task_date</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Task date wildcard</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="clients.ForemanAPIClient.ForemanAPIClient.get_url">
 <tt class="descclassname">ForemanAPIClient.</tt><tt class="descname">get_url</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#ForemanAPIClient.get_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient.get_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the configured URL of the object instance</p>
@@ -269,34 +280,97 @@ Using older version than API v2 is not recommended. In this case, an
 exception will be thrown.</p>
 </dd></dl>
 
-<dl class="staticmethod">
-<dt id="clients.ForemanAPIClient.ForemanAPIClient.validate_hostname">
-<em class="property">static </em><tt class="descclassname">ForemanAPIClient.</tt><tt class="descname">validate_hostname</tt><big>(</big><em>hostname</em><big>)</big><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#ForemanAPIClient.validate_hostname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.ForemanAPIClient.validate_hostname" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validates that the Foreman API uses a FQDN as hostname.
-Also looks up the &#8220;real&#8221; hostname if &#8220;localhost&#8221; is specified.
-Otherwise, the picky Foreman API won&#8217;t connect.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the hostname to validate</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="exception">
-<dt id="clients.ForemanAPIClient.SessionException">
-<em class="property">exception </em><tt class="descclassname">clients.ForemanAPIClient.</tt><tt class="descname">SessionException</tt><a class="reference internal" href="_modules/clients/ForemanAPIClient.html#SessionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.ForemanAPIClient.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="katprep.html#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
-<blockquote>
-<div>Dummy class for session errors</div></blockquote>
+</div>
+<div class="section" id="module-clients.SpacewalkAPIClient">
+<span id="spacewalnapiclient-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">SpacewalnAPIClient</span></tt> Module<a class="headerlink" href="#module-clients.SpacewalkAPIClient" title="Permalink to this headline">¶</a></h2>
+<p>This file contains the SpacewalkAPIClient and
+depending exception classes</p>
 <dl class="class">
-<dt id="clients.ForemanAPIClient.SessionException.SessionException">
-<em class="property">class </em><tt class="descname">SessionException</tt><a class="headerlink" href="#clients.ForemanAPIClient.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient">
+<em class="property">class </em><tt class="descclassname">clients.SpacewalkAPIClient.</tt><tt class="descname">SpacewalkAPIClient</tt><big>(</big><em>log_level</em>, <em>hostname</em>, <em>username</em>, <em>password</em><big>)</big><a class="reference internal" href="_modules/clients/SpacewalkAPIClient.html#SpacewalkAPIClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<blockquote>
+<div>Class for communicating with the Spacewalk API</div></blockquote>
+<dl class="class">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.SpacewalkAPIClient">
+<em class="property">class </em><tt class="descname">SpacewalkAPIClient</tt><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.SpacewalkAPIClient" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.API_MIN">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">API_MIN</tt><em class="property"> = 14.0</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.API_MIN" title="Permalink to this definition">¶</a></dt>
+<dd><p>int: Minimum supported API version.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.HEADERS">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">HEADERS</tt><em class="property"> = {'User-Agent': 'katprep (https://github.com/stdevel/katprep)'}</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.HEADERS" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict: Default headers set for every HTTP request</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.LOGGER">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x7f1ba52752d0&gt;</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.LOGGER" title="Permalink to this definition">¶</a></dt>
+<dd><p>logging: Logger instance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.api_key">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">api_key</tt><em class="property"> = None</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.api_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: Session key</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.api_session">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">api_session</tt><em class="property"> = None</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.api_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Session: HTTP session to Spacewalk host</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.get_hostname">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">get_hostname</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/SpacewalkAPIClient.html#SpacewalkAPIClient.get_hostname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.get_hostname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the configured hostname of the objecti nstance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.get_url">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">get_url</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/SpacewalkAPIClient.html#SpacewalkAPIClient.get_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.get_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the configured URL of the object instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.hostname">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">hostname</tt><em class="property"> = ''</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.hostname" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: Spacewalk API hostname</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.password">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">password</tt><em class="property"> = ''</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.password" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: API password</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.url">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">url</tt><em class="property"> = ''</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: Spacewalk API base URL</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.username">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">username</tt><em class="property"> = ''</em><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.username" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: API username</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="clients.SpacewalkAPIClient.SpacewalkAPIClient.validate_api_support">
+<tt class="descclassname">SpacewalkAPIClient.</tt><tt class="descname">validate_api_support</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/SpacewalkAPIClient.html#SpacewalkAPIClient.validate_api_support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.SpacewalkAPIClient.SpacewalkAPIClient.validate_api_support" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether the API version on the Spacewalk server is supported.
+Using older versions than 11.1 is not recommended. In this case, an
+exception will be thrown.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -323,7 +397,7 @@ monitoring systems.</p>
 
 <dl class="attribute">
 <dt id="clients.Icinga2APIClient.Icinga2APIClient.LOGGER">
-<tt class="descclassname">Icinga2APIClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x3cca3d0&gt;</em><a class="headerlink" href="#clients.Icinga2APIClient.Icinga2APIClient.LOGGER" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">Icinga2APIClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x7f1ba5ae3e90&gt;</em><a class="headerlink" href="#clients.Icinga2APIClient.Icinga2APIClient.LOGGER" title="Permalink to this definition">¶</a></dt>
 <dd><p>logging: Logger instance</p>
 </dd></dl>
 
@@ -341,8 +415,16 @@ monitoring systems.</p>
 
 <dl class="method">
 <dt id="clients.Icinga2APIClient.Icinga2APIClient.get_hosts">
-<tt class="descclassname">Icinga2APIClient.</tt><tt class="descname">get_hosts</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/Icinga2APIClient.html#Icinga2APIClient.get_hosts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.Icinga2APIClient.Icinga2APIClient.get_hosts" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">Icinga2APIClient.</tt><tt class="descname">get_hosts</tt><big>(</big><em>ipv6_only=False</em><big>)</big><a class="reference internal" href="_modules/clients/Icinga2APIClient.html#Icinga2APIClient.get_hosts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.Icinga2APIClient.Icinga2APIClient.get_hosts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns hosts by their name and IP.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ipv6_only</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; use IPv6 addresses only</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -426,19 +508,6 @@ period (the default is 8 hours).</p>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="clients.Icinga2APIClient.SessionException">
-<em class="property">exception </em><tt class="descclassname">clients.Icinga2APIClient.</tt><tt class="descname">SessionException</tt><a class="reference internal" href="_modules/clients/Icinga2APIClient.html#SessionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.Icinga2APIClient.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="katprep.html#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
-<blockquote>
-<div>Dummy class for session errors</div></blockquote>
-<dl class="class">
-<dt id="clients.Icinga2APIClient.SessionException.SessionException">
-<em class="property">class </em><tt class="descname">SessionException</tt><a class="headerlink" href="#clients.Icinga2APIClient.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="module-clients.LibvirtClient">
 <span id="libvirtclient-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">LibvirtClient</span></tt> Module<a class="headerlink" href="#module-clients.LibvirtClient" title="Permalink to this headline">¶</a></h2>
@@ -455,7 +524,7 @@ period (the default is 8 hours).</p>
 
 <dl class="attribute">
 <dt id="clients.LibvirtClient.LibvirtClient.LOGGER">
-<tt class="descclassname">LibvirtClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x32fdad0&gt;</em><a class="headerlink" href="#clients.LibvirtClient.LibvirtClient.LOGGER" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">LibvirtClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x7f1badc92a90&gt;</em><a class="headerlink" href="#clients.LibvirtClient.LibvirtClient.LOGGER" title="Permalink to this definition">¶</a></dt>
 <dd><p>logging: Logger instance</p>
 </dd></dl>
 
@@ -661,19 +730,6 @@ libvirt protocols.</p>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="clients.LibvirtClient.SessionException">
-<em class="property">exception </em><tt class="descclassname">clients.LibvirtClient.</tt><tt class="descname">SessionException</tt><a class="reference internal" href="_modules/clients/LibvirtClient.html#SessionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.LibvirtClient.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="katprep.html#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
-<blockquote>
-<div>Dummy class for session errors</div></blockquote>
-<dl class="class">
-<dt id="clients.LibvirtClient.SessionException.SessionException">
-<em class="property">class </em><tt class="descname">SessionException</tt><a class="headerlink" href="#clients.LibvirtClient.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="module-clients.NagiosCGIClient">
 <span id="nagioscgiclient-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">NagiosCGIClient</span></tt> Module<a class="headerlink" href="#module-clients.NagiosCGIClient" title="Permalink to this headline">¶</a></h2>
@@ -681,8 +737,9 @@ libvirt protocols.</p>
 monitoring systems.</p>
 <dl class="class">
 <dt id="clients.NagiosCGIClient.NagiosCGIClient">
-<em class="property">class </em><tt class="descclassname">clients.NagiosCGIClient.</tt><tt class="descname">NagiosCGIClient</tt><big>(</big><em>log_level</em>, <em>url</em>, <em>username=''</em>, <em>password=''</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="class">
+<em class="property">class </em><tt class="descclassname">clients.NagiosCGIClient.</tt><tt class="descname">NagiosCGIClient</tt><big>(</big><em>log_level</em>, <em>url</em>, <em>username</em>, <em>password</em>, <em>verify=True</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<dl class="class">
 <dt id="clients.NagiosCGIClient.NagiosCGIClient.NagiosCGIClient">
 <em class="property">class </em><tt class="descname">NagiosCGIClient</tt><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.NagiosCGIClient" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -695,74 +752,8 @@ monitoring systems.</p>
 
 <dl class="attribute">
 <dt id="clients.NagiosCGIClient.NagiosCGIClient.LOGGER">
-<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x3d8fb50&gt;</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.LOGGER" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x7f1ba6324bd0&gt;</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.LOGGER" title="Permalink to this definition">¶</a></dt>
 <dd><p>logging: Logger instance</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="clients.NagiosCGIClient.NagiosCGIClient.SESSION">
-<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">SESSION</tt><em class="property"> = None</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.SESSION" title="Permalink to this definition">¶</a></dt>
-<dd><p>session: API session</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="clients.NagiosCGIClient.NagiosCGIClient.URL">
-<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">URL</tt><em class="property"> = ''</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.URL" title="Permalink to this definition">¶</a></dt>
-<dd><p>str: Nagios/Icinga URL</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="clients.NagiosCGIClient.NagiosCGIClient.api_request">
-<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">api_request</tt><big>(</big><em>method</em>, <em>sub_url</em>, <em>payload=''</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.api_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.api_request" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Sends a HTTP request to the Nagios/Icinga API. This function requires</dt>
-<dd><p class="first">a valid HTTP method and a sub-URL (such as /cgi-bin/status.cgi).
-Optionally, you can also specify payload (for POST).
-There are also alias functions available.</p>
-<table class="last docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">param method:</th><td class="field-body">HTTP request method (GET, POST)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">type method:</th><td class="field-body">str</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">param sub_url:</th><td class="field-body">relative path (e.g. /cgi-bin/status.cgi)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">type sub_url:</th><td class="field-body">str</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">param payload:</th><td class="field-body">payload for POST requests</td>
-</tr>
-<tr class="field-even field"><th class="field-name">type payload:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd>
-</dl>
-<div class="admonition-see-also admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last">__api_get()</p>
-</div>
-<div class="admonition-see-also admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last">__api_post()</p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="clients.NagiosCGIClient.NagiosCGIClient.calculate_time">
-<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">calculate_time</tt><big>(</big><em>hours</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.calculate_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.calculate_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the time range for POST requests in the format the
-Nagios/Icinga 1.x API requires. For this, the current time/date
-is chosen and the specified amount of hours is added.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hours</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Amount of hours for the time range</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -772,9 +763,24 @@ is chosen and the specified amount of hours is added.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="clients.NagiosCGIClient.NagiosCGIClient.dummy_call">
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">dummy_call</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.dummy_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.dummy_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used for checking whether authorization succeeded.
+It simply retrieves status.cgi</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="clients.NagiosCGIClient.NagiosCGIClient.get_hosts">
-<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">get_hosts</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.get_hosts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.get_hosts" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">get_hosts</tt><big>(</big><em>ipv6_only=False</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.get_hosts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.get_hosts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns hosts by their name and IP.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ipv6_only</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; use IPv6 addresses only</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -810,9 +816,15 @@ scheduled downtime. This required specifying an object name and type.</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="clients.NagiosCGIClient.NagiosCGIClient.obsolete">
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">obsolete</tt><em class="property"> = False</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.obsolete" title="Permalink to this definition">¶</a></dt>
+<dd><p>bool: Nagios system</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="clients.NagiosCGIClient.NagiosCGIClient.remove_downtime">
-<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">remove_downtime</tt><big>(</big><em>object_name</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.remove_downtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.remove_downtime" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">remove_downtime</tt><big>(</big><em>object_name</em>, <em>object_type='host'</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.remove_downtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.remove_downtime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes scheduled downtime for a host.
 For this, a object name is required.
 At this point, it is not possible to remove downtime for a
@@ -850,18 +862,38 @@ period (the default is 8 hours).</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="clients.NagiosCGIClient.NagiosCGIClient.session">
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">session</tt><em class="property"> = None</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.session" title="Permalink to this definition">¶</a></dt>
+<dd><p>session: API session</p>
 </dd></dl>
 
-<dl class="exception">
-<dt id="clients.NagiosCGIClient.SessionException">
-<em class="property">exception </em><tt class="descclassname">clients.NagiosCGIClient.</tt><tt class="descname">SessionException</tt><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#SessionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="katprep.html#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
-<blockquote>
-<div>Dummy class for session errors</div></blockquote>
-<dl class="class">
-<dt id="clients.NagiosCGIClient.SessionException.SessionException">
-<em class="property">class </em><tt class="descname">SessionException</tt><a class="headerlink" href="#clients.NagiosCGIClient.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="clients.NagiosCGIClient.NagiosCGIClient.set_nagios">
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">set_nagios</tt><big>(</big><em>flag</em><big>)</big><a class="reference internal" href="_modules/clients/NagiosCGIClient.html#NagiosCGIClient.set_nagios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.set_nagios" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function sets a flag for Nagios systems as there are CGI
+differences between Nagios and Icinga 1.x.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>flag</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; boolean whether Nagios system</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.NagiosCGIClient.NagiosCGIClient.url">
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">url</tt><em class="property"> = ''</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: Nagios/Icinga URL</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="clients.NagiosCGIClient.NagiosCGIClient.verify">
+<tt class="descclassname">NagiosCGIClient.</tt><tt class="descname">verify</tt><em class="property"> = True</em><a class="headerlink" href="#clients.NagiosCGIClient.NagiosCGIClient.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>bool: SSL verification</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -873,14 +905,15 @@ just an endless pain when managing VMware products</p>
 <dl class="class">
 <dt id="clients.PyvmomiClient.PyvmomiClient">
 <em class="property">class </em><tt class="descclassname">clients.PyvmomiClient.</tt><tt class="descname">PyvmomiClient</tt><big>(</big><em>log_level</em>, <em>hostname</em>, <em>username</em>, <em>password</em><big>)</big><a class="reference internal" href="_modules/clients/PyvmomiClient.html#PyvmomiClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.PyvmomiClient.PyvmomiClient" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="class">
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v3.6)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<dl class="class">
 <dt id="clients.PyvmomiClient.PyvmomiClient.PyvmomiClient">
 <em class="property">class </em><tt class="descname">PyvmomiClient</tt><a class="headerlink" href="#clients.PyvmomiClient.PyvmomiClient.PyvmomiClient" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="clients.PyvmomiClient.PyvmomiClient.LOGGER">
-<tt class="descclassname">PyvmomiClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x3ee3e90&gt;</em><a class="headerlink" href="#clients.PyvmomiClient.PyvmomiClient.LOGGER" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">PyvmomiClient.</tt><tt class="descname">LOGGER</tt><em class="property"> = &lt;logging.Logger object at 0x7f1ba6984b10&gt;</em><a class="headerlink" href="#clients.PyvmomiClient.PyvmomiClient.LOGGER" title="Permalink to this definition">¶</a></dt>
 <dd><p>logging: Logger instance</p>
 </dd></dl>
 
@@ -919,14 +952,18 @@ current connection.</p>
 
 <dl class="method">
 <dt id="clients.PyvmomiClient.PyvmomiClient.get_vm_ips">
-<tt class="descclassname">PyvmomiClient.</tt><tt class="descname">get_vm_ips</tt><big>(</big><em>hide_empty=True</em><big>)</big><a class="reference internal" href="_modules/clients/PyvmomiClient.html#PyvmomiClient.get_vm_ips"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.PyvmomiClient.PyvmomiClient.get_vm_ips" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of VMs and their IPs available through the current 
+<tt class="descclassname">PyvmomiClient.</tt><tt class="descname">get_vm_ips</tt><big>(</big><em>hide_empty=True</em>, <em>ipv6_only=False</em><big>)</big><a class="reference internal" href="_modules/clients/PyvmomiClient.html#PyvmomiClient.get_vm_ips"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.PyvmomiClient.PyvmomiClient.get_vm_ips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of VMs and their IPs available through the current
 connection.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hide_empty</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; hide VMs without network information</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hide_empty</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; hide VMs without network information</li>
+<li><strong>ipv6_only</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; use IPv6 addresses only</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1051,19 +1088,6 @@ This requires specifying a VM and a comment title.</p>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="clients.PyvmomiClient.SessionException">
-<em class="property">exception </em><tt class="descclassname">clients.PyvmomiClient.</tt><tt class="descname">SessionException</tt><a class="reference internal" href="_modules/clients/PyvmomiClient.html#SessionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clients.PyvmomiClient.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="katprep.html#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
-<blockquote>
-<div>Dummy class for session errors</div></blockquote>
-<dl class="class">
-<dt id="clients.PyvmomiClient.SessionException.SessionException">
-<em class="property">class </em><tt class="descname">SessionException</tt><a class="headerlink" href="#clients.PyvmomiClient.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 </div>
 
@@ -1077,6 +1101,7 @@ This requires specifying a VM and a comment title.</p>
   <ul>
 <li><a class="reference internal" href="#">clients Package</a><ul>
 <li><a class="reference internal" href="#module-clients.ForemanAPIClient"><tt class="docutils literal"><span class="pre">ForemanAPIClient</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-clients.SpacewalkAPIClient"><tt class="docutils literal"><span class="pre">SpacewalnAPIClient</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-clients.Icinga2APIClient"><tt class="docutils literal"><span class="pre">Icinga2APIClient</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-clients.LibvirtClient"><tt class="docutils literal"><span class="pre">LibvirtClient</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-clients.NagiosCGIClient"><tt class="docutils literal"><span class="pre">NagiosCGIClient</span></tt> Module</a></li>

@@ -20,7 +20,7 @@ Package
 :mod:`authconfig` Module
 ------------------------
 
-.. automodule:: authconfig
+.. automodule:: katprep.authconfig
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,7 +36,7 @@ Package
 :mod:`maintenance` Module
 -------------------------
 
-.. automodule:: maintenance
+.. automodule:: katprep.maintenance
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,7 +44,7 @@ Package
 :mod:`parameters` Module
 ------------------------
 
-.. automodule:: parameters
+.. automodule:: katprep.parameters
     :members:
     :undoc-members:
     :show-inheritance:
@@ -52,7 +52,7 @@ Package
 :mod:`populate` Module
 ----------------------
 
-.. automodule:: populate
+.. automodule:: katprep.populate
     :members:
     :undoc-members:
     :show-inheritance:
@@ -60,7 +60,7 @@ Package
 :mod:`report` Module
 --------------------
 
-.. automodule:: report
+.. automodule:: katprep.report
     :members:
     :undoc-members:
     :show-inheritance:
@@ -68,7 +68,7 @@ Package
 :mod:`snapshot` Module
 ----------------------
 
-.. automodule:: snapshot
+.. automodule:: katprep.snapshot
     :members:
     :undoc-members:
     :show-inheritance:

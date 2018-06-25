@@ -52,38 +52,18 @@
 <span class="c">#!/usr/bin/env python</span>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This file contains the ForemanAPIClient and</span>
-<span class="sd">APILevelNotSupportedException and SessionException classes</span>
+<span class="sd">This file contains the ForemanAPIClient class</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">requests.packages.urllib3.exceptions</span> <span class="kn">import</span> <span class="n">InsecureRequestWarning</span>
+<span class="kn">from</span> <span class="nn">katprep.clients</span> <span class="kn">import</span> <span class="n">SessionException</span><span class="p">,</span> <span class="n">InvalidCredentialsException</span><span class="p">,</span> \
+<span class="n">APILevelNotSupportedException</span><span class="p">,</span> <span class="n">InvalidHostnameFormatException</span>
 
 
 
-<div class="viewcode-block" id="APILevelNotSupportedException"><a class="viewcode-back" href="../../katprep.clients.html#clients.ForemanAPIClient.APILevelNotSupportedException">[docs]</a><span class="k">class</span> <span class="nc">APILevelNotSupportedException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dummy class for unsupported API levels</span>
-
-<span class="sd">.. class:: APILevelNotSupportedException</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
-
-
-</div>
-<div class="viewcode-block" id="SessionException"><a class="viewcode-back" href="../../katprep.clients.html#clients.ForemanAPIClient.SessionException">[docs]</a><span class="k">class</span> <span class="nc">SessionException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dummy class for session errors</span>
-
-<span class="sd">.. class:: SessionException</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
-
-
-</div>
 <div class="viewcode-block" id="ForemanAPIClient"><a class="viewcode-back" href="../../katprep.clients.html#clients.ForemanAPIClient.ForemanAPIClient">[docs]</a><span class="k">class</span> <span class="nc">ForemanAPIClient</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for communicating with the Foreman API</span>
@@ -120,7 +100,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span>
-        <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+                 <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor, creating the class. It requires specifying a</span>
 <span class="sd">        hostname, username and password to access the API. After</span>
@@ -144,7 +124,7 @@
         <span class="c">#disable SSL warning outputs</span>
         <span class="n">requests</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">urllib3</span><span class="o">.</span><span class="n">disable_warnings</span><span class="p">(</span><span class="n">InsecureRequestWarning</span><span class="p">)</span>
         <span class="c">#set connection information</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">HOSTNAME</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_hostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HOSTNAME</span> <span class="o">=</span> <span class="n">hostname</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">USERNAME</span> <span class="o">=</span> <span class="n">username</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">PASSWORD</span> <span class="o">=</span> <span class="n">password</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">VERIFY</span> <span class="o">=</span> <span class="n">verify</span>
@@ -157,14 +137,24 @@
 
 
     <span class="k">def</span> <span class="nf">__connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This function establishes a connection to Foreman.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function establishes a connection to Foreman.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">SESSION</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">USERNAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PASSWORD</span><span class="p">)</span>
 
 
 
-    <span class="c">#TODO: find a nicer way to displaying _all_ the hits...</span>
+<div class="viewcode-block" id="ForemanAPIClient.get_hostname"><a class="viewcode-back" href="../../katprep.clients.html#clients.ForemanAPIClient.ForemanAPIClient.get_hostname">[docs]</a>    <span class="k">def</span> <span class="nf">get_hostname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the configured hostname of the object instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">HOSTNAME</span>
+
+
+
+    <span class="c">#TODO: find a nicer way to displaying _all_ the hits...</span></div>
     <span class="k">def</span> <span class="nf">__api_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">sub_url</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">hits</span><span class="o">=</span><span class="mi">1337</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sends a HTTP request to the Foreman API. This function requires</span>
@@ -197,6 +187,10 @@
                 <span class="c">#going home</span>
                 <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Illegal method &#39;{}&#39; specified&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
 
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s">&quot;</span><span class="si">%s</span><span class="s"> request to </span><span class="si">%s%s</span><span class="s"> (payload: </span><span class="si">%s</span><span class="s">)&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">URL</span><span class="p">,</span>
+                <span class="n">sub_url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="c">#setting headers</span>
             <span class="n">my_headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span>
             <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&quot;get&quot;</span><span class="p">:</span>
@@ -231,7 +225,7 @@
                     <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VERIFY</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="s">&quot;unable to authenticate&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Unable to authenticate&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidCredentialsException</span><span class="p">(</span><span class="s">&quot;Unable to authenticate&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">202</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;{}: HTTP operation not successful {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">result</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
@@ -312,39 +306,16 @@
             <span class="n">result_obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">api_get</span><span class="p">(</span><span class="s">&quot;/status&quot;</span><span class="p">)</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;API version {} found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;api_version&quot;</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;API version </span><span class="si">%s</span><span class="s"> found&quot;</span><span class="p">,</span> <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;api_version&quot;</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;api_version&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">API_MIN</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">APILevelNotSupportedException</span><span class="p">(</span>
-                    <span class="s">&quot;Your API version ({}) does not support the required calls.&quot;</span>
-                    <span class="s">&quot;You&#39;ll need API version {} - stop using historic&quot;</span>
-                    <span class="s">&quot; software!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;api_version&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">API_MIN</span><span class="p">)</span>
+                    <span class="s">&quot;Your API version (</span><span class="si">%s</span><span class="s">) does not support the required calls.&quot;</span>
+                    <span class="s">&quot;You&#39;ll need API version </span><span class="si">%s</span><span class="s"> - stop using historic&quot;</span>
+                    <span class="s">&quot; software!&quot;</span><span class="p">,</span> <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;api_version&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">API_MIN</span>
                 <span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">APILevelNotSupportedException</span><span class="p">(</span><span class="s">&quot;Unable to verify API version&quot;</span><span class="p">)</span>
-
-
-</div>
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="ForemanAPIClient.validate_hostname"><a class="viewcode-back" href="../../katprep.clients.html#clients.ForemanAPIClient.ForemanAPIClient.validate_hostname">[docs]</a>    <span class="k">def</span> <span class="nf">validate_hostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Validates that the Foreman API uses a FQDN as hostname.</span>
-<span class="sd">        Also looks up the &quot;real&quot; hostname if &quot;localhost&quot; is specified.</span>
-<span class="sd">        Otherwise, the picky Foreman API won&#39;t connect.</span>
-
-<span class="sd">        :param hostname: the hostname to validate</span>
-<span class="sd">        :type hostname: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">hostname</span> <span class="o">==</span> <span class="s">&quot;localhost&quot;</span><span class="p">:</span>
-            <span class="c">#get real hostname</span>
-            <span class="n">hostname</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c">#convert to FQDN if possible:</span>
-            <span class="n">fqdn</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyaddr</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">fqdn</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                <span class="n">hostname</span> <span class="o">=</span> <span class="n">fqdn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">hostname</span>
 
 
 </div>
@@ -381,9 +352,7 @@
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">object_id</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="s">&quot;I think I found {} #{}...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">api_object</span><span class="p">,</span> <span class="n">object_id</span>
-                        <span class="p">)</span>
+                        <span class="s">&quot;I think I found </span><span class="si">%s</span><span class="s"> #</span><span class="si">%s</span><span class="s">...&quot;</span><span class="p">,</span> <span class="n">api_object</span><span class="p">,</span> <span class="n">object_id</span>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="n">api_object</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;user&quot;</span><span class="p">:</span>
                     <span class="k">return</span> <span class="s">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -411,7 +380,7 @@
             <span class="s">&quot;host&quot;</span>
         <span class="p">]</span>
         <span class="n">filter_object</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;hostgroup&quot;</span> <span class="p">:</span> <span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;location&quot;</span><span class="p">:</span> <span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;host&quot;</span> <span class="p">:</span> <span class="s">&quot;name&quot;</span><span class="p">,</span> 
+            <span class="s">&quot;hostgroup&quot;</span> <span class="p">:</span> <span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;location&quot;</span><span class="p">:</span> <span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;host&quot;</span> <span class="p">:</span> <span class="s">&quot;name&quot;</span><span class="p">,</span>
             <span class="s">&quot;organization&quot;</span> <span class="p">:</span> <span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;environment&quot;</span> <span class="p">:</span> <span class="s">&quot;name&quot;</span>
         <span class="p">}</span>
         <span class="k">try</span><span class="p">:</span>
@@ -430,11 +399,12 @@
                 <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="n">filter_object</span><span class="p">[</span><span class="n">api_object</span><span class="p">]]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                            <span class="s">&quot;{} {} seems to have ID #{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                <span class="n">api_object</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span>
-                            <span class="p">)</span>
+                            <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> seems to have ID #</span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span>
+                            <span class="n">api_object</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span>
                         <span class="p">)</span>
                         <span class="k">return</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span>
+                <span class="c">#not found</span>
+                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Object not found&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
@@ -450,6 +420,7 @@
 <span class="sd">        :param param_name: host parameter name</span>
 <span class="sd">        :type param_name: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#TODO: Move to get_id_by_name</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">result_obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">api_get</span><span class="p">(</span><span class="s">&quot;/hosts/{}/parameters&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">host</span><span class="p">))</span>
@@ -459,9 +430,8 @@
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">param_name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="s">&quot;Found relevant parameter &#39;{}&#39; with ID #{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">entry</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span>
-                        <span class="p">)</span>
+                        <span class="s">&quot;Found relevant parameter &#39;</span><span class="si">%s</span><span class="s">&#39; with ID #</span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span>
+                        <span class="n">entry</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span>
                     <span class="p">)</span>
                     <span class="k">return</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span>
 
@@ -485,7 +455,43 @@
             <span class="k">return</span> <span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div></div>
+            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+
+</div>
+<div class="viewcode-block" id="ForemanAPIClient.get_task_by_filter"><a class="viewcode-back" href="../../katprep.clients.html#clients.ForemanAPIClient.ForemanAPIClient.get_task_by_filter">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_by_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">task_name</span><span class="p">,</span> <span class="n">task_date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns host management tasks by filter</span>
+
+<span class="sd">        :param host: Foreman host name</span>
+<span class="sd">        :type host: str</span>
+<span class="sd">        :param task_name: Filter argument</span>
+<span class="sd">        :type task_name: str</span>
+<span class="sd">        :param task_date: Task date wildcard</span>
+<span class="sd">        :type task_date: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">my_results</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c">#get _all_ the results</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">api_get</span><span class="p">(</span>
+                    <span class="s">&#39;/../../foreman_tasks/api/tasks?search=&quot;{}&quot;&#39;</span> \
+                    <span class="s">&#39;&amp;order=&quot;started_at DESC&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c">#print results</span>
+            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
+                <span class="c">#validate date and host</span>
+                <span class="n">host_info</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;host&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">host_info</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">host</span> <span class="ow">and</span> \
+                    <span class="n">task_date</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;started_at&quot;</span><span class="p">]:</span>
+                    <span class="n">my_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">my_results</span></div></div>
 </pre></div>
 
           </div>

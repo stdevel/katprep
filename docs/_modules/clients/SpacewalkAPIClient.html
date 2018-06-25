@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>clients.SpacewalkAPIClient &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">katprep 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for clients.SpacewalkAPIClient</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file contains the SpacewalkAPIClient and</span>
+<span class="sd">depending exception classes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">xmlrpclib</span>
+<span class="kn">from</span> <span class="nn">katprep.clients</span> <span class="kn">import</span> <span class="n">SessionException</span><span class="p">,</span> <span class="n">InvalidCredentialsException</span><span class="p">,</span> \
+<span class="n">APILevelNotSupportedException</span><span class="p">,</span> <span class="n">InvalidHostnameFormatException</span>
+
+
+
+<div class="viewcode-block" id="SpacewalkAPIClient"><a class="viewcode-back" href="../../katprep.clients.html#clients.SpacewalkAPIClient.SpacewalkAPIClient">[docs]</a><span class="k">class</span> <span class="nc">SpacewalkAPIClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for communicating with the Spacewalk API</span>
+
+<span class="sd">.. class:: SpacewalkAPIClient</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;SpacewalkAPIClient&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    logging: Logger instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">API_MIN</span> <span class="o">=</span> <span class="mf">14.0</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    int: Minimum supported API version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s">&#39;katprep (https://github.com/stdevel/katprep)&#39;</span><span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    dict: Default headers set for every HTTP request</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hostname</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    str: Spacewalk API hostname</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    str: Spacewalk API base URL</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    str: API username</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    str: API password</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">api_session</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Session: HTTP session to Spacewalk host</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">api_key</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    str: Session key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor, creating the class. It requires specifying a</span>
+<span class="sd">        hostname, username and password to access the API. After</span>
+<span class="sd">        initialization, a connected is established.</span>
+
+<span class="sd">        :param log_level: log level</span>
+<span class="sd">        :type log_level: logging</span>
+<span class="sd">        :param hostname: Spacewalk host</span>
+<span class="sd">        :type hostname: str</span>
+<span class="sd">        :param username: API username</span>
+<span class="sd">        :type username: str</span>
+<span class="sd">        :param password: corresponding password</span>
+<span class="sd">        :type password: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#set logging</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s">&quot;About to create Spacewalk client &#39;</span><span class="si">%s</span><span class="s">&#39;@&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">hostname</span>
+        <span class="p">)</span>
+
+        <span class="c">#set connection information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">hostname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Set hostname to &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;https://{0}/rpc/api&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">)</span>
+
+        <span class="c">#start session and check API version if Spacewalk API</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__connect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_api_support</span><span class="p">()</span>
+
+
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Destructor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_session</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">logout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span> <span class="nf">__connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function establishes a connection to Spacewalk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#set api session and key</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_session</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_session</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Fault</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">faultCode</span> <span class="o">==</span> <span class="mi">2950</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidCredentialsException</span><span class="p">(</span>
+                    <span class="s">&quot;Wrong credentials supplied: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">faultString</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span>
+                    <span class="s">&quot;Generic remote communication error: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">faultString</span>
+                <span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="SpacewalkAPIClient.validate_api_support"><a class="viewcode-back" href="../../katprep.clients.html#clients.SpacewalkAPIClient.SpacewalkAPIClient.validate_api_support">[docs]</a>    <span class="k">def</span> <span class="nf">validate_api_support</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether the API version on the Spacewalk server is supported.</span>
+<span class="sd">        Using older versions than 11.1 is not recommended. In this case, an</span>
+<span class="sd">        exception will be thrown.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c">#check whether API is supported</span>
+            <span class="n">api_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_session</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVersion</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">api_level</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">API_MIN</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">APILevelNotSupportedException</span><span class="p">(</span>
+                    <span class="s">&quot;Your API version ({0}) does not support the required calls. &quot;</span>
+                    <span class="s">&quot;You&#39;ll need API version ({1}) or higher!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">api_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">API_MIN</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Supported API version (&quot;</span> <span class="o">+</span> <span class="n">api_level</span> <span class="o">+</span> <span class="s">&quot;) found.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">APILevelNotSupportedException</span><span class="p">(</span><span class="s">&quot;Unable to verify API version&quot;</span><span class="p">)</span>
+
+
+</div>
+<div class="viewcode-block" id="SpacewalkAPIClient.get_url"><a class="viewcode-back" href="../../katprep.clients.html#clients.SpacewalkAPIClient.SpacewalkAPIClient.get_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the configured URL of the object instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+
+
+</div>
+<div class="viewcode-block" id="SpacewalkAPIClient.get_hostname"><a class="viewcode-back" href="../../katprep.clients.html#clients.SpacewalkAPIClient.SpacewalkAPIClient.get_hostname">[docs]</a>    <span class="k">def</span> <span class="nf">get_hostname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the configured hostname of the objecti nstance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">katprep 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
