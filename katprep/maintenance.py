@@ -155,6 +155,7 @@ def manage_host_preparation(options, host, cleanup=False):
         errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
     except KeyError:
         #no reboot suggested
+        errata_reboot = []
         pass
 
     #schedule downtime if applicable
@@ -304,6 +305,7 @@ def execute(options, args):
                 errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
             except KeyError:
                 #no reboot suggested
+                errata_reboot = []
                 pass
 
             if options.foreman_reboot or \
