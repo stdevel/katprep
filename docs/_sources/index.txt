@@ -20,6 +20,7 @@ Contents:
    Parameter overview <parameter_overview>
    Implementation examples <examples>
    Common issues <issues>
+   Manpages <manpages>
    Debugging and getting help <debug>
 
 

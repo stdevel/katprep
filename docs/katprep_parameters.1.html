@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NAME &mdash; katprep 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
+    <link rel="up" title="Manpages" href="manpages.html" />
+    <link rel="next" title="NAME" href="katprep_populate.1.html" />
+    <link rel="prev" title="NAME" href="katprep_maintenance.1.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="katprep_populate.1.html" title="NAME"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="katprep_maintenance.1.html" title="NAME"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="manpages.html" accesskey="U">Manpages</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="name">
+<h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_parameters</strong> — bulk edits Puppet host parameters for managed
+hosts</p>
+</div>
+<div class="section" id="synopsis">
+<h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_parameters</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
+[<strong>-n</strong>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
+[<strong>&#8211;insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-l</strong> <em>name</em>|<em>id</em> | <strong>-o</strong>
+<em>name</em>|<em>id</em> | <strong>-g</strong> <em>name</em>|<em>id</em> | <strong>-e</strong> <em>name</em>|<em>id</em>]
+[<strong>-A</strong> | <strong>&#8211;add-optional-parameters</strong> | <strong>-R</strong> | <strong>-D</strong> | <strong>-U</strong>
+| <strong>-L</strong>]</p>
+</div>
+<div class="section" id="description">
+<h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>Creates, removes, updates or audits Puppet host parameters used by the
+katprep framework in order to automate system maintenance. Use this
+utility to bulk edit host parameters, e.g. to change snapshot protection
+settings per hostgroup. For the first integration of your
+infrastructure, use <strong>katprep_populate(1)</strong> as it offers
+auto-discovery.</p>
+<div class="section" id="host-parameters">
+<h2>Host parameters<a class="headerlink" href="#host-parameters" title="Permalink to this headline">¶</a></h2>
+<p>The following Puppet host parameters are created/updated:</p>
+<dl class="docutils">
+<dt>katprep_mon</dt>
+<dd>URL of the monitoring system (see also <strong>Monitoring URLs</strong>)</dd>
+<dt>katprep_mon_name</dt>
+<dd>Object name within monitoring if ont FQDN</dd>
+<dt>katprep_mon_type</dt>
+<dd>Monitoring system type: [<em>nagios</em>|<em>icinga</em>] (default: icinga)</dd>
+<dt>katprep_virt</dt>
+<dd>URI of the virtualization host (see also <strong>Virtualization URIs</strong>)</dd>
+<dt>katprep_virt_snapshot</dt>
+<dd>Boolean [<em>0</em>|<em>1</em>] whether the system needs to be protected by a
+snapshot</dd>
+<dt>katprep_virt_name</dt>
+<dd>Object name within hypervisor if not FQDN</dd>
+<dt>katprep_virt_type</dt>
+<dd>Virtualization host type, [<em>libvirt</em>|<em>pyvmovmi</em>] (default:
+libvirt)</dd>
+</dl>
+</div>
+<div class="section" id="virtualization-uris">
+<h2>Virtualization URIs<a class="headerlink" href="#virtualization-uris" title="Permalink to this headline">¶</a></h2>
+<p>When using <strong>libvirt</strong> specify a valid connection URI, such as:</p>
+<div class="line-block">
+<div class="line">qemu+ssh://root&#64;pinkepank.giertz.loc/system</div>
+<div class="line">xen:///system</div>
+<div class="line">esx:///system</div>
+<div class="line">vbox:///system</div>
+</div>
+<p>See the libvirt documentation
+(<a class="reference external" href="https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html">https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html</a>)
+for more examples.</p>
+<p>When using <strong>pyvmomi</strong>, specify a valid ESXi host or vCenter Server
+hostname, such as:</p>
+<div class="line-block">
+<div class="line">vcenter.localdomain.loc</div>
+<div class="line">esxi.giertz.loc</div>
+</div>
+</div>
+<div class="section" id="monitoring-urls">
+<h2>Monitoring URLs:<a class="headerlink" href="#monitoring-urls" title="Permalink to this headline">¶</a></h2>
+<p>When using <strong>nagios</strong> (<em>NagiosCGIClient</em>), specify the full Nagios or
+Icinga 1.x URL - make sure <strong>not</strong> to include <strong>/cgi-bin</strong>. Examples:</p>
+<div class="line-block">
+<div class="line"><a class="reference external" href="https://nagios.giertz.loc/nagios">https://nagios.giertz.loc/nagios</a></div>
+<div class="line"><a class="reference external" href="http://omd.pinkepank.loc/icinga">http://omd.pinkepank.loc/icinga</a></div>
+</div>
+<p>When using <strong>icinga</strong> (<em>IcingaAPIClient</em>), specify the full API URL
+including the port - such as:</p>
+<p><a class="reference external" href="https://bigbrother.giertz.loc:5665">https://bigbrother.giertz.loc:5665</a></p>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>Prints brief usage information.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></td>
+<td>Prints the current version number.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
+<td>Supresses printing status messages to stdout.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
+<td>Enables debugging outputs.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
+<td>Only simulates what would be done (default: no)</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-C <em>filename</em>, &#8211;auth-container <em>filename</em></dt>
+<dd>Defines an authentication container file (see also
+<strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</dd>
+<dt>-P <em>passphrase</em>, &#8211;auth-password <em>passphrase</em></dt>
+<dd>Defines the authentication container password to avoid password
+prompt (unattented mode)</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>Disables SSL verification (default: no)</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-s <em>hostname</em>, &#8211;server <em>hostname</em></dt>
+<dd>Defines the Foreman server to use (default: localhost)</dd>
+<dt>-l <em>name</em>|<em>id</em>, &#8211;location <em>name</em>|<em>id</em></dt>
+<dd>filters by particular location</dd>
+<dt>-o <em>name</em>|<em>id</em>, &#8211;organization <em>name</em>|<em>id</em></dt>
+<dd>filters by particular organization</dd>
+<dt>-g <em>name</em>|<em>id</em>, &#8211;hostgroup <em>name</em>|<em>id</em></dt>
+<dd>filters by particular hostgroup</dd>
+<dt>-e <em>name</em>|<em>id</em>, &#8211;environment <em>name</em>|<em>id</em></dt>
+<dd>filters by particular Puppet environment</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-A</span>, <span class="option">--add-parameters</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Adds built-in parameters (<em>katprep_mon</em>, <em>katprep_virt</em>,
+<em>katprep_virt_snapshot</em>) to all affected hosts (default: no)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--add-optional-parameters</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Adds optoinal built-in parameters (<em>katprep_mon_type</em>,
+<em>katprep_mon_name</em>, <em>katprep_virt_name</em>, <em>katprep_virt_type</em>)
+to all affected hosts (default: no)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-R</span>, <span class="option">--remove-parameters</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Removes built-in parameters from all affected hosts (default: no)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-D</span>, <span class="option">--display-parameters</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Lists values of defined parameters for affected hosts (default: no)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-U</span>, <span class="option">--update-parameters</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Updates values of defined parameters for affected hosts (default:
+no)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-L</span>, <span class="option">--list-parameters</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Only lists available parameters (default: no)</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="examples">
+<h1>EXAMPLES<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<p>It is a good idea to start-over by specifying your monitoring and
+hypervisor systems and enabling <strong>dry-run</strong> mode:</p>
+<div class="line-block">
+<div class="line">$ katprep_parameters &#8211;virt-uri st-vcsa03.stankowic.loc &#8211;virt-type</div>
+</div>
+<p>pyvmomi &#8211;mon-url <a class="reference external" href="https://st-mon03.stankowic.loc:5665">https://st-mon03.stankowic.loc:5665</a> -C pinkepank.auth
+&#8211;dry-run
+| <a class="reference external" href="INFO:katprep_parameters:This">INFO:katprep_parameters:This</a> is just a SIMULATION - no changes will
+be made.
+| <a class="reference external" href="INFO:katprep_parameters:Host">INFO:katprep_parameters:Host</a> &#8216;giertz.stankowic.loc&#8217; ==&gt; set/update
+parameter/value: katprep_virt/st-vcsa03.stankowic.loc
+| <a class="reference external" href="INFO:katprep_parameters:Host">INFO:katprep_parameters:Host</a> &#8216;giertz.stankowic.loc&#8217; ==&gt; set/update
+parameter/value: katprep_mon_type/icinga
+| ...</p>
+<p>Check the values that would be set - run the command again with omitting
+the <strong>dry-run</strong> parameter if they are correct.</p>
+</div>
+<div class="section" id="files">
+<h1>FILES<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt><em>~/.katpreprc</em></dt>
+<dd>Per-user katprep configuration file.</dd>
+<dt><em>katprep.auth</em></dt>
+<dd>Individual katprep authentication container file.</dd>
+</dl>
+</div>
+<div class="section" id="bugs">
+<h1>BUGS<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
+<p>See GitHub issues: <a class="reference external" href="https://github.com/stdevel/katprep/issues">https://github.com/stdevel/katprep/issues</a></p>
+</div>
+<div class="section" id="author">
+<h1>AUTHOR<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h1>
+<p>Christian Stankowic <a class="reference external" href="mailto:info&#37;&#52;&#48;cstan&#46;io">info<span>&#64;</span>cstan<span>&#46;</span>io</a></p>
+</div>
+<div class="section" id="see-also">
+<h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_authconfig(1)</strong>, <strong>katprep_populate(1)</strong></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NAME</a></li>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
+<li><a class="reference internal" href="#host-parameters">Host parameters</a></li>
+<li><a class="reference internal" href="#virtualization-uris">Virtualization URIs</a></li>
+<li><a class="reference internal" href="#monitoring-urls">Monitoring URLs:</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">EXAMPLES</a></li>
+<li><a class="reference internal" href="#files">FILES</a></li>
+<li><a class="reference internal" href="#bugs">BUGS</a></li>
+<li><a class="reference internal" href="#author">AUTHOR</a></li>
+<li><a class="reference internal" href="#see-also">SEE ALSO</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="katprep_maintenance.1.html"
+                        title="previous chapter">NAME</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="katprep_populate.1.html"
+                        title="next chapter">NAME</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/katprep_parameters.1.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="katprep_populate.1.html" title="NAME"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="katprep_maintenance.1.html" title="NAME"
+             >previous</a> |</li>
+        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="manpages.html" >Manpages</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
