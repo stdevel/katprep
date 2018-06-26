@@ -97,7 +97,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">OPT_PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&quot;katprep_mon_name&quot;</span> <span class="p">:</span> <span class="s">&quot;Object name within monitoring if not FQDN&quot;</span><span class="p">,</span>
-    <span class="s">&quot;katprep_mon_type&quot;</span> <span class="p">:</span> <span class="s">&quot;Monitoring system type: nagios/(icinga2)&quot;</span><span class="p">,</span>
+    <span class="s">&quot;katprep_mon_type&quot;</span> <span class="p">:</span> <span class="s">&quot;Monitoring system type: nagios/(icinga)&quot;</span><span class="p">,</span>
     <span class="s">&quot;katprep_virt_name&quot;</span><span class="p">:</span> <span class="s">&quot;Object name within hypervisor if not FQDN&quot;</span><span class="p">,</span>
     <span class="s">&quot;katprep_virt_type&quot;</span><span class="p">:</span> <span class="s">&quot;Virtualization host type: (libvirt)/pyvmomi&quot;</span>
 <span class="p">}</span>
@@ -342,11 +342,11 @@
     <span class="c">#-D / --display-values</span>
     <span class="n">action_opts_excl</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;-D&quot;</span><span class="p">,</span> <span class="s">&quot;--display-parameters&quot;</span><span class="p">,</span> \
     <span class="n">action</span><span class="o">=</span><span class="s">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&quot;action_display&quot;</span><span class="p">,</span> \
-    <span class="n">help</span><span class="o">=</span><span class="s">&quot;lists values of defined parameters of affected hosts (default: no)&quot;</span><span class="p">)</span>
+    <span class="n">help</span><span class="o">=</span><span class="s">&quot;lists values of defined parameters for affected hosts (default: no)&quot;</span><span class="p">)</span>
     <span class="c">#-U / --update-parameters</span>
     <span class="n">action_opts_excl</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;-U&quot;</span><span class="p">,</span> <span class="s">&quot;--update-parameters&quot;</span><span class="p">,</span> \
     <span class="n">action</span><span class="o">=</span><span class="s">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&quot;action_update&quot;</span><span class="p">,</span> \
-    <span class="n">help</span><span class="o">=</span><span class="s">&quot;updates values of defined parameters of affected hosts (default: no)&quot;</span><span class="p">)</span>
+    <span class="n">help</span><span class="o">=</span><span class="s">&quot;updates values of defined parameters for affected hosts (default: no)&quot;</span><span class="p">)</span>
     <span class="c">#-L / --list-parameters</span>
     <span class="n">action_opts_excl</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;-L&quot;</span><span class="p">,</span> <span class="s">&quot;--list-parameters&quot;</span><span class="p">,</span> \
     <span class="n">action</span><span class="o">=</span><span class="s">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&quot;action_list&quot;</span><span class="p">,</span> \
