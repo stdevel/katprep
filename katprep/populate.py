@@ -243,7 +243,7 @@ def parse_options(args=None):
     metavar="URL", default="", help="defines a monitoring URL to use")
     #--mon-type
     mon_opts.add_argument("--mon-type", dest="mon_type", \
-    metavar="TYPE", type=str, choices="nagios|icinga", default="icinga", \
+    metavar="nagios|icinga", type=str, choices="nagios|icinga", default="icinga", \
     help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or" \
     " icinga (Icinga 2.x). (default: icinga)")
     #--skip-mon
