@@ -1,0 +1,89 @@
+.TH "katprep_report" "1" "" "Version 0.5.0" "katprep documentation"
+.SH NAME
+.PP
+\f[B]katprep_report\f[] \[em] creates reports after system maintenance
+.SH SYNOPSIS
+.PP
+\f[B]katprep_report\f[] [\f[B]\-h\f[]] [\f[B]\-v\f[]] [\f[B]\-q\f[]]
+[\f[B]\-d\f[]] [\f[B]\-p\f[] \f[I]path\f[]] [\f[B]\-o\f[] \f[I]path\f[]]
+[\f[B]\-x\f[]] [\f[B]\-t\f[] \f[I]file\f[]] \f[I]snapshot_file\f[]
+\f[I]snapshot_file\f[]
+.SH DESCRIPTION
+.PP
+Creates reports after system maintenance based on two infrastructure
+status snapshots created by \f[B]katprep_snapshot(1)\f[].
+The utility will automatically detect previous and current snapshots by
+checking the report change times.
+.PP
+Run this utility after maintaining systems using
+\f[B]katprep_maintenance(1)\f[].
+.SS Options
+.TP
+.B \-h, \-\-help
+Prints brief usage information.
+.RS
+.RE
+.TP
+.B \-v, \-\-version
+Prints the current version number.
+.RS
+.RE
+.TP
+.B \-q, \-\-quiet
+Supresses printing status messages to stdout.
+.RS
+.RE
+.TP
+.B \-d, \-\-debug
+Enables debugging outputs.
+.RS
+.RE
+.TP
+.B \-p \f[I]path\f[], \-\-output\-path \f[I]path\f[]
+Defines the report output path (default: current directory)
+.RS
+.RE
+.TP
+.B \-C \f[I]filename\f[], \-\-auth\-container \f[I]filename\f[]
+Defines an authentication container file (see also
+\f[B]katprep.auth(5)\f[] and \f[B]katprep_authconfig(1)\f[])
+.RS
+.RE
+.TP
+.B \-o \f[I]type\f[], \-\-output\-tpe \f[I]type\f[]
+Defines the Pandoc output file type, usually this is set automatically
+based on the template file extension (default: no)
+.RS
+.RE
+.TP
+.B \-x, \-\-preserve\-yaml
+Keeps the YAML metadata after creating the reports, useful for debugging
+(default: no)
+.RS
+.RE
+.TP
+.B \-t \f[I]file\f[], \-\-template \f[I]file\f[]
+Defined the Pandoc template to use
+.RS
+.RE
+.SH FILES
+.TP
+.B \f[I]~/.katpreprc\f[]
+Per\-user katprep configuration file.
+.RS
+.RE
+.TP
+.B \f[I]katprep.auth\f[]
+Individual katprep authentication container file.
+.RS
+.RE
+.SH BUGS
+.PP
+See GitHub issues: <https://github.com/stdevel/katprep/issues>
+.SH AUTHOR
+.PP
+Christian Stankowic <info@cstan.io>
+.SH SEE ALSO
+.PP
+\f[B]errata\-diff.yml(5)\f[], \f[B]katprep_maintenance(1)\f[],
+\f[B]katprep_snapshot(1)\f[]
