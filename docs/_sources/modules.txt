@@ -1,8 +1,0 @@
-.
-=
-
-.. toctree::
-   :maxdepth: 4
-
-   katprep
-   katprep.clients

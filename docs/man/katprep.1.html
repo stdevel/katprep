@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NAME &mdash; katprep 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="name">
+<h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep</strong> — Python toolkit for automating system maintenance and
+generating patch reports along with Foreman/Katello and Red Hat
+Satellite 6.x</p>
+</div>
+<div class="section" id="description">
+<h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>katprep is a toolkit for automating system maintenance tasks such as:</p>
+<ul class="simple">
+<li>Preparing system maintenance (scheduling downtimes, creating VM
+snapshots)</li>
+<li>Installing errata and non-erratum package upgrades</li>
+<li>Showing status of maintenance progress</li>
+<li>Checking monitoring and snapshot status</li>
+<li>Reverting VM snapshots</li>
+<li>Removing downtimes and snapshots</li>
+<li>Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
+IT certifications)</li>
+</ul>
+<p>For VM management, the <strong>libvirt</strong> and <strong>pyVmomi</strong> (VMware vSphere
+Python API bindings) libraries are used, therefore at least the
+following hypervisors are supported: - VMware vSphere, Workstation,
+Player - VirtualBox - QEMU - KVM - XEN - Microsoft Hyper-V</p>
+<p>Check-out the libvirt website (<a class="reference external" href="https://libvirt.org/drivers.html">https://libvirt.org/drivers.html</a>) for
+additional drivers.</p>
+<p>For managing monitoring, the following products are supported: -
+Nagios/Icinga 1.x - Icinga2</p>
+<p>When creating reports, the document converter Pandoc is used. This
+enables exporting reports in various formats; this utility offers
+pre-defined Markdown and HTML templates.</p>
+<div class="section" id="virtualization-uris">
+<h2>Virtualization URIs<a class="headerlink" href="#virtualization-uris" title="Permalink to this headline">¶</a></h2>
+<p>When using <strong>libvirt</strong> specify a valid connection URI, such as:</p>
+<div class="line-block">
+<div class="line">qemu+ssh://root&#64;pinkepank.giertz.loc/system</div>
+<div class="line">xen:///system</div>
+<div class="line">esx:///system</div>
+<div class="line">vbox:///system</div>
+</div>
+<p>See the libvirt documentation
+(<a class="reference external" href="https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html">https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html</a>)
+for more examples.</p>
+<p>When using <strong>pyvmomi</strong>, specify a valid ESXi host or vCenter Server
+hostname, such as:</p>
+<div class="line-block">
+<div class="line">vcenter.localdomain.loc</div>
+<div class="line">esxi.giertz.loc</div>
+</div>
+</div>
+<div class="section" id="monitoring-urls">
+<h2>Monitoring URLs:<a class="headerlink" href="#monitoring-urls" title="Permalink to this headline">¶</a></h2>
+<p>When using <strong>nagios</strong> (<em>NagiosCGIClient</em>), specify the full Nagios or
+Icinga 1.x URL - make sure <strong>not</strong> to include <strong>/cgi-bin</strong>. Examples:</p>
+<div class="line-block">
+<div class="line"><a class="reference external" href="https://nagios.giertz.loc/nagios">https://nagios.giertz.loc/nagios</a></div>
+<div class="line"><a class="reference external" href="http://omd.pinkepank.loc/icinga">http://omd.pinkepank.loc/icinga</a></div>
+</div>
+<p>When using <strong>icinga</strong> (<em>IcingaAPIClient</em>), specify the full API URL
+including the port - such as:</p>
+<p><a class="reference external" href="https://bigbrother.giertz.loc:5665">https://bigbrother.giertz.loc:5665</a></p>
+</div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<p>The following utilities are part of the katprep framework:</p>
+<ul class="simple">
+<li><strong>katprep_authconfig(1)</strong> - Manages credentials for third-party
+systems triggered by katprep</li>
+<li><strong>katprep_maintenance(1)</strong> - Prepares, executes and verifies system
+maintenance tasks</li>
+<li><strong>katprep_parameters(1)</strong> - Bulk edits Puppet host parameters for
+managed hosts</li>
+<li><strong>katprep_populate(1)</strong> - Auto-discovers and updates monitoring and
+hypervisor information for managed systems</li>
+<li><strong>katprep_report(1)</strong> - Creates reports after system maintenance</li>
+<li><strong>katprep_snapshot(1)</strong> - Creates infrastructure status overview
+snapshots</li>
+</ul>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>In order to automate system maintenance, you will need to represent your
+system landscape in katprep as the toolkit needs to know <em>which</em> hosts
+are <em>VMs</em> running on <em>which</em> hypervisor monitored by <em>which</em> monitoring
+system (managing physical hosts is also possible). From a Foreman
+perspective, these information are stored as Puppet host parameter - see
+also <strong>katprep_parameters(1)</strong>. To omit the need of entering these
+information manually, two tools can assist - see
+<strong>katprep_parameters(1)</strong> and <strong>katprep_populate(1)</strong>.</p>
+<p>After your infrastructure is known to katprep, it can create
+infrastructure status reports using <strong>katprep_snapshot(5)</strong>. This
+snapshot includes information about hosts and outstanding patches.
+Before and after managing hosts, a report needs to be created in order
+to be able to calculate the delta. System maintenance is triggered via
+<strong>katprep_maintenance(1)</strong>. This utilities automates preparing,
+executing, verifying and cleaning-up maintenance tasks.</p>
+<p>After finishing maintenance, it is possible to create maintenance
+reports by leveraging <strong>katprep_report(1)</strong>.</p>
+<p>So, in summary - to automate patching your system landscape, execute the
+following tools:</p>
+<ol class="arabic simple">
+<li><strong>katprep_snapshot(1)</strong> to create an infrastructure snapshot</li>
+<li><strong>katprep_maintenance(1)</strong> to prepare, execute and clean-up
+maintenance</li>
+<li><strong>katprep_snapshot(1)</strong> to create another infrastructure snapshot</li>
+<li><strong>katprep_report(1)</strong> to create maintenance reports (optional)</li>
+</ol>
+</div>
+</div>
+<div class="section" id="bugs">
+<h1>BUGS<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
+<p>See GitHub issues: <a class="reference external" href="https://github.com/stdevel/katprep/issues">https://github.com/stdevel/katprep/issues</a></p>
+</div>
+<div class="section" id="author">
+<h1>AUTHOR<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h1>
+<p>Christian Stankowic <a class="reference external" href="mailto:info&#37;&#52;&#48;cstan&#46;io">info<span>&#64;</span>cstan<span>&#46;</span>io</a></p>
+</div>
+<div class="section" id="see-also">
+<h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_authconfig(1)</strong>, <strong>katprep_maintenance(1)</strong>,
+<strong>katprep_parameters(1)</strong>, <strong>katprep_populate(1)</strong>,
+<strong>katprep_report(1)</strong>, <strong>katprep_snapshot(1)</strong></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NAME</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
+<li><a class="reference internal" href="#virtualization-uris">Virtualization URIs</a></li>
+<li><a class="reference internal" href="#monitoring-urls">Monitoring URLs:</a></li>
+<li><a class="reference internal" href="#utilities">Utilities</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bugs">BUGS</a></li>
+<li><a class="reference internal" href="#author">AUTHOR</a></li>
+<li><a class="reference internal" href="#see-also">SEE ALSO</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/man/katprep.1.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

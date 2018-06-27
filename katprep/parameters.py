@@ -19,7 +19,7 @@ UnsupportedFilterException
 
 
 
-__version__ = "0.0.1"
+__version__ = "0.5.0"
 """
 str: Program version
 """
@@ -45,7 +45,7 @@ dict: Built-in default host parameters mandatory for katprep
 """
 OPT_PARAMETERS = {
     "katprep_mon_name" : "Object name within monitoring if not FQDN",
-    "katprep_mon_type" : "Monitoring system type: nagios/(icinga2)",
+    "katprep_mon_type" : "Monitoring system type: nagios/(icinga)",
     "katprep_virt_name": "Object name within hypervisor if not FQDN",
     "katprep_virt_type": "Virtualization host type: (libvirt)/pyvmomi"
 }
@@ -290,11 +290,11 @@ def parse_options(args=None):
     #-D / --display-values
     action_opts_excl.add_argument("-D", "--display-parameters", \
     action="store_true", default=False, dest="action_display", \
-    help="lists values of defined parameters of affected hosts (default: no)")
+    help="lists values of defined parameters for affected hosts (default: no)")
     #-U / --update-parameters
     action_opts_excl.add_argument("-U", "--update-parameters", \
     action="store_true", default=False, dest="action_update", \
-    help="updates values of defined parameters of affected hosts (default: no)")
+    help="updates values of defined parameters for affected hosts (default: no)")
     #-L / --list-parameters
     action_opts_excl.add_argument("-L", "--list-parameters", \
     action="store_true", default=False, dest="action_list", \

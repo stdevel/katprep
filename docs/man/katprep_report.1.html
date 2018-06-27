@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NAME &mdash; katprep 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="name">
+<h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_report</strong> — Creates reports after system maintenance</p>
+</div>
+<div class="section" id="synopsis">
+<h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_report</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>] [<strong>-p</strong>
+<em>path</em>] [<strong>-o</strong> <em>path</em>] [<strong>-x</strong>] [<strong>-t</strong> <em>file</em>] <em>snapshot_file</em>
+<em>snapshot_file</em></p>
+</div>
+<div class="section" id="description">
+<h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>Creates reports after system maintenance based on two infrastructure
+status snapshots created by <strong>katprep_snapshot(1)</strong>. The utility will
+automatically detect previous and current snapshots by checking the
+report change times.</p>
+<p>Run this utility after maintaining systems using
+<strong>katprep_maintenance(1)</strong>.</p>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>Prints brief usage information.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></td>
+<td>Prints the current version number.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
+<td>Supresses printing status messages to stdout.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
+<td>Enables debugging outputs.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-p <em>path</em>, &#8211;output-path <em>path</em></dt>
+<dd>Defines the report output path (default: current directory)</dd>
+<dt>-C <em>filename</em>, &#8211;auth-container <em>filename</em></dt>
+<dd>Defines an authentication container file (see also
+<strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</dd>
+<dt>-o <em>type</em>, &#8211;output-tpe <em>type</em></dt>
+<dd>Defines the Pandoc output file type, usually this is set
+automatically based on the template file extension (default: no)</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-x</span>, <span class="option">--preserve-yaml</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Keeps the YAML metadata after creating the reports, useful for
+debugging (default: no)</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-t <em>file</em>, &#8211;template <em>file</em></dt>
+<dd>Defined the Pandoc template to use</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="files">
+<h1>FILES<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt><em>~/.katpreprc</em></dt>
+<dd>Per-user katprep configuration file.</dd>
+<dt><em>katprep.auth</em></dt>
+<dd>Individual katprep authentication container file.</dd>
+</dl>
+</div>
+<div class="section" id="bugs">
+<h1>BUGS<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
+<p>See GitHub issues: <a class="reference external" href="https://github.com/stdevel/katprep/issues">https://github.com/stdevel/katprep/issues</a></p>
+</div>
+<div class="section" id="author">
+<h1>AUTHOR<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h1>
+<p>Christian Stankowic <a class="reference external" href="mailto:info&#37;&#52;&#48;cstan&#46;io">info<span>&#64;</span>cstan<span>&#46;</span>io</a></p>
+</div>
+<div class="section" id="see-also">
+<h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep(1)</strong>, <strong>errata-diff.yml(5)</strong>, <strong>katprep_maintenance(1)</strong>,
+<strong>katprep_snapshot(1)</strong></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NAME</a></li>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#files">FILES</a></li>
+<li><a class="reference internal" href="#bugs">BUGS</a></li>
+<li><a class="reference internal" href="#author">AUTHOR</a></li>
+<li><a class="reference internal" href="#see-also">SEE ALSO</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/man/katprep_report.1.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

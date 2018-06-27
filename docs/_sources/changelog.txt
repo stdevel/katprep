@@ -68,5 +68,10 @@ Shared library
 ==============
 * added parameters ``-P`` / ``--auth-password`` for pre-defining authentication container password (`issue36`_)
 
-
 .. _issue36: https://github.com/stdevel/katprep/issues/36
+
+Miscellaneous
+=============
+* added manpages (`issue11`_)
+
+.. _issue11: https://github.com/stdevel/katprep/issues/11

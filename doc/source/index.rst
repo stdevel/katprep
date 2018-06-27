@@ -6,26 +6,52 @@
 Welcome to katprep's documentation!
 ===================================
 
-Contents:
+Generic topics
+==============
 
 .. toctree::
    :maxdepth: 1
 
    Changelog <changelog>
+   Tested setups <tested_setups>
+   Common issues <issues>
+   Debugging and getting help <debug>
+   Module details <modules>
+
+Instalation and usage
+=====================
+
+.. toctree::
+   :maxdepth: 1
+
    Basic installation <installation>
    Authentication <authentication>
    Represent your landscape <landscape>
-   Tested setups <tested_setups>
    Customizing reports <reports>
    Parameter overview <parameter_overview>
    Implementation examples <examples>
-   Common issues <issues>
-   Debugging and getting help <debug>
 
+Manpages
+========
 
-..   Module details<modules>
+---------
+Utilities
+---------
 
+- :doc:`katprep(1) <man/katprep.1>`
+- :doc:`katprep_authconfig(1) <man/katprep_authconfig.1>`
+- :doc:`katprep_maintenance(1) <man/katprep_maintenance.1>`
+- :doc:`katprep_parameters(1) <man/katprep_parameters.1>`
+- :doc:`katprep_populate(1) <man/katprep_populate.1>`
+- :doc:`katprep_report(1) <man/katprep_report.1>`
+- :doc:`katprep_snapshot(1) <man/katprep_snapshot.1>`
 
+-------------------
+Configuration files
+-------------------
+
+- :doc:`errata-diff.yml(5) <man/errata-diff.yml.5>`
+- :doc:`katprep.auth(5) <man/katprep.auth.5>`
 
 Indices and tables
 ==================
@@ -33,6 +59,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-
-

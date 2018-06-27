@@ -12,7 +12,7 @@ import json
 import getpass
 from .AuthContainer import AuthContainer, ContainerException
 
-__version__ = "0.0.1"
+__version__ = "0.5.0"
 LOGGER = logging.getLogger('katprep_authconfig')
 """
 logging: Logger instance

@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NAME &mdash; katprep 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="name">
+<h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_authconfig</strong> — Manages credentials for third-party systems
+triggered by katprep</p>
+</div>
+<div class="section" id="synopsis">
+<h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep_authconfig</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
+[<em>file</em>] [<strong>list</strong>|<strong>add</strong>|<strong>remove</strong>|<strong>password</strong>]</p>
+</div>
+<div class="section" id="description">
+<h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>Creates, modifies and removes entries from authentication containers
+used by the <strong>katprep(1)</strong> framework in order to gain access to external
+third-party systems (such as monitoring systems and hypervisors). This
+removes the need of entering login information every time to trigger
+external systems. Authentication containers are JSON documents that can
+also be protected by a passphrase. In this case, you need to enter the
+passphrase once when using the container.</p>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>Prints brief usage information.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></td>
+<td>Prints the current version number.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
+<td>Supresses printing status messages to stdout.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
+<td>Enables debugging outputs.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="listing-credentials">
+<h2>Listing credentials<a class="headerlink" href="#listing-credentials" title="Permalink to this headline">¶</a></h2>
+<p>To list credentials, use the <strong>list</strong> command. By default, the output
+will contain hostnames and usernames, but no password. To also show
+password in plain text, add the following parameter:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-a</span>, <span class="option">--show-password</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>also print passwords.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="adding-credentials">
+<h2>Adding credentials<a class="headerlink" href="#adding-credentials" title="Permalink to this headline">¶</a></h2>
+<p>To add credentials, use the <strong>add</strong> command. By default, you will be
+prompted for hostname, username and password. To pre-select information,
+utilize the following parameters:</p>
+<dl class="docutils">
+<dt>-H <em>hostname</em>, &#8211;hostname <em>hostname</em></dt>
+<dd>Third-party system hostname</dd>
+<dt>-u <em>username</em>, &#8211;username <em>username</em></dt>
+<dd>Appropriate username</dd>
+<dt>-p <em>password</em>, &#8211;password <em>password</em></dt>
+<dd>Corresponding password</dd>
+</dl>
+</div>
+<div class="section" id="removing-credentials">
+<h2>Removing credentials<a class="headerlink" href="#removing-credentials" title="Permalink to this headline">¶</a></h2>
+<p>To remove credentials, use the <strong>remove</strong> command. You will be prompted
+for a hostname, to pre-select the hostname, utilize the following
+parameter:</p>
+<dl class="docutils">
+<dt>-H <em>hostname</em>, &#8211;hostname <em>hostname</em></dt>
+<dd>Third-party system hostname</dd>
+</dl>
+</div>
+<div class="section" id="encrypting-decrypting-containers">
+<h2>Encrypting/decrypting containers<a class="headerlink" href="#encrypting-decrypting-containers" title="Permalink to this headline">¶</a></h2>
+<p>By default, authentication containers contain login information in plain
+text. To enhance security, it is possible to encrypt the passwords with
+a passphrase up to 32 chars. To encrypt or decrypt a file, utilize the
+<strong>password</strong> command. By default, the utility prompts a password. To
+pre-select the password, utilize the following parameter:</p>
+<dl class="docutils">
+<dt>-p <em>password</em>, &#8211;password <em>password</em></dt>
+<dd>Password</dd>
+</dl>
+<p>To encrypt an authentication container, simply execute
+<strong>katprep_authconfig</strong> [<em>file</em>] <strong>password</strong> and specify a
+passphrase. To remove the encryption, re-run the command without
+specifying a passphrase.</p>
+</div>
+</div>
+<div class="section" id="files">
+<h1>FILES<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt><em>~/.katpreprc</em></dt>
+<dd>Per-user katprep configuration file.</dd>
+<dt><em>katprep.auth</em></dt>
+<dd>Individual katprep authentication container file.</dd>
+</dl>
+</div>
+<div class="section" id="bugs">
+<h1>BUGS<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
+<p>See GitHub issues: <a class="reference external" href="https://github.com/stdevel/katprep/issues">https://github.com/stdevel/katprep/issues</a></p>
+</div>
+<div class="section" id="author">
+<h1>AUTHOR<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h1>
+<p>Christian Stankowic <a class="reference external" href="mailto:info&#37;&#52;&#48;cstan&#46;io">info<span>&#64;</span>cstan<span>&#46;</span>io</a></p>
+</div>
+<div class="section" id="see-also">
+<h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
+<p><strong>katprep(1)</strong>, <strong>katprep.auth(5)</strong></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NAME</a></li>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#listing-credentials">Listing credentials</a></li>
+<li><a class="reference internal" href="#adding-credentials">Adding credentials</a></li>
+<li><a class="reference internal" href="#removing-credentials">Removing credentials</a></li>
+<li><a class="reference internal" href="#encrypting-decrypting-containers">Encrypting/decrypting containers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#files">FILES</a></li>
+<li><a class="reference internal" href="#bugs">BUGS</a></li>
+<li><a class="reference internal" href="#author">AUTHOR</a></li>
+<li><a class="reference internal" href="#see-also">SEE ALSO</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/man/katprep_authconfig.1.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
