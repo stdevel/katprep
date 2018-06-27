@@ -39,7 +39,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: System Administrators',
         'Topic :: System :: Systems Administration',
         'Topic :: Utilities',
@@ -59,6 +59,8 @@ setup(
         'lxml',
         'pyvmomi',
         'pyyaml',
+        'fernet',
+        'cryptography',
         # TODO: specify libvirt?
     ],
     # Remember to insert the requirements into requirements.txt!
