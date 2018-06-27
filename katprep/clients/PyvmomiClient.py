@@ -143,7 +143,7 @@ class PyvmomiClient(object):
                             snapshot.snapshot.RemoveSnapshot_Task(True)
                         else:
                             #revert snapshot
-                            snapshot.snapshot.RevertToSnapshot_Task(True)
+                            snapshot.snapshot.RevertToSnapshot_Task()
                     if childs:
                         #also iterate through childs
                         for child in childs:
@@ -153,8 +153,7 @@ class PyvmomiClient(object):
                                     child.snapshot.RemoveSnapshot_Task(True)
                                 else:
                                     #revert snapshot
-                                    child.snapshot.RevertToSnapshot_Task(True)
-            #TODO: implement revert
+                                    child.snapshot.RevertToSnapshot_Task()
             else:
                 #only create snapshot if not already existing
                 try:
