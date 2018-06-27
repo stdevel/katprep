@@ -232,7 +232,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'katprep', u'katprep Documentation',
-   u'Christian Stankowic', 'katprep', 'One line description of project.',
+   u'Christian Stankowic', 'katprep', 'Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Red Hat Satellite 6.x',
    'Miscellaneous'),
 ]
 

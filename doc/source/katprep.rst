@@ -78,5 +78,5 @@ Subpackages
 
 .. toctree::
 
-    clients
+    katprep.clients
 

@@ -3,7 +3,7 @@
 #source and output directory
 source := src
 output := man
-output_rst := ../source
+output_rst := ../source/man
 
 #all Markdown files in source directory are considered
 sources := $(wildcard $(source)/*.md)

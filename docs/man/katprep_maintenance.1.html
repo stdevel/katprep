@@ -10,44 +10,34 @@
     
     <title>NAME &mdash; katprep 0.0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    '../',
         VERSION:     '0.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="katprep 0.0.1 documentation" href="index.html" />
-    <link rel="up" title="Manpages" href="manpages.html" />
-    <link rel="next" title="NAME" href="errata-diff.yml.5.html" />
-    <link rel="prev" title="NAME" href="katprep_report.1.html" /> 
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="katprep 0.0.1 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
+          <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="errata-diff.yml.5.html" title="NAME"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="katprep_report.1.html" title="NAME"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="manpages.html" accesskey="U">Manpages</a> &raquo;</li> 
+        <li><a href="../index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,30 +48,42 @@
             
   <div class="section" id="name">
 <h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_snapshot</strong> — creates infrastructure status overview snapshots</p>
+<p><strong>katprep_maintenance</strong> — Prepares, executes and verifies system
+maintenance tasks</p>
 </div>
 <div class="section" id="synopsis">
 <h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_snapshot</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
-[<strong>-p</strong> <em>path</em>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
-[<strong>-s</strong> <em>server</em>] [<strong>&#8211;insecure</strong>] [<strong>-l</strong> <em>name</em>|<em>id</em> | <strong>-o</strong>
-<em>name</em>|<em>id</em> | <strong>-g</strong> <em>name</em>|<em>id</em> | <strong>-e</strong> <em>name</em>|<em>id</em>]
-[<strong>-E</strong> <em>name</em>]</p>
+<p><strong>katprep_maintenance</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
+[<strong>-n</strong>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
+[<strong>&#8211;insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-r</strong>] [<strong>-R</strong>]
+[<strong>&#8211;virt-uri</strong> <em>uri</em>] [<strong>-k</strong>] [<strong>&#8211;mon-url</strong> <em>url</em>] [<strong>&#8211;mon-type</strong>
+<em>nagios</em>|<em>icinga</em>] [<strong>-S</strong>] [<strong>-t</strong> <em>hours</em>] [<strong>-l</strong>
+<em>name</em>|<em>id</em> | <strong>-o</strong> <em>name</em>|<em>id</em> | <strong>-g</strong> <em>name</em>|<em>id</em>
+| <strong>-e</strong> <em>name</em>|<em>id</em>] [<strong>-E</strong> <em>name</em>] [<strong>-I</strong> <em>name</em>]
+<em>snapshot_report</em>
+[<strong>prepare</strong>|<strong>execute</strong>|<strong>status</strong>|<strong>revert</strong>|<strong>verify</strong>|<strong>cleanup</strong>]</p>
 </div>
 <div class="section" id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
-<p>Creates infrastructure status overview snapshots including host
-information such as:</p>
+<p>This utility controls maintenance tasks such as:</p>
 <ul class="simple">
-<li>system information (IP address, operating system, owner,...)</li>
-<li>katprep configuration parameters (monitoring and hypervisor
-configuration)</li>
-<li>errata information (outstanding patches)</li>
+<li>Preparing system maintenance (scheduling downtimes, creating VM
+snapshots)</li>
+<li>Installing errata and non-erratum package upgrades</li>
+<li>Showing status of maintenance progress</li>
+<li>Checking monitoring and snapshot status</li>
+<li>Reverting VM snapshots</li>
+<li>Removing downtimes and snapshots</li>
 </ul>
-<p>These information are required by the katprep framework in order to
-create maintenance reports using <strong>katprep_report(1)</strong>.</p>
-<p>Run this utility before and after maintaining systems using
-<strong>katprep_maintenance(1)</strong>.</p>
+<p>For this, host parameters for your infrastructure need to be set (see
+also <strong>katprep_populate(1)</strong> and <strong>katprep_parameters(1)</strong>) and a
+infrastructure snapshot needs to be available (see also
+<strong>katprep_snapshot(1)</strong>).</p>
+<p>If these requirements are set, all necessary information are retrieved
+from Foreman - but you can also override them (e.g. force using
+dedicated monitoring system).</p>
+<p>You can filter maintenance tasks per various entities, such as
+hostgroups, hostnames, locations and organizations.</p>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <table class="docutils option-list" frame="void" rules="none">
@@ -100,19 +102,18 @@ create maintenance reports using <strong>katprep_report(1)</strong>.</p>
 <tr><td class="option-group">
 <kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
 <td>Enables debugging outputs.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
+<td>Only simulates what would be done (default: no)</td></tr>
 </tbody>
 </table>
 <dl class="docutils">
-<dt>-p <em>path</em>, &#8211;output-path <em>path</em></dt>
-<dd>Defines the report output path (default: current directory)</dd>
 <dt>-C <em>filename</em>, &#8211;auth-container <em>filename</em></dt>
 <dd>Defines an authentication container file (see also
 <strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</dd>
 <dt>-P <em>passphrase</em>, &#8211;auth-password <em>passphrase</em></dt>
 <dd>Defines the authentication container password to avoid password
 prompt (unattented mode)</dd>
-<dt>-s <em>hostname</em>, &#8211;server <em>hostname</em></dt>
-<dd>Defines the Foreman server to use (default: localhost)</dd>
 </dl>
 <table class="docutils option-list" frame="void" rules="none">
 <col class="option" />
@@ -124,16 +125,73 @@ prompt (unattented mode)</dd>
 </tbody>
 </table>
 <dl class="docutils">
-<dt>-E <em>hostname</em>, &#8211;exclude <em>hostname</em></dt>
-<dd>Excludes particular hosts, using wildcards is possible.</dd>
+<dt>-s <em>hostname</em>, &#8211;server <em>hostname</em></dt>
+<dd>Defines the Foreman server to use (default: localhost)</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--reboot-systems</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Always reboot systems after successful errata installation (default:
+no, only if <tt class="docutils literal"><span class="pre">reboot_suggested</span></tt> flag set)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-R</span>, <span class="option">--no-reboot</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Suppresses rebooting the system under any circumstances (default:
+no)</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>&#8211;virt-uri <em>uri</em></dt>
+<dd>Defines an URI to use (see also <strong>Virtualization URIs</strong>)</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-k</span>, <span class="option">--skip-snapshot</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Skips gathering data from hypervisor (default: no)</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>&#8211;mon-url <em>url</em></dt>
+<dd>Defines a monitoring URL to use (see also <strong>Monitoring URLs</strong>)</dd>
+<dt>&#8211;mon-type <em>nagios</em>|<em>icinga</em></dt>
+<dd>Defines the monitoring sytem type, currently supported: <em>nagios</em>
+(Nagios, Icinga 1.x) or <em>icinga</em> (Icinga 2). (default: icinga)</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--skip-downtime</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Skips gathering data from monitoring system (default: no)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-S</span>, <span class="option">--mon-suggested</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Only schedules downtime if suggested (default: no)</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-t <em>hours</em>, &#8211;mon-downtime <em>hours</em></dt>
+<dd>Downtime period (default: 8 hours)</dd>
 <dt>-l <em>name</em>|<em>id</em>, &#8211;location <em>name</em>|<em>id</em></dt>
 <dd>filters by particular location</dd>
 <dt>-o <em>name</em>|<em>id</em>, &#8211;organization <em>name</em>|<em>id</em></dt>
 <dd>filters by particular organization</dd>
-<dt>-g <em>name</em>|<em>id</em>, &#8211;hostgroup <em>name</em>|<em>id</em></dt>
-<dd>filters by particular hostgroup</dd>
 <dt>-e <em>name</em>|<em>id</em>, &#8211;environment <em>name</em>|<em>id</em></dt>
 <dd>filters by particular Puppet environment</dd>
+<dt>-E <em>hostname</em>, &#8211;exclude <em>hostname</em></dt>
+<dd>Excludes particular hosts, using wildcards is possible.</dd>
+<dt>-I <em>hostname</em>, &#8211;include-only <em>hostname</em></dt>
+<dd>Only includes particular hosts (default: no)</dd>
 </dl>
 </div>
 </div>
@@ -156,7 +214,8 @@ prompt (unattented mode)</dd>
 </div>
 <div class="section" id="see-also">
 <h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_maintenance(1)</strong>, <strong>katprep_report(1)</strong></p>
+<p><strong>katprep.authconfig(1)</strong>, <strong>katprep_parameters(1)</strong>,
+<strong>katprep_populate(1)</strong>, <strong>katprep_snapshot(1)</strong></p>
 </div>
 
 
@@ -165,7 +224,7 @@ prompt (unattented mode)</dd>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">NAME</a></li>
 <li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
@@ -179,20 +238,14 @@ prompt (unattented mode)</dd>
 <li><a class="reference internal" href="#see-also">SEE ALSO</a></li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="katprep_report.1.html"
-                        title="previous chapter">NAME</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="errata-diff.yml.5.html"
-                        title="next chapter">NAME</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/katprep_snapshot.1.txt"
+    <li><a href="../_sources/man/katprep_maintenance.1.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
+    <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
@@ -211,19 +264,12 @@ prompt (unattented mode)</dd>
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
+          <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="errata-diff.yml.5.html" title="NAME"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="katprep_report.1.html" title="NAME"
-             >previous</a> |</li>
-        <li><a href="index.html">katprep 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="manpages.html" >Manpages</a> &raquo;</li> 
+        <li><a href="../index.html">katprep 0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
