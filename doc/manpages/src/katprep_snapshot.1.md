@@ -3,7 +3,7 @@
 NAME
 ====
 
-**katprep_snapshot** — creates infrastructure status overview snapshots
+**katprep_snapshot** — Creates infrastructure status overview snapshots
 
 SYNOPSIS
 ========
@@ -19,7 +19,7 @@ Creates infrastructure status overview snapshots including host information such
 - katprep configuration parameters (monitoring and hypervisor configuration)
 - errata information (outstanding patches)
 
-These information are required by the katprep framework in order to create maintenance reports using **katprep_report(1)**.
+These information are required by the **katprep(1)** framework in order to create maintenance reports using **katprep_report(1)**.
 
 Run this utility before and after maintaining systems using **katprep_maintenance(1)**.
 
@@ -106,4 +106,4 @@ Christian Stankowic <info@cstan.io>
 SEE ALSO
 ========
 
-**katprep_maintenance(1)**, **katprep_report(1)**
+**katprep(1)**, **katprep_maintenance(1)**, **katprep_report(1)**

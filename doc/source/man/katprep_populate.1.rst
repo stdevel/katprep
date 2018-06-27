@@ -1,7 +1,7 @@
 NAME
 ====
 
-**katprep\_populate** — auto-discovers and updates monitoring and
+**katprep\_populate** — Auto-discovers and updates monitoring and
 hypervisor information for managed systems
 
 SYNOPSIS
@@ -54,39 +54,7 @@ katprep\_virt\_type
     Virtualization host type, [*libvirt*\ \|\ *pyvmovmi*] (default:
     libvirt)
 
-Virtualization URIs
--------------------
-
-When using **libvirt** specify a valid connection URI, such as:
-
-| qemu+ssh://root@pinkepank.giertz.loc/system
-| xen:///system
-| esx:///system
-| vbox:///system
-
-See the libvirt documentation
-(https://libvirt.org/guide/html/Application\_Development\_Guide-Connections-URI\_Formats.html)
-for more examples.
-
-When using **pyvmomi**, specify a valid ESXi host or vCenter Server
-hostname, such as:
-
-| vcenter.localdomain.loc
-| esxi.giertz.loc
-
-Monitoring URLs:
-----------------
-
-When using **nagios** (*NagiosCGIClient*), specify the full Nagios or
-Icinga 1.x URL - make sure **not** to include **/cgi-bin**. Examples:
-
-| https://nagios.giertz.loc/nagios
-| http://omd.pinkepank.loc/icinga
-
-When using **icinga** (*IcingaAPIClient*), specify the full API URL
-including the port - such as:
-
-https://bigbrother.giertz.loc:5665
+For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
 Options
 -------
@@ -189,4 +157,4 @@ Christian Stankowic info@cstan.io
 SEE ALSO
 ========
 
-**katprep\_parameters(1)**
+**katprep(1)**, **katprep\_parameters(1)**

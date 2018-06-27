@@ -3,12 +3,12 @@
 NAME
 ====
 
-**katprep.auth** — an individual katprep authentication container file
+**katprep.auth** — An individual katprep authentication container file
 
 DESCRIPTION
 ===========
 
-A _katprep.auth_ file is an individual authentication container file used by the katprep framework in order to gain access to external third-party systems (such as monitoring systems and  hypervisors). This removes the need  of entering login information every time to trigger external systems. Authentication containers are JSON documents that can also be protected by a passphrase. In this case, you need to enter the passphrase once when using the container.
+A _katprep.auth_ file is an individual authentication container file used by the **katprep(1)** framework in order to gain access to external third-party systems (such as monitoring systems and  hypervisors). This removes the need  of entering login information every time to trigger external systems. Authentication containers are JSON documents that can also be protected by a passphrase. In this case, you need to enter the passphrase once when using the container.
 
 A valid document contains a dictionary containing hostnames and another dictionary specifying the following fields:
 
@@ -41,4 +41,4 @@ Christian Stankowic <info@cstan.io>
 SEE ALSO
 ========
 
-**katprep_authconfig(1)**
+**katprep(1)**, **katprep_authconfig(1)**

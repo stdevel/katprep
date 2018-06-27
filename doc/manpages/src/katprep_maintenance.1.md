@@ -146,4 +146,4 @@ Christian Stankowic <info@cstan.io>
 SEE ALSO
 ========
 
-**katprep.authconfig(1)**, **katprep_parameters(1)**, **katprep_populate(1)**, **katprep_snapshot(1)**
+**katprep(1)**, **katprep.authconfig(1)**, **katprep_parameters(1)**, **katprep_populate(1)**, **katprep_snapshot(1)**

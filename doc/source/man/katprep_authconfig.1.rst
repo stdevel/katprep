@@ -1,7 +1,7 @@
 NAME
 ====
 
-**katprep\_authconfig** — manages credentials for third-party systems
+**katprep\_authconfig** — Manages credentials for third-party systems
 triggered by katprep
 
 SYNOPSIS
@@ -14,7 +14,7 @@ DESCRIPTION
 ===========
 
 Creates, modifies and removes entries from authentication containers
-used by the katprep framework in order to gain access to external
+used by the **katprep(1)** framework in order to gain access to external
 third-party systems (such as monitoring systems and hypervisors). This
 removes the need of entering login information every time to trigger
 external systems. Authentication containers are JSON documents that can
@@ -111,4 +111,4 @@ Christian Stankowic info@cstan.io
 SEE ALSO
 ========
 
-**katprep.auth(5)**
+**katprep(1)**, **katprep.auth(5)**

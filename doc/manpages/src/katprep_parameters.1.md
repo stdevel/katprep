@@ -3,7 +3,7 @@
 NAME
 ====
 
-**katprep_parameters** — bulk edits Puppet host parameters for managed hosts
+**katprep_parameters** — Bulk edits Puppet host parameters for managed hosts
 
 SYNOPSIS
 ========
@@ -13,7 +13,7 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-Creates, removes, updates or audits Puppet host parameters used by the katprep framework in order to automate system maintenance.
+Creates, removes, updates or audits Puppet host parameters used by the **katprep(1)** framework in order to automate system maintenance.
 Use this utility to bulk edit host parameters, e.g. to change snapshot protection settings per hostgroup. For the first integration of your infrastructure, use **katprep_populate(1)** as it offers auto-discovery.
 
 Host parameters
@@ -49,32 +49,7 @@ katprep_virt_type
 
 :   Virtualization host type, \[_libvirt_|_pyvmovmi_] (default: libvirt)
 
-Virtualization URIs
--------------------
-When using **libvirt** specify a valid connection URI, such as:
-
-| qemu+ssh://root@pinkepank.giertz.loc/system
-| xen:///system
-| esx:///system
-| vbox:///system
-
-See the libvirt documentation (https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html) for more examples.
-
-When using **pyvmomi**, specify a valid ESXi host or vCenter Server hostname, such as:
-
-| vcenter.localdomain.loc
-| esxi.giertz.loc
-
-Monitoring URLs:
-----------------
-When using **nagios** (_NagiosCGIClient_), specify the full Nagios or Icinga 1.x URL - make sure **not** to include **/cgi-bin**. Examples:
-
-| https://nagios.giertz.loc/nagios
-| http://omd.pinkepank.loc/icinga
-
-When using **icinga** (_IcingaAPIClient_), specify the full API URL including the port - such as:
-
-| https://bigbrother.giertz.loc:5665
+For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
 Options
 -------
@@ -153,19 +128,6 @@ Options
 -L, --list-parameters
 :   Only lists available parameters (default: no)
 
-EXAMPLES
-========
-
-It is a good idea to start-over by specifying your monitoring and hypervisor systems and enabling **dry-run** mode:
-
-| $ katprep_parameters --virt-uri st-vcsa03.stankowic.loc --virt-type pyvmomi --mon-url https://st-mon03.stankowic.loc:5665 -C pinkepank.auth --dry-run
-| INFO:katprep_parameters:This is just a SIMULATION - no changes will be made.
-| INFO:katprep_parameters:Host 'giertz.stankowic.loc' ==> set/update parameter/value: katprep_virt/st-vcsa03.stankowic.loc
-| INFO:katprep_parameters:Host 'giertz.stankowic.loc' ==> set/update parameter/value: katprep_mon_type/icinga
-| ...
-
-Check the values that would be set - run the command again with omitting the **dry-run** parameter if they are correct.
-
 FILES
 =====
 
@@ -190,4 +152,4 @@ Christian Stankowic <info@cstan.io>
 SEE ALSO
 ========
 
-**katprep_authconfig(1)**, **katprep_populate(1)**
+**katprep(1)**, **katprep_authconfig(1)**, **katprep_populate(1)**

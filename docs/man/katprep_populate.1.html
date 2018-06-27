@@ -48,7 +48,7 @@
             
   <div class="section" id="name">
 <h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_populate</strong> — auto-discovers and updates monitoring and
+<p><strong>katprep_populate</strong> — Auto-discovers and updates monitoring and
 hypervisor information for managed systems</p>
 </div>
 <div class="section" id="synopsis">
@@ -90,37 +90,7 @@ snapshot</dd>
 <dd>Virtualization host type, [<em>libvirt</em>|<em>pyvmovmi</em>] (default:
 libvirt)</dd>
 </dl>
-</div>
-<div class="section" id="virtualization-uris">
-<h2>Virtualization URIs<a class="headerlink" href="#virtualization-uris" title="Permalink to this headline">¶</a></h2>
-<p>When using <strong>libvirt</strong> specify a valid connection URI, such as:</p>
-<div class="line-block">
-<div class="line">qemu+ssh://root&#64;pinkepank.giertz.loc/system</div>
-<div class="line">xen:///system</div>
-<div class="line">esx:///system</div>
-<div class="line">vbox:///system</div>
-</div>
-<p>See the libvirt documentation
-(<a class="reference external" href="https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html">https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html</a>)
-for more examples.</p>
-<p>When using <strong>pyvmomi</strong>, specify a valid ESXi host or vCenter Server
-hostname, such as:</p>
-<div class="line-block">
-<div class="line">vcenter.localdomain.loc</div>
-<div class="line">esxi.giertz.loc</div>
-</div>
-</div>
-<div class="section" id="monitoring-urls">
-<h2>Monitoring URLs:<a class="headerlink" href="#monitoring-urls" title="Permalink to this headline">¶</a></h2>
-<p>When using <strong>nagios</strong> (<em>NagiosCGIClient</em>), specify the full Nagios or
-Icinga 1.x URL - make sure <strong>not</strong> to include <strong>/cgi-bin</strong>. Examples:</p>
-<div class="line-block">
-<div class="line"><a class="reference external" href="https://nagios.giertz.loc/nagios">https://nagios.giertz.loc/nagios</a></div>
-<div class="line"><a class="reference external" href="http://omd.pinkepank.loc/icinga">http://omd.pinkepank.loc/icinga</a></div>
-</div>
-<p>When using <strong>icinga</strong> (<em>IcingaAPIClient</em>), specify the full API URL
-including the port - such as:</p>
-<p><a class="reference external" href="https://bigbrother.giertz.loc:5665">https://bigbrother.giertz.loc:5665</a></p>
+<p>For valid Virtualization URIs and monitoring URLs, see <strong>katprep(1)</strong>.</p>
 </div>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
@@ -251,7 +221,7 @@ the <strong>dry-run</strong> parameter if they are correct.</p>
 </div>
 <div class="section" id="see-also">
 <h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_parameters(1)</strong></p>
+<p><strong>katprep(1)</strong>, <strong>katprep_parameters(1)</strong></p>
 </div>
 
 
@@ -266,8 +236,6 @@ the <strong>dry-run</strong> parameter if they are correct.</p>
 <li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
 <li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
 <li><a class="reference internal" href="#host-parameters">Host parameters</a></li>
-<li><a class="reference internal" href="#virtualization-uris">Virtualization URIs</a></li>
-<li><a class="reference internal" href="#monitoring-urls">Monitoring URLs:</a></li>
 <li><a class="reference internal" href="#options">Options</a></li>
 </ul>
 </li>

@@ -1,7 +1,7 @@
 NAME
 ====
 
-**katprep\_report** — creates reports after system maintenance
+**katprep\_report** — Creates reports after system maintenance
 
 SYNOPSIS
 ========
@@ -76,5 +76,5 @@ Christian Stankowic info@cstan.io
 SEE ALSO
 ========
 
-**errata-diff.yml(5)**, **katprep\_maintenance(1)**,
+**katprep(1)**, **errata-diff.yml(5)**, **katprep\_maintenance(1)**,
 **katprep\_snapshot(1)**

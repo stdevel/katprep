@@ -1,7 +1,7 @@
 NAME
 ====
 
-**errata-diff.yml** — an individual katprep host maintenance report
+**errata-diff.yml** — An individual katprep host maintenance report
 variable file
 
 DESCRIPTION
@@ -22,7 +22,7 @@ debugging purposes or writing your own templates it might be necessary
 to check the content. To preserve YAML files execute
 **katprep\_report(1)** like this:
 
-katprep\_report errata\*json -t *template* -x
+$ katprep\_report errata\*json -t *template* -x
 
 A valid variable file is written in YAML and contains the following
 dictionaries:
@@ -119,5 +119,5 @@ Christian Stankowic info@cstan.io
 SEE ALSO
 ========
 
-**katprep\_maintenance(1)**, **katprep\_report(1)**,
+**katprep(1)**, **katprep\_maintenance(1)**, **katprep\_report(1)**,
 **katprep\_snapshot(1)**

@@ -1,13 +1,13 @@
 NAME
 ====
 
-**katprep.auth** — an individual katprep authentication container file
+**katprep.auth** — An individual katprep authentication container file
 
 DESCRIPTION
 ===========
 
 A *katprep.auth* file is an individual authentication container file
-used by the katprep framework in order to gain access to external
+used by the **katprep(1)** framework in order to gain access to external
 third-party systems (such as monitoring systems and hypervisors). This
 removes the need of entering login information every time to trigger
 external systems. Authentication containers are JSON documents that can
@@ -49,4 +49,4 @@ Christian Stankowic info@cstan.io
 SEE ALSO
 ========
 
-**katprep\_authconfig(1)**
+**katprep(1)**, **katprep\_authconfig(1)**
