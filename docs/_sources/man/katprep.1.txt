@@ -43,6 +43,7 @@ When using **libvirt** specify a valid connection URI, such as:
 | qemu+ssh://root@pinkepank.giertz.loc/system
 | xen:///system
 | esx:///system
+| vpx://vc01/cluster02/locaiton03/esxi04/?no\_verify=1
 | vbox:///system
 
 See the libvirt documentation

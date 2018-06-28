@@ -6,7 +6,8 @@ Class for sending requests to libvirt
 
 import libvirt
 import logging
-from katprep.clients import SessionException
+from katprep.clients import SessionException, EmptySetException, \
+UnsupportedRequestException, InvalidCredentialsException
 
 
 
@@ -91,9 +92,12 @@ class LibvirtClient:
             self.retrieve_credentials, None
             ]
         #authenticate
-        self.SESSION = libvirt.openAuth(self.URI, auth, 0)
-        if self.SESSION == None:
-            raise SessionException("Unable to establish connection to hypervisor!")
+        try:
+            self.SESSION = libvirt.openAuth(self.URI, auth, 0)
+            if self.SESSION == None:
+                raise SessionException("Unable to establish connection to hypervisor!")
+        except libvirt.libvirtError as err:
+            raise InvalidCredentialsException("Invalid credentials")
 
 
 
@@ -227,10 +231,12 @@ class LibvirtClient:
             if snapshot_title in target_snapshots:
                 return True
         except libvirt.libvirtError as err:
-            self.LOGGER.error("Unable to determine snapshot: '{}'".format(err))
-            raise SessionException(err)
-        except Exception as err:
-            raise SessionException(err)
+            if "no domain with name" in err.message.lower():
+                #snapshot not found
+                raise EmptySetException("No snapshots found")
+            else:
+                self.LOGGER.error("Unable to determine snapshot: '{}'".format(err))
+                raise SessionException(err)
 
 
 
@@ -257,7 +263,10 @@ class LibvirtClient:
                 )
             return result
         except libvirt.libvirtError as err:
-            raise SessionException("Unable to get VM IP information: '{}'".format(err))
+            if "not supported by" in err.message.lower():
+                raise UnsupportedRequestException(err)
+            else:
+                raise SessionException("Unable to get VM IP information: '{}'".format(err))
 
 
 

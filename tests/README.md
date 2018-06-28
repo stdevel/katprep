@@ -15,7 +15,22 @@ The following tests are available:
 Each test has an appropriate JSON configuration file specifying connection details and objects used for the particular tests. Copy a template file (*`*.json.tmpl`*) and customize it.
 
 ## Continuous Integration
-will follow
+This directory also contains a [CI configuration stub](.gitlab-ci.yml) (*tested on GitLab CI*) for automating unit tests. You might be able to use this stub on other CI products such as Travis CI after altering it. Before using this configuration, have a look at it and modify it. The stub defines:
+- **test** stage with multiple jobs per library
+  - enable the tests you need
+- jobs are executed within a Docker image **katprep-centos7** on a local registry
+  - see also the [Dockerfile](tmpl-katprep-centos7/Dockerfile)
+
+Credentials are assigned using secret variables containing the appropriate JSON content. Before running the tests, variable content is written to configuration files. Create and test JSON configuration files and paste them to your job configuration:
+
+| Variable name | Configuration file | Description |
+|:------------- |:------------------ |:----------- |
+| `fman_config` | `fman_config.json` | Foreman test configuration |
+| `nagios_config` | `nagios_config.json` | Nagios/Icinga 1.x test configuration |
+| `icinga2_config` | `icinga2_config.json` | Icinga2 test configuration |
+| `pyvmomi_config` | `pyvmomi_config.json` | Pyvmomi test configuration |
+| `libvirt_config` | `libvirt_config.json` | Libvirt test configuration |
+| `spw_config` | `spw_config.json` | Spacewalk test configuration |
 
 # ForemanAPIClientTest
 This test checks:
@@ -103,10 +118,11 @@ For this test, you will need:
 - an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
 - a VM that can be restarted, snapshotted, etc. (**Caution: this VM is very likely to break because of numerous restarts**)
 
-# LibvirtClient
-This test checks:
-- will follow
+# LibvirtClientThis test checks:
+- valid/invalid logins
+- checking/creating/reverting/removing snapshots
 
 ## Preparation
 For this test, you will need:
-- will follow
+- a hypervisor supported by [libvirt](https://libvirt.org/drivers.html)
+- an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
