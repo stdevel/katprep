@@ -10,7 +10,7 @@ import unittest
 import logging
 import json
 from katprep.clients.Icinga2APIClient import Icinga2APIClient
-from katprep.clients import SessionException
+from katprep.clients import SessionException, EmptySetException
 
 
 
@@ -30,6 +30,10 @@ class Icinga2APIClientTest(unittest.TestCase):
     """
     str: JSON object containing valid hosts and services
     """
+    set_up = False
+    """
+    bool: Flag whether the connection was set up
+    """
 
 
 
@@ -37,24 +41,35 @@ class Icinga2APIClientTest(unittest.TestCase):
         """
         Connecting the interfaces
         """
-        #instance logging
-        logging.basicConfig()
-        self.LOGGER.setLevel(logging.DEBUG)
-        #reading configuration
-        try:
-            with open("icinga2_config.json", "r") as json_file:
-                json_data = json_file.read().replace("\n", "")
-            self.config = json.loads(json_data)
-        except IOError as err:
-            self.LOGGER.error(
-                "Unable to read configuration file: '%s'", err
+        if not self.set_up:
+            #instance logging
+            logging.basicConfig()
+            self.LOGGER.setLevel(logging.DEBUG)
+            #reading configuration
+            try:
+                with open("icinga2_config.json", "r") as json_file:
+                    json_data = json_file.read().replace("\n", "")
+                self.config = json.loads(json_data)
+            except IOError as err:
+                self.LOGGER.error(
+                    "Unable to read configuration file: '%s'", err
+                )
+            #instance API client
+            self.api_icinga = Icinga2APIClient(
+                logging.ERROR, self.config["config"]["hostname"],
+                self.config["config"]["api_user"],
+                self.config["config"]["api_pass"]
             )
-        #instance API client
-        self.api_icinga = Icinga2APIClient(
-            logging.ERROR, self.config["config"]["hostname"],
-            self.config["config"]["api_user"],
-            self.config["config"]["api_pass"]
-        )
+            self.set_up = True
+
+
+
+    def tearDown(self):
+        """
+        Function that is executed after every test
+        """
+        #wait for changes to be applied
+        time.sleep(10)
 
 
 
@@ -63,7 +78,7 @@ class Icinga2APIClientTest(unittest.TestCase):
         Ensure exceptions on valid logins
         """
         #dummy call
-        self.api_icinga.get_hosts()
+        self.api_icinga.dummy_call()
 
     def test_invalid_login(self):
         """
@@ -75,7 +90,7 @@ class Icinga2APIClientTest(unittest.TestCase):
                 "giertz", "paulapinkepank"
             )
             #dummy call
-            api_dummy.get_hosts()
+            api_dummy.dummy_call()
 
 
 
@@ -83,21 +98,15 @@ class Icinga2APIClientTest(unittest.TestCase):
         """
         Ensure that host downtimes can be scheduled
         """
-        self.assertTrue(
-            bool(
-                self.api_icinga.schedule_downtime(
-                    self.config["valid_objects"]["host"], "host"
-                )
-            )
+        self.api_icinga.schedule_downtime(
+            self.config["valid_objects"]["host"], "host"
         )
-        #wait, dude
-        time.sleep(15)
 
     def test_sched_dt_host_fail(self):
         """
         Ensure that host downtimes cannot be scheduled when using invalid hosts
         """
-        with self.assertRaises(SessionException):
+        with self.assertRaises(EmptySetException):
             self.api_icinga.schedule_downtime(
                 "giertz.pinkepank.loc", "host"
             )
@@ -109,21 +118,17 @@ class Icinga2APIClientTest(unittest.TestCase):
         Ensure that hostgroup downtimes can be scheduled
         """
         self.assertTrue(
-            bool(
-                self.api_icinga.schedule_downtime(
-                    self.config["valid_objects"]["hostgroup"],
-                    "hostgroup"
-                )
+            self.api_icinga.schedule_downtime(
+                self.config["valid_objects"]["hostgroup"],
+                "hostgroup"
             )
         )
-        #wait, dude
-        time.sleep(15)
 
     def test_sched_dt_hostgrp_fail(self):
         """
         Ensure that hostgroup downtimes cannot be scheduled with invalid names
         """
-        with self.assertRaises(SessionException):
+        with self.assertRaises(EmptySetException):
             self.api_icinga.schedule_downtime(
                 "giertz.pinkepank.loc", "hostgroup"
             )
@@ -135,10 +140,8 @@ class Icinga2APIClientTest(unittest.TestCase):
         Ensure that checking downtime is working
         """
         self.assertTrue(
-            bool(
-                self.api_icinga.has_downtime(
-                    self.config["valid_objects"]["host"]
-                )
+            self.api_icinga.has_downtime(
+                self.config["valid_objects"]["host"]
             )
         )
 
@@ -146,7 +149,7 @@ class Icinga2APIClientTest(unittest.TestCase):
         """
         Ensure that checking downtime fails for non-existing hosts
         """
-        with self.assertRaises(SessionException):
+        with self.assertRaises(EmptySetException):
             self.api_icinga.has_downtime(
                 "giertz.pinkepank.loc"
             )
@@ -158,10 +161,8 @@ class Icinga2APIClientTest(unittest.TestCase):
         Ensure that unscheduling downtimes for hosts is working
         """
         self.assertTrue(
-            bool(
-                self.api_icinga.remove_downtime(
-                    self.config["valid_objects"]["host"], "host"
-                )
+            self.api_icinga.remove_downtime(
+                self.config["valid_objects"]["host"], "host"
             )
         )
 
@@ -169,7 +170,7 @@ class Icinga2APIClientTest(unittest.TestCase):
         """
         Ensure that unscheduling downtimes fails for non-existing hosts
         """
-        with self.assertRaises(SessionException):
+        with self.assertRaises(EmptySetException):
             self.api_icinga.remove_downtime(
                 "giertz.pinkepank.loc", "host"
             )
@@ -181,18 +182,16 @@ class Icinga2APIClientTest(unittest.TestCase):
         Ensure that unscheduling downtimes for hostgroups is working
         """
         self.assertTrue(
-            bool(
-                self.api_icinga.remove_downtime(
-                    self.config["valid_objects"]["hostgroup"], "hostgroup"
-                )
+            self.api_icinga.remove_downtime(
+                self.config["valid_objects"]["hostgroup"], "hostgroup"
             )
         )
 
-    def test_unsched_dt_hostgrp_test(self):
+    def test_unsched_dt_hostgrp_fail(self):
         """
         Ensure that unscheduling downtimes fails for non-existing hostgroups
         """
-        with self.assertRaises(SessionException):
+        with self.assertRaises(EmptySetException):
             self.api_icinga.remove_downtime(
                 "giertz-hosts", "hostgroup"
             )
@@ -204,9 +203,7 @@ class Icinga2APIClientTest(unittest.TestCase):
         Ensure that receiving hosts is possible
         """
         self.assertTrue(
-            bool(
-                self.config["valid_objects"]["host"] in str(self.api_icinga.get_hosts())
-            )
+            self.config["valid_objects"]["host"] in str(self.api_icinga.get_hosts())
         )
 
 
@@ -219,16 +216,14 @@ class Icinga2APIClientTest(unittest.TestCase):
             self.config["valid_objects"]["host"], only_failed=False
         )
         self.assertTrue(
-            bool(
-                str(self.config["valid_objects"]["host_service"]) in str(services)
-            )
+            str(self.config["valid_objects"]["host_service"]) in str(services)
         )
 
     def test_get_services_fail(self):
         """
         Ensure that checking services of non-existing hosts fails
         """
-        with self.assertRaises(SessionException):
+        with self.assertRaises(EmptySetException):
             self.api_icinga.get_services(
                 "giertz.pinkepank.loc", only_failed=False
             )
