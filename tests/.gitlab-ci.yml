@@ -1,0 +1,77 @@
+#NOTE: This is _just_ a template tested on GitLab CI
+#
+#You might want to alter it, to:
+#- exlucde/include particular tests
+#- change Docker image
+#- work on other CI (e.g. Travis CI)
+
+#install katprep
+#create unit test configuration files from secret variables
+before_script:
+  - cd $CI_PROJECT_DIR/katprep
+  - python setup.py install
+  - echo $fman_config > $CI_PROJECT_DIR/katprep/tests/fman_config.json
+  - echo $nagios_config > $CI_PROJECT_DIR/katprep/tests/nagios_config.json
+  - echo $icinga2_config > $CI_PROJECT_DIR/katprep/tests/icinga2_config.json
+  - echo $pyvmomi_config > $CI_PROJECT_DIR/katprep/tests/pyvmomi_config.json
+  - echo $libvirt_config > $CI_PROJECT_DIR/katprep/tests/libvirt_config.json
+  - echo $spw_config > $CI_PROJECT_DIR/katprep/tests/spw_config.json
+
+stages:
+  - test
+
+#Foreman unit tests
+#test:foreman:
+#  stage: test
+#  image: localhost:5000/katprep-centos7
+#  script:
+#  - cd $CI_PROJECT_DIR/katprep/tests
+#  - python ForemanAPIClientTest.py
+
+#Nagios unit tests
+#test:nagios:
+#  stage: test
+#  image: localhost:5000/katprep-centos7
+#  script:
+#  - cd $CI_PROJECT_DIR/katprep/tests
+#  - python NagiosCGIClientTest.py
+
+#Icinga 1.x unit tests
+#test:icinga:
+#  stage: test
+#  image: localhost:5000/katprep-centos7
+#  script:
+#  - cd $CI_PROJECT_DIR/katprep/tests
+#  - python IcingaCGIClientTest.py
+
+#Icinga2 unit tests
+#test:icinga2:
+#  stage: test
+#  image: localhost:5000/katprep-centos7
+#  script:
+#  - cd $CI_PROJECT_DIR/katprep/tests
+#  - python Icinga2APIClientTest.py
+
+#Pyvmomi unit tests
+#test:pyvmomi:
+#  stage: test
+#  image: localhost:5000/katprep-centos7
+#  script:
+#  - cd $CI_PROJECT_DIR/katprep/tests
+#  - python PyvmomiClientTest.py
+
+#Libvirt unit tests
+#test:libvirt:
+#  stage: test
+#  image: localhost:5000/katprep-centos7
+#  script:
+#  - cd $CI_PROJECT_DIR/katprep/tests
+#  - python LibvirtClientTest.py
+
+#Spacewalk unit tests
+#test:spacewalk:
+#  stage: test
+#  image: localhost:5000/katprep-centos7
+#  script:
+#  - cd $CI_PROJECT_DIR/katprep/tests
+#  - python SpacewalkClientTest.py
