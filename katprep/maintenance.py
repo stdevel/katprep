@@ -362,6 +362,10 @@ def revert(options, args):
                     VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].revert_snapshot(
                         vm_name, "katprep_{}".format(REPORT_PREFIX)
                     )
+                    #power-on VM?
+                    #VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].poweron_vm(
+                    #    vm_name
+                    #)
     except ValueError as err:
         LOGGER.error("Error reverting maintenance: '%s'", err)
 
