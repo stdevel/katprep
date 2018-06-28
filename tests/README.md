@@ -118,10 +118,11 @@ For this test, you will need:
 - an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
 - a VM that can be restarted, snapshotted, etc. (**Caution: this VM is very likely to break because of numerous restarts**)
 
-# LibvirtClient
-This test checks:
-- will follow
+# LibvirtClientThis test checks:
+- valid/invalid logins
+- checking/creating/reverting/removing snapshots
 
 ## Preparation
 For this test, you will need:
-- will follow
+- a hypervisor supported by [libvirt](https://libvirt.org/drivers.html)
+- an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
