@@ -22,7 +22,9 @@ katprep_maintenance
 * implemented ``-E`` / ``--exclude`` parameters to exclude particular hosts by hostname wildcards (`issue38`_)
 * fixed bug where non-existent snapshots forced crashes
 * implemented ``-I`` / ``--include-only`` parameters to only include particular hosts by hostname wildcards (`issue63`_)
+* implemented ``revert`` command (`issue6`_)
 
+.. _issue6: https://github.com/stdevel/katprep/issues/6
 .. _issue33: https://github.com/stdevel/katprep/issues/33
 .. _issue38: https://github.com/stdevel/katprep/issues/38
 .. _issue39: https://github.com/stdevel/katprep/issues/39

@@ -57,7 +57,8 @@
 
 <span class="kn">import</span> <span class="nn">libvirt</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">katprep.clients</span> <span class="kn">import</span> <span class="n">SessionException</span>
+<span class="kn">from</span> <span class="nn">katprep.clients</span> <span class="kn">import</span> <span class="n">SessionException</span><span class="p">,</span> <span class="n">EmptySetException</span><span class="p">,</span> \
+<span class="n">UnsupportedRequestException</span><span class="p">,</span> <span class="n">InvalidCredentialsException</span>
 
 
 
@@ -142,9 +143,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_credentials</span><span class="p">,</span> <span class="bp">None</span>
             <span class="p">]</span>
         <span class="c">#authenticate</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span> <span class="o">=</span> <span class="n">libvirt</span><span class="o">.</span><span class="n">openAuth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">URI</span><span class="p">,</span> <span class="n">auth</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Unable to establish connection to hypervisor!&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span> <span class="o">=</span> <span class="n">libvirt</span><span class="o">.</span><span class="n">openAuth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">URI</span><span class="p">,</span> <span class="n">auth</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SESSION</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Unable to establish connection to hypervisor!&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libvirt</span><span class="o">.</span><span class="n">libvirtError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidCredentialsException</span><span class="p">(</span><span class="s">&quot;Invalid credentials&quot;</span><span class="p">)</span>
 
 
 
@@ -278,10 +282,12 @@
             <span class="k">if</span> <span class="n">snapshot_title</span> <span class="ow">in</span> <span class="n">target_snapshots</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">True</span>
         <span class="k">except</span> <span class="n">libvirt</span><span class="o">.</span><span class="n">libvirtError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to determine snapshot: &#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
-            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&quot;no domain with name&quot;</span> <span class="ow">in</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="c">#snapshot not found</span>
+                <span class="k">raise</span> <span class="n">EmptySetException</span><span class="p">(</span><span class="s">&quot;No snapshots found&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to determine snapshot: &#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
 
 </div>
@@ -308,7 +314,10 @@
                 <span class="p">)</span>
             <span class="k">return</span> <span class="n">result</span>
         <span class="k">except</span> <span class="n">libvirt</span><span class="o">.</span><span class="n">libvirtError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Unable to get VM IP information: &#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&quot;not supported by&quot;</span> <span class="ow">in</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">UnsupportedRequestException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Unable to get VM IP information: &#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 
 
 </div>
