@@ -194,6 +194,20 @@ no)</td></tr>
 <dd>Only includes particular hosts (default: no)</dd>
 </dl>
 </div>
+<div class="section" id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<p>This utility supports the following commands</p>
+<ul class="simple">
+<li><strong>prepare</strong> - Preparing maintenance</li>
+<li><strong>execute</strong> - Installing errata and optionally package upgrades
+(<strong>-p</strong> / <strong>&#8211;include-packages</strong> parameter)</li>
+<li><strong>status</strong> - Display software maintenance progress (Foreman tasks)</li>
+<li><strong>revert</strong> - Reverting changes (currently only reverting snapshots is
+supported)</li>
+<li><strong>verify</strong> - Verifying status (checking snapshots and downtime)</li>
+<li><strong>cleanup</strong> - Cleaning-up (removing downtimes and snapshots)</li>
+</ul>
+</div>
 </div>
 <div class="section" id="files">
 <h1>FILES<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h1>
@@ -230,6 +244,7 @@ no)</td></tr>
 <li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
 <li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
 <li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#commands">Commands</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#files">FILES</a></li>

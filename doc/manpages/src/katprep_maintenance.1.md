@@ -122,6 +122,18 @@ Options
 
 :   Only includes particular hosts (default: no)
 
+Commands
+--------
+
+This utility supports the following commands
+
+- **prepare** - Preparing maintenance
+- **execute** - Installing errata and optionally package upgrades (**-p** / **--include-packages** parameter)
+- **status** - Display software maintenance progress (Foreman tasks)
+- **revert** - Reverting changes (currently only reverting snapshots is supported)
+- **verify** - Verifying status (checking snapshots and downtime)
+- **cleanup** - Cleaning-up (removing downtimes and snapshots)
+
 FILES
 =====
 

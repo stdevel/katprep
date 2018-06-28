@@ -194,7 +194,7 @@
                             <span class="n">snapshot</span><span class="o">.</span><span class="n">snapshot</span><span class="o">.</span><span class="n">RemoveSnapshot_Task</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="c">#revert snapshot</span>
-                            <span class="n">snapshot</span><span class="o">.</span><span class="n">snapshot</span><span class="o">.</span><span class="n">RevertToSnapshot_Task</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                            <span class="n">snapshot</span><span class="o">.</span><span class="n">snapshot</span><span class="o">.</span><span class="n">RevertToSnapshot_Task</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">childs</span><span class="p">:</span>
                         <span class="c">#also iterate through childs</span>
                         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">childs</span><span class="p">:</span>
@@ -204,8 +204,7 @@
                                     <span class="n">child</span><span class="o">.</span><span class="n">snapshot</span><span class="o">.</span><span class="n">RemoveSnapshot_Task</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
                                 <span class="k">else</span><span class="p">:</span>
                                     <span class="c">#revert snapshot</span>
-                                    <span class="n">child</span><span class="o">.</span><span class="n">snapshot</span><span class="o">.</span><span class="n">RevertToSnapshot_Task</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-            <span class="c">#TODO: implement revert</span>
+                                    <span class="n">child</span><span class="o">.</span><span class="n">snapshot</span><span class="o">.</span><span class="n">RevertToSnapshot_Task</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c">#only create snapshot if not already existing</span>
                 <span class="k">try</span><span class="p">:</span>

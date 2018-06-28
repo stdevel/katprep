@@ -327,13 +327,48 @@ def execute(options, args):
 
 def revert(options, args):
     """
-    This function reverts maintenance tasks, which might include removing
-    errata or restoring virtual machine snapshots.
+    This function reverts maintenance tasks.
+    As the Foreman APIs lacks possibilities, only VM snapshots are restored
+    currently.
 
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    print "TODO: implement"
+    #restore snapshots per host
+    try:
+        for host in REPORT:
+            LOGGER.debug("Restoring host '%s'...", host)
+
+            #create snapshot if applicable
+            if not options.virt_skip_snapshot and \
+                get_host_param_from_report(REPORT, host, "katprep_virt_snapshot") \
+                not in [None, "", "fixmepls"]:
+                #use customized VM name if applicable
+                if get_host_param_from_report(REPORT, host, "katprep_virt_name") \
+                    not in ["", None]:
+                    vm_name = get_host_param_from_report(
+                        REPORT, host, "katprep_virt_name"
+                    )
+                else:
+                    vm_name = host
+
+                if options.generic_dry_run:
+                    LOGGER.info(
+                        "Host '%s' --> revert snapshot (katprep_%s@%s)",
+                        host, REPORT_PREFIX, vm_name
+                    )
+                else:
+                    #revert snapshot
+                    VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].revert_snapshot(
+                        vm_name, "katprep_{}".format(REPORT_PREFIX)
+                    )
+                    #power-on VM?
+                    #VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].poweron_vm(
+                    #    vm_name
+                    #)
+    except ValueError as err:
+        LOGGER.error("Error reverting maintenance: '%s'", err)
+
 
 
 

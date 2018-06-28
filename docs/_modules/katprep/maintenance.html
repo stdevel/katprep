@@ -379,13 +379,48 @@
 </div>
 <div class="viewcode-block" id="revert"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.revert">[docs]</a><span class="k">def</span> <span class="nf">revert</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function reverts maintenance tasks, which might include removing</span>
-<span class="sd">    errata or restoring virtual machine snapshots.</span>
+<span class="sd">    This function reverts maintenance tasks.</span>
+<span class="sd">    As the Foreman APIs lacks possibilities, only VM snapshots are restored</span>
+<span class="sd">    currently.</span>
 
 <span class="sd">    :param args: argparse options dictionary containing parameters</span>
 <span class="sd">    :type args: argparse options dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">print</span> <span class="s">&quot;TODO: implement&quot;</span>
+    <span class="c">#restore snapshots per host</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Restoring host &#39;</span><span class="si">%s</span><span class="s">&#39;...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c">#create snapshot if applicable</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">virt_skip_snapshot</span> <span class="ow">and</span> \
+                <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;katprep_virt_snapshot&quot;</span><span class="p">)</span> \
+                <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;fixmepls&quot;</span><span class="p">]:</span>
+                <span class="c">#use customized VM name if applicable</span>
+                <span class="k">if</span> <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;katprep_virt_name&quot;</span><span class="p">)</span> \
+                    <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">]:</span>
+                    <span class="n">vm_name</span> <span class="o">=</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                        <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;katprep_virt_name&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vm_name</span> <span class="o">=</span> <span class="n">host</span>
+
+                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s">&quot;Host &#39;</span><span class="si">%s</span><span class="s">&#39; --&gt; revert snapshot (katprep_</span><span class="si">%s</span><span class="s">@</span><span class="si">%s</span><span class="s">)&quot;</span><span class="p">,</span>
+                        <span class="n">host</span><span class="p">,</span> <span class="n">REPORT_PREFIX</span><span class="p">,</span> <span class="n">vm_name</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c">#revert snapshot</span>
+                    <span class="n">VIRT_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;katprep_virt&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">revert_snapshot</span><span class="p">(</span>
+                        <span class="n">vm_name</span><span class="p">,</span> <span class="s">&quot;katprep_{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">REPORT_PREFIX</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="c">#power-on VM?</span>
+                    <span class="c">#VIRT_CLIENTS[get_host_param_from_report(REPORT, host, &quot;katprep_virt&quot;)].poweron_vm(</span>
+                    <span class="c">#    vm_name</span>
+                    <span class="c">#)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Error reverting maintenance: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+
 
 
 </div>
