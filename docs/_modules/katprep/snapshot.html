@@ -215,7 +215,7 @@
                 <span class="c">#unable to read errata</span>
                 <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                     <span class="s">&quot;Unable to read errata counters for system &#39;</span><span class="si">%s</span><span class="s">&#39; - check &quot;</span> \
-                    <span class="s">&quot;system! (Hint: unregistered content host?)&quot;</span>
+                    <span class="s">&quot;system! (Hint: unregistered content host?)&quot;</span><span class="p">,</span> <span class="n">system</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span>
                 <span class="p">)</span>
                 <span class="n">errata_counter</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">errata_counter</span><span class="p">[</span><span class="s">u&quot;security&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -264,9 +264,7 @@
                 <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">get_name_by_id</span><span class="p">(</span><span class="n">params_obj</span><span class="p">[</span><span class="s">&quot;owner_id&quot;</span><span class="p">],</span> <span class="s">&quot;user&quot;</span><span class="p">)</span>
 
             <span class="c">#set HW flag</span>
-            <span class="k">if</span> <span class="n">params_obj</span><span class="p">[</span><span class="s">&quot;facts&quot;</span><span class="p">][</span><span class="s">&quot;is_virtual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;true&quot;</span><span class="p">:</span>
-                <span class="n">SYSTEM_ERRATA</span><span class="p">[</span><span class="n">system</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]][</span><span class="s">&quot;params&quot;</span><span class="p">][</span><span class="s">&quot;system_physical&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">params_obj</span><span class="p">[</span><span class="s">&quot;facts&quot;</span><span class="p">][</span><span class="s">&quot;is_virtual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;true&quot;</span><span class="p">:</span>
                 <span class="n">SYSTEM_ERRATA</span><span class="p">[</span><span class="n">system</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]][</span><span class="s">&quot;params&quot;</span><span class="p">][</span><span class="s">&quot;system_physical&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
 
             <span class="c">#add errata information if applicable</span>

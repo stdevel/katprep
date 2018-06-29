@@ -6,7 +6,7 @@ This page shows changes of the latest releases.
 -------------
 Version 0.5.0
 -------------
-Release date: **yyyy/mm/dd**
+Release date: **2018/06/29**
 
 .. note:: Red Hat Satellite 6.x users need to update to version 6.3 in order to enable VM reboots after system maintenance. Also, you will need to ensure that your virtualization infrastructure is registered within Foreman to link VMs to hosts.
 
