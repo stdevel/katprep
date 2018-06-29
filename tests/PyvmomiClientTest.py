@@ -37,6 +37,10 @@ class PyvmomiClientTest(unittest.TestCase):
     """
     str: Snapshot title
     """
+    set_up = False
+    """
+    bool: Flag whether the connection was set up
+    """
 
 
 
@@ -44,24 +48,36 @@ class PyvmomiClientTest(unittest.TestCase):
         """
         Connecting the interfaces
         """
-        #instance logging
-        logging.basicConfig()
-        self.LOGGER.setLevel(logging.DEBUG)
-        #reading configuration
-        try:
-            with open("pyvmomi_config.json", "r") as json_file:
-                json_data = json_file.read().replace("\n", "")
-            self.config = json.loads(json_data)
-        except IOError as err:
-            self.LOGGER.error(
-                "Unable to read configuration file: '%s'", err
+        #only set-up _all_ the stuff once
+        if not self.set_up:
+            #instance logging
+            logging.basicConfig()
+            self.LOGGER.setLevel(logging.DEBUG)
+            #reading configuration
+            try:
+                with open("pyvmomi_config.json", "r") as json_file:
+                    json_data = json_file.read().replace("\n", "")
+                self.config = json.loads(json_data)
+            except IOError as err:
+                self.LOGGER.error(
+                    "Unable to read configuration file: '%s'", err
+                )
+            #instance API client
+            self.pyvmomi_client = PyvmomiClient(
+                logging.ERROR, self.config["config"]["hostname"],
+                self.config["config"]["api_user"],
+                self.config["config"]["api_pass"]
             )
-        #instance API client
-        self.pyvmomi_client = PyvmomiClient(
-            logging.ERROR, self.config["config"]["hostname"],
-            self.config["config"]["api_user"],
-            self.config["config"]["api_pass"]
-        )
+        self.set_up = True
+
+
+
+    def tearDown(self):
+        """
+        Function that is executed after every test
+        """
+        #wait for changes to be applied
+        time.sleep(20)
 
 
 
@@ -88,7 +104,7 @@ class PyvmomiClientTest(unittest.TestCase):
 
 
 
-    def test_create_snapshot(self):
+    def test_a_create_snapshot(self):
         """
         Ensure that creating snapshots is possible
         """
@@ -97,6 +113,38 @@ class PyvmomiClientTest(unittest.TestCase):
             self.dummy_snapshot,
             self.dummy_snapshot
         )
+
+    def test_b_has_snapshot(self):
+        """
+        Ensure that checking for existing snapshots is possible
+        """
+        try:
+            self.pyvmomi_client.has_snapshot(
+                self.config["valid_objects"]["vm"],
+                self.dummy_snapshot
+            )
+        except EmptySetException as err:
+            pass
+
+    def test_c_revert_snapshot(self):
+        """
+        Ensure that reverting snapshots is possible
+        """
+        self.pyvmomi_client.revert_snapshot(
+            self.config["valid_objects"]["vm"],
+            self.dummy_snapshot
+        )
+
+    def test_d_remove_snapshot(self):
+        """
+        Ensure that removing snapshots is possible
+        """
+        self.pyvmomi_client.remove_snapshot(
+            self.config["valid_objects"]["vm"],
+            self.dummy_snapshot
+        )
+
+
 
     def test_create_snapshot_fail(self):
         """
@@ -109,33 +157,15 @@ class PyvmomiClientTest(unittest.TestCase):
                 self.dummy_snapshot
             )
 
-    def remove_snapshot(self):
+    def test_has_snapshot_fail(self):
         """
-        Ensure that removing snapshots is possible
+        Ensure that checking non-existing VMs for snapshots is not possible
         """
-        self.pyvmomi_client.remove_snapshot(
-            self.config["valid_objects"]["vm"],
-            self.dummy_snapshot
-        )
-
-    def test_remove_snapshot_fail(self):
-        """
-        Ensure that removing snapshots of non-existing VMs is not possible
-        """
-        with self.assertRaises(SessionException):
-            self.pyvmomi_client.remove_snapshot(
+        with self.assertRaises(EmptySetException):
+            self.pyvmomi_client.has_snapshot(
                 self.dummy_vm,
                 self.dummy_snapshot
             )
-
-    def revert_snapshot(self):
-        """
-        Ensure that reverting snapshots is possible
-        """
-        self.pyvmomi_client.revert_snapshot(
-            self.config["valid_objects"]["vm"],
-            self.dummy_snapshot
-        )
 
     def test_revert_snapshot_fail(self):
         """
@@ -147,31 +177,19 @@ class PyvmomiClientTest(unittest.TestCase):
                 self.dummy_snapshot
             )
 
-    def test_has_snapshot(self):
+    def test_remove_snapshot_fail(self):
         """
-        Ensure that checking for existing snapshots is possible
+        Ensure that removing snapshots of non-existing VMs is not possible
         """
-        try:
-            self.pyvmomi_client.has_snapshot(
-                self.config["valid_objects"]["vm"],
-                self.dummy_snapshot
-            )
-        except EmptySetException as err:
-            pass
-
-    def test_has_snapshot_fail(self):
-        """
-        Ensure that checking non-existing VMs for snapshots is not possible
-        """
-        with self.assertRaises(EmptySetException):
-            self.pyvmomi_client.has_snapshot(
+        with self.assertRaises(SessionException):
+            self.pyvmomi_client.remove_snapshot(
                 self.dummy_vm,
                 self.dummy_snapshot
             )
 
 
 
-    def test_get_vm_ips(self):
+    def test_a_get_vm_ips(self):
         """
         Ensure that receiving VMs with their IPs is possible
         """
@@ -180,7 +198,7 @@ class PyvmomiClientTest(unittest.TestCase):
             self.config["valid_objects"]["vm"] in str(vm_ips)
         )
 
-    def test_get_vm_hosts(self):
+    def test_a_get_vm_hosts(self):
         """
         Ensure that receiving VMs with their hosts is possible
         """
@@ -198,7 +216,16 @@ class PyvmomiClientTest(unittest.TestCase):
         self.pyvmomi_client.restart_vm(
             self.config["valid_objects"]["vm"]
         )
-        time.sleep(10)
+
+    def test_restart_vm_forcefully(self):
+        """
+        Ensure that restarting VMs forcefully is possible
+        """
+        self.pyvmomi_client.restart_vm(
+            self.config["valid_objects"]["vm"], force=True
+        )
+
+
 
     def test_restart_vm_fail(self):
         """
@@ -208,15 +235,6 @@ class PyvmomiClientTest(unittest.TestCase):
             self.pyvmomi_client.restart_vm(
                 self.dummy_vm
             )
-
-    def test_restart_vm_forcefully(self):
-        """
-        Ensure that restarting VMs forcefully is possible
-        """
-        self.pyvmomi_client.restart_vm(
-            self.config["valid_objects"]["vm"], force=True
-        )
-        time.sleep(10)
 
     def test_restart_vm_forcefully_fail(self):
         """
@@ -252,32 +270,23 @@ class PyvmomiClientTest(unittest.TestCase):
 
 
 
-    def vm_poweron(self):
-        """
-        Ensure that powering on a VM is possible
-        """
-        self.pyvmomi_client.poweron_vm(
-            self.config["valid_objects"]["vm"]
-        )
-        time.sleep(10)
-
-    def test_vm_poweron_fail(self):
-        """
-        Ensure that powering on a non-existing VM is not possible
-        """
-        with self.assertRaises(SessionException):
-            self.pyvmomi_client.poweron_vm(
-                self.dummy_vm
-            )
-
-    def vm_poweroff(self):
+    def test_e_vm_poweroff(self):
         """
         Ensure that powering off a VM is possible
         """
         self.pyvmomi_client.poweroff_vm(
             self.config["valid_objects"]["vm"]
         )
-        time.sleep(10)
+
+    def test_f_vm_poweron(self):
+        """
+        Ensure that powering on a VM is possible
+        """
+        self.pyvmomi_client.poweron_vm(
+            self.config["valid_objects"]["vm"]
+        )
+
+
 
     def test_vm_poweroff_fail(self):
         """
@@ -285,6 +294,15 @@ class PyvmomiClientTest(unittest.TestCase):
         """
         with self.assertRaises(SessionException):
             self.pyvmomi_client.poweroff_vm(
+                self.dummy_vm
+            )
+
+    def test_vm_poweron_fail(self):
+        """
+        Ensure that powering on a non-existing VM is not possible
+        """
+        with self.assertRaises(SessionException):
+            self.pyvmomi_client.poweron_vm(
                 self.dummy_vm
             )
 

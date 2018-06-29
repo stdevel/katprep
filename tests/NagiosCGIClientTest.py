@@ -28,6 +28,10 @@ class NagiosCGIClientTest(unittest.TestCase):
     """
     str: JSON object containing valid hosts and services
     """
+    set_up = False
+    """
+    bool: Flag whether the connection was set up
+    """
 
 
 
@@ -35,25 +39,37 @@ class NagiosCGIClientTest(unittest.TestCase):
         """
         Connecting the interfaces
         """
-        #instance logging
-        logging.basicConfig()
-        self.LOGGER.setLevel(logging.DEBUG)
-        #reading configuration
-        try:
-            with open("nagios_config.json", "r") as json_file:
-                json_data = json_file.read().replace("\n", "")
-            self.config = json.loads(json_data)
-        except IOError as err:
-            self.LOGGER.error(
-                "Unable to read configuration file: '%s'", err
+        #only set-up _all_ the stuff once
+        if not self.set_up:
+            #instance logging
+            logging.basicConfig()
+            self.LOGGER.setLevel(logging.DEBUG)
+            #reading configuration
+            try:
+                with open("nagios_config.json", "r") as json_file:
+                    json_data = json_file.read().replace("\n", "")
+                self.config = json.loads(json_data)
+            except IOError as err:
+                self.LOGGER.error(
+                    "Unable to read configuration file: '%s'", err
+                )
+            #Legacy
+            self.cgi_nagios = NagiosCGIClient(
+                logging.ERROR, self.config["legacy"]["hostname"],
+                self.config["legacy"]["cgi_user"],
+                self.config["legacy"]["cgi_pass"],
+                verify=False
             )
-        #Legacy
-        self.cgi_nagios = NagiosCGIClient(
-            logging.ERROR, self.config["legacy"]["hostname"],
-            self.config["legacy"]["cgi_user"],
-            self.config["legacy"]["cgi_pass"],
-            verify=False
-        )
+            self.set_up = True
+
+
+
+    def tearDown(self):
+        """
+        Function that is executed after every test
+        """
+        #wait for changes to be applied
+        time.sleep(30)
 
 
 
@@ -87,8 +103,6 @@ class NagiosCGIClientTest(unittest.TestCase):
         self.cgi_nagios.schedule_downtime(
             self.config["legacy"]["host"], "host"
         )
-        #wait as it might take some time to see downtime in CGI
-        time.sleep(30)
 
     def test_has_downtime(self):
         """

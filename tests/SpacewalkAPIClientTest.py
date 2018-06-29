@@ -29,6 +29,10 @@ class SpacewalkAPIClientTest(unittest.TestCase):
     """
     str: JSON object containing valid hosts and services
     """
+    set_up = False
+    """
+    bool: Flag whether the connection was set up
+    """
 
 
 
@@ -36,18 +40,22 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         """
         Connecting the interfaces
         """
-        #instance logging
-        logging.basicConfig()
-        self.LOGGER.setLevel(logging.DEBUG)
-        #reading configuration
-        try:
-            with open("spw_config.json", "r") as json_file:
-                json_data = json_file.read().replace("\n", "")
-            self.config = json.loads(json_data)
-        except IOError as err:
-            self.LOGGER.error(
-                "Unable to read configuration file: '%s'", err
-            )
+        #only set-up _all_ the stuff once
+        if not self.set_up:
+            #instance logging
+            logging.basicConfig()
+            self.LOGGER.setLevel(logging.DEBUG)
+            #reading configuration
+            try:
+                with open("spw_config.json", "r") as json_file:
+                    json_data = json_file.read().replace("\n", "")
+                self.config = json.loads(json_data)
+                #TODO: Instance client
+            except IOError as err:
+                self.LOGGER.error(
+                    "Unable to read configuration file: '%s'", err
+                )
+            self.set_up = True
 
 
 
@@ -57,7 +65,7 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         """
         with self.assertRaises(InvalidCredentialsException):
             self.api_spacewalk = SpacewalkAPIClient(
-                logging.DEBUG,
+                logging.ERROR,
                 self.config["config"]["hostname"],
                 "giertz", "paulapinkepank"
             )
@@ -72,7 +80,7 @@ class SpacewalkAPIClientTest(unittest.TestCase):
         ssl._create_default_https_context = ssl._create_unverified_context
         with self.assertRaises(APILevelNotSupportedException):
             self.api_spacewalk = SpacewalkAPIClient(
-                logging.DEBUG,
+                logging.ERROR,
                 self.config["config"]["hostname_legacy"],
                 self.config["config"]["api_user"],
                 self.config["config"]["api_pass"],

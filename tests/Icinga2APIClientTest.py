@@ -69,7 +69,7 @@ class Icinga2APIClientTest(unittest.TestCase):
         Function that is executed after every test
         """
         #wait for changes to be applied
-        time.sleep(10)
+        time.sleep(30)
 
 
 

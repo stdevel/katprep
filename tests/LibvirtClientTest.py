@@ -37,6 +37,10 @@ class LibvirtClientTest(unittest.TestCase):
     """
     str: Snapshot title
     """
+    set_up = False
+    """
+    bool: Flag whether the connection was set up
+    """
 
 
 
@@ -44,24 +48,27 @@ class LibvirtClientTest(unittest.TestCase):
         """
         Connecting the interfaces
         """
-        #instance logging
-        logging.basicConfig()
-        self.LOGGER.setLevel(logging.DEBUG)
-        #reading configuration
-        try:
-            with open("libvirt_config.json", "r") as json_file:
-                json_data = json_file.read().replace("\n", "")
-            self.config = json.loads(json_data)
-        except IOError as err:
-            self.LOGGER.error(
-                "Unable to read configuration file: '%s'", err
+        #only set-up _all_ the stuff once
+        if not self.set_up:
+            #instance logging
+            logging.basicConfig()
+            self.LOGGER.setLevel(logging.DEBUG)
+            #reading configuration
+            try:
+                with open("libvirt_config.json", "r") as json_file:
+                    json_data = json_file.read().replace("\n", "")
+                self.config = json.loads(json_data)
+            except IOError as err:
+                self.LOGGER.error(
+                    "Unable to read configuration file: '%s'", err
+                )
+            #instance API client
+            self.libvirt_client = LibvirtClient(
+                logging.ERROR, self.config["config"]["uri"],
+                self.config["config"]["api_user"],
+                self.config["config"]["api_pass"]
             )
-        #instance API client
-        self.libvirt_client = LibvirtClient(
-            logging.ERROR, self.config["config"]["uri"],
-            self.config["config"]["api_user"],
-            self.config["config"]["api_pass"]
-        )
+            self.set_up = True
 
 
 
