@@ -105,6 +105,10 @@ class Icinga2APIClient:
             if method.lower() not in ["get", "post"]:
                 #going home
                 raise SessionException("Illegal method '{}' specified".format(method))
+            self.LOGGER.debug(
+                "%s request to %s (payload: %s)",
+                method.upper(), sub_url, payload
+            )
 
             #execute request
             if method.lower() == "post":
@@ -125,10 +129,8 @@ class Icinga2APIClient:
                     result.status_code))
             else:
                 #return result
-                if method.lower() == "get":
-                    return result.text
-                else:
-                    return True
+                self.LOGGER.debug(result.text)
+                return result
 
         except ValueError as err:
             self.LOGGER.error(err)
@@ -202,13 +204,13 @@ class Icinga2APIClient:
             if remove_downtime:
                 #remove hostgroup downtime
                 payload = {
-                    "type": "foobar",
+                    "type": "Host",
                     "filter": "\"{}\" in host.groups".format(object_name),
                 }
             else:
                 #create hostgroup downtime
                 payload = {
-                    "type": "foobar",
+                    "type": "Host",
                     "filter": "\"{}\" in host.groups".format(object_name),
                     "start_time": int(current_time),
                     "end_time": int(end_time),
@@ -220,13 +222,13 @@ class Icinga2APIClient:
             if remove_downtime:
                 #remove host downtime
                 payload = {
-                    "type": "foobar",
+                    "type": "Host",
                     "filter": "host.name==\"{}\"".format(object_name),
                 }
             else:
                 #create host downtime
                 payload = {
-                    "type": "foobar",
+                    "type": "Host",
                     "filter": "host.name==\"{}\"".format(object_name),
                     "start_time": int(current_time),
                     "end_time": int(end_time),
@@ -235,16 +237,23 @@ class Icinga2APIClient:
                     "comment": comment,
                 }
         #send POST
+        result = ""
         if remove_downtime:
             payload["type"] = "Host"
-            self.__api_post("/actions/remove-downtime", json.dumps(payload))
+            result = self.__api_post("/actions/remove-downtime", json.dumps(payload))
             payload["type"] = "Service"
-            return self.__api_post("/actions/remove-downtime", json.dumps(payload))
+            result = self.__api_post("/actions/remove-downtime", json.dumps(payload))
         else:
             payload["type"] = "Host"
-            self.__api_post("/actions/schedule-downtime", json.dumps(payload))
+            result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
             payload["type"] = "Service"
-            return self.__api_post("/actions/schedule-downtime", json.dumps(payload))
+            result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
+        #return result
+        result_obj = json.loads(result.text)
+        if len(result_obj["results"]) == 0:
+            raise EmptySetException("Host/service not found")
+        else:
+            return result
 
 
 
@@ -280,8 +289,8 @@ class Icinga2APIClient:
         :param object_type: host or hostgroup
         :type object_type: str
         """
-        return self.__manage_downtime(object_name, object_type, hours=8, \
-            comment="Downtime managed by katprep", remove_downtime=True)
+        return self.__manage_downtime(object_name, object_type, 8, \
+            "Downtime managed by katprep", remove_downtime=True)
 
 
 
@@ -296,18 +305,21 @@ class Icinga2APIClient:
         :type object_type: str
         """
         #retrieve and load data
-        result = self.__api_get("/objects/{}s?host={}".format(
-           object_type, object_name)
-        )
-        data = json.loads(result)
-
-        #check if downtime
-        #TODO: how to do this for hostgroups?!
-        if object_type == "host":
-            for result in data["results"]:
-                if result["attrs"]["downtime_depth"] > 0:
-                    return True
-            return False
+        try:
+            result = self.__api_get("/objects/{}s?host={}".format(
+               object_type, object_name)
+            )
+            data = json.loads(result.text)
+            #check if downtime
+            #TODO: how to do this for hostgroups?!
+            if object_type == "host":
+                for result in data["results"]:
+                    if result["attrs"]["downtime_depth"] > 0:
+                        return True
+                return False
+        except SessionException as err:
+            if "404" in err.message:
+                raise EmptySetException("Host not found")
 
 
 
@@ -321,10 +333,10 @@ class Icinga2APIClient:
         :type only_failed: bool
         """
         #retrieve result
-        result = self.__api_get("/objects/services?host={}".format(
+        result = self.__api_get('/objects/services?filter=match("{}",host.name)'.format(
             object_name)
         )
-        data = json.loads(result)
+        data = json.loads(result.text)
         services = []
         for result in data["results"]:
             #get all the service information
@@ -339,9 +351,13 @@ class Icinga2APIClient:
                 services.append(this_service)
         if len(services) == 0:
             #empty set
+<<<<<<< HEAD
             raise EmptySetException(
                 "No results for host '%s'".format(object_name)
             )
+=======
+            raise EmptySetException("Host not found")
+>>>>>>> 778dabd2d9e6f9471cd80f3e3c6607f3e9a2fe15
         else:
             return services
 
@@ -356,7 +372,7 @@ class Icinga2APIClient:
         """
         #retrieve result
         result = self.__api_get("/objects/hosts")
-        data = json.loads(result)
+        data = json.loads(result.text)
         hosts = []
         for result in data["results"]:
             #get all the host information
@@ -368,3 +384,19 @@ class Icinga2APIClient:
             this_host = {"name": host, "ip": ip}
             hosts.append(this_host)
         return hosts
+
+
+
+    def dummy_call(self):
+        """
+        This function is used for checking whether authorization succeeded.
+        It simply retrieves status.cgi
+        """
+        #set-up URL
+        url = "/"
+        #retrieve data
+        result = self.__api_get(url)
+        if result != "":
+            return True
+        else:
+            return False
