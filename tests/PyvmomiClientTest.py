@@ -9,9 +9,81 @@ import time
 import unittest
 import logging
 import json
+import pytest
 from katprep.clients.PyvmomiClient import PyvmomiClient
 from katprep.clients import SessionException, InvalidCredentialsException, \
 EmptySetException
+
+
+# scope used to reuse the same fixture for all tests
+@pytest.fixture(scope="session")
+def pyvmomiConfig():
+    try:
+        with open("pyvmomi_config.json", "r") as json_file:
+            json_data = json_file.read().replace("\n", "")
+            yield json.loads(json_data)
+    except IOError as err:
+        pytest.skip("Unable to read configuration file: {!r}".format(err))
+
+
+@pytest.fixture
+def pyvmomiClient(pyvmomiConfig):
+    try:
+        yield PyvmomiClient(
+            logging.ERROR, pyvmomiConfig["config"]["hostname"],
+            pyvmomiConfig["config"]["api_user"],
+            pyvmomiConfig["config"]["api_pass"]
+        )
+    finally:
+        # Executes this after every test
+        # wait for changes to be applied
+        time.sleep(20)
+
+
+def pyvmomiDummySnapshot():
+    return "PyvmomiClientTest"
+
+
+def test_valid_login(pyvmomiConfig, pyvmomiClient, pyvmomiDummySnapshot):
+    """
+    Ensure exceptions on valid logins
+    """
+    try:
+        result = pyvmomiClient.has_snapshot(
+            pyvmomiConfig["valid_objects"]["vm"],
+            pyvmomiDummySnapshot
+        )
+        assert result in [True, False]
+    except EmptySetException:
+        # An alternative could be to use a skip here to give a reason
+        # why this has been skipped
+        # pytest.skip("Insert reason here...")
+        pass
+
+
+def test_a_create_snapshot(pyvmomiConfig, pyvmomiClient, pyvmomiDummySnapshot):
+    """
+    Ensure that creating snapshots is possible
+    """
+    pyvmomiClient.create_snapshot(
+        pyvmomiConfig["valid_objects"]["vm"],
+        pyvmomiDummySnapshot,
+        pyvmomiDummySnapshot
+    )
+
+
+def test_invalid_login(pyvmomiConfig):
+    """
+    Ensure exceptions on invalid logins
+    """
+    with pytest.raises(InvalidCredentialsException):
+        api_dummy = PyvmomiClient(
+            logging.ERROR, pyvmomiConfig["config"]["hostname"],
+            "giertz", "paulapinkepank"
+        )
+        #dummy call
+        api_dummy.get_vm_ips()
+
 
 class PyvmomiClientTest(unittest.TestCase):
     """
