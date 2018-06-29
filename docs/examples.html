@@ -158,6 +158,10 @@ INFO:katprep_maintenance:Host 'pinkepank.test.loc' --&gt; install: FEDORA-EPEL-2
 <p>Several errata will be installed on the systems. Now, go ahead and omit the simulation parameter. By default, the system will only reboot if an installed erratum requires this. If we want to automatically reboot the systems after installing errata (<em>regardless if an erratum requires this</em>), we also need to supply the <tt class="docutils literal"><span class="pre">-r</span></tt> / <tt class="docutils literal"><span class="pre">--reboot-systems</span></tt> parameter:</p>
 <div class="highlight-python"><pre>$ katprep_maintenance -C mycontainer.auth -S foreman.localdomain.loc errata-snapshot-*.json -r execute</pre>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For rebooting VMs after system maintenance, at least Foreman 1.15.x or Red Hat Satellite 6.3 is required.</p>
+</div>
 <p>Once the systems have been patched (<em>and maybe also rebooted</em>), it&#8217;s time to check whether the monitoring status is fine, again:</p>
 <div class="highlight-python"><pre>$ katprep_maintenance -C mycontainer.auth -S foreman.localdomian.loc errata-snapshot-*.json verify</pre>
 </div>

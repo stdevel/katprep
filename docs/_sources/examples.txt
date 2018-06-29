@@ -118,6 +118,8 @@ Several errata will be installed on the systems. Now, go ahead and omit the simu
 
   $ katprep_maintenance -C mycontainer.auth -S foreman.localdomain.loc errata-snapshot-*.json -r execute
 
+.. note:: For rebooting VMs after system maintenance, at least Foreman 1.15.x or Red Hat Satellite 6.3 is required.
+
 Once the systems have been patched (*and maybe also rebooted*), it's time to check whether the monitoring status is fine, again::
 
   $ katprep_maintenance -C mycontainer.auth -S foreman.localdomian.loc errata-snapshot-*.json verify

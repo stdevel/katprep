@@ -33,6 +33,10 @@ class ForemanAPIClientTest(unittest.TestCase):
     """
     int: ID of temporary bookmark
     """
+    set_up = False
+    """
+    bool: Flag whether the connection was set up
+    """
 
 
 
@@ -40,52 +44,55 @@ class ForemanAPIClientTest(unittest.TestCase):
         """
         Connecting the interface and populating demo content
         """
-        #instance logging
-        logging.basicConfig()
-        self.LOGGER.setLevel(logging.DEBUG)
-        #reading configuration
-        try:
-            with open("fman_config.json", "r") as json_file:
-                json_data = json_file.read().replace("\n", "")
-            self.config = json.loads(json_data)
-        except IOError as err:
-            self.LOGGER.error(
-                "Unable to read configuration file: '%s'", err
+        #only set-up _all_ the stuff once
+        if not self.set_up:
+            #instance logging
+            logging.basicConfig()
+            self.LOGGER.setLevel(logging.DEBUG)
+            #reading configuration
+            try:
+                with open("fman_config.json", "r") as json_file:
+                    json_data = json_file.read().replace("\n", "")
+                self.config = json.loads(json_data)
+            except IOError as err:
+                self.LOGGER.error(
+                    "Unable to read configuration file: '%s'", err
+                )
+            #connect to API
+            self.api_foreman = ForemanAPIClient(
+                logging.ERROR, self.config["config"]["hostname"],
+                self.config["config"]["api_user"],
+                self.config["config"]["api_pass"],
+                verify=False
             )
-        #connect to API
-        self.api_foreman = ForemanAPIClient(
-            logging.ERROR, self.config["config"]["hostname"],
-            self.config["config"]["api_user"],
-            self.config["config"]["api_pass"],
-            verify=False
-        )
-        #create demo bookmark
-        try:
-            self.api_foreman.api_post(
-                "/bookmarks", '''
-                    {
-                        "bookmark":
+            #create demo bookmark
+            try:
+                self.api_foreman.api_post(
+                    "/bookmarks", '''
                         {
-                            "name": "ForemanAPIClientTest",
-                            "controller": "dashboard",
-                            "query": "architecture = x86_64",
-                            "public": true
-                        }
-                    }'''
+                            "bookmark":
+                            {
+                                "name": "ForemanAPIClientTest",
+                                "controller": "dashboard",
+                                "query": "architecture = x86_64",
+                                "public": true
+                            }
+                        }'''
+                )
+            except SessionException as err:
+                if "422" in err:
+                    #demo content already present
+                    pass
+            #Retrieving the ID of the previously created bookmark
+            bookmarks = json.loads(
+                self.api_foreman.api_get(
+                    "/bookmarks"
+                )
             )
-        except SessionException as err:
-            if "422" in err:
-                #demo content already present
-                pass
-        #Retrieving the ID of the previously created bookmark
-        bookmarks = json.loads(
-            self.api_foreman.api_get(
-                "/bookmarks"
-            )
-        )
-        for bookmark in bookmarks["results"]:
-            if bookmark["name"] == "ForemanAPIClientTest":
-                self.bookmark_id = bookmark["id"]
+            for bookmark in bookmarks["results"]:
+                if bookmark["name"] == "ForemanAPIClientTest":
+                    self.bookmark_id = bookmark["id"]
+        self.set_up = True
 
     def tearDown(self):
         """
