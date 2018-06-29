@@ -134,6 +134,9 @@ This utility supports the following commands
 - **verify** - Verifying status (checking snapshots and downtime)
 - **cleanup** - Cleaning-up (removing downtimes and snapshots)
 
+**IMPORTANT NOTE**:
+For rebooting VMs after system maintenance, at least Foreman 1.15.x or Red Hat Satellite 6.3 is required.
+
 FILES
 =====
 

@@ -86,8 +86,16 @@ class PyvmomiClientTest(unittest.TestCase):
         Ensure exceptions on valid logins
         """
         #dummy call
-        #TODO: other call?
-        self.pyvmomi_client.get_vm_ips()
+        try:
+            result = self.pyvmomi_client.has_snapshot(
+                self.config["valid_objects"]["vm"],
+                self.dummy_snapshot
+            )
+            self.assertTrue(
+                result in [True, False]
+            )
+        except EmptySetException:
+            pass
 
     def test_invalid_login(self):
         """
@@ -99,7 +107,6 @@ class PyvmomiClientTest(unittest.TestCase):
                 "giertz", "paulapinkepank"
             )
             #dummy call
-            #TODO. other call?
             api_dummy.get_vm_ips()
 
 
