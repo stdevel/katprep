@@ -163,7 +163,7 @@ def scan_systems(options):
                 #unable to read errata
                 LOGGER.info(
                     "Unable to read errata counters for system '%s' - check " \
-                    "system! (Hint: unregistered content host?)"
+                    "system! (Hint: unregistered content host?)", system["name"]
                 )
                 errata_counter = {}
                 errata_counter[u"security"] = 0
@@ -212,9 +212,7 @@ def scan_systems(options):
                 SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
 
             #set HW flag
-            if params_obj["facts"]["is_virtual"].lower() == "true":
-                SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = False
-            else:
+            if not params_obj["facts"]["is_virtual"].lower() == "true":
                 SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
 
             #add errata information if applicable
