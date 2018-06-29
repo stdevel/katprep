@@ -351,13 +351,9 @@ class Icinga2APIClient:
                 services.append(this_service)
         if len(services) == 0:
             #empty set
-<<<<<<< HEAD
             raise EmptySetException(
                 "No results for host '%s'".format(object_name)
             )
-=======
-            raise EmptySetException("Host not found")
->>>>>>> 778dabd2d9e6f9471cd80f3e3c6607f3e9a2fe15
         else:
             return services
 
