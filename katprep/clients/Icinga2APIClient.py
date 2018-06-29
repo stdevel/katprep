@@ -12,7 +12,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import time
 from datetime import datetime, timedelta
-from katprep.clients import SessionException
+from katprep.clients import SessionException, EmptySetException
 
 
 
@@ -330,13 +330,18 @@ class Icinga2APIClient:
             #get all the service information
             service = result["attrs"]["display_name"]
             state = result["attrs"]["state"]
-            if only_failed == False or state == 0:
-                #append service if ok or all states
+            self.LOGGER.debug(
+                "Found service '%s' with state '%s'", service, state
+            )
+            if only_failed == False or float(state) != 0.0:
+                #append service if ok or state not ok
                 this_service = {"name": service, "state": state}
                 services.append(this_service)
         if len(services) == 0:
             #empty set
-            raise SessionException("Not found")
+            raise EmptySetException(
+                "No results for host '%s'".format(object_name)
+            )
         else:
             return services
 

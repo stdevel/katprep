@@ -436,9 +436,15 @@ def verify(options, args):
                     set_verification_value(options, host, "mon_cleanup", True)
                     LOGGER.info("No downtime for host '%s' found, probably cleaned-up.", host)
                 #check critical services
-                crit_services = MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].get_services(mon_name)
+                try:
+                    crit_services = MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].get_services(mon_name)
+                except EmptySetException:
+                    crit_services = {}
                 if len(crit_services) > 0:
                     services = ""
+                    LOGGER.debug(
+                        "Critical services: '%s'", str(crit_services)
+                    )
                     for service in crit_services:
                         services = "{}{} - {}, ".format(
                             services, service.keys()[0], service.values()[0]
@@ -448,6 +454,7 @@ def verify(options, args):
                     set_verification_value(options, host, "mon_status_detail", services)
                 else:
                     set_verification_value(options, host, "mon_status", "Ok")
+                    set_verification_value(options, host, "mon_status_detail", "All services OK")
 
     except KeyError:
         #host with either no virt/mon
