@@ -1,3 +1,5 @@
 lxml
 pyvmomi
 pyyaml
+fernet
+cryptography

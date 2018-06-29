@@ -18,50 +18,39 @@ Vendor: Christian Stankowic <katprep@st-devel.net>
 Url: https://github.com/stdevel/katprep
 
 %description
+[![Build Status](https://travis-ci.org/stdevel/katprep.svg?branch=master)](https://travis-ci.org/stdevel/katprep)
+
 # katprep
 **katprep** is a Python toolkit for automating system maintenance and generating patch reports for systems managed with [Foreman](http://www.theforeman.org/)/[Katello](http://www.katello.org/) or [Red Hat Satellite 6.x](http://www.redhat.com/products/enterprise-linux/satellite/).
 
 This can be very useful if you need to document software changes due to IT certifications like [ISO/IEC 27001:2005](http://en.wikipedia.org/wiki/ISO/IEC_27001:2005) or many other.
 
-This toolkit is currently under early development, it's a complete rewrite of my other toolkit [**satprep**](https://github.com/stdevel/satprep), which did the same job for systems managed with [Spacewalk](http://www.spacewalkproject.org/), [Red Hat Satellite 5.x](http://www.redhat.com/products/enterprise-linux/satellite/) or [SUSE Manager](http://www.suse.com/products/suse-manager/).
+katprep can automate the following infrastructure tasks:
+  - create/remove virtual machine snapshots hypervisor independently (*e.g. VMware vSphere, KVM, XEN, Hyper-V,...*) by utilizing [libvirt](http://www.libvirt.org) and the [VMware vSphere Python API bindings (*pyVmomi*)](https://github.com/vmware/pyvmomi)
+  - schedule/remove downtimes within your monitoring system (*Nagios/Icinga, Icinga2*)
+  - patch and reboot affected systems
+  - document system changes in a customizable report by utilizing [Pandoc](https://pypi.python.org/pypi/pypandoc) (*HTML, Markdown,...*)
+  
+This software is a complete rewrite of my other toolkit [**satprep**](https://github.com/stdevel/satprep).
 
-So - stay tuned and check-out this site more often.
+# Documentation and contribution
+The project documentation is created automatically using [Sphinx](http://www.sphinx-doc.org) - it can be found in the **doc** folder of this repository. Check-out [**this website**](https://stdevel.github.io/katprep/) for an online mirror.
 
-# Planned features
-- Reporting
-  - ~~various formats by using **Pandoc** and [**pypandoc**](https://pypi.python.org/pypi/pypandoc)~~ :white_check_mark: implemented
-  - ~~creating inventory snapshots of managed systems before and after maintenance~~ :white_check_mark: implemented
-  - ~~creating reports listing relevant information about installed errata (*category, date, affected packages, CVE information*)~~ :white_check_mark: implemented
-  - ~~template with variables, automation using YAML metadata~~ :white_check_mark: implemented
-- Automation
-  - (*un-*)scheduling downtimes within popular monitoring solutions such as:
-    - ~~Nagios / Icinga 1.x~~ :white_check_mark: implemented
-    - Icinga 2 (*will follow soon*)
-    - ~~Thruk~~ :white_check_mark: implemented
-    - ~~Shinken~~ :white_check_mark: implemented
-  - ~~creating/removing snapshots for virtual machines using [libvirt](http://www.libvirt.org) supporting multiple hypervisors including:~~ :white_check_mark: implemented
-    - ~~KVM~~ :white_check_mark: implemented
-    - ~~Xen~~ :white_check_mark: implemented
-    - ~~VMware vSphere ESXi~~ :white_check_mark: implemented
-    - ~~Microsoft Hyper-V~~ :white_check_mark: implemented
-  - ~~applying errata after successful preparation~~ :white_check_mark: implemented
-  - rebooting systems if patches require this
-- Documentation
-  - ~~automatic Documentation with [**Sphinx**](http://www.sphinx-doc.org)~~ :white_check_mark: implemented
-  - manpages for server installations without browser
-  - ability to execute scripts before maintenance (*e.g. to remount ``/usr`` in rw mode*)
-  - implement central configuration file to avoid using thousands of parameters
-- Other
-  - create a Python module for this utility
-  - serve a RPM spec file for easier distribution
-  - integration into Foreman user interface? :innocent:
+You want to contribute? That's great! Please check-out the [**Issues**](https://github.com/stdevel/katprep/issues) tab of this project and share your thoughts/ideas in a new issue - also, pull requests are welcome!
 
-# Planned workflow
-1. Once after the installation and after new systems were registered, Puppet host parameters are set using ``katprep_parameters``
-2. When patch maintenance is needed, a snapshot report is created using ``katprep_snapshot``
-3. Patch maintenance per system is prepared and (*optionally*) executed using ``katprep_maintenance``
-4. After patch maintenance, another snapshot report is created
-5. Final patch reports per system are created using ``katprep_report``
+# How does this work?
+katprep uses Puppet host parameters to assign additional meta information to systems managed with Foreman/Katello or Red Hat Satellite such as:
+  - monitoring/virtualization system managing the host
+  - differing object names within those systems
+  - snapshots required before system maintenance
+
+![katprep workflow](https://raw.githubusercontent.com/stdevel/katprep/master/katprep_workflow.jpg "katprep workflow")
+
+If you plan to execute maintenance tasks, katprep triggers (*`katprep_maintenance` utility*) monitoring and virtualization hosts to schedule downtimes and create VM snapshots. Once these tasks have been completed, katprep can automatically trigger the patch installation and system reboot. After verifying your systems, katprep can remove downtimes and snapshots automatically. Before and after patching systems, it is necessary to create an inventory report of your system landscape. These reports contain information such as outstanding patches - after patching your systems, the `katprep_report` utility automatically calculares differences and creates patch reports for all updated hosts.
+
+As a result, patching big system landscapes becomes less time-consuming with katprep: it's only executing three commands - independent whether you are patching 1 host or 1000 hosts.
+
+To make the installation even easier, an auto-discover functionality can scan your monitoring systems and hypervisors and link gathered information with Foreman/Katello and Red Hat Satellite automatically (``katprep_populate``).
 
 
 %prep
