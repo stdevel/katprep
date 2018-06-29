@@ -50,6 +50,12 @@ katprep_populate
 
 .. _issue35: https://github.com/stdevel/katprep/issues/35
 
+katprep_report
+==============
+* fixed several bugs where report information were incorrect (`issue61`_)
+
+.. _issue61: https://github.com/stdevel/katprep/issues/61
+
 API integrations
 ================
 * All: implemented unit tests for API clients (`issue13`_)
@@ -61,9 +67,11 @@ API integrations
 * NagiosCGIClient: made ``has_downtime()`` more efficient and overhauled webscraping (`issue64`_)
 * SpacewalkAPIClient: first integration stubs
 * ForemanAPIClient, SpacewalkAPIClient: Moved hostname verification to shared library
+* Icinga2APIClient: Fixed a bug where some information were not retrieved correctly (`issue60`_)
 
 .. _issue13: https://github.com/stdevel/katprep/issues/13
 .. _issue41: https://github.com/stdevel/katprep/issues/41
+.. _issue60: https://github.com/stdevel/katprep/issues/60
 .. _issue64: https://github.com/stdevel/katprep/issues/64
 
 Shared library

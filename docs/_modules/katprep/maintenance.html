@@ -488,9 +488,15 @@
                     <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;mon_cleanup&quot;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
                     <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;No downtime for host &#39;</span><span class="si">%s</span><span class="s">&#39; found, probably cleaned-up.&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
                 <span class="c">#check critical services</span>
-                <span class="n">crit_services</span> <span class="o">=</span> <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;katprep_mon&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">get_services</span><span class="p">(</span><span class="n">mon_name</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">crit_services</span> <span class="o">=</span> <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;katprep_mon&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">get_services</span><span class="p">(</span><span class="n">mon_name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">EmptySetException</span><span class="p">:</span>
+                    <span class="n">crit_services</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">crit_services</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">services</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s">&quot;Critical services: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">crit_services</span><span class="p">)</span>
+                    <span class="p">)</span>
                     <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="n">crit_services</span><span class="p">:</span>
                         <span class="n">services</span> <span class="o">=</span> <span class="s">&quot;{}{} - {}, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">services</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">service</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
@@ -500,6 +506,7 @@
                     <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;mon_status_detail&quot;</span><span class="p">,</span> <span class="n">services</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;mon_status&quot;</span><span class="p">,</span> <span class="s">&quot;Ok&quot;</span><span class="p">)</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;mon_status_detail&quot;</span><span class="p">,</span> <span class="s">&quot;All services OK&quot;</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="c">#host with either no virt/mon</span>

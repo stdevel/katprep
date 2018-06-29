@@ -63,7 +63,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">katprep.clients</span> <span class="kn">import</span> <span class="n">SessionException</span>
+<span class="kn">from</span> <span class="nn">katprep.clients</span> <span class="kn">import</span> <span class="n">SessionException</span><span class="p">,</span> <span class="n">EmptySetException</span>
 
 
 
@@ -181,10 +181,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="c">#return result</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;get&quot;</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">text</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">return</span> <span class="n">result</span>
 
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
@@ -291,16 +288,23 @@
                     <span class="s">&quot;comment&quot;</span><span class="p">:</span> <span class="n">comment</span><span class="p">,</span>
                 <span class="p">}</span>
         <span class="c">#send POST</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">remove_downtime</span><span class="p">:</span>
             <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Host&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/remove-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/remove-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
             <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Service&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/remove-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/remove-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Host&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/schedule-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/schedule-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
             <span class="n">payload</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Service&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/schedule-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_post</span><span class="p">(</span><span class="s">&quot;/actions/schedule-downtime&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+        <span class="c">#return result</span>
+        <span class="n">result_obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result_obj</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EmptySetException</span><span class="p">(</span><span class="s">&quot;Host/service not found&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
 
 
 
@@ -352,18 +356,21 @@
 <span class="sd">        :type object_type: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c">#retrieve and load data</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&quot;/objects/{}s?host={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-           <span class="n">object_type</span><span class="p">,</span> <span class="n">object_name</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-
-        <span class="c">#check if downtime</span>
-        <span class="c">#TODO: how to do this for hostgroups?!</span>
-        <span class="k">if</span> <span class="n">object_type</span> <span class="o">==</span> <span class="s">&quot;host&quot;</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;downtime_depth&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">True</span>
-            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&quot;/objects/{}s?host={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+               <span class="n">object_type</span><span class="p">,</span> <span class="n">object_name</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="c">#check if downtime</span>
+            <span class="c">#TODO: how to do this for hostgroups?!</span>
+            <span class="k">if</span> <span class="n">object_type</span> <span class="o">==</span> <span class="s">&quot;host&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;downtime_depth&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="n">SessionException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&quot;404&quot;</span> <span class="ow">in</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">EmptySetException</span><span class="p">(</span><span class="s">&quot;Host not found&quot;</span><span class="p">)</span>
 
 
 </div>
@@ -377,22 +384,27 @@
 <span class="sd">        :type only_failed: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c">#retrieve result</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&quot;/objects/services?host={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&#39;/objects/services?filter=match(&quot;{}&quot;,host.name)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">object_name</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
         <span class="n">services</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
             <span class="c">#get all the service information</span>
             <span class="n">service</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;display_name&quot;</span><span class="p">]</span>
             <span class="n">state</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;state&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">only_failed</span> <span class="o">==</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="c">#append service if ok or all states</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s">&quot;Found service &#39;</span><span class="si">%s</span><span class="s">&#39; with state &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">state</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">only_failed</span> <span class="o">==</span> <span class="bp">False</span> <span class="ow">or</span> <span class="nb">float</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="c">#append service if ok or state not ok</span>
                 <span class="n">this_service</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">service</span><span class="p">,</span> <span class="s">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">}</span>
                 <span class="n">services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_service</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">services</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c">#empty set</span>
-            <span class="k">raise</span> <span class="n">SessionException</span><span class="p">(</span><span class="s">&quot;Not found&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">EmptySetException</span><span class="p">(</span>
+                <span class="s">&quot;No results for host &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">object_name</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">services</span>
 
@@ -407,7 +419,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c">#retrieve result</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="s">&quot;/objects/hosts&quot;</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
         <span class="n">hosts</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;results&quot;</span><span class="p">]:</span>
             <span class="c">#get all the host information</span>
@@ -418,7 +430,23 @@
                 <span class="n">ip</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;attrs&quot;</span><span class="p">][</span><span class="s">&quot;address&quot;</span><span class="p">]</span>
             <span class="n">this_host</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span> <span class="s">&quot;ip&quot;</span><span class="p">:</span> <span class="n">ip</span><span class="p">}</span>
             <span class="n">hosts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_host</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">hosts</span></div></div>
+        <span class="k">return</span> <span class="n">hosts</span>
+
+
+</div>
+<div class="viewcode-block" id="Icinga2APIClient.dummy_call"><a class="viewcode-back" href="../../katprep.clients.html#clients.Icinga2APIClient.Icinga2APIClient.dummy_call">[docs]</a>    <span class="k">def</span> <span class="nf">dummy_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function is used for checking whether authorization succeeded.</span>
+<span class="sd">        It simply retrieves status.cgi</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#set-up URL</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span>
+        <span class="c">#retrieve data</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__api_get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span></div></div>
 </pre></div>
 
           </div>
