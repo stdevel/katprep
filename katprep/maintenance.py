@@ -504,7 +504,7 @@ def status(options, args):
                                     task, host
                                 )
                             elif result["result"].lower() == "error":
-                                LOGGER.error(
+                                LOGGER.info(
                                     "%s task for host '%s' FAILED!",
                                     task, host
                                 )
