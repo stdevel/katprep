@@ -208,8 +208,13 @@ def scan_systems(options):
                     pass
 
             #get owner
-            SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
-                SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
+            try:
+                SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
+                    SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
+            except SessionException:
+                #no user
+                SYSTEM_ERRATA[system["name"]]["params"]["owner"] = ""
+                LOGGER.debug("No owner for system '%s' defined", system["name"])
 
             #set HW flag
             if not params_obj["facts"]["is_virtual"].lower() == "true":
