@@ -108,21 +108,27 @@ def set_password(options):
         new_pass = options.file_password
     else:
         new_pass = getpass.getpass("New file password (max. 32 chars): ")
+    #fix too long passwords
+    while len(new_pass) > 32:
+        new_pass = getpass.getpass("New file password (max. 32 chars!): ")
     confirm=""
     while confirm != new_pass:
         confirm = getpass.getpass("Confirm password: ")
     new_container = AuthContainer(LOG_LEVEL, options.container[0], new_pass)
 
-    #encrypt/change _all_ the passwords!
-    for hostname in CONTAINER.get_hostnames():
-        #get credentials
-        credentials = CONTAINER.get_credential(hostname)
-        #add new entry
-        new_container.add_credentials(
-            hostname, credentials[0], credentials[1]
-        )
-    #save new container
-    new_container.save()
+    try:
+        #encrypt/change _all_ the passwords!
+        for hostname in CONTAINER.get_hostnames():
+            #get credentials
+            credentials = CONTAINER.get_credential(hostname)
+            #add new entry
+            new_container.add_credentials(
+                hostname, credentials[0], credentials[1]
+            )
+        #save new container
+        new_container.save()
+    except ContainerException:
+        LOGGER.error("Unable to change password (Hint: wrong old password?)")
 
 
 
