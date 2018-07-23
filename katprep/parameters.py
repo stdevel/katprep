@@ -68,7 +68,7 @@ def list_params():
 
     for key, value in PARAMETERS.items():
         LOGGER.info(
-            "Setting '{}' will define '{}'".format(key, value)
+            "Setting '%s' will define '%s'", key, value
         )
 
 
@@ -103,9 +103,8 @@ def change_param(options, host, mode="add", dry_run=True):
         if VALUES[param] != "":
             if dry_run:
                 LOGGER.info(
-                    "Host '{}' (#{}) --> {} parameter '{}'".format(
-                        host["name"], host["id"], mode, param
-                    )
+                    "Host '%s' (#%s) --> %s parameter '%s'",
+                    host["name"], host["id"], mode, param
                 )
             else:
                 #get ID of parameter
@@ -125,9 +124,9 @@ def change_param(options, host, mode="add", dry_run=True):
                         "name": param, "value": VALUES[param]
                     }
                 LOGGER.debug(
-                    "JSON payload: {}".format(json.dumps(payload))
+                    "JSON payload: %s", str(json.dumps(payload))
                 )
-    
+
                 #send request
                 if mode.lower() == "del":
                     #delete parameter
@@ -145,7 +144,7 @@ def change_param(options, host, mode="add", dry_run=True):
                         host["id"]
                     ), json.dumps(payload))
         else:
-            LOGGER.debug("Empty value for '{}', not changing anything!".format(param))
+            LOGGER.debug("Empty value for '%s', not changing anything!", param)
 
 
 
@@ -156,7 +155,7 @@ def manage_params(options):
 
     #get all the hosts depending on the filter
     filter_url = get_filter(options, "host")
-    LOGGER.debug("Filter URL will be '{}'".format(filter_url))
+    LOGGER.debug("Filter URL will be '%s'", filter_url)
     result_obj = json.loads(
         SAT_CLIENT.api_get("{}".format(filter_url))
     )
@@ -164,7 +163,7 @@ def manage_params(options):
     #manage _all_ the hosts
     for entry in result_obj["results"]:
         LOGGER.debug(
-            "Found host '{}' (#{}),".format(entry["name"], entry["id"])
+            "Found host '%s' (#%s),", entry["name"], entry["id"]
         )
         #execute action
         if options.action_add or options.action_addopt:
@@ -190,12 +189,11 @@ def manage_params(options):
                     else:
                         note = ""
                     LOGGER.info(
-                        "Host '{}' (#{}) --> setting '{}' has {}value '{}'"
-                        " (created: {} - last updated: {})".format(
-                            entry["name"], entry["id"], setting["name"],
-                            note, setting["value"], setting["created_at"],
-                            setting["updated_at"]
-                        )
+                        "Host '%s' (#%s) --> setting '%s' has %s value '%s'"
+                        " (created: %s - last updated: %s)",
+                        entry["name"], entry["id"], setting["name"],
+                        note, setting["value"], setting["created_at"],
+                        setting["updated_at"]
                     )
 
 
@@ -316,8 +314,8 @@ def main(options, args):
     """Main function, starts the logic based on parameters."""
     global SAT_CLIENT
 
-    LOGGER.debug("Options: {0}".format(options))
-    LOGGER.debug("Arguments: {0}".format(args))
+    LOGGER.debug("Options: %s", str(options))
+    LOGGER.debug("Arguments: %s", str(args))
 
     if options.dry_run:
         LOGGER.info("This is just a SIMULATION - no changes will be made.")
@@ -342,7 +340,8 @@ def main(options, args):
     if not options.action_list:
         #initalize Satellite connection
         (sat_user, sat_pass) = get_credentials(
-            "Satellite", options.server, options.auth_container
+            "Satellite", options.server, options.auth_container,
+            options.auth_password
         )
         SAT_CLIENT = ForemanAPIClient(
             LOG_LEVEL, options.server, sat_user,

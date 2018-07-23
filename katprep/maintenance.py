@@ -803,7 +803,8 @@ def main(options, args):
 
     #initialize APIs
     (fman_user, fman_pass) = get_credentials(
-        "Foreman", options.foreman_server, options.generic_auth_container
+        "Foreman", options.foreman_server, options.generic_auth_container,
+        options.auth_password
     )
     SAT_CLIENT = ForemanAPIClient(
         LOG_LEVEL, options.foreman_server, fman_user,
@@ -816,7 +817,7 @@ def main(options, args):
         for host in required_virt:
             (virt_user, virt_pass) = get_credentials(
                 "Virtualization {}".format(host),
-                host, options.generic_auth_container
+                host, options.generic_auth_container, options.auth_password
             )
             #create client based on type
             host_params = get_host_params_by_report(REPORT, host)
@@ -835,7 +836,7 @@ def main(options, args):
         for host in required_mon:
             (mon_user, mon_pass) = get_credentials(
                 "Monitoring {}".format(host),
-                host, options.generic_auth_container
+                host, options.generic_auth_container, options.auth_password
             )
             host_params = get_host_params_by_report(REPORT, host)
             if "katprep_mon_type" in host_params and \
