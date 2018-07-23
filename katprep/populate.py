@@ -9,13 +9,9 @@ from __future__ import absolute_import
 
 import argparse
 import logging
-import yaml
 import json
-import time
-import os
 import getpass
-from . import is_valid_report, get_json, get_credentials, \
-get_required_hosts_by_report
+from . import get_credentials
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
@@ -61,7 +57,7 @@ def populate(options):
         "This *WILL* take some time - please be patient.")
     try:
         #retrieve host information
-        hosts = params_obj = json.loads(SAT_CLIENT.api_get("/hosts"))
+        hosts = json.loads(SAT_CLIENT.api_get("/hosts"))
         required_settings = {}
 
         #retrieve VM/IP information
@@ -69,16 +65,18 @@ def populate(options):
             vm_hosts = VIRT_CLIENT.get_vm_ips(ipv6_only=options.ipv6_only)
             #print vm_hosts
             for host in vm_hosts:
-                LOGGER.debug("HYPERVISOR: Found VM '{}' with IP '{}'".format(
-                    host["hostname"], host["ip"])
+                LOGGER.debug(
+                    "HYPERVISOR: Found VM '%s' with IP '%s'",
+                    host["hostname"], host["ip"]
                 )
 
         #retrieve monitoring information
         if not options.mon_skip:
             mon_hosts = MON_CLIENT.get_hosts(ipv6_only=options.ipv6_only)
             for host in mon_hosts:
-                LOGGER.debug("MONITORING: Found host '{}' with IP '{}'".format(
-                    host["name"], host["ip"])
+                LOGGER.debug(
+                    "MONITORING: Found host '%s' with IP '%s'",
+                    host["name"], host["ip"]
                 )
 
         #check _all_ the hosts
@@ -87,15 +85,16 @@ def populate(options):
         else:
             ip_filter = "ip"
         for host in hosts["results"]:
-            LOGGER.debug("SATELLITE: Found host '{}' with IP '{}'".format(
-                host["name"], host[ip_filter])
+            LOGGER.debug(
+                "SATELLITE: Found host '%s' with IP '%s'",
+                host["name"], host[ip_filter]
             )
 
             #check if host parameters set appropriately
-            required_settings={}
+            required_settings = {}
 
             if host["ip"] in [x["ip"] for x in vm_hosts]:
-                LOGGER.debug("Host '{}' is a VM".format(host["name"]))
+                LOGGER.debug("Host '%s' is a VM", host["name"])
 
                 required_settings["katprep_virt"] = options.virt_uri
                 required_settings["katprep_virt_type"] = options.virt_type
@@ -104,7 +103,7 @@ def populate(options):
                     required_settings["katprep_virt_name"] = vm_name[0]
 
             if host["ip"] in [x["ip"] for x in mon_hosts]:
-                LOGGER.debug("Host '{}' is monitored".format(host["name"]))
+                LOGGER.debug("Host '%s' is monitored", host["name"])
 
                 required_settings["katprep_mon"] = options.mon_url
                 required_settings["katprep_mon_type"] = options.mon_type
@@ -115,9 +114,9 @@ def populate(options):
             #set host parameters
             for setting in required_settings:
                 if options.generic_dry_run:
-                    LOGGER.info("Host '{}' ==> set/update parameter/value: {}/{}".format(
+                    LOGGER.info(
+                        "Host '%s' ==> set/update parameter/value: %s/%s",
                         host["name"], setting, required_settings[setting]
-                        )
                     )
                 else:
                     #host_id = SAT_CLIENT.get_id_by_name(host["name"], "host")
@@ -131,9 +130,9 @@ def populate(options):
                     #update or create parameter
                     if len(key_exists) > 0:
                         if options.foreman_update:
-                            LOGGER.debug("Host '{}' ==> UPDATE parameter/value: {}/{}".format(
+                            LOGGER.debug(
+                                "Host '%s' ==> UPDATE parameter/value: %s/%s",
                                 host["name"], setting, required_settings[setting]
-                                )
                             )
                             #get parameter ID to update
                             param_id = SAT_CLIENT.get_hostparam_id_by_name(
@@ -145,24 +144,26 @@ def populate(options):
                                 json.dumps(payload)
                             )
                         else:
-                            LOGGER.error("Parameter '{}' for host '{}' already exists "
-                                "and updating values has not been enabled!".format(
-                                    setting, host["name"]
-                                )
+                            LOGGER.error(
+                                "Parameter '%s' for host '%s' already exists "
+                                "and updating values has not been enabled!",
+                                setting, host["name"]
                             )
                     else:
-                        LOGGER.debug("Host '{}' ==> CREATE parameter/value: {}/{}".format(
+                        LOGGER.debug(
+                            "Host '%s' ==> CREATE parameter/value: %s/%s",
                             host["name"], setting, required_settings[setting]
-                            )
                         )
                         #add parameter
-                        SAT_CLIENT.api_post("/hosts/{}/parameters".format(
-                            host["id"]),
+                        SAT_CLIENT.api_post(
+                            "/hosts/{}/parameters".format(
+                                host["id"]
+                            ),
                             json.dumps(payload)
                         )
 
     except ValueError as err:
-        LOGGER.error("Unable to populate virtualization data: '{}'".format(err))
+        LOGGER.error("Unable to populate virtualization data: '%s'", err)
 
 
 
@@ -265,8 +266,8 @@ def main(options, args):
     """Main function, starts the logic based on parameters."""
     global SAT_CLIENT, VIRT_CLIENT, MON_CLIENT
 
-    LOGGER.debug("Options: {0}".format(options))
-    LOGGER.debug("Arguments: {0}".format(args))
+    LOGGER.debug("Options: %s", str(options))
+    LOGGER.debug("Arguments: %s", str(args))
 
     if not options.mon_skip and options.mon_url == "":
         LOGGER.error("Please specify a monitoring URL or set --skip-mon")
@@ -292,7 +293,7 @@ def main(options, args):
     )
 
     #get virtualization host credentials
-    if options.virt_skip == False:
+    if not options.virt_skip:
         (virt_user, virt_pass) = get_credentials(
             "Virtualization", options.virt_uri, options.generic_auth_container,
             options.auth_password
@@ -307,7 +308,7 @@ def main(options, args):
                 LOG_LEVEL, options.virt_uri, virt_user, virt_pass)
 
     #get monitoring host credentials
-    if options.mon_skip == False:
+    if not options.mon_skip:
         (mon_user, mon_pass) = get_credentials(
             "Monitoring", options.mon_url, options.generic_auth_container,
             options.auth_password
@@ -330,6 +331,9 @@ def main(options, args):
 
 
 def cli():
+    """
+    This functions initializes the CLI interface
+    """
     global LOG_LEVEL
     (options, args) = parse_options()
 
