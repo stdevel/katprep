@@ -244,7 +244,8 @@ class AuthContainer:
         """
         hostname = self.cut_hostname(hostname)
         try:
-            if self.KEY:
+            if self.is_encrypted():
+                self.LOGGER.debug("Decrypting crendentials")
                 crypto = Fernet(self.KEY)
                 return (
                     self.CREDENTIALS[hostname]["username"],
@@ -252,6 +253,7 @@ class AuthContainer:
                     )
             else:
                 #return plain information
+                self.LOGGER.debug("Plain login data")
                 return (
                     self.CREDENTIALS[hostname]["username"],
                     self.CREDENTIALS[hostname]["password"]
