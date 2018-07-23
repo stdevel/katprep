@@ -283,7 +283,8 @@ def main(options, args):
 
     #initialize APIs
     (fman_user, fman_pass) = get_credentials(
-        "Foreman", options.foreman_server, options.generic_auth_container
+        "Foreman", options.foreman_server, options.generic_auth_container,
+        options.auth_password
     )
     SAT_CLIENT = ForemanAPIClient(
         LOG_LEVEL, options.foreman_server, fman_user,
@@ -293,7 +294,8 @@ def main(options, args):
     #get virtualization host credentials
     if options.virt_skip == False:
         (virt_user, virt_pass) = get_credentials(
-            "Virtualization", options.virt_uri, options.generic_auth_container
+            "Virtualization", options.virt_uri, options.generic_auth_container,
+            options.auth_password
         )
         if options.virt_type == "pyvmomi":
             #vSphere Python API
@@ -307,7 +309,8 @@ def main(options, args):
     #get monitoring host credentials
     if options.mon_skip == False:
         (mon_user, mon_pass) = get_credentials(
-            "Monitoring", options.mon_url, options.generic_auth_container
+            "Monitoring", options.mon_url, options.generic_auth_container,
+            options.auth_password
         )
         if options.mon_type == "nagios":
             #Yet another legacy installation

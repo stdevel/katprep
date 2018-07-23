@@ -342,7 +342,8 @@ def main(options, args):
     if not options.action_list:
         #initalize Satellite connection
         (sat_user, sat_pass) = get_credentials(
-            "Satellite", options.server, options.auth_container
+            "Satellite", options.server, options.auth_container,
+            options.auth_password
         )
         SAT_CLIENT = ForemanAPIClient(
             LOG_LEVEL, options.server, sat_user,
