@@ -181,18 +181,20 @@ def validate_filters(options, api_client):
     :type api_client: ForemanAPIClient
     """
     try:
-        if options.location.isdigit() == False:
+        if options.location and options.location.isdigit() == False:
             options.location = api_client.get_id_by_name(
                 options.location, "location")
-        if options.organization.isdigit() == False:
+        if options.organization and options.organization.isdigit() == False:
             options.organization = api_client.get_id_by_name(
                 options.organization, "organization")
-        if options.hostgroup.isdigit() == False:
+        if options.hostgroup and options.hostgroup.isdigit() == False:
             options.hostgroup = api_client.get_id_by_name(
                 options.hostgroup, "hostgroup")
-        if options.environment.isdigit() == False:
+        if options.environment and options.environment.isdigit() == False:
             options.environment = api_client.get_id_by_name(
                 options.environment, "environment")
+    except Exception as err:
+        print err
     except SessionException:
         pass
 
