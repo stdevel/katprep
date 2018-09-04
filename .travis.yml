@@ -8,3 +8,5 @@ install: "pip install -r requirements.txt"
 # TODO: implement tests
 # script: pytest
 script: echo "I have no idea what I'm doing"
+# upload code coverage
+script: codeconv
