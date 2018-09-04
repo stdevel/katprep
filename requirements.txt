@@ -3,3 +3,4 @@ pyvmomi
 pyyaml
 fernet
 cryptography
+codecov
