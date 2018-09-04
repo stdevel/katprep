@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=not-callable
 """
 A script which populates the Foreman/Katello or Red Hat Satellite 6 host
 parameters with information from Nagios/Icinga or a virtualization host
@@ -352,7 +353,4 @@ def cli():
 
 
 if __name__ == "__main__":
-    """
-    Start the utility
-    """
     cli()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=not-callable
 """
 A script for creating a snapshot report of available errata and updates for
 systems managed with Foreman/Katello or Red Hat Satellite 6.
@@ -319,7 +320,4 @@ def cli():
 
 
 if __name__ == "__main__":
-    """
-    Start the utility
-    """
     cli()

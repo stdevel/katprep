@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=not-callable
 """
 A script for creating maintenance reports including installed errata per system
 managed with Foreman/Katello or Red Hat Satellite 6.
@@ -135,7 +136,7 @@ def get_file_by_age(file_a, file_b, return_older=False):
             else:
                 return file_a
     except IOError as err:
-        LOGGER.error("Unable to open file: '{}'".format(err))
+        LOGGER.error("Unable to open file: '%s'", err)
 
 def get_newer_file(file_a, file_b):
     """
@@ -178,10 +179,11 @@ def analyze_reports(options):
     REPORT_NEW = json.loads(get_json(
         get_newer_file(options.reports[0], options.reports[1])
     ))
-    LOGGER.debug("Old report ist '{}', new report is '{}'".format(
+    LOGGER.debug(
+        "Old report ist '%s', new report is '%s'",
         get_older_file(options.reports[0], options.reports[1]),
         get_newer_file(options.reports[0], options.reports[1])
-        ))
+    )
 
 
 
@@ -200,7 +202,7 @@ def get_errata_by_host(report, hostname):
         if host == hostname:
             for erratum in report[host]["errata"]:
                 errata.append(erratum["errata_id"])
-    LOGGER.debug("Errata for host '{}': '{}'".format(hostname, errata))
+    LOGGER.debug("Errata for host '%s': '%s'", hostname, errata)
     return errata
 
 
@@ -214,25 +216,26 @@ def create_delta(options):
     now = datetime.datetime.now()
     #open old report and remove entries from newer report
     for host in REPORT_OLD:
-        LOGGER.debug("Analyzing changes for host '{}'".format(host))
+        LOGGER.debug("Analyzing changes for host '%s'", host)
         try:
             for i, erratum in enumerate(REPORT_OLD[host]["errata"]):
                 if erratum["errata_id"] in get_errata_by_host(REPORT_NEW, host):
-                    LOGGER.debug("Dropping erratum '{}' (#{}) as it seems not to" \
-                        " be installed".format(
-                            erratum["summary"], erratum["errata_id"]
-                        ))
+                    LOGGER.debug(
+                        "Dropping erratum '%s' (#%s}) as it seems not to" \
+                        " be installed",
+                        erratum["summary"], erratum["errata_id"]
+                    )
                     del REPORT_OLD[host]["errata"][i]
             #add date and time
             #TODO: date format based on locale?
             REPORT_OLD[host]["params"]["date"] = now.strftime("%Y-%m-%d")
             REPORT_OLD[host]["params"]["time"] = now.strftime("%H:%M")
-    
+
             #store delta report
             timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
                 get_newer_file(options.reports[0], options.reports[1])
             )).strftime('%Y%m%d')
-    
+
             #store YAML files if at least 1 erratum installed
             if len(REPORT_OLD[host]["errata"]) > len(REPORT_NEW[host]["errata"]):
                 with open("{}errata-diff-{}-{}.yml".format(options.output_path, \
@@ -241,11 +244,11 @@ def create_delta(options):
                     default_flow_style=False, explicit_start=True, \
                     explicit_end=True, default_style="'")
             else:
-                LOGGER.debug("Host '{}' has not been patched #ohman".format(
-                    host)
+                LOGGER.debug(
+                    "Host '%s' has not been patched #ohman", host
                 )
         except KeyError:
-            LOGGER.debug("Unable to find changes for host '{}'".format(host))
+            LOGGER.debug("Unable to find changes for host '%s'", host)
 
 
 
@@ -255,24 +258,26 @@ def create_reports(options):
     YAML reports created previously into the desired format using ``pandoc``.
     """
     for host in REPORT_OLD:
-            timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
-                get_newer_file(options.reports[0], options.reports[1])
-            )).strftime('%Y%m%d')
-            filename = "{}errata-diff-{}-{}".format(
-                options.output_path, host, timestamp
+        timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
+            get_newer_file(options.reports[0], options.reports[1])
+        )).strftime('%Y%m%d')
+        filename = "{}errata-diff-{}-{}".format(
+            options.output_path, host, timestamp
+        )
+        if os.path.isfile("{}.yml".format(filename)):
+            LOGGER.debug("Creating report for host '%s'", host)
+            LOGGER.debug("%s.yml", filename)
+            #TODO: figure out why pypandoc doesn't work at this point
+            os.system("pandoc {}.yml --template {} -o {}.{}".format(filename, \
+                options.template_file, filename, options.output_type))
+            if not options.preserve_yaml:
+                #Remove file
+                os.remove("{}.yml".format(filename))
+        else:
+            LOGGER.debug(
+                "Non-existing report template: '%s.yml'",
+                filename
             )
-            if os.path.isfile("{}.yml".format(filename)):
-                LOGGER.debug("Creating report for host '{}'".format(host))
-                LOGGER.debug("{}.yml".format(filename))
-                #TODO: figure out why pypandoc doesn't work at this point
-                os.system("pandoc {}.yml --template {} -o {}.{}".format(filename, \
-                    options.template_file, filename, options.output_type))
-                if not options.preserve_yaml:
-                    #Remove file
-                    os.remove("{}.yml".format(filename))
-            else:
-                LOGGER.debug("Non-existing report template: " \
-                    "'{}.yml'".format(filename))
 
 
 
@@ -287,8 +292,10 @@ def main(options, args):
         options.template_file[options.template_file.rfind(".")+1:].lower()
     else:
         #no extension
-        LOGGER.error("Could not detect type of template," \
-        "please add a file extension such as .md")
+        LOGGER.error(
+            "Could not detect type of template," \
+            "please add a file extension such as .md"
+        )
         exit(1)
 
     #set output file
@@ -299,8 +306,8 @@ def main(options, args):
         #add trailing slash
         options.output_path = "{}/".format(options.output_path)
 
-    LOGGER.debug("Options: {0}".format(options))
-    LOGGER.debug("Arguments: {0}".format(args))
+    LOGGER.debug("Options: %s", options)
+    LOGGER.debug("Arguments: %s", args)
 
     #check if we can read and write before digging
     if not check_pandoc():
@@ -308,8 +315,10 @@ def main(options, args):
     #check if template exists
     elif not os.path.exists(options.template_file) or \
     not os.access(options.template_file, os.R_OK):
-        LOGGER.error("Template file '{}' non-existent or " \
-        "not readable".format(options.template_file))
+        LOGGER.error(
+            "Template file '%s' non-existent or not readable",
+            options.template_file
+        )
     elif is_writable(options.output_path):
         #find reports
         analyze_reports(options)
@@ -320,6 +329,9 @@ def main(options, args):
 
 
 def cli():
+    """
+    This functions initializes the CLI interface
+    """
     global LOG_LEVEL
     (options, args) = parse_options()
 
@@ -338,7 +350,4 @@ def cli():
 
 
 if __name__ == "__main__":
-    """
-    Start the utility
-    """
     cli()
