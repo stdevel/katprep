@@ -18,3 +18,9 @@ dist/
 # Python dirs
 __pycache__
 *.egg-info
+.cache/
+
+# Coverage dirs
+.coverage
+coverage.xml
+htmlcov/

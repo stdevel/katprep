@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=not-callable
 """
 A script which prepares, executes and controls maintenance tasks on systems
 managed with Foreman/Katello or Red Hat Satellite 6.
@@ -527,7 +528,7 @@ def status(options, args):
     except KeyError:
         #host with either no virt/mon
         pass
-    except ValueError as err:
+    except ValueError:
         LOGGER.error("Error getting '%s' task status...", host)
 
 
@@ -881,3 +882,8 @@ def cli():
     LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)
+
+
+
+if __name__ == "__main__":
+    cli()
