@@ -334,3 +334,11 @@ def cli():
     LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)
+
+
+
+if __name__ == "__main__":
+    """
+    Start the utility
+    """
+    cli()
