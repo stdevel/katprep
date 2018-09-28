@@ -5,7 +5,6 @@ Unit tests for Libvirt integration
 """
 
 import os
-import time
 import unittest
 import logging
 import json
