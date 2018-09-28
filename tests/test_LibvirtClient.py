@@ -5,184 +5,113 @@ Unit tests for Libvirt integration
 """
 
 import os
-import unittest
 import logging
 import json
-from katprep.clients.LibvirtClient import LibvirtClient
-from katprep.clients import SessionException, InvalidCredentialsException, \
-EmptySetException
-
-class LibvirtClientTest(unittest.TestCase):
-    """
-    LibvirtClient test cases
-    """
-    LOGGER = logging.getLogger('LibvirtClientTest')
-    """
-    logging: Logger instance
-    """
-    libvirt_client = None
-    """
-    LibvirtClient: Libvirt client
-    """
-    config = None
-    """
-    str: JSON object containing valid VMs
-    """
-    dummy_vm = "giertz.pinkepank.loc"
-    """
-    str: Non-existing VM
-    """
-    dummy_snapshot = "LibvirtClientTest"
-    """
-    str: Snapshot title
-    """
-    set_up = False
-    """
-    bool: Flag whether the connection was set up
-    """
+import pytest
+from katprep.clients import (EmptySetException, InvalidCredentialsException,
+                             SessionException)
 
 
+@pytest.fixture(scope="session")
+def config():
+    config_file = "libvirt_config.json"
+    if not os.path.isfile(config_file):
+        pytest.skip("Please create configuration file libvirt_config.json!")
 
-    def setUp(self):
-        """
-        Connecting the interfaces
-        """
-        #only set-up _all_ the stuff once
-        if not self.set_up:
-            #instance logging
-            logging.basicConfig()
-            self.LOGGER.setLevel(logging.DEBUG)
-            #reading configuration
-            try:
-                with open("libvirt_config.json", "r") as json_file:
-                    json_data = json_file.read().replace("\n", "")
-                self.config = json.loads(json_data)
-            except IOError as err:
-                self.LOGGER.error(
-                    "Unable to read configuration file: '%s'", err
-                )
-            #instance API client
-            self.libvirt_client = LibvirtClient(
-                logging.ERROR, self.config["config"]["uri"],
-                self.config["config"]["api_user"],
-                self.config["config"]["api_pass"]
-            )
-            self.set_up = True
+    try:
+        with open(config_file, "r") as json_file:
+            return json.load(json_file)
+    except IOError as err:
+        pytest.skip("Unable to read configuration file: '%s'", err)
 
 
+@pytest.fixture
+def client(config):
+    LibvirtClient = pytest.importorskip("katprep.clients.LibvirtClient")
 
-    #def test_valid_login(self):
-    #    """
-    #    Ensure exceptions on valid logins
-    #    """
-    #    #dummy call
-    #    #TODO: other call?
-    #    self.libvirt_client.get_vm_ips()
-
-    def test_invalid_login(self):
-        """
-        Ensure exceptions on invalid logins
-        """
-        with self.assertRaises(InvalidCredentialsException):
-            api_dummy = LibvirtClient(
-                logging.ERROR, self.config["config"]["uri"],
-                "giertz", "paulapinkepank"
-            )
-            #dummy call
-            #TODO: other call?
-            #api_dummy.get_vm_ips()
+    return LibvirtClient.LibvirtClient(
+        logging.ERROR,
+        config["config"]["uri"],
+        config["config"]["api_user"],
+        config["config"]["api_pass"]
+    )
 
 
+def test_invalid_login(config):
+    """
+    Ensure exceptions on invalid logins
+    """
+    LibvirtClient = pytest.importorskip("katprep.clients.LibvirtClient")
 
-    def test_create_snapshot(self):
-        """
-        Ensure that creating snapshots is possible
-        """
-        self.libvirt_client.create_snapshot(
-            self.config["valid_objects"]["vm"],
-            self.dummy_snapshot,
-            self.dummy_snapshot
+    with pytest.raises(InvalidCredentialsException):
+        LibvirtClient.LibvirtClient(
+            logging.ERROR,
+            config["config"]["uri"],
+            "giertz", "paulapinkepank"
         )
 
-    def test_create_snapshot_fail(self):
-        """
-        Ensure that creating snapshots of non-existing VMs is not possible
-        """
-        with self.assertRaises(SessionException):
-            self.libvirt_client.create_snapshot(
-                self.dummy_vm,
-                self.dummy_snapshot,
-                self.dummy_snapshot
-            )
+        # TODO: make a call?
+        # api_dummy.get_vm_ips
 
-    def remove_snapshot(self):
-        """
-        Ensure that removing snapshots is possible
-        """
-        self.libvirt_client.remove_snapshot(
-            self.config["valid_objects"]["vm"],
-            self.dummy_snapshot
-        )
 
-    def test_remove_snapshot_fail(self):
-        """
-        Ensure that removing snapshots of non-existing VMs is not possible
-        """
-        with self.assertRaises(SessionException):
-            self.libvirt_client.remove_snapshot(
-                self.dummy_vm,
-                self.dummy_snapshot
-            )
+@pytest.fixture
+def nonexisting_vm():
+    return "giertz.pinkepank.loc"
 
-    def revert_snapshot(self):
-        """
-        Ensure that reverting snapshots is possible
-        """
-        self.libvirt_client.revert_snapshot(
-            self.config["valid_objects"]["vm"],
-            self.dummy_snapshot
-        )
 
-    def test_revert_snapshot_fail(self):
-        """
-        Ensure that reverting non-existing snapshots is not possible
-        """
-        with self.assertRaises(SessionException):
-            self.libvirt_client.revert_snapshot(
-                self.dummy_vm,
-                self.dummy_snapshot
-            )
+@pytest.fixture
+def snapshot_name():
+    return "LibvirtClientTest"
 
-    def test_has_snapshot(self):
-        """
-        Ensure that checking for existing snapshots is possible
-        """
+
+def test_create_snapshot_fail(client, nonexisting_vm, snapshot_name):
+    """
+    Ensure that creating snapshots of non-existing VMs is not possible
+    """
+    with pytest.raises(SessionException):
+        client.create_snapshot(nonexisting_vm, snapshot_name, snapshot_name)
+
+
+def test_remove_snapshot_fail(client, nonexisting_vm, snapshot_name):
+    """
+    Ensure that removing snapshots of non-existing VMs is not possible
+    """
+    with pytest.raises(SessionException):
+        client.remove_snapshot(nonexisting_vm, snapshot_name)
+
+
+def test_has_snapshot_fail(client, nonexisting_vm, snapshot_name):
+    """
+    Ensure that checking non-existing VMs for snapshots is not possible
+    """
+    with pytest.raises(EmptySetException):
+        client.has_snapshot(nonexisting_vm, snapshot_name)
+
+
+def test_revert_snapshot_fail(client, nonexisting_vm, snapshot_name):
+    """
+    Ensure that reverting non-existing snapshots is not possible
+    """
+    with pytest.raises(SessionException):
+        client.revert_snapshot(nonexisting_vm, snapshot_name)
+
+
+def test_snapshot_handling(client, config, snapshot_name):
+    client.create_snapshot(
+        config["valid_objects"]["vm"],
+        snapshot_name,
+        snapshot_name
+    )
+
+    try:
+        client.revert_snapshot(config["valid_objects"]["vm"], snapshot_name)
+
         try:
-            self.libvirt_client.has_snapshot(
-                self.config["valid_objects"]["vm"],
-                self.dummy_snapshot
+            assert client.has_snapshot(
+                config["valid_objects"]["vm"],
+                snapshot_name
             )
         except EmptySetException as err:
-            pass
-
-    def test_has_snapshot_fail(self):
-        """
-        Ensure that checking non-existing VMs for snapshots is not possible
-        """
-        with self.assertRaises(EmptySetException):
-            self.libvirt_client.has_snapshot(
-                self.dummy_vm,
-                self.dummy_snapshot
-            )
-
-
-
-if __name__ == "__main__":
-    #start tests or die in a fire
-    if not os.path.isfile("libvirt_config.json"):
-        print "Please create configuration file libvirt_config.json!"
-        exit(1)
-    else:
-        #do not sort test cases as there are dependencies
-        unittest.sortTestMethodsUsing = None
-        unittest.main()
+            print(err)
+    finally:
+        client.remove_snapshot(config["valid_objects"]["vm"], snapshot_name)
