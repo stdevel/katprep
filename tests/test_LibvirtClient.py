@@ -48,11 +48,6 @@ def test_invalid_login(config):
         # api_dummy.get_vm_ips
 
 
-@pytest.fixture
-def snapshot_name():
-    return "LibvirtClientTest"
-
-
 def test_create_snapshot_fail(client, nonexisting_vm, snapshot_name):
     """
     Ensure that creating snapshots of non-existing VMs is not possible

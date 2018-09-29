@@ -13,6 +13,14 @@ def nonexisting_vm():
     return "giertz.pinkepank.loc"
 
 
+@pytest.fixture
+def snapshot_name(virtualisation):
+    if virtualisation == 'libvirt':
+        return "LibvirtClientTest"
+    elif virtualisation == 'pyvmomi':
+        return "PyvmomiClientTest"
+
+
 @pytest.fixture(params=['libvirt', 'pyvmomi'])
 def virtualisation(request):
     return request.params
