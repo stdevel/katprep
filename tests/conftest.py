@@ -26,7 +26,7 @@ def virtualisation(request):
     return request.param
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def virtConfigFile(virtualisation):
     if virtualisation == 'libvirt':
         return "libvirt_config.json"
@@ -34,12 +34,12 @@ def virtConfigFile(virtualisation):
         return "pyvmomi_config.json"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def virtConfig(virtConfigFile):
     return load_config(virtConfigFile)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def virtClass(virtualisation):
     if virtualisation == 'libvirt':
         LibvirtClient = pytest.importorskip("katprep.clients.LibvirtClient")
