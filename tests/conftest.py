@@ -23,7 +23,7 @@ def snapshot_name(virtualisation):
 
 @pytest.fixture(params=['libvirt', 'pyvmomi'])
 def virtualisation(request):
-    return request.params
+    return request.param
 
 
 @pytest.fixture(scope="session")
