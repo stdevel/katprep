@@ -216,7 +216,7 @@ class Icinga2APIClientTest(unittest.TestCase):
             self.config["valid_objects"]["host"], only_failed=False
         )
         self.assertTrue(
-            str(self.config["valid_objects"]["host_service"]) in str(services)
+            self.config["valid_objects"]["host_service"] in services
         )
 
     def test_get_services_fail(self):

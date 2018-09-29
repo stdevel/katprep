@@ -274,7 +274,7 @@ class PyvmomiClientTest(unittest.TestCase):
         """
         vm_ips = self.pyvmomi_client.get_vm_ips()
         self.assertTrue(
-            self.config["valid_objects"]["vm"] in str(vm_ips)
+            self.config["valid_objects"]["vm"] in vm_ips
         )
 
     def test_a_get_vm_hosts(self):
@@ -283,7 +283,7 @@ class PyvmomiClientTest(unittest.TestCase):
         """
         vm_hosts = self.pyvmomi_client.get_vm_hosts()
         self.assertTrue(
-            self.config["valid_objects"]["vm"] in str(vm_hosts)
+            self.config["valid_objects"]["vm"] in vm_hosts
         )
 
 

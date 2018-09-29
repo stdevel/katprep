@@ -128,7 +128,7 @@ def test_get_hosts(monitoringClient, config, nagiosType):
     Ensure that receiving hosts is possible
     """
     hosts = nagiosClient.get_hosts()
-    assert config[nagiosType]["host"] in str(hosts)
+    assert config[nagiosType]["host"] in hosts
 
 
 def test_get_services(monitoringClient, config, nagiosType):
@@ -138,5 +138,5 @@ def test_get_services(monitoringClient, config, nagiosType):
     services = monitoringClient.get_services(
         config["legacy"]["host"], only_failed=False
     )
-    assert config["legacy"]["host_service"] in str(services)
+    assert config["legacy"]["host_service"] in services
     assert len(services) == config["legacy"]["host_services"]
