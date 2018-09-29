@@ -4,13 +4,16 @@
 Unit tests for Nagios/Icinga 1.x CGI integration
 """
 
-import os
-import time
+from __future__ import absolute_import
+
 import logging
-import json
+import time
 import pytest
+
 from katprep.clients.NagiosCGIClient import NagiosCGIClient
 from katprep.clients import SessionException, UnsupportedRequestException
+
+from .utilities import load_config
 
 
 @pytest.fixture(params=["main", "legacy"], ids=["Icinga", "Nagios"])
@@ -20,15 +23,7 @@ def nagiosType(request):
 
 @pytest.fixture(scope='session')
 def config():
-    config_file = "nagios_config.json"
-    if not os.path.isfile(config_file):
-        pytest.skip("Please create configuration file %s!" % config_file)
-
-    try:
-        with open(config_file, "r") as json_file:
-            return json.load(json_file)
-    except IOError as err:
-        pytest.skip("Unable to read configuration file: '%s'", err)
+    return load_config("nagios_config.json")
 
 
 @pytest.fixture
