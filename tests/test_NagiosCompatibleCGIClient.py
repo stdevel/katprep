@@ -136,7 +136,7 @@ def test_get_services(monitoringClient, config, nagiosType):
     Ensure that hosts include existing services
     """
     services = monitoringClient.get_services(
-        config["legacy"]["host"], only_failed=False
+        config[nagiosType]["host"], only_failed=False
     )
-    assert config["legacy"]["host_service"] in services
-    assert len(services) == config["legacy"]["host_services"]
+    assert config[nagiosType]["host_service"] in services
+    assert len(services) == config[nagiosType]["host_services"]
