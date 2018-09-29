@@ -48,54 +48,48 @@ def test_invalid_login(config):
         # api_dummy.get_vm_ips
 
 
-def test_create_snapshot_fail(client, nonexisting_vm, snapshot_name):
+def test_create_snapshot_fail(virtClient, nonexisting_vm, snapshot_name):
     """
     Ensure that creating snapshots of non-existing VMs is not possible
     """
     with pytest.raises(SessionException):
-        client.create_snapshot(nonexisting_vm, snapshot_name, snapshot_name)
+        virtClient.create_snapshot(nonexisting_vm, snapshot_name, snapshot_name)
 
 
-def test_remove_snapshot_fail(client, nonexisting_vm, snapshot_name):
+def test_remove_snapshot_fail(virtClient, nonexisting_vm, snapshot_name):
     """
     Ensure that removing snapshots of non-existing VMs is not possible
     """
     with pytest.raises(SessionException):
-        client.remove_snapshot(nonexisting_vm, snapshot_name)
+        virtClient.remove_snapshot(nonexisting_vm, snapshot_name)
 
 
-def test_has_snapshot_fail(client, nonexisting_vm, snapshot_name):
+def test_has_snapshot_fail(virtClient, nonexisting_vm, snapshot_name):
     """
     Ensure that checking non-existing VMs for snapshots is not possible
     """
     with pytest.raises(EmptySetException):
-        client.has_snapshot(nonexisting_vm, snapshot_name)
+        virtClient.has_snapshot(nonexisting_vm, snapshot_name)
 
 
-def test_revert_snapshot_fail(client, nonexisting_vm, snapshot_name):
+def test_revert_snapshot_fail(virtClient, nonexisting_vm, snapshot_name):
     """
     Ensure that reverting non-existing snapshots is not possible
     """
     with pytest.raises(SessionException):
-        client.revert_snapshot(nonexisting_vm, snapshot_name)
+        virtClient.revert_snapshot(nonexisting_vm, snapshot_name)
 
 
-def test_snapshot_handling(client, config, snapshot_name):
-    client.create_snapshot(
-        config["valid_objects"]["vm"],
-        snapshot_name,
-        snapshot_name
-    )
+def test_snapshot_handling(virtClient, config, snapshot_name):
+    host = config["valid_objects"]["vm"]
+    virtClient.create_snapshot(host, snapshot_name, snapshot_name)
 
     try:
-        client.revert_snapshot(config["valid_objects"]["vm"], snapshot_name)
+        virtClient.revert_snapshot(host, snapshot_name)
 
         try:
-            assert client.has_snapshot(
-                config["valid_objects"]["vm"],
-                snapshot_name
-            )
+            assert virtClient.has_snapshot(host, snapshot_name)
         except EmptySetException as err:
             print(err)
     finally:
-        client.remove_snapshot(config["valid_objects"]["vm"], snapshot_name)
+        virtClient.remove_snapshot(host, snapshot_name)
