@@ -77,11 +77,13 @@ def test_invalid_login(pyvmomiConfig):
     """
     with pytest.raises(InvalidCredentialsException):
         api_dummy = PyvmomiClient(
-            logging.ERROR, pyvmomiConfig["config"]["hostname"],
-            "giertz", "paulapinkepank"
+            logging.ERROR,
+            pyvmomiConfig["config"]["hostname"],
+            "giertz",
+            "paulapinkepank"
         )
-        #dummy call
-        api_dummy.get_vm_ips()
+
+        api_dummy.get_vm_ips()  # dummy call
 
 
 class PyvmomiClientTest(unittest.TestCase):
