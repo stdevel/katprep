@@ -84,7 +84,7 @@ def test_a_get_vm_hosts(client, config):
     assert config["valid_objects"]["vm"] in vm_hosts
 
 
-@pytest.mark.parametrize("forcefully", values=[True, False])
+@pytest.mark.parametrize("forcefully", [True, False])
 def test_restart_vm(client, config, forcefully):
     """
     Ensure that restarting VMs is possible
@@ -92,7 +92,7 @@ def test_restart_vm(client, config, forcefully):
     client.restart_vm(config["valid_objects"]["vm"], force=forcefully)
 
 
-@pytest.mark.parametrize("forcefully", values=[True, False])
+@pytest.mark.parametrize("forcefully", [True, False])
 def test_restart_vm_fail(virtClient, nonexisting_vm, forcefully):
     """
     Ensure that restarting non-existing VMs is not possible
