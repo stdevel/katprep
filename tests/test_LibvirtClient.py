@@ -49,11 +49,6 @@ def test_invalid_login(config):
 
 
 @pytest.fixture
-def nonexisting_vm():
-    return "giertz.pinkepank.loc"
-
-
-@pytest.fixture
 def snapshot_name():
     return "LibvirtClientTest"
 
