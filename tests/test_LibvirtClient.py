@@ -4,25 +4,19 @@
 Unit tests for Libvirt integration
 """
 
-import os
+from __future__ import absolute_import
+
 import logging
-import json
 import pytest
 from katprep.clients import (EmptySetException, InvalidCredentialsException,
                              SessionException)
 
+from .utilities import load_config
+
 
 @pytest.fixture(scope="session")
 def config():
-    config_file = "libvirt_config.json"
-    if not os.path.isfile(config_file):
-        pytest.skip("Please create configuration file libvirt_config.json!")
-
-    try:
-        with open(config_file, "r") as json_file:
-            return json.load(json_file)
-    except IOError as err:
-        pytest.skip("Unable to read configuration file: '%s'", err)
+    return load_config("libvirt_config.json")
 
 
 @pytest.fixture

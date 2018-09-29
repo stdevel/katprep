@@ -3,6 +3,7 @@
 """
 Unit tests for Pyvmomi integration
 """
+from __future__ import absolute_import
 
 import os
 import time
@@ -14,23 +15,21 @@ from katprep.clients.PyvmomiClient import PyvmomiClient
 from katprep.clients import SessionException, InvalidCredentialsException, \
 EmptySetException
 
+from .utilities import load_config
+
 
 # scope used to reuse the same fixture for all tests
 @pytest.fixture(scope="session")
 def pyvmomiConfig():
-    try:
-        with open("pyvmomi_config.json", "r") as json_file:
-            json_data = json_file.read().replace("\n", "")
-            yield json.loads(json_data)
-    except IOError as err:
-        pytest.skip("Unable to read configuration file: {!r}".format(err))
+    return load_config("pyvmomi_config.json")
 
 
 @pytest.fixture
 def pyvmomiClient(pyvmomiConfig):
     try:
         yield PyvmomiClient(
-            logging.ERROR, pyvmomiConfig["config"]["hostname"],
+            logging.ERROR,
+            pyvmomiConfig["config"]["hostname"],
             pyvmomiConfig["config"]["api_user"],
             pyvmomiConfig["config"]["api_pass"]
         )

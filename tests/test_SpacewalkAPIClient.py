@@ -4,28 +4,22 @@
 Unit tests for Spacewalk API integration
 """
 
-import os
+from __future__ import absolute_import
+
 import logging
-import json
-import ssl
-import pytest
 import mock
+import pytest
+import ssl
 from katprep.clients.SpacewalkAPIClient import SpacewalkAPIClient
 from katprep.clients import (APILevelNotSupportedException,
                              InvalidCredentialsException)
 
+from .utilities import load_config
+
 
 @pytest.fixture(scope='session')
 def config():
-    config_file = "spw_config.json"
-    if not os.path.isfile(config_file):
-        pytest.skip("Please create configuration file %s!" % config_file)
-
-    try:
-        with open(config_file, "r") as json_file:
-            return json.load(json_file)
-    except IOError as err:
-        pytest.skip("Unable to read configuration file: '%s'", err)
+    return load_config("spw_config.json")
 
 
 @pytest.fixture
