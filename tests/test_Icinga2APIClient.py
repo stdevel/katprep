@@ -20,7 +20,7 @@ def config():
 
 
 @pytest.fixture
-def client(icinga2Config):
+def client(config):
     return Icinga2APIClient(
         logging.ERROR,
         config["config"]["hostname"],
