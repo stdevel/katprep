@@ -137,7 +137,7 @@ class AuthContainer:
                 target.write(json.dumps(self.CREDENTIALS))
 
             #setting the good perms
-            os.chmod(self.FILENAME, 0600)
+            os.chmod(self.FILENAME, 0o600)
         except IOError as err:
             raise ContainerException(err)
 
