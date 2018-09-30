@@ -16,7 +16,10 @@ from katprep.clients import SessionException, UnsupportedRequestException
 from .utilities import load_config
 
 
-@pytest.fixture(params=["main", "legacy"], ids=["Icinga", "Nagios"])
+@pytest.fixture(
+    params=["main", "legacy"],
+    ids=["Icinga 1", "Nagios"]
+)
 def nagiosType(request):
     return request.param
 
