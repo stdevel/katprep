@@ -4,238 +4,132 @@
 Unit tests for Icinga2 API integration
 """
 
-import os
-import time
-import unittest
+from __future__ import absolute_import
+
 import logging
-import json
+import pytest
 from katprep.clients.Icinga2APIClient import Icinga2APIClient
-from katprep.clients import SessionException, EmptySetException
+from katprep.clients import EmptySetException, SessionException
+
+from .utilities import load_config
 
 
+@pytest.fixture
+def config():
+    return load_config("icinga2_config.json")
 
-class Icinga2APIClientTest(unittest.TestCase):
+
+@pytest.fixture
+def client(icinga2Config):
+    return Icinga2APIClient(
+        logging.ERROR,
+        config["config"]["hostname"],
+        config["config"]["api_user"],
+        config["config"]["api_pass"]
+    )
+
+
+def test_valid_login(client):
     """
-    Icinga2APIClient test cases
+    Ensure exceptions on valid logins
     """
-    LOGGER = logging.getLogger('Icinga2APIClientTest')
+    client.dummy_call()
+
+
+def test_invalid_login(config, nagiosType):
     """
-    logging: Logger instance
+    Ensure exceptions on invalid logins
     """
-    api_icinga = None
-    """
-    Icinga2APIClient: Icinga2 API client
-    """
-    config = None
-    """
-    str: JSON object containing valid hosts and services
-    """
-    set_up = False
-    """
-    bool: Flag whether the connection was set up
-    """
-
-
-
-    def setUp(self):
-        """
-        Connecting the interfaces
-        """
-        if not self.set_up:
-            #instance logging
-            logging.basicConfig()
-            self.LOGGER.setLevel(logging.DEBUG)
-            #reading configuration
-            try:
-                with open("icinga2_config.json", "r") as json_file:
-                    json_data = json_file.read().replace("\n", "")
-                self.config = json.loads(json_data)
-            except IOError as err:
-                self.LOGGER.error(
-                    "Unable to read configuration file: '%s'", err
-                )
-            #instance API client
-            self.api_icinga = Icinga2APIClient(
-                logging.ERROR, self.config["config"]["hostname"],
-                self.config["config"]["api_user"],
-                self.config["config"]["api_pass"]
-            )
-            self.set_up = True
-
-
-
-    def tearDown(self):
-        """
-        Function that is executed after every test
-        """
-        #wait for changes to be applied
-        time.sleep(30)
-
-
-
-    def test_valid_login(self):
-        """
-        Ensure exceptions on valid logins
-        """
-        #dummy call
-        self.api_icinga.dummy_call()
-
-    def test_invalid_login(self):
-        """
-        Ensure exceptions on invalid logins
-        """
-        with self.assertRaises(SessionException):
-            api_dummy = Icinga2APIClient(
-                logging.ERROR, self.config["config"]["hostname"],
-                "giertz", "paulapinkepank"
-            )
-            #dummy call
-            api_dummy.dummy_call()
-
-
-
-    def test_sched_dt_host(self):
-        """
-        Ensure that host downtimes can be scheduled
-        """
-        self.api_icinga.schedule_downtime(
-            self.config["valid_objects"]["host"], "host"
+    with pytest.raises(SessionException):
+        client = Icinga2APIClient(
+            logging.ERROR,
+            config["config"]["hostname"],
+            "giertz",
+            "paulapinkepank"
         )
-
-    def test_sched_dt_host_fail(self):
-        """
-        Ensure that host downtimes cannot be scheduled when using invalid hosts
-        """
-        with self.assertRaises(EmptySetException):
-            self.api_icinga.schedule_downtime(
-                "giertz.pinkepank.loc", "host"
-            )
+        client.dummy_call()
 
 
-
-    def test_sched_dt_hostgrp(self):
-        """
-        Ensure that hostgroup downtimes can be scheduled
-        """
-        self.assertTrue(
-            self.api_icinga.schedule_downtime(
-                self.config["valid_objects"]["hostgroup"],
-                "hostgroup"
-            )
-        )
-
-    def test_sched_dt_hostgrp_fail(self):
-        """
-        Ensure that hostgroup downtimes cannot be scheduled with invalid names
-        """
-        with self.assertRaises(EmptySetException):
-            self.api_icinga.schedule_downtime(
-                "giertz.pinkepank.loc", "hostgroup"
-            )
+def test_scheduling_downtime_for_host(client, config):
+    """
+    Ensure that host downtimes can be scheduled
+    """
+    host = config["valid_objects"]["host"]
+    client.schedule_downtime(host, "host")
+    assert client.has_downtime(host)
+    assert client.remove_downtime(host, "host")
 
 
-
-    def test_sched_has_downtime(self):
-        """
-        Ensure that checking downtime is working
-        """
-        self.assertTrue(
-            self.api_icinga.has_downtime(
-                self.config["valid_objects"]["host"]
-            )
-        )
-
-    def test_sched_has_downtime_fail(self):
-        """
-        Ensure that checking downtime fails for non-existing hosts
-        """
-        with self.assertRaises(EmptySetException):
-            self.api_icinga.has_downtime(
-                "giertz.pinkepank.loc"
-            )
+def test_sched_dt_host_fail(client, config):
+    """
+    Ensure that host downtimes cannot be scheduled when using invalid hosts
+    """
+    with pytest.raises(EmptySetException):
+        client.schedule_downtime("giertz.pinkepank.loc", "host")
 
 
-
-    def test_unsched_dt_host(self):
-        """
-        Ensure that unscheduling downtimes for hosts is working
-        """
-        self.assertTrue(
-            self.api_icinga.remove_downtime(
-                self.config["valid_objects"]["host"], "host"
-            )
-        )
-
-    def test_unsched_dt_host_fail(self):
-        """
-        Ensure that unscheduling downtimes fails for non-existing hosts
-        """
-        with self.assertRaises(EmptySetException):
-            self.api_icinga.remove_downtime(
-                "giertz.pinkepank.loc", "host"
-            )
+def test_schedule_downtime_for_hostgrp(client, config):
+    """
+    Ensure that hostgroup downtimes can be scheduled
+    """
+    hostgroup = config["valid_objects"]["hostgroup"]
+    assert client.schedule_downtime(hostgroup, "hostgroup")
+    assert client.remove_downtime(hostgroup, "hostgroup")
 
 
-
-    def test_unsched_dt_hostgrp(self):
-        """
-        Ensure that unscheduling downtimes for hostgroups is working
-        """
-        self.assertTrue(
-            self.api_icinga.remove_downtime(
-                self.config["valid_objects"]["hostgroup"], "hostgroup"
-            )
-        )
-
-    def test_unsched_dt_hostgrp_fail(self):
-        """
-        Ensure that unscheduling downtimes fails for non-existing hostgroups
-        """
-        with self.assertRaises(EmptySetException):
-            self.api_icinga.remove_downtime(
-                "giertz-hosts", "hostgroup"
-            )
+def test_sched_dt_hostgrp_fail(client):
+    """
+    Ensure that hostgroup downtimes cannot be scheduled with invalid names
+    """
+    with pytest.raises(EmptySetException):
+        client.schedule_downtime("giertz.pinkepank.loc", "hostgroup")
 
 
-
-    def test_get_hosts(self):
-        """
-        Ensure that receiving hosts is possible
-        """
-        self.assertTrue(
-            self.config["valid_objects"]["host"] in str(self.api_icinga.get_hosts())
-        )
+def test_sched_has_downtime_fail(client):
+    """
+    Ensure that checking downtime fails for non-existing hosts
+    """
+    with pytest.raises(EmptySetException):
+        client.has_downtime("giertz.pinkepank.loc")
 
 
-
-    def test_get_services(self):
-        """
-        Ensure that hosts include existing services
-        """
-        services = self.api_icinga.get_services(
-            self.config["valid_objects"]["host"], only_failed=False
-        )
-        self.assertTrue(
-            self.config["valid_objects"]["host_service"] in services
-        )
-
-    def test_get_services_fail(self):
-        """
-        Ensure that checking services of non-existing hosts fails
-        """
-        with self.assertRaises(EmptySetException):
-            self.api_icinga.get_services(
-                "giertz.pinkepank.loc", only_failed=False
-            )
+def test_unsched_dt_host_fail(client):
+    """
+    Ensure that unscheduling downtimes fails for non-existing hosts
+    """
+    with pytest.raises(EmptySetException):
+        client.remove_downtime("giertz.pinkepank.loc", "host")
 
 
+def test_unsched_dt_hostgrp_fail(client):
+    """
+    Ensure that unscheduling downtimes fails for non-existing hostgroups
+    """
+    with pytest.raises(EmptySetException):
+        client.remove_downtime("giertz-hosts", "hostgroup")
 
-if __name__ == "__main__":
-    #start tests or die in a fire
-    if not os.path.isfile("icinga2_config.json"):
-        print "Please create configuration file icinga2_config.json!"
-        exit(1)
-    else:
-        #do not sort test cases as there are dependencies
-        unittest.sortTestMethodsUsing = None
-        unittest.main()
+
+def test_get_hosts(client, config):
+    """
+    Ensure that receiving hosts is possible
+    """
+    assert config["valid_objects"]["host"] in client.get_hosts()
+
+
+def test_get_services(client, config):
+    """
+    Ensure that hosts include existing services
+    """
+    services = client.get_services(
+        config["valid_objects"]["host"],
+        only_failed=False
+    )
+    assert config["valid_objects"]["host_service"] in services
+
+
+def test_get_services_fail(client):
+    """
+    Ensure that checking services of non-existing hosts fails
+    """
+    with pytest.raises(EmptySetException):
+        client.get_services("giertz.pinkepank.loc", only_failed=False)
