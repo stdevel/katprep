@@ -5,12 +5,12 @@ The following tests are available:
 
 | File          | Type | Description |
 |:------------- |:---- |:----------- |
-| `ForemanAPIClientTest.py` | Unit test | Foreman API integration |
-| `SpacewalkAPIClientTest.py` | Unit test | Spacewalk API integration |
-| `Icinga2APIClientTest.py` | Unit test | Icinga 2.x API integration |
-| `NagiosCGIClientTest.py` | Unit test | Nagios/Icinga 1.x CGI integration |
-| `PyvmomiClient.py` | Unit test | Pyvmomi integration |
-| `LibvirtClient.py` | Unit test | Libvirt integration |
+| `test_ForemanAPIClient.py` | Unit test | Foreman API integration |
+| `test_SpacewalkAPIClient.py` | Unit test | Spacewalk API integration |
+| `test_Icinga2APIClient.py` | Unit test | Icinga 2.x API integration |
+| `test_NagiosCompatibleCGIClient.py` | Unit test | Nagios/Icinga 1.x CGI integration |
+| `test_PyvmomiClient.py` | Unit test | Pyvmomi integration |
+| `test_LibvirtClient.py` | Unit test | Libvirt integration |
 
 Each test has an appropriate JSON configuration file specifying connection details and objects used for the particular tests. Copy a template file (*`*.json.tmpl`*) and customize it.
 
