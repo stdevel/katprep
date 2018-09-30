@@ -18,3 +18,4 @@ dist/
 # Python dirs
 __pycache__
 *.egg-info
+.cache
