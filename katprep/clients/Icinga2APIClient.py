@@ -7,7 +7,6 @@ monitoring systems.
 
 import logging
 import requests
-from urlparse import urlparse
 from requests.auth import HTTPBasicAuth
 import json
 import time

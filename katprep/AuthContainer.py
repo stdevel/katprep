@@ -9,10 +9,13 @@ import os
 import stat
 import json
 import base64
-from urlparse import urlparse
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 
 class ContainerException(Exception):
