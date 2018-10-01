@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=not-callable
 """
 A script for managing Puppet host parameters for systems managed with
 Foreman/Katello or Red Hat Satellite 6.
@@ -356,6 +357,9 @@ def main(options, args):
 
 
 def cli():
+    """
+    This functions initializes the CLI interface
+    """
     global LOG_LEVEL
     (options, args) = parse_options()
 
@@ -370,3 +374,8 @@ def cli():
     LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)
+
+
+
+if __name__ == "__main__":
+    cli()

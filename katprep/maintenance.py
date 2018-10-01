@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=not-callable
 """
 A script which prepares, executes and controls maintenance tasks on systems
 managed with Foreman/Katello or Red Hat Satellite 6.
@@ -146,6 +147,9 @@ def manage_host_preparation(options, host, cleanup=False):
                 LOGGER.error("Invalid crendentials supplied")
             except SnapshotExistsException as err:
                 LOGGER.info("Snapshot for host '%s' already exists: %s", host, err)
+                pass
+            except EmptySetException as err:
+                LOGGER.info("Snapshot for host '%s' already removed: %s", host, err)
                 pass
             except SessionException as err:
                 LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
@@ -514,14 +518,17 @@ def status(options, args):
                                     task, host, result["result"]
                                 )
                     else:
-                        LOGGER.error("No %s task for '%s' found!", task.lower(), host)
+                        if task.lower() == "package":
+                            LOGGER.info("No %s task for '%s' found!", task.lower(), host)
+                        else:
+                            LOGGER.error("No %s task for '%s' found!", task.lower(), host)
             except TypeError:
                 pass
 
     except KeyError:
         #host with either no virt/mon
         pass
-    except ValueError as err:
+    except ValueError:
         LOGGER.error("Error getting '%s' task status...", host)
 
 
@@ -875,3 +882,8 @@ def cli():
     LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)
+
+
+
+if __name__ == "__main__":
+    cli()

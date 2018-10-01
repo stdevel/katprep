@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=not-callable
 """
 A script which maintains entries in a authentication container.
 """
@@ -8,7 +9,6 @@ from __future__ import absolute_import
 
 import argparse
 import logging
-import json
 import getpass
 from .AuthContainer import AuthContainer, ContainerException
 
@@ -28,7 +28,7 @@ AuthContainer: authentication container file
 
 
 
-def list(options):
+def list_entries(options):
     """
     This function lists entries from the authentication container.
     """
@@ -58,10 +58,10 @@ def add(options):
         options.entry_username = raw_input(
             "{} Username: ".format(options.entry_hostname)
         )
-    password_prompted=False
+    password_prompted = False
     while options.entry_password == "":
         #prompt for password
-        password_prompted=True
+        password_prompted = True
         options.entry_password = getpass.getpass(
             "{} Password: ".format(options.entry_hostname)
         )
@@ -74,8 +74,9 @@ def add(options):
         verification = getpass.getpass(
             "Verify {} Password: ".format(options.entry_hostname)
         )
-    LOGGER.debug("Adding entry hostname='{}', username='{}'...".format(
-        options.entry_hostname, options.entry_username)
+    LOGGER.debug(
+        "Adding entry hostname='%s', username='%s'...",
+        options.entry_hostname, options.entry_username
     )
     CONTAINER.add_credentials(
         options.entry_hostname, options.entry_username, options.entry_password
@@ -91,8 +92,8 @@ def remove(options):
     while options.entry_hostname == "":
         #prompt for hostname
         options.entry_hostname = raw_input("Hostname: ")
-    LOGGER.debug("Removing entry hostname='{}'...".format(
-        options.entry_hostname)
+    LOGGER.debug(
+        "Removing entry hostname='%s'...", options.entry_hostname
     )
     CONTAINER.remove_credentials(options.entry_hostname)
     CONTAINER.save()
@@ -111,7 +112,7 @@ def set_password(options):
     #fix too long passwords
     while len(new_pass) > 32:
         new_pass = getpass.getpass("New file password (max. 32 chars!): ")
-    confirm=""
+    confirm = ""
     while confirm != new_pass:
         confirm = getpass.getpass("Confirm password: ")
     new_container = AuthContainer(LOG_LEVEL, options.container[0], new_pass)
@@ -171,7 +172,7 @@ def parse_options(args=None):
     cmd_list.add_argument("-a", "--show-passwords", action="store_true", \
     dest="show_passwords", default=False, help="also shows passwords " \
     "(default: no)")
-    cmd_list.set_defaults(func=list)
+    cmd_list.set_defaults(func=list_entries)
 
     cmd_add = subparsers.add_parser("add", help="adding/modifying entries")
     cmd_add.add_argument("-H", "--hostname", action="store", default="", \
@@ -203,8 +204,8 @@ def main(options, args):
     """Main function, starts the logic based on parameters."""
     global CONTAINER
 
-    LOGGER.debug("Options: {0}".format(options))
-    LOGGER.debug("Arguments: {0}".format(args))
+    LOGGER.debug("Options: %s", options)
+    LOGGER.debug("Arguments: %s", args)
 
     #prompt for password
     container_pass = "JaHaloIBimsDiPaulaPinkePank#Ohman"
@@ -218,6 +219,9 @@ def main(options, args):
 
 
 def cli():
+    """
+    This functions initializes the CLI interface
+    """
     global LOG_LEVEL
     (options, args) = parse_options()
 
@@ -232,3 +236,8 @@ def cli():
     LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)
+
+
+
+if __name__ == "__main__":
+    cli()

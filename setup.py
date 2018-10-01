@@ -61,6 +61,7 @@ setup(
         'pyyaml',
         'fernet',
         'cryptography',
+        'codecov'
         # TODO: specify libvirt?
     ],
     # Remember to insert the requirements into requirements.txt!
