@@ -5,7 +5,7 @@ A shared library containing functions used by other scripts of the
 katprep toolkit.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import getpass
 import logging
@@ -194,7 +194,7 @@ def validate_filters(options, api_client):
             options.environment = api_client.get_id_by_name(
                 options.environment, "environment")
     except Exception as err:
-        print err
+        print(err)
     except SessionException:
         pass
 

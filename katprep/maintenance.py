@@ -6,7 +6,7 @@ A script which prepares, executes and controls maintenance tasks on systems
 managed with Foreman/Katello or Red Hat Satellite 6.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import argparse
 import logging
@@ -568,7 +568,7 @@ def load_configuration(config_file, options):
         with open(config_file, 'r') as yml_file:
             config = yaml.load(yml_file)
         #TODO: load configuration
-        print "TODO: load_configuration"
+        print("TODO: load_configuration")
     except ValueError as err:
         LOGGER.debug("Error: '%s'", err)
     return options
