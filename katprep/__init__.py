@@ -10,7 +10,6 @@ from __future__ import absolute_import, print_function
 import getpass
 import logging
 import os
-import stat
 import json
 import argparse
 from .AuthContainer import AuthContainer, ContainerException
