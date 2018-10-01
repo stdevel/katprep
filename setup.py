@@ -61,7 +61,6 @@ setup(
         'pyyaml',
         'fernet',
         'cryptography',
-        'codecov'
         # TODO: specify libvirt?
     ],
     # Remember to insert the requirements into requirements.txt!
@@ -72,7 +71,7 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         # 'dev': ['check-manifest'],
-        'test': ['pytest'],
+        'test': ['pytest', 'codecov'],
     },
 
     # If there are data files included in your packages that need to be
