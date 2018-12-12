@@ -125,7 +125,7 @@ def test_get_hosts(monitoringClient, config, nagiosType):
     """
     Ensure that receiving hosts is possible
     """
-    hosts = nagiosClient.get_hosts()
+    hosts = monitoringClient.get_hosts()
     assert config[nagiosType]["host"] in hosts
 
 
