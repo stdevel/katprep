@@ -6,7 +6,6 @@ import pytest
 
 
 def load_config(config_file):
-    config_file = "nagios_config.json"
     if not os.path.isfile(config_file):
         pytest.skip("Please create configuration file %s!" % config_file)
 
