@@ -123,7 +123,10 @@ class Icinga2APIClient:
                     headers=self.HEADERS, verify=self.VERIFY_SSL
                     )
 
-            if result.status_code != 200:
+            if result.status_code == 404:
+                raise EmptySetException("HTTP resource not found: {}".format(
+                    sub_url))
+            elif result.status_code != 200:
                 raise SessionException("{}: HTTP operation not successful".format(
                     result.status_code))
             else:
