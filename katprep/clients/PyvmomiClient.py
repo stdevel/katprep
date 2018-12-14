@@ -7,7 +7,6 @@ just an endless pain when managing VMware products
 
 import logging
 import ssl
-from urlparse import urlparse
 import sys
 from katprep.clients.katprep_shared import is_ipv4, is_ipv6
 from katprep.clients import SessionException, InvalidCredentialsException, \
@@ -15,6 +14,10 @@ EmptySetException, SnapshotExistsException
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 
 class PyvmomiClient(object):

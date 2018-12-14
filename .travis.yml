@@ -3,10 +3,8 @@ python:
   - "2.7"
   - "3.4"
 # command to install dependencies
-install: "pip install -r requirements.txt"
-# command to run tests
-# TODO: implement tests
-# script: pytest
-script: echo "I have no idea what I'm doing"
-# upload code coverage
-script: codecov
+install: "pip install -r requirements-tests.txt"
+
+script:
+  - pytest --cov=katprep
+  - codecov

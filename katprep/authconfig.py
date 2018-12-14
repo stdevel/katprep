@@ -5,7 +5,7 @@
 A script which maintains entries in a authentication container.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import argparse
 import logging
@@ -39,10 +39,9 @@ def list_entries(options):
             password = credentials[1]
         else:
             password = "xxx"
-        #print entry
-        print "{} (Username: {} / Password: {})".format(
+        print("{} (Username: {} / Password: {})".format(
             hostname, credentials[0], password
-        )
+        ))
 
 
 

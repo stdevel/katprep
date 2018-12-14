@@ -5,12 +5,12 @@ The following tests are available:
 
 | File          | Type | Description |
 |:------------- |:---- |:----------- |
-| `ForemanAPIClientTest.py` | Unit test | Foreman API integration |
-| `SpacewalkAPIClientTest.py` | Unit test | Spacewalk API integration |
-| `Icinga2APIClientTest.py` | Unit test | Icinga 2.x API integration |
-| `NagiosCGIClientTest.py` | Unit test | Nagios/Icinga 1.x CGI integration |
-| `PyvmomiClient.py` | Unit test | Pyvmomi integration |
-| `LibvirtClient.py` | Unit test | Libvirt integration |
+| `test_ForemanAPIClient.py` | Unit test | Foreman API integration |
+| `test_SpacewalkAPIClient.py` | Unit test | Spacewalk API integration |
+| `test_Icinga2APIClient.py` | Unit test | Icinga 2.x API integration |
+| `test_NagiosCompatibleCGIClient.py` | Unit test | Nagios/Icinga 1.x CGI integration |
+| `test_PyvmomiClient.py` | Unit test | Pyvmomi integration |
+| `test_LibvirtClient.py` | Unit test | Libvirt integration |
 
 Each test has an appropriate JSON configuration file specifying connection details and objects used for the particular tests. Copy a template file (*`*.json.tmpl`*) and customize it.
 
@@ -32,7 +32,7 @@ Credentials are assigned using secret variables containing the appropriate JSON 
 | `libvirt_config` | `libvirt_config.json` | Libvirt test configuration |
 | `spw_config` | `spw_config.json` | Spacewalk test configuration |
 
-# ForemanAPIClientTest
+# Tests for ForemanAPIClient
 This test checks:
 - hostname verification
 - valid/invalid logins
@@ -53,8 +53,8 @@ For this test, you will need:
   - hostgroup
   - location
   - organization
-  
-# SpacewalkAPIClientTest
+
+# Test SpacewalkAPIClient
 This test checks:
 - hostname verification
 - valid/invalid logins
@@ -66,7 +66,7 @@ For this test, you will need:
 - a legacy Spacewalk system (*< 2.1*)
 - a user per installation with read-only permissions
 
-# Icinga2ClientTest
+# Test Icinga2Client
 This test checks:
 - valid/invalid logins
 - scheduling/removing downtimes for hosts/hostgroups
@@ -82,13 +82,15 @@ For this test, you will need:
   - hostgroup
   - at least one service per host
 
-# NagiosCGIClientTest
+# Test NagiosCompatibleCGIClient
 This test checks:
 - valid/invalid logins
 - scheduling/removing downtimes for hosts/hostgroups
 - unsupported requests (*e.g. unscheduling downtimes on Nagios systems*)
 - checking downtimes
 - retrieving host and service information
+
+The tests are run for Nagios and Icinga 1.x
 
 I highly recommend using [OMD (*Open Monitoring Distribution*)](http://omdistro.org/) as it is simple to deploy dummy sites and hosts. Make sure to use **Basic Auth** rather than check_mk authorization before running your tests.
 
@@ -102,7 +104,7 @@ For this test, you will need:
   - hostgroup
   - at least one service per host
 
-# PyvmomiClient
+# Test PyvmomiClient
 This test checks:
 - valid/invalid logins
 - checking/creating/reverting/removing snapshots
@@ -118,7 +120,9 @@ For this test, you will need:
 - an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
 - a VM that can be restarted, snapshotted, etc. (**Caution: this VM is very likely to break because of numerous restarts**)
 
-# LibvirtClientThis test checks:
+# Test LibvirtClient
+
+This test checks:
 - valid/invalid logins
 - checking/creating/reverting/removing snapshots
 

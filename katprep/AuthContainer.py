@@ -9,10 +9,13 @@ import os
 import stat
 import json
 import base64
-from urlparse import urlparse
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 
 class ContainerException(Exception):
@@ -137,7 +140,7 @@ class AuthContainer:
                 target.write(json.dumps(self.CREDENTIALS))
 
             #setting the good perms
-            os.chmod(self.FILENAME, 0600)
+            os.chmod(self.FILENAME, 0o600)
         except IOError as err:
             raise ContainerException(err)
 

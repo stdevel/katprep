@@ -4,6 +4,8 @@
 Class for sending requests to libvirt
 """
 
+from __future__ import print_function
+
 import libvirt
 import logging
 from katprep.clients import SessionException, EmptySetException, \
@@ -275,7 +277,7 @@ class LibvirtClient:
         Returns a list of VMs and their hypervisors available through the
         current connection.
         """
-        print "TODO: get_vm_hosts"
+        print("TODO: get_vm_hosts")
 
 
 
@@ -315,7 +317,7 @@ class LibvirtClient:
         :type vm_name: str
 
         """
-        print "TODO: powerstate_vm"
+        print("TODO: powerstate_vm")
 
 
 
@@ -331,7 +333,7 @@ class LibvirtClient:
         :type action: str
 
         """
-        print "TODO: manage_power"
+        print("TODO: manage_power")
 
 
 

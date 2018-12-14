@@ -6,11 +6,14 @@ depending exception classes
 """
 
 import logging
-import socket
-import xmlrpclib
-from katprep.clients import SessionException, InvalidCredentialsException, \
-APILevelNotSupportedException, InvalidHostnameFormatException
+from katprep.clients import (SessionException, InvalidCredentialsException,
+                             APILevelNotSupportedException)
 
+try:
+    from xmlrpc.server import SimpleXMLRPCServer as Server
+    from xmlrpc.client import Fault
+except ImportError:
+    from xmlrpclib import Server, Fault
 
 
 class SpacewalkAPIClient(object):
@@ -105,9 +108,9 @@ class SpacewalkAPIClient(object):
         """
         #set api session and key
         try:
-            self.api_session = xmlrpclib.Server(self.url)
+            self.api_session = Server(self.url)
             self.api_key = self.api_session.auth.login(self.username, self.password)
-        except xmlrpclib.Fault as err:
+        except Fault as err:
             if err.faultCode == 2950:
                 raise InvalidCredentialsException(
                     "Wrong credentials supplied: '%s'", err.faultString
