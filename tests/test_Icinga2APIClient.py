@@ -36,7 +36,7 @@ def test_valid_login(client):
     client.dummy_call()
 
 
-def test_invalid_login(config, nagiosType):
+def test_invalid_login(config):
     """
     Ensure exceptions on invalid logins
     """
@@ -97,7 +97,7 @@ def test_unsched_dt_host_fail(client):
     """
     Ensure that unscheduling downtimes fails for non-existing hosts
     """
-    with pytest.raises(EmptySetException):
+    with pytest.raises(SessionException):
         client.remove_downtime("giertz.pinkepank.loc", "host")
 
 
@@ -105,7 +105,7 @@ def test_unsched_dt_hostgrp_fail(client):
     """
     Ensure that unscheduling downtimes fails for non-existing hostgroups
     """
-    with pytest.raises(EmptySetException):
+    with pytest.raises(SessionException):
         client.remove_downtime("giertz-hosts", "hostgroup")
 
 
@@ -113,7 +113,8 @@ def test_get_hosts(client, config):
     """
     Ensure that receiving hosts is possible
     """
-    assert config["valid_objects"]["host"] in client.get_hosts()
+    hosts = client.get_hosts()
+    assert config["valid_objects"]["host"] in [host['name'] for host in hosts]
 
 
 def test_get_services(client, config):
@@ -124,7 +125,7 @@ def test_get_services(client, config):
         config["valid_objects"]["host"],
         only_failed=False
     )
-    assert config["valid_objects"]["host_service"] in services
+    assert config["valid_objects"]["host_service"] in [service['name'] for service in services]
 
 
 def test_get_services_fail(client):

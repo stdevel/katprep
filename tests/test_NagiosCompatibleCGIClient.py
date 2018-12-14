@@ -40,7 +40,7 @@ def monitoringClient(config, nagiosType):
             verify=False
         )
     finally:
-        time.sleep(30)
+        time.sleep(8)
 
 
 @pytest.fixture
@@ -54,7 +54,7 @@ def icingaClient(config):
             verify=False
         )
     finally:
-        time.sleep(30)
+        time.sleep(8)
 
 
 @pytest.fixture
@@ -68,7 +68,7 @@ def nagiosClient(config):
             verify=False
         )
     finally:
-        time.sleep(30)
+        time.sleep(8)
 
 
 def test_valid_login(monitoringClient):
@@ -126,7 +126,7 @@ def test_get_hosts(monitoringClient, config, nagiosType):
     Ensure that receiving hosts is possible
     """
     hosts = monitoringClient.get_hosts()
-    assert config[nagiosType]["host"] in hosts
+    assert config[nagiosType]["host"] in [host['name'] for host in hosts]
 
 
 def test_get_services(monitoringClient, config, nagiosType):
@@ -136,5 +136,5 @@ def test_get_services(monitoringClient, config, nagiosType):
     services = monitoringClient.get_services(
         config[nagiosType]["host"], only_failed=False
     )
-    assert config[nagiosType]["host_service"] in services
+    assert config[nagiosType]["host_service"] in [service['name'] for service in services]
     assert len(services) == config[nagiosType]["host_services"]
