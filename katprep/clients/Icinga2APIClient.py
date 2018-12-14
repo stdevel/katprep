@@ -169,11 +169,9 @@ class Icinga2APIClient:
         :param hours: Amount of hours for the time range
         :type hours: int
         """
-        current_time = time.strftime("%s")
-        end_time = format(
-            datetime.now() + timedelta(hours=int(hours)),
-            '%s')
-        return (current_time, end_time)
+        current_time = datetime.now()
+        end_time = current_time + timedelta(hours=int(hours))
+        return current_time, end_time
 
 
 
@@ -211,8 +209,8 @@ class Icinga2APIClient:
                 payload = {
                     "type": "Host",
                     "filter": "\"{}\" in host.groups".format(object_name),
-                    "start_time": int(current_time),
-                    "end_time": int(end_time),
+                    "start_time": current_time.timestamp(),
+                    "end_time": end_time.timestamp(),
                     "fixed": True,
                     "author": self.USERNAME,
                     "comment": comment,
@@ -229,8 +227,8 @@ class Icinga2APIClient:
                 payload = {
                     "type": "Host",
                     "filter": "host.name==\"{}\"".format(object_name),
-                    "start_time": int(current_time),
-                    "end_time": int(end_time),
+                    "start_time": current_time.timestamp(),
+                    "end_time": end_time.timestamp(),
                     "fixed": True,
                     "author": self.USERNAME,
                     "comment": comment,
