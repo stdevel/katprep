@@ -533,7 +533,7 @@ class NagiosCGIClient(object):
 
 
 
-    def dummy_call(self):
+    def is_authenticated(self):
         """
         This function is used for checking whether authorization succeeded.
         It simply retrieves status.cgi
