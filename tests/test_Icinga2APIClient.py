@@ -33,7 +33,7 @@ def test_valid_login(client):
     """
     Ensure exceptions on valid logins
     """
-    client.dummy_call()
+    client.is_authenticated()
 
 
 def test_invalid_login(config):
@@ -47,7 +47,7 @@ def test_invalid_login(config):
             "giertz",
             "paulapinkepank"
         )
-        client.dummy_call()
+        client.is_authenticated()
 
 
 def test_scheduling_downtime_for_host(client, config):

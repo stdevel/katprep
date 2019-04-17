@@ -1,35 +1,22 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>AuthContainer &mdash; katprep 0.5.0 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>AuthContainer &#8212; katprep 0.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.5.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="katprep 0.5.0 documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
-  </head>
-  <body>
-    <div class="related">
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -38,19 +25,19 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for AuthContainer</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Class for managing multiple authentication credentials</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -60,10 +47,13 @@
 <span class="kn">import</span> <span class="nn">stat</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">base64</span>
-<span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlparse</span>
-<span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
-<span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">InvalidToken</span>
+<span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="k">import</span> <span class="n">Fernet</span>
+<span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="k">import</span> <span class="n">InvalidToken</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlparse</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urlparse</span> <span class="k">import</span> <span class="n">urlparse</span>
 
 
 <div class="viewcode-block" id="ContainerException"><a class="viewcode-back" href="../katprep.html#AuthContainer.ContainerException">[docs]</a><span class="k">class</span> <span class="nc">ContainerException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -72,19 +62,19 @@
 
 <span class="sd">.. class:: ContainerException</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
+    <span class="k">pass</span></div>
 
 
-</div>
+
 <div class="viewcode-block" id="AuthContainer"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer">[docs]</a><span class="k">class</span> <span class="nc">AuthContainer</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">.. class:: AuthContainer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;AuthContainer&#39;</span><span class="p">)</span>
+    <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AuthContainer&#39;</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    logging: Logger instance</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">FILENAME</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="n">FILENAME</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    str: correspending file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -92,12 +82,12 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    dict: authentication credentials</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">KEY</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="n">KEY</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    str: encryption key</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor, creating the class. It requires specifying a filename.</span>
 <span class="sd">        If the file already exists, already existing entries are imported.</span>
@@ -107,12 +97,12 @@
 <span class="sd">        :param filename: filename</span>
 <span class="sd">        :type filename: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c">#set logging</span>
+        <span class="c1">#set logging</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
-        <span class="c">#set key if defined</span>
+        <span class="c1">#set key if defined</span>
         <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="c">#set filename and import data</span>
+        <span class="c1">#set filename and import data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span> <span class="o">=</span> <span class="n">filename</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__import</span><span class="p">()</span>
@@ -129,37 +119,37 @@
 <span class="sd">        :type key: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="c">#fill up to 32 chars</span>
+            <span class="c1">#fill up to 32 chars</span>
             <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">32</span><span class="p">)[</span><span class="o">-</span><span class="mi">32</span><span class="p">:]</span>
-            <span class="c">#set key</span>
+            <span class="c1">#set key</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">KEY</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Empty password specified&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Empty password specified&quot;</span><span class="p">)</span></div>
 
 
-</div>
+
 <div class="viewcode-block" id="AuthContainer.is_encrypted"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.is_encrypted">[docs]</a>    <span class="k">def</span> <span class="nf">is_encrypted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This functions returns whether the authentication container is</span>
 <span class="sd">        encrypted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">KEY</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
 
-</div>
+
     <span class="k">def</span> <span class="nf">__import</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This function imports definitions from the file.&quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">CREDENTIALS</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">)</span> <span class="ow">and</span> \
-            <span class="nb">oct</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IMODE</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">lstat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">)</span><span class="o">.</span><span class="n">st_mode</span><span class="p">))</span> <span class="o">==</span> <span class="s">&quot;0600&quot;</span><span class="p">:</span>
-            <span class="c">#loading file</span>
+            <span class="nb">oct</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IMODE</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">lstat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">)</span><span class="o">.</span><span class="n">st_mode</span><span class="p">))</span> <span class="o">==</span> <span class="s2">&quot;0600&quot;</span><span class="p">:</span>
+            <span class="c1">#loading file</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;File non-existent or file mode not 0600!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;File non-existent or file mode not 0600!&quot;</span><span class="p">)</span>
 
 
 
@@ -171,31 +161,31 @@
 <span class="sd">        :type filename: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
-                <span class="n">json_data</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+                <span class="n">json_data</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">json_data</span>
         <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to read file &#39;{}&#39;: &#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to read file &#39;</span><span class="si">{}</span><span class="s2">&#39;: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span></div>
 
 
-</div>
+
 <div class="viewcode-block" id="AuthContainer.save"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function stores the changed authentication container to disk.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">target</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">target</span><span class="p">:</span>
                 <span class="n">target</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">))</span>
 
-            <span class="c">#setting the good perms</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">,</span> <span class="mo">0600</span><span class="p">)</span>
+            <span class="c1">#setting the good perms</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">,</span> <span class="mo">0o600</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ContainerException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ContainerException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div>
 
 
-</div>
+
     <span class="k">def</span> <span class="nf">__manage_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span>
-        <span class="n">remove_entry</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">remove_entry</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This functions adds or removes credentials to/from the authentication</span>
 <span class="sd">        container.</span>
@@ -219,25 +209,25 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">remove_entry</span><span class="p">:</span>
-                <span class="c">#remove entry</span>
+                <span class="c1">#remove entry</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c">#add entry</span>
+                <span class="c1">#add entry</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s">&quot;username&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">username</span>
-                <span class="c">#add encrypted or plain password</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">username</span>
+                <span class="c1">#add encrypted or plain password</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">KEY</span><span class="p">:</span>
                     <span class="n">crypto</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;s/{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s2">&quot;password&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;s/</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">crypto</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">()))</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">password</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s2">&quot;password&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">password</span>
         <span class="k">except</span> <span class="n">InvalidToken</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ContainerException</span><span class="p">(</span><span class="s">&quot;Invalid password specified!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ContainerException</span><span class="p">(</span><span class="s2">&quot;Invalid password specified!&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
 
-    <span class="c">#aliases</span>
+    <span class="c1">#aliases</span>
 <div class="viewcode-block" id="AuthContainer.add_credentials"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.add_credentials">[docs]</a>    <span class="k">def</span> <span class="nf">add_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds credentials to the authentication container.</span>
@@ -249,8 +239,8 @@
 <span class="sd">        :param password: corresponding password</span>
 <span class="sd">        :type password: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__manage_credentials</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__manage_credentials</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="AuthContainer.remove_credentials"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.remove_credentials">[docs]</a>    <span class="k">def</span> <span class="nf">remove_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes credentials from the authentication container.</span>
@@ -258,18 +248,18 @@
 <span class="sd">        :param hostname: hostname</span>
 <span class="sd">        :type hostname: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__manage_credentials</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__manage_credentials</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 
-</div>
+
 <div class="viewcode-block" id="AuthContainer.get_hostnames"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.get_hostnames">[docs]</a>    <span class="k">def</span> <span class="nf">get_hostnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This function returns hostnames&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
 
-</div>
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AuthContainer.cut_hostname"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.cut_hostname">[docs]</a>    <span class="k">def</span> <span class="nf">cut_hostname</span><span class="p">(</span><span class="n">snippet</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AuthContainer.cut_hostname"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.cut_hostname">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cut_hostname</span><span class="p">(</span><span class="n">snippet</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function removes protocol pre- and postfix data in order to</span>
 <span class="sd">        find/create generic authentication information.</span>
@@ -278,14 +268,14 @@
 <span class="sd">        :type snippet: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parsed_uri</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">snippet</span><span class="p">)</span>
-        <span class="n">host</span> <span class="o">=</span> <span class="s">&#39;{uri.netloc}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">parsed_uri</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">host</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
-            <span class="c">#non-URL/URI</span>
+        <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{uri.netloc}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">parsed_uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">host</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="c1">#non-URL/URI</span>
             <span class="n">host</span> <span class="o">=</span> <span class="n">snippet</span>
-        <span class="k">return</span> <span class="n">host</span>
+        <span class="k">return</span> <span class="n">host</span></div>
 
 
-</div>
+
 <div class="viewcode-block" id="AuthContainer.get_credential"><a class="viewcode-back" href="../katprep.html#AuthContainer.AuthContainer.get_credential">[docs]</a>    <span class="k">def</span> <span class="nf">get_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function returns credentials for a particular hostname.</span>
@@ -295,20 +285,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">hostname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_hostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">KEY</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_encrypted</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Decrypting crendentials&quot;</span><span class="p">)</span>
                 <span class="n">crypto</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s">&quot;username&quot;</span><span class="p">],</span>
-                    <span class="n">crypto</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">],</span>
+                    <span class="n">crypto</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s2">&quot;password&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
                     <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c">#return plain information</span>
+                <span class="c1">#return plain information</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Plain login data&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s">&quot;username&quot;</span><span class="p">],</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">CREDENTIALS</span><span class="p">[</span><span class="n">hostname</span><span class="p">][</span><span class="s2">&quot;password&quot;</span><span class="p">]</span>
                     <span class="p">)</span>
         <span class="k">except</span> <span class="n">InvalidToken</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ContainerException</span><span class="p">(</span><span class="s">&quot;Invalid password specified!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ContainerException</span><span class="p">(</span><span class="s2">&quot;Invalid password specified!&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span></div></div>
 </pre></div>
@@ -316,26 +308,25 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -344,13 +335,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
     </div>
   </body>
 </html>
