@@ -75,7 +75,7 @@ def test_valid_login(monitoringClient):
     """
     Ensure exceptions on valid logins
     """
-    monitoringClient.dummy_call()
+    monitoringClient.is_authenticated()
 
 
 def test_invalid_login(config, nagiosType):
@@ -90,7 +90,7 @@ def test_invalid_login(config, nagiosType):
             "paulapinkepank",
             verify=False
         )
-        client.dummy_call()
+        client.is_authenticated()
 
 
 def test_scheduling_downtime_for_host(monitoringClient, config, nagiosType):

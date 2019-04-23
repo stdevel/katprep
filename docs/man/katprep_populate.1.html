@@ -1,34 +1,22 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>NAME &mdash; katprep 0.5.0 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>NAME &#8212; katprep 0.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.5.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="katprep 0.5.0 documentation" href="../index.html" /> 
-  </head>
-  <body>
-    <div class="related">
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,14 +25,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="name">
 <h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
@@ -55,10 +43,10 @@ hypervisor information for managed systems</p>
 <h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
 <p><strong>katprep_populate</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
 [<strong>-n</strong>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
-[<strong>&#8211;ipv6-only</strong>] [<strong>&#8211;insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-u</strong>]
-[<strong>&#8211;virt-uri</strong> <em>uri</em>] [<strong>&#8211;virt-type</strong> <em>libvirt</em>|<em>pyvmomi</em>]
-[<strong>&#8211;skip-virt</strong>] [<strong>&#8211;mon-url</strong> <em>url</em>] [<strong>&#8211;mon-type</strong>
-<em>nagios</em>|<em>icinga</em>] [<strong>&#8211;skip-mon</strong>]</p>
+[<strong>–ipv6-only</strong>] [<strong>–insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-u</strong>]
+[<strong>–virt-uri</strong> <em>uri</em>] [<strong>–virt-type</strong> <em>libvirt</em>|<em>pyvmomi</em>]
+[<strong>–skip-virt</strong>] [<strong>–mon-url</strong> <em>url</em>] [<strong>–mon-type</strong>
+<em>nagios</em>|<em>icinga</em>] [<strong>–skip-mon</strong>]</p>
 </div>
 <div class="section" id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
@@ -116,10 +104,10 @@ libvirt)</dd>
 </tbody>
 </table>
 <dl class="docutils">
-<dt>-C <em>filename</em>, &#8211;auth-container <em>filename</em></dt>
+<dt>-C <em>filename</em>, –auth-container <em>filename</em></dt>
 <dd>Defines an authentication container file (see also
 <strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</dd>
-<dt>-P <em>passphrase</em>, &#8211;auth-password <em>passphrase</em></dt>
+<dt>-P <em>passphrase</em>, –auth-password <em>passphrase</em></dt>
 <dd>Defines the authentication container password to avoid password
 prompt (unattented mode)</dd>
 </dl>
@@ -136,7 +124,7 @@ prompt (unattented mode)</dd>
 </tbody>
 </table>
 <dl class="docutils">
-<dt>-s <em>hostname</em>, &#8211;server <em>hostname</em></dt>
+<dt>-s <em>hostname</em>, –server <em>hostname</em></dt>
 <dd>Defines the Foreman server to use (default: localhost)</dd>
 </dl>
 <table class="docutils option-list" frame="void" rules="none">
@@ -149,9 +137,9 @@ prompt (unattented mode)</dd>
 </tbody>
 </table>
 <dl class="docutils">
-<dt>&#8211;virt-uri <em>uri</em></dt>
+<dt>–virt-uri <em>uri</em></dt>
 <dd>Defines an URI to use (see also <strong>Virtualization URIs</strong>)</dd>
-<dt>&#8211;virt-type <em>libvirt</em>|<em>pyvmomi</em></dt>
+<dt>–virt-type <em>libvirt</em>|<em>pyvmomi</em></dt>
 <dd>Defines the library to use for accessing the hypervisor, currently
 supported: <em>libvirt</em> or <em>pyvmomi</em> (VMware vSphere). (default:
 libvirt)</dd>
@@ -166,9 +154,9 @@ libvirt)</dd>
 </tbody>
 </table>
 <dl class="docutils">
-<dt>&#8211;mon-url <em>url</em></dt>
+<dt>–mon-url <em>url</em></dt>
 <dd>Defines a monitoring URL to use (see also <strong>Monitoring URLs</strong>)</dd>
-<dt>&#8211;mon-type <em>nagios</em>|<em>icinga</em></dt>
+<dt>–mon-type <em>nagios</em>|<em>icinga</em></dt>
 <dd>Defines the monitoring sytem type, currently supported: <em>nagios</em>
 (Nagios, Icinga 1.x) or <em>icinga</em> (Icinga 2). (default: icinga)</dd>
 </dl>
@@ -188,17 +176,17 @@ libvirt)</dd>
 <p>It is a good idea to start-over by specifying your monitoring and
 hypervisor systems and enabling <strong>dry-run</strong> mode:</p>
 <div class="line-block">
-<div class="line">$ katprep_populate &#8211;virt-uri st-vcsa03.stankowic.loc &#8211;virt-type</div>
+<div class="line">$ katprep_populate –virt-uri st-vcsa03.stankowic.loc –virt-type</div>
 </div>
-<p>pyvmomi &#8211;mon-url <a class="reference external" href="https://st-mon03.stankowic.loc:5665">https://st-mon03.stankowic.loc:5665</a> -C pinkepank.auth
-&#8211;dry-run
+<p>pyvmomi –mon-url <a class="reference external" href="https://st-mon03.stankowic.loc:5665">https://st-mon03.stankowic.loc:5665</a> -C pinkepank.auth
+–dry-run
 | <a class="reference external" href="INFO:katprep_populate:This">INFO:katprep_populate:This</a> is just a SIMULATION - no changes will be
 made.
-| <a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> &#8216;giertz.stankowic.loc&#8217; ==&gt; set/update
+| <a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> ‘giertz.stankowic.loc’ ==&gt; set/update
 parameter/value: katprep_virt/st-vcsa03.stankowic.loc
-| <a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> &#8216;giertz.stankowic.loc&#8217; ==&gt; set/update
+| <a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> ‘giertz.stankowic.loc’ ==&gt; set/update
 parameter/value: katprep_mon_type/icinga
-| ...</p>
+| …</p>
 <p>Check the values that would be set - run the command again with omitting
 the <strong>dry-run</strong> parameter if they are correct.</p>
 </div>
@@ -228,7 +216,7 @@ the <strong>dry-run</strong> parameter if they are correct.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
@@ -246,29 +234,30 @@ the <strong>dry-run</strong> parameter if they are correct.</p>
 <li><a class="reference internal" href="#see-also">SEE ALSO</a></li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/man/katprep_populate.1.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/man/katprep_populate.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -277,12 +266,12 @@ the <strong>dry-run</strong> parameter if they are correct.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">katprep 0.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
     </div>
   </body>
 </html>
