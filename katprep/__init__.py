@@ -161,7 +161,7 @@ def is_valid_report(filename):
     try:
         json_obj = json.loads(get_json(filename))
         #check whether at least one host with a params dict is found
-        if "params" not in json_obj.itervalues().next().keys():
+        if "params" not in iter(json_obj.values()).next().keys():
             raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
                 " snapshot report.".format(filename))
     except StopIteration as err:
