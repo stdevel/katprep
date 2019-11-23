@@ -167,10 +167,10 @@ def scan_systems(options):
                     "system! (Hint: unregistered content host?)", system["name"]
                 )
                 errata_counter = {}
-                errata_counter[u"security"] = 0
-                errata_counter[u"bugfix"] = 0
-                errata_counter[u"enhancement"] = 0
-                errata_counter[u"total"] = 0
+                errata_counter["security"] = 0
+                errata_counter["bugfix"] = 0
+                errata_counter["enhancement"] = 0
+                errata_counter["total"] = 0
             LOGGER.debug(
                 "System errata counter: security=%s, bugfix=%s," \
                 " enhancement=%s, total=%s",
