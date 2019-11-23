@@ -12,7 +12,7 @@ import argparse
 import logging
 import json
 import getpass
-from . import get_credentials
+from . import __version__, get_credentials
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
@@ -22,7 +22,6 @@ from .clients import EmptySetException, SessionException, \
 InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
 
-__version__ = "0.5.0"
 """
 ForemanAPIClient: Foreman API client handle
 """

@@ -16,8 +16,9 @@ import os
 import getpass
 import datetime
 import yaml
-from . import is_valid_report, get_json, get_credentials, \
-get_required_hosts_by_report, get_host_params_by_report
+from . import (
+    __version__, is_valid_report, get_json, get_credentials,
+    get_required_hosts_by_report, get_host_params_by_report)
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
@@ -27,7 +28,6 @@ from .clients import validate_hostname, EmptySetException, \
 SessionException, InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException, SnapshotExistsException
 
-__version__ = "0.5.0"
 """
 ForemanAPIClient: Foreman API client handle
 """

@@ -15,9 +15,8 @@ import datetime
 import os
 #import pypandoc
 import yaml
-from . import is_writable, which, is_valid_report, get_json
+from . import __version__, is_writable, which, is_valid_report, get_json
 
-__version__ = "0.5.0"
 """
 str: Program version
 """

@@ -20,6 +20,8 @@ try:
 except NameError:  # Python 3
     raw_input = input
 
+__version__ = "0.5.0"
+
 LOGGER = logging.getLogger('katprep_shared')
 """
 logging: Logger instance

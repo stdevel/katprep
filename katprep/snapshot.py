@@ -13,14 +13,13 @@ import logging
 import json
 import time
 import getpass
-from . import get_credentials, is_writable, validate_filters, \
-get_filter
+from . import (
+    __version__, get_credentials, is_writable, validate_filters, get_filter)
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients import validate_hostname, EmptySetException, \
 SessionException, InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
 
-__version__ = "0.5.0"
 """
 str: Program version
 """
