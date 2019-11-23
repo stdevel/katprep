@@ -451,7 +451,7 @@ def verify(options, args):
                     )
                     for service in crit_services:
                         services = "{}{} - {}, ".format(
-                            services, service.keys()[0], service.values()[0]
+                            services, list(service.keys())[0], list(service.values())[0]
                         )
                     #add status to verfication values
                     set_verification_value(options, host, "mon_status", "Warning/Critical")

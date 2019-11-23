@@ -216,7 +216,7 @@ class AuthContainer:
 
     def get_hostnames(self):
         """This function returns hostnames"""
-        return self.CREDENTIALS.keys()
+        return list(self.CREDENTIALS.keys())
 
 
 
