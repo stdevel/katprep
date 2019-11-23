@@ -143,7 +143,7 @@ def test_get_name_by_id(client, config):
     """
     Ensure that names can be retrieved by supplying an ID
     """
-    for f_obj, f_conf in config["valid_objects"].iteritems():
+    for f_obj, f_conf in config["valid_objects"].items():
         assert client.get_name_by_id(f_conf['id'], f_obj)
 
 
@@ -152,7 +152,7 @@ def test_get_name_by_id_invalid(client, config):
     Ensure that names cannot be retrieving when supplying invalid IDs
     """
     with pytest.raises(SessionException):
-        for f_obj, f_conf in config["valid_objects"].iteritems():
+        for f_obj, f_conf in config["valid_objects"].items():
             client.get_name_by_id(random.randint(800, 1500), f_obj)
 
 
@@ -160,7 +160,7 @@ def test_get_id_by_name(client, config):
     """
     Ensure that IDs can be retrieved by supplying an ID
     """
-    for f_obj, f_conf in config["valid_objects"].iteritems():
+    for f_obj, f_conf in config["valid_objects"].items():
         assert client.get_id_by_name(f_conf['name'], f_obj)
 
 
@@ -169,7 +169,7 @@ def test_get_id_by_name_invalid(client, config):
     Ensure that names IDs cannot be retrieved by supplying invalid IDs
     """
     with pytest.raises(SessionException):
-        for f_obj, f_conf in config["valid_objects"].iteritems():
+        for f_obj, f_conf in config["valid_objects"].items():
             vm_name = "giertz{}".format(random.randint(800, 1500))
             client.get_id_by_name(vm_name, f_obj)
 
