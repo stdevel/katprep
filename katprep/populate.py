@@ -177,9 +177,8 @@ def parse_options(args=None):
     '''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(
-        description=desc, version=__version__, epilog=epilog
-    )
+    parser = argparse.ArgumentParser(description=desc, epilog=epilog)
+    parser.add_argument('--version', action='version', version=__version__)
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
