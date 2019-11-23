@@ -15,6 +15,11 @@ import argparse
 from .AuthContainer import AuthContainer, ContainerException
 from .clients import SessionException
 
+try:
+    raw_input
+except NameError:  # Python 3
+    raw_input = input
+
 LOGGER = logging.getLogger('katprep_shared')
 """
 logging: Logger instance

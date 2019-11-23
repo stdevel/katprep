@@ -18,7 +18,10 @@ from .clients import EmptySetException, SessionException, \
 InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
 
-
+try:
+    raw_input
+except NameError:  # Python 3
+    raw_input = input
 
 __version__ = "0.5.0"
 """
