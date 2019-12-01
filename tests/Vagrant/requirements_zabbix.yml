@@ -1,0 +1,5 @@
+---
+- src: geerlingguy.mysql
+- src: geerlingguy.apache
+- src: dj-wasabi.zabbix-server
+- src: dj-wasabi.zabbix-web

@@ -1,0 +1,6 @@
+---
+- hosts: katello
+  remote_user: root
+  become: yes
+  roles:
+    - { role: sean797.foreman_installer, foreman_installer_pkg: katello, foreman_installer_scenario: katello, foreman_installer_scenarios_answers: [foreman: {admin_password: "admin"}] }

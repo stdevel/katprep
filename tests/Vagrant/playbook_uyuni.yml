@@ -1,0 +1,6 @@
+---
+- hosts: uyuni
+  remote_user: root
+  become: yes
+  roles:
+    - { role: stdevel.ansible_uyuni, use_lvm: false }
