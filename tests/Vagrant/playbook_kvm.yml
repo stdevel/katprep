@@ -1,0 +1,6 @@
+---
+- hosts: kvm
+  remote_user: root
+  become: true
+  roles:
+    - role: while_true_do.srv_kvm
