@@ -3,4 +3,4 @@
   remote_user: root
   become: yes
   roles:
-    - { role: stdevel.ansible_omd }
+    - role: ansible_omd

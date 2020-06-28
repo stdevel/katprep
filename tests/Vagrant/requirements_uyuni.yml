@@ -1,2 +1,3 @@
 ---
-- src: stdevel.ansible_uyuni
+- src: stdevel.uyuni
+  version: 1.0.0

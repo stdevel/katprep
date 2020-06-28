@@ -3,4 +3,5 @@
   remote_user: root
   become: yes
   roles:
-    - { role: stdevel.ansible_uyuni, use_lvm: false }
+    - role: stdevel.uyuni
+      use_lvm: false
