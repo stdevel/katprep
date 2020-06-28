@@ -2,11 +2,13 @@
 [![codecov](https://codecov.io/gh/stdevel/katprep/branch/master/graph/badge.svg)](https://codecov.io/gh/stdevel/katprep)
 
 # katprep
+
 **katprep** is a Python toolkit for automating system maintenance and generating patch reports for systems managed with [Foreman](http://www.theforeman.org/)/[Katello](http://www.katello.org/) or [Red Hat Satellite 6.x](http://www.redhat.com/products/enterprise-linux/satellite/).
 
 This can be very useful if you need to document software changes due to IT certifications like [ISO/IEC 27001:2005](http://en.wikipedia.org/wiki/ISO/IEC_27001:2005) or many other.
 
 katprep can automate the following infrastructure tasks:
+
   - create/remove virtual machine snapshots hypervisor independently (*e.g. VMware vSphere, KVM, XEN, Hyper-V,...*) by utilizing [libvirt](http://www.libvirt.org) and the [VMware vSphere Python API bindings (*pyVmomi*)](https://github.com/vmware/pyvmomi)
   - schedule/remove downtimes within your monitoring system (*Nagios/Icinga, Icinga2*)
   - patch and reboot affected systems
@@ -14,12 +16,14 @@ katprep can automate the following infrastructure tasks:
   
 This software is a complete rewrite of my other toolkit [**satprep**](https://github.com/stdevel/satprep).
 
-# Documentation and contribution
+## Documentation and contribution
+
 The project documentation is created automatically using [Sphinx](http://www.sphinx-doc.org) - it can be found in the **doc** folder of this repository. Check-out [**this website**](https://stdevel.github.io/katprep/) for an online mirror.
 
 You want to contribute? That's great! Please check-out the [**Issues**](https://github.com/stdevel/katprep/issues) tab of this project and share your thoughts/ideas in a new issue - also, pull requests are welcome!
 
-# How does this work?
+## How does this work?
+
 katprep uses Puppet host parameters to assign additional meta information to systems managed with Foreman/Katello or Red Hat Satellite such as:
   - monitoring/virtualization system managing the host
   - differing object names within those systems
