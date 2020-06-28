@@ -14,8 +14,7 @@ Vagrant.configure("2") do |config|
     # install Ansible and configure system
     monitoring.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
-      # ensure to update to latest EPEL and ansible release
-      yum -y install epel-release ansible
+      yum -y install ansible
     SHELL
     monitoring.vm.provision "ansible_local" do |ansible|
       ansible.galaxy_role_file = "requirements_monitoring.yml"
@@ -36,8 +35,7 @@ Vagrant.configure("2") do |config|
     # install Ansible and configure system
     zabbix.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
-      # ensure to update to latest EPEL and ansible release
-      yum -y install epel-release ansible
+      yum -y install ansible
     SHELL
     zabbix.vm.provision "ansible_local" do |ansible|
       ansible.galaxy_role_file = "requirements_zabbix.yml"
@@ -55,8 +53,7 @@ Vagrant.configure("2") do |config|
     # install Ansible and configure system
     xen.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
-      # ensure to update to latest EPEL and ansible release
-      yum -y install epel-release ansible
+      yum -y install ansible
     SHELL
     xen.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "playbook_xen.yml"
@@ -73,8 +70,7 @@ Vagrant.configure("2") do |config|
     # install Ansible and configure system
     kvm.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
-      # ensure to update to latest EPEL and ansible release
-      yum -y install epel-release ansible
+      yum -y install ansible
     SHELL
     kvm.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "playbook_kvm.yml"
@@ -112,8 +108,7 @@ Vagrant.configure("2") do |config|
     # install Ansible and configure system
     katello.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
-      # ensure to update to latest EPEL and ansible release
-      yum -y install epel-release ansible
+      yum -y install ansible
     SHELL
     katello.vm.provision "ansible_local" do |ansible|
       ansible.galaxy_role_file = "requirements_katello.yml"
