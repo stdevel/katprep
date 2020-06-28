@@ -1,6 +1,6 @@
 ---
 - hosts: monitoring
   remote_user: root
-  become: yes
+  become: true
   roles:
-    - role: ansible_omd
+    - role: stdevel.omd

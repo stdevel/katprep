@@ -1,7 +1,7 @@
 ---
 - hosts: uyuni
   remote_user: root
-  become: yes
+  become: true
   roles:
     - role: stdevel.uyuni
       use_lvm: false
