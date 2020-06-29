@@ -25,7 +25,7 @@ Every box forwards some ports directly so that you can use the endpoints for uni
   - at least 20 GB of disk storage
 - Software
   - [HashiCorp Vagrant](https://vagrantup.com)
-  - [Oracle VirtualBox](https://virtualbox.org)
+  - [Oracle VirtualBox](https://virtualbox.org) or **KVM/XEN**
 
 ## Usage
 
@@ -40,6 +40,7 @@ To create non-autostart boxes, run one of the following commands:
 ```bash
 $ vagrant up zabbix
 $ vagrant up xen
+$ vagrant up kvm
 $ vagrant up esxi
 ```
 
