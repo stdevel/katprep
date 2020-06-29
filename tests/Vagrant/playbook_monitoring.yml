@@ -3,4 +3,5 @@
   remote_user: root
   become: true
   roles:
+    - role: geerlingguy.repo-epel
     - role: stdevel.omd
