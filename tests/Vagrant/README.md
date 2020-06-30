@@ -50,6 +50,19 @@ To destroy the VMs after testing integrations, run the following command:
 $ vagrant destroy
 ```
 
+### Xen
+
+After creating the Xen box, you need to reboot the machine after running the playbook to have Xen ready:
+
+```bash
+$ vagrant halt xen
+$ vagrant up xen
+$ vagrant ssh xen -c "sudo xl info"
+host                   : xen.example.com
+release                : 4.9.215-36.el7.x86_64
+...
+```
+
 ## Running tests in VMs
 
 TODO: will follow soon

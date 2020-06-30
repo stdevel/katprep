@@ -1,0 +1,34 @@
+---
+- hosts: xen
+  remote_user: root
+  become: true
+  tasks:
+    - name: Install Xen release
+      yum:
+        name: centos-release-xen
+    - name: Install Xen
+      yum:
+        name:
+          - xen
+          - libvirt
+          - libvirt-daemon-xen
+          - virt-install
+    - name: Update Xen kernel
+      yum:
+        name: kernel
+        state: latest
+    - name: Update GRUB configuration
+      command: grub-bootxen.sh
+      args:
+        creates: /boot/xen.gz
+    - name: Enable services
+      service:
+        name: "{{ item }}"
+      with_items:
+        - xen-init-dom0.service
+        - xen-qemu-dom0-disk-backend.service
+        - xenconsoled.service
+        - xen-watchdog.service
+        - xendomains.service
+        - xendomains.service
+        - xenstored.service
