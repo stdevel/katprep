@@ -6,4 +6,4 @@
 - src: dj-wasabi.zabbix-server
   version: 1.8.0
 - src: dj-wasabi.zabbix-web
-  version: 1.6.0
+  version: 1.5.0
