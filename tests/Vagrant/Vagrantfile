@@ -43,34 +43,6 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  # Xen host running a VM
-  config.vm.define "xen", autostart: false do |xen|
-    xen.vm.hostname = "xen.example.com"
-    xen.vm.box = "centos/7"
-    # add private network
-    xen.vm.network "private_network", ip: "192.168.23.30"
-    # set CPU and memory
-    xen.vm.provider "virtualbox" do |vb|
-      vb.cpus = "2"
-      vb.memory = "4096"
-      vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
-    end
-    xen.vm.provider :libvirt do |libvirt|
-      libvirt.cpus = "2"
-      libvirt.memory = "4096"
-      libvirt.cpu_model = "host-model"
-      libvirt.nested = true
-    end
-    # install Ansible and configure system
-    xen.vm.provision "shell", inline: <<-SHELL
-      yum -y install rpm-python epel-release python-xml
-      yum -y install ansible
-    SHELL
-    xen.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "playbook_xen.yml"
-    end
-  end
-
   # KVM host running a VM
   config.vm.define "kvm", autostart: false do |kvm|
     kvm.vm.hostname = "kvm.example.com"

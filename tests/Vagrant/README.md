@@ -12,7 +12,6 @@ Every box forwards some ports directly so that you can use the endpoints for uni
 | --- | --------- | ----------- | --------------- |
 | ``monitoring`` | yes | EL7 running OMD with Icinga2, etc. | 80=>8080 (*http*), 443=>8443 (*https*), 5665=>8665 (*icinga2*) |
 | ``zabbix`` | no | EL7 running Zabbix | 80=>8081 (*http*), 443=>8444 (*https*) |
-| ``xen`` | no | EL7 running XEN and dummy VM with networking (**WIP**) | |
 | ``kvm`` | yes | EL7 running KVM and dummy VM with networking (**WIP**) | |
 | ``esxi`` | no | vSphere ESXi 6.7 running a dummy VM with networking (**WIP**) | |
 | ``katello`` | yes | EL7 running Foreman/Katello (**WIP**) | 80=>8083 (*http*), 443=>8446 (*https*) |
@@ -25,7 +24,7 @@ Every box forwards some ports directly so that you can use the endpoints for uni
   - at least 20 GB of disk storage
 - Software
   - [HashiCorp Vagrant](https://vagrantup.com)
-  - [Oracle VirtualBox](https://virtualbox.org) or **KVM/XEN**
+  - [Oracle VirtualBox](https://virtualbox.org) or **KVM**
 
 ## Usage
 
@@ -39,7 +38,6 @@ To create non-autostart boxes, run one of the following commands:
 
 ```bash
 $ vagrant up zabbix
-$ vagrant up xen
 $ vagrant up kvm
 $ vagrant up esxi
 ```
@@ -48,19 +46,6 @@ To destroy the VMs after testing integrations, run the following command:
 
 ```bash
 $ vagrant destroy
-```
-
-### Xen
-
-After creating the Xen box, you need to reboot the machine after running the playbook to have Xen ready:
-
-```bash
-$ vagrant halt xen
-$ vagrant up xen
-$ vagrant ssh xen -c "sudo xl info"
-host                   : xen.example.com
-release                : 4.9.215-36.el7.x86_64
-...
 ```
 
 ## Running tests in VMs
