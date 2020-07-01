@@ -2,5 +2,42 @@
 - hosts: kvm
   remote_user: root
   become: true
+  post_tasks:
+    - name: Add user to libvirt group
+      user:
+        name: "{{ ansible_user }}"
+        groups: libvirt
+        append: true
+    - name: Install Vagrant
+      block:
+        - name: Install Vagrant
+          yum:
+            name: https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.rpm
+        - name: Install Vagrant development files
+          yum:
+            name:
+              - ruby-devel
+              - gcc
+              - make
+              - libvirt-devel
+        - name: Install vagrant-libvirt plugin
+          command: vagrant plugin install vagrant-libvirt
+          become: false
+          args:
+            creates: /home/vagrant/.vagrant.d/gems
+    - name: Create Alpine Linux VM
+      block:
+        - name: Create Vagrantfile
+          copy:
+            src: files/nested-Vagrantfile
+            dest: /home/vagrant/Vagrantfile
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+        - name: Create Vagrantbox
+          command: vagrant up
+          args:
+            chdir: /home/vagrant
+          become: false
   roles:
     - role: while_true_do.srv_kvm
+      wtd_srv_kvm_reboot_enabled: false
