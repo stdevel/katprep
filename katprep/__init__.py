@@ -190,10 +190,10 @@ def validate_filters(options, api_client):
         if options.environment and options.environment.isdigit() is False:
             options.environment = api_client.get_id_by_name(
                 options.environment, "environment")
-    except Exception as err:
-        print(err)
     except SessionException:
         pass
+    except Exception as err:
+        print(err)
 
 
 def get_filter(options, api_object):

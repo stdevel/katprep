@@ -808,9 +808,9 @@ def main(options, args):
 
     # warn if user tends to do something stupid
     if options.virt_skip_snapshot:
-        LOGGER.warn("You decided to skip creating snapshots - I've warned you!")
+        LOGGER.warning("You decided to skip creating snapshots - I've warned you!")
     if options.mon_skip_downtime:
-        LOGGER.warn("You decided to skip scheduling downtimes - happy flooding!")
+        LOGGER.warning("You decided to skip scheduling downtimes - happy flooding!")
 
     # initialize APIs
     (fman_user, fman_pass) = get_credentials(

@@ -98,3 +98,4 @@ To remove a master password, simply specify a new empty password::
     File password (max. 32 chars): ...
     New file password (max. 32 chars): 
     {"myhost": {"username": "giertz", "password": "pinkepank"}}
+

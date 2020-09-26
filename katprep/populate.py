@@ -61,7 +61,6 @@ def populate(options):
     try:
         # retrieve host information
         hosts = json.loads(SAT_CLIENT.api_get("/hosts"))
-        required_settings = {}
 
         # retrieve VM/IP information
         if not options.virt_skip:
@@ -126,10 +125,9 @@ def populate(options):
                     host_params = SAT_CLIENT.get_host_params(host["id"])
                     key_exists = [x for x in host_params if x["name"] == setting]
                     # set payload
-                    payload = {}
-                    payload["parameter"] = {
+                    payload = {"parameter": {
                         "name": setting, "value": required_settings[setting]
-                    }
+                    }}
                     # update or create parameter
                     if len(key_exists) > 0:
                         if options.foreman_update:

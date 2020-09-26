@@ -164,11 +164,7 @@ def scan_systems(options):
                     "Unable to read errata counters for system '%s' - check "
                     "system! (Hint: unregistered content host?)", system["name"]
                 )
-                errata_counter = {}
-                errata_counter["security"] = 0
-                errata_counter["bugfix"] = 0
-                errata_counter["enhancement"] = 0
-                errata_counter["total"] = 0
+                errata_counter = {"security": 0, "bugfix": 0, "enhancement": 0, "total": 0}
             LOGGER.debug(
                 "System errata counter: security=%s, bugfix=%s,"
                 " enhancement=%s, total=%s",

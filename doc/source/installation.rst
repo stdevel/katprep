@@ -125,3 +125,4 @@ Specifying the **--spec-only** parameter will only create a RPM spec file::
 
    $ python setup.py bdist_rpm --spec-only
    $ less dist/katprep.spec
+

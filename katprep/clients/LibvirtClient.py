@@ -93,7 +93,7 @@ class LibvirtClient:
             self.SESSION = libvirt.openAuth(self.URI, auth, 0)
             if self.SESSION is None:
                 raise SessionException("Unable to establish connection to hypervisor!")
-        except libvirt.libvirtError as err:
+        except libvirt.libvirtError:
             raise InvalidCredentialsException("Invalid credentials")
 
     def retrieve_credentials(self, credentials, user_data):
