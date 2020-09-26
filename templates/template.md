@@ -1,11 +1,13 @@
 # System maintenance report $if(params.name)$for $params.name$$endif$
 
 ## Meta information
+
 IP | Date | Time | Owner
 -- | ---- | ---- | -----
 $if(params.ip)$$params.ip$$endif$ | $if(params.date)$$params.date$$endif$ | $if(params.time)$$params.time$$endif$ | $if(params.owner)$$params.owner$$endif$ |
 
 ## Task checklist
+
 Task | Status | Description/Notes
 ---- | ------ | -----------------
 Snapshot created | $if(verification.virt_snapshot)$$verification.virt_snapshot$$endif$ | $if(params.system_physical)$physical system$endif$
@@ -15,6 +17,7 @@ Monitoring status | $if(verification.mon_status)$$verification.mon_status$$endif
 Monitoring enabled | $if(verification.mon_cleanup)$$verification.mon_cleanup$$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
 
 ## Patch list
+
 Type | Name | Date | Description | Reboot required?
 ---- | ---- | ---- | ----------- | ----------------
 $for(errata)$

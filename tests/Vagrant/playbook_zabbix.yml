@@ -1,0 +1,16 @@
+---
+- hosts: zabbix
+  remote_user: root
+  become: true
+  roles:
+    - role: geerlingguy.apache
+    - role: geerlingguy.mysql
+    - role: dj-wasabi.zabbix-server
+      zabbix_server_database: mysql
+      zabbix_server_database_long: mysql
+      zabbix_server_dbport: 3306
+    - role: dj-wasabi.zabbix-web
+      zabbix_url: "localhost"
+      zabbix_server_database: mysql
+      zabbix_server_database_long: mysql
+      zabbix_server_dbport: 3306

@@ -1,0 +1,21 @@
+---
+- hosts: katello
+  remote_user: root
+  become: true
+  pre_tasks:
+    - name: Install needed repositories
+      yum:
+        name:
+          - https://yum.theforeman.org/releases/2.0/el7/x86_64/foreman-release.rpm
+          - https://fedorapeople.org/groups/katello/releases/yum/3.15/katello/el7/x86_64/katello-repos-latest.rpm
+          - https://yum.puppet.com/puppet6-release-el-7.noarch.rpm
+          - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    - name: Install Foreman SCL release
+      yum:
+        name: foreman-release-scl
+
+  roles:
+    - role: sean797.foreman_installer
+      foreman_installer_pkg: katello
+      foreman_installer_scenario: katello
+      foreman_installer_scenarios_answers: [foreman: {initial_admin_password: "admin"}]
