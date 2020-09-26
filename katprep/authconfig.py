@@ -153,44 +153,64 @@ def parse_options(args=None):
 
     # GENERIC ARGUMENTS
     # -q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true",
-                          dest="generic_quiet",
-                          default=False, help="don't print status messages to stdout (default: no)")
+    gen_opts.add_argument(
+        "-q", "--quiet", action="store_true",
+        dest="generic_quiet",
+        default=False, help="don't print status messages to stdout (default: no)"
+    )
     # -d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="generic_debug",
-                          default=False, action="store_true",
-                          help="enable debugging outputs (default: no)")
+    gen_opts.add_argument(
+        "-d", "--debug", dest="generic_debug",
+        default=False, action="store_true",
+        help="enable debugging outputs (default: no)"
+    )
     # authentication container
-    gen_opts.add_argument('container', metavar='FILE', nargs=1,
-                          help='An authentication container', type=str)
+    gen_opts.add_argument(
+        'container', metavar='FILE', nargs=1,
+        help='An authentication container', type=str
+    )
 
     # COMMANDS
-    subparsers = parser.add_subparsers(title='commands',
-                                       description='controlling maintenance stages', help='additional help')
+    subparsers = parser.add_subparsers(
+        title='commands',
+        description='controlling maintenance stages', help='additional help'
+    )
     cmd_list = subparsers.add_parser("list", help="listing entries")
-    cmd_list.add_argument("-a", "--show-passwords", action="store_true",
-                          dest="show_passwords", default=False, help="also shows passwords "
-                                                                     "(default: no)")
+    cmd_list.add_argument(
+        "-a", "--show-passwords", action="store_true",
+        dest="show_passwords", default=False, help="also shows passwords (default: no)"
+    )
     cmd_list.set_defaults(func=list_entries)
 
     cmd_add = subparsers.add_parser("add", help="adding/modifying entries")
-    cmd_add.add_argument("-H", "--hostname", action="store", default="",
-                         dest="entry_hostname", metavar="HOSTNAME", help="hostname entry")
-    cmd_add.add_argument("-u", "--username", action="store", default="",
-                         dest="entry_username", metavar="USERNAME", help="username")
-    cmd_add.add_argument("-p", "--password", action="store", default="",
-                         dest="entry_password", metavar="PASSWORD", help="corresponding password")
+    cmd_add.add_argument(
+        "-H", "--hostname", action="store", default="",
+        dest="entry_hostname", metavar="HOSTNAME", help="hostname entry"
+    )
+    cmd_add.add_argument(
+        "-u", "--username", action="store", default="",
+        dest="entry_username", metavar="USERNAME", help="username"
+    )
+    cmd_add.add_argument(
+        "-p", "--password", action="store", default="",
+        dest="entry_password", metavar="PASSWORD", help="corresponding password"
+    )
     cmd_add.set_defaults(func=add)
 
     cmd_remove = subparsers.add_parser("remove", help="removing entries")
-    cmd_remove.add_argument("-H", "--hostname", action="store", default="",
-                            dest="entry_hostname", metavar="HOSTNAME", help="hostname entry")
+    cmd_remove.add_argument(
+        "-H", "--hostname", action="store", default="",
+        dest="entry_hostname", metavar="HOSTNAME", help="hostname entry"
+    )
     cmd_remove.set_defaults(func=remove)
 
-    cmd_password = subparsers.add_parser("password", help="add/change/remove "
-                                                          "encryption password")
-    cmd_password.add_argument("-p", "--password", action="store",
-                              dest="file_password", metavar="PASSWORD", help="password")
+    cmd_password = subparsers.add_parser(
+        "password", help="add/change/remove encryption password"
+    )
+    cmd_password.add_argument(
+        "-p", "--password", action="store",
+        dest="file_password", metavar="PASSWORD", help="password"
+    )
     cmd_password.set_defaults(func=set_password)
 
     # parse options and arguments

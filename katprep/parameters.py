@@ -232,76 +232,110 @@ def parse_options(args=None):
 
     # GENERIC ARGUMENTS
     # -q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true",
-                          dest="generic_quiet", default=False, help="don't print status messages "
-                                                                    "to stdout (default: no)")
+    gen_opts.add_argument(
+        "-q", "--quiet", action="store_true",
+        dest="generic_quiet", default=False,
+        help="don't print status messages to stdout (default: no)"
+    )
     # -d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="generic_debug", default=False,
-                          action="store_true", help="enable debugging outputs (default: no)")
+    gen_opts.add_argument(
+        "-d", "--debug", dest="generic_debug", default=False,
+        action="store_true", help="enable debugging outputs (default: no)"
+    )
     # -n / --dry-run
-    gen_opts.add_argument("-n", "--dry-run", dest="dry_run", default=False,
-                          action="store_true", help="only simulate what would be done (default: no)")
+    gen_opts.add_argument(
+        "-n", "--dry-run", dest="dry_run", default=False,
+        action="store_true", help="only simulate what would be done (default: no)"
+    )
     # -C / --auth-container
-    gen_opts.add_argument("-C", "--auth-container", default="",
-                          dest="auth_container", action="store", metavar="FILE",
-                          help="defines an authentication container file (default: no)")
+    gen_opts.add_argument(
+        "-C", "--auth-container", default="",
+        dest="auth_container", action="store", metavar="FILE",
+        help="defines an authentication container file (default: no)"
+    )
     # -P / --auth-password
-    gen_opts.add_argument("-P", "--auth-password", default="empty",
-                          dest="auth_password", action="store", metavar="PASSWORD",
-                          help="defines the authentication container password in case you don't "
-                               "want to enter it manually (useful for scripted automation)")
+    gen_opts.add_argument(
+        "-P", "--auth-password", default="empty",
+        dest="auth_password", action="store", metavar="PASSWORD",
+        help="defines the authentication container password in case you don't "
+             "want to enter it manually (useful for scripted automation)"
+    )
 
     # SERVER ARGUMENTS
     # -s / --server
-    srv_opts.add_argument("-s", "--server", dest="server", metavar="SERVER",
-                          default="localhost", help="defines the server to use (default: localhost)")
+    srv_opts.add_argument(
+        "-s", "--server", dest="server", metavar="SERVER",
+        default="localhost", help="defines the server to use (default: localhost)"
+    )
     # --insecure
-    srv_opts.add_argument("--insecure", dest="ssl_verify", default=True,
-                          action="store_false", help="Disables SSL verification (default: no)")
+    srv_opts.add_argument(
+        "--insecure", dest="ssl_verify", default=True,
+        action="store_false", help="Disables SSL verification (default: no)"
+    )
 
     # FILTER ARGUMENTS
     # -l / --location
-    filter_opts_excl.add_argument("-l", "--location", action="store",
-                                  default="", dest="location", metavar="NAME|ID",
-                                  help="filters by a particular location (default: no)")
+    filter_opts_excl.add_argument(
+        "-l", "--location", action="store",
+        default="", dest="location", metavar="NAME|ID",
+        help="filters by a particular location (default: no)"
+    )
     # -o / --organization
-    filter_opts_excl.add_argument("-o", "--organization", action="store",
-                                  default="", dest="organization", metavar="NAME|ID",
-                                  help="filters by an particular organization (default: no)")
+    filter_opts_excl.add_argument(
+        "-o", "--organization", action="store",
+        default="", dest="organization", metavar="NAME|ID",
+        help="filters by an particular organization (default: no)"
+    )
     # -g / --hostgroup
-    filter_opts_excl.add_argument("-g", "--hostgroup", action="store",
-                                  default="", dest="hostgroup", metavar="NAME|ID",
-                                  help="filters by a particular hostgroup (default: no)")
+    filter_opts_excl.add_argument(
+        "-g", "--hostgroup", action="store",
+        default="", dest="hostgroup", metavar="NAME|ID",
+        help="filters by a particular hostgroup (default: no)"
+    )
     # -e / --environment
-    filter_opts_excl.add_argument("-e", "--environment", action="store",
-                                  default="", dest="environment", metavar="NAME|ID",
-                                  help="filters by an particular environment (default: no)")
+    filter_opts_excl.add_argument(
+        "-e", "--environment", action="store",
+        default="", dest="environment", metavar="NAME|ID",
+        help="filters by an particular environment (default: no)"
+    )
 
     # ACTION ARGUMENTS
     # -A / --add-parameters
-    action_opts_excl.add_argument("-A", "--add-parameters",
-                                  action="store_true", default=False, dest="action_add",
-                                  help="adds built-in parameters to all affected hosts (default: no)")
+    action_opts_excl.add_argument(
+        "-A", "--add-parameters",
+        action="store_true", default=False, dest="action_add",
+        help="adds built-in parameters to all affected hosts (default: no)"
+    )
     # --add-optional-parameters
-    action_opts_excl.add_argument("--add-optional-parameters",
-                                  action="store_true", default=False, dest="action_addopt",
-                                  help="adds optional built-in parameters to all affected hosts (default: no)")
+    action_opts_excl.add_argument(
+        "--add-optional-parameters",
+        action="store_true", default=False, dest="action_addopt",
+        help="adds optional built-in parameters to all affected hosts (default: no)"
+    )
     # -R / --remove-parameters
-    action_opts_excl.add_argument("-R", "--remove-parameters",
-                                  action="store_true", default=False, dest="action_remove",
-                                  help="removes built-in parameters from all affected hosts (default: no)")
+    action_opts_excl.add_argument(
+        "-R", "--remove-parameters",
+        action="store_true", default=False, dest="action_remove",
+        help="removes built-in parameters from all affected hosts (default: no)"
+    )
     # -D / --display-values
-    action_opts_excl.add_argument("-D", "--display-parameters",
-                                  action="store_true", default=False, dest="action_display",
-                                  help="lists values of defined parameters for affected hosts (default: no)")
+    action_opts_excl.add_argument(
+        "-D", "--display-parameters",
+        action="store_true", default=False, dest="action_display",
+        help="lists values of defined parameters for affected hosts (default: no)"
+    )
     # -U / --update-parameters
-    action_opts_excl.add_argument("-U", "--update-parameters",
-                                  action="store_true", default=False, dest="action_update",
-                                  help="updates values of defined parameters for affected hosts (default: no)")
+    action_opts_excl.add_argument(
+        "-U", "--update-parameters",
+        action="store_true", default=False, dest="action_update",
+        help="updates values of defined parameters for affected hosts (default: no)"
+    )
     # -L / --list-parameters
-    action_opts_excl.add_argument("-L", "--list-parameters",
-                                  action="store_true", default=False, dest="action_list",
-                                  help="only lists parameters this script uses (default: no)")
+    action_opts_excl.add_argument(
+        "-L", "--list-parameters",
+        action="store_true", default=False, dest="action_list",
+        help="only lists parameters this script uses (default: no)"
+    )
 
     # parse options and arguments
     options = parser.parse_args()

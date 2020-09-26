@@ -188,69 +188,96 @@ def parse_options(args=None):
 
     # GENERIC ARGUMENTS
     # -q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true",
-                          dest="generic_quiet",
-                          default=False, help="don't print status messages to stdout (default: no)")
+    gen_opts.add_argument(
+        "-q", "--quiet", action="store_true",
+        dest="generic_quiet",
+        default=False, help="don't print status messages to stdout (default: no)"
+    )
     # -d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="generic_debug",
-                          default=False, action="store_true",
-                          help="enable debugging outputs (default: no)")
+    gen_opts.add_argument(
+        "-d", "--debug", dest="generic_debug",
+        default=False, action="store_true",
+        help="enable debugging outputs (default: no)"
+    )
     # -n / --dry-run
-    gen_opts.add_argument("-n", "--dry-run", dest="generic_dry_run",
-                          default=False, action="store_true",
-                          help="only simulate what would be done (default: no)")
+    gen_opts.add_argument(
+        "-n", "--dry-run", dest="generic_dry_run",
+        default=False, action="store_true",
+        help="only simulate what would be done (default: no)"
+    )
     # -C / --auth-container
-    gen_opts.add_argument("-C", "--auth-container", default="", metavar="FILE",
-                          dest="generic_auth_container", action="store",
-                          help="defines an authentication container file (default: no)")
+    gen_opts.add_argument(
+        "-C", "--auth-container", default="", metavar="FILE",
+        dest="generic_auth_container", action="store",
+        help="defines an authentication container file (default: no)"
+    )
     # -P / --auth-password
-    gen_opts.add_argument("-P", "--auth-password", default="empty",
-                          dest="auth_password", action="store", metavar="PASSWORD",
-                          help="defines the authentication container password in case you don't "
-                               "want to enter it manually (useful for scripted automation)")
+    gen_opts.add_argument(
+        "-P", "--auth-password", default="empty",
+        dest="auth_password", action="store", metavar="PASSWORD",
+        help="defines the authentication container password in case you don't "
+             "want to enter it manually (useful for scripted automation)"
+    )
     # --ip-filter
-    gen_opts.add_argument("--ipv6-only", dest="ipv6_only", default=False,
-                          action="store_true", help="Filters for IPv6-only addresses (default: no)")
+    gen_opts.add_argument(
+        "--ipv6-only", dest="ipv6_only", default=False,
+        action="store_true", help="Filters for IPv6-only addresses (default: no)"
+    )
     # --insecure
-    gen_opts.add_argument("--insecure", dest="ssl_verify", default=True,
-                          action="store_false", help="Disables SSL verification (default: no)")
+    gen_opts.add_argument(
+        "--insecure", dest="ssl_verify", default=True,
+        action="store_false", help="Disables SSL verification (default: no)"
+    )
 
     # FOREMAN ARGUMENTS
     # -s / --foreman-server
-    fman_opts.add_argument("-s", "--foreman-server",
-                           dest="foreman_server", metavar="SERVER", default="localhost",
-                           help="defines the Foreman server to use (default: localhost)")
+    fman_opts.add_argument(
+        "-s", "--foreman-server",
+        dest="foreman_server", metavar="SERVER", default="localhost",
+        help="defines the Foreman server to use (default: localhost)"
+    )
     # -u / --update
-    fman_opts.add_argument("-u", "--update", dest="foreman_update",
-                           action="store_true", default=False, help="Updates pre-existing host "
-                                                                    "parameters (default: no)")
+    fman_opts.add_argument(
+        "-u", "--update", dest="foreman_update",
+        action="store_true", default=False, help="Updates pre-existing host parameters (default: no)"
+    )
 
     # VIRTUALIZATION ARGUMENTS
-    virt_opts.add_argument("--virt-uri", dest="virt_uri",
-                           metavar="URI", default="", help="defines an URI to use")
+    virt_opts.add_argument(
+        "--virt-uri", dest="virt_uri",
+        metavar="URI", default="", help="defines an URI to use"
+    )
     # --virt-type
-    virt_opts.add_argument("--virt-type", dest="virt_type",
-                           metavar="libvirt|pyvmomi", default="libvirt", type=str,
-                           help="defines the library used to operate with virtualization host: "
-                                "libvirt or pyvmomi (vSphere). (default: libvirt)")
+    virt_opts.add_argument(
+        "--virt-type", dest="virt_type",
+        metavar="libvirt|pyvmomi", default="libvirt", type=str,
+        help="defines the library used to operate with virtualization host: "
+             "libvirt or pyvmomi (vSphere). (default: libvirt)"
+    )
     # --skip-virt
-    virt_opts.add_argument("--skip-virt", dest="virt_skip", default=False,
-                           action="store_true", help="skips gathering data from virtualization "
-                                                     "host (default: no)")
+    virt_opts.add_argument(
+        "--skip-virt", dest="virt_skip", default=False,
+        action="store_true", help="skips gathering data from virtualization host (default: no)"
+    )
 
     # MONITORING ARGUMENTS
     # --mon-url
-    mon_opts.add_argument("--mon-url", dest="mon_url",
-                          metavar="URL", default="", help="defines a monitoring URL to use")
+    mon_opts.add_argument(
+        "--mon-url", dest="mon_url",
+        metavar="URL", default="", help="defines a monitoring URL to use"
+    )
     # --mon-type
-    mon_opts.add_argument("--mon-type", dest="mon_type",
-                          metavar="nagios|icinga", type=str, choices="nagios|icinga", default="icinga",
-                          help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or"
-                               " icinga (Icinga 2.x). (default: icinga)")
+    mon_opts.add_argument(
+        "--mon-type", dest="mon_type",
+        metavar="nagios|icinga", type=str, choices="nagios|icinga", default="icinga",
+        help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or"
+             " icinga (Icinga 2.x). (default: icinga)"
+    )
     # --skip-mon
-    mon_opts.add_argument("--skip-mon", dest="mon_skip", default=False,
-                          action="store_true", help="skips gathering data from monitoring system "
-                                                    "(default: no)")
+    mon_opts.add_argument(
+        "--skip-mon", dest="mon_skip", default=False,
+        action="store_true", help="skips gathering data from monitoring system (default: no)"
+    )
 
     # parse options and arguments
     options = parser.parse_args()

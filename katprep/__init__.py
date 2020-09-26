@@ -47,7 +47,6 @@ def get_credentials(prefix, hostname=None, auth_container=None, auth_pass=None):
         try:
             container = AuthContainer(
                 logging.ERROR, auth_container, auth_pass)
-            s_creds = None
             s_creds = container.get_credential(hostname)
             if len(s_creds) == 2:
                 return s_creds[0], s_creds[1]
@@ -111,13 +110,13 @@ def which(command):
     :param command: command name to check
     :type command: str
     """
-    # stackoverflow.com/questions/377017/test-if-executable-exists-in-python
-
-    fpath, fname = os.path.split(command)
-    if fpath:
+    # taken from: stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+    file_path, file_name = os.path.split(command)
+    if file_path:
         if is_exe(command):
             return command
     else:
+        # try to find application in PATH
         for path in os.environ["PATH"].split(os.pathsep):
             path = path.strip('"')
             exe_file = os.path.join(path, command)
@@ -149,21 +148,25 @@ def is_valid_report(filename):
     :type filename: str
     """
     if not os.path.exists(filename) or not os.access(filename, os.R_OK):
-        raise argparse.ArgumentTypeError("File '{}' non-existent or not"
-                                         " readable".format(filename))
+        raise argparse.ArgumentTypeError(
+            "File '{}' non-existent or not readable".format(filename)
+        )
     # check whether valid json
     try:
         json_obj = json.loads(get_json(filename))
         # check whether at least one host with a params dict is found
         if "params" not in iter(json_obj.values()).next().keys():
-            raise argparse.ArgumentTypeError("File '{}' is not a valid JSON"
-                                             " snapshot report.".format(filename))
+            raise argparse.ArgumentTypeError(
+                "File '{}' is not a valid JSON snapshot report.".format(filename)
+            )
     except StopIteration:
-        raise argparse.ArgumentTypeError("File '{}' is not a valid JSON"
-                                         " snapshot report.".format(filename))
+        raise argparse.ArgumentTypeError(
+            "File '{}' is not a valid JSON snapshot report.".format(filename)
+        )
     except ValueError as err:
-        raise argparse.ArgumentTypeError("File '{}' is not a valid JSON"
-                                         " document: '{}'".format(filename, err))
+        raise argparse.ArgumentTypeError(
+            "File '{}' is not a valid JSON document: '{}'".format(filename, err)
+        )
     return filename
 
 
@@ -173,21 +176,25 @@ def validate_filters(options, api_client):
     This is done by detecting strings and translating them into IDs.
 
     :param options: argparse options dict
-    :type options: dict
+    :type options: optparse dict
     :param api_client: ForemanAPIClient object
     :type api_client: ForemanAPIClient
     """
     try:
         if options.location and options.location.isdigit() is False:
+            # use location
             options.location = api_client.get_id_by_name(
                 options.location, "location")
         if options.organization and options.organization.isdigit() is False:
+            # use organization
             options.organization = api_client.get_id_by_name(
                 options.organization, "organization")
         if options.hostgroup and options.hostgroup.isdigit() is False:
+            # use hostgroup
             options.hostgroup = api_client.get_id_by_name(
                 options.hostgroup, "hostgroup")
         if options.environment and options.environment.isdigit() is False:
+            # use environment
             options.environment = api_client.get_id_by_name(
                 options.environment, "environment")
     except SessionException:
@@ -201,7 +208,7 @@ def get_filter(options, api_object):
     Sets up a filter URL based on arguments set-up with argpase.
 
     :param options: argparse options dict
-    :type options: dict
+    :type options: optparse dict
     :param api_object: Foreman object type (e.g. host, environment)
     :type api_object: str
     """

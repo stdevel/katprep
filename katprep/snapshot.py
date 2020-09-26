@@ -74,56 +74,78 @@ http://github.com/stdevel/katprep'''
 
     # GENERIC ARGUMENTS
     # -q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true",
-                          dest="generic_quiet", default=False, help="don't print status messages "
-                                                                    "to stdout (default: no)")
+    gen_opts.add_argument(
+        "-q", "--quiet", action="store_true",
+        dest="generic_quiet", default=False, help="don't print status messages to stdout (default: no)"
+    )
     # -d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="generic_debug", default=False,
-                          action="store_true", help="enable debugging outputs (default: no)")
+    gen_opts.add_argument(
+        "-d", "--debug", dest="generic_debug", default=False,
+        action="store_true", help="enable debugging outputs (default: no)"
+    )
     # -p / --output-path
-    gen_opts.add_argument("-p", "--output-path", dest="output_path",
-                          metavar="PATH", default="", action="store", help="defines the output path"
-                                                                           " for reports (default: current directory)")
+    gen_opts.add_argument(
+        "-p", "--output-path", dest="output_path",
+        metavar="PATH", default="", action="store",
+        help="defines the output path for reports (default: current directory)"
+    )
     # -C / --auth-container
-    gen_opts.add_argument("-C", "--auth-container", default="",
-                          dest="auth_container", action="store", metavar="FILE",
-                          help="defines an authentication container file (default: no)")
+    gen_opts.add_argument(
+        "-C", "--auth-container", default="",
+        dest="auth_container", action="store", metavar="FILE",
+        help="defines an authentication container file (default: no)"
+    )
     # -P / --auth-password
-    gen_opts.add_argument("-P", "--auth-password", default="empty",
-                          dest="auth_password", action="store", metavar="PASSWORD",
-                          help="defines the authentication container password in case you don't "
-                               "want to enter it manually (useful for scripted automation)")
+    gen_opts.add_argument(
+        "-P", "--auth-password", default="empty",
+        dest="auth_password", action="store", metavar="PASSWORD",
+        help="defines the authentication container password in case you don't "
+             "want to enter it manually (useful for scripted automation)"
+    )
 
     # SERVER ARGUMENTS
     # -s / --server
-    fman_opts.add_argument("-s", "--server", dest="server", metavar="SERVER",
-                           default="localhost", help="defines the server to use (default: localhost)")
+    fman_opts.add_argument(
+        "-s", "--server", dest="server", metavar="SERVER",
+        default="localhost", help="defines the server to use (default: localhost)"
+    )
     # --insecure
-    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True,
-                           action="store_false", help="Disables SSL verification (default: no)")
+    fman_opts.add_argument(
+        "--insecure", dest="ssl_verify", default=True,
+        action="store_false", help="Disables SSL verification (default: no)"
+    )
 
     # SNAPSHOT FILTER ARGUMENTS
     # -l / --location
-    filter_opts_excl.add_argument("-l", "--location", action="store",
-                                  default="", dest="location", metavar="NAME|ID", help="filters by a particular "
-                                                                                       "location (default: no)")
+    filter_opts_excl.add_argument(
+        "-l", "--location", action="store",
+        default="", dest="location", metavar="NAME|ID",
+        help="filters by a particular location (default: no)"
+    )
     # -o / --organization
-    filter_opts_excl.add_argument("-o", "--organization", action="store",
-                                  default="", dest="organization", metavar="NAME|ID", help="filters by an particular "
-                                                                                           "organization (default: "
-                                                                                           "no)")
+    filter_opts_excl.add_argument(
+        "-o", "--organization", action="store",
+        default="", dest="organization", metavar="NAME|ID",
+        help="filters by an particular organization (default: no)"
+    )
     # -g / --hostgroup
-    filter_opts_excl.add_argument("-g", "--hostgroup", action="store",
-                                  default="", dest="hostgroup", metavar="NAME|ID", help="filters by a particular "
-                                                                                        "hostgroup (default: no)")
+    filter_opts_excl.add_argument(
+        "-g", "--hostgroup", action="store",
+        default="", dest="hostgroup", metavar="NAME|ID",
+        help="filters by a particular hostgroup (default: no)"
+    )
     # -e / --environment
-    filter_opts_excl.add_argument("-e", "--environment", action="store",
-                                  default="", dest="environment", metavar="NAME|ID", help="filters by an particular "
-                                                                                          "environment (default: no)")
+    filter_opts_excl.add_argument(
+        "-e", "--environment", action="store",
+        default="", dest="environment", metavar="NAME|ID",
+        help="filters by an particular environment (default: no)"
+    )
     # -E / --exclude
-    fman_opts.add_argument("-E", "--exclude", action="append", default=[],
-                           type=str, dest="filter_exclude", metavar="NAME",
-                           help="excludes particular hosts (default: no)")
+    fman_opts.add_argument(
+        "-E", "--exclude", action="append", default=[],
+        type=str, dest="filter_exclude", metavar="NAME",
+        help="excludes particular hosts (default: no)"
+    )
 
     # parse options and arguments
     options = parser.parse_args()

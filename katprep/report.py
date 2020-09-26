@@ -58,34 +58,48 @@ def parse_options(args=None):
 
     # GENERIC ARGUMENTS
     # -q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true",
-                          dest="generic_quiet", default=False, help="don't print status messages "
-                                                                    "to stdout (default: no)")
+    gen_opts.add_argument(
+        "-q", "--quiet", action="store_true",
+        dest="generic_quiet", default=False, help="don't print status messages "
+                                                  "to stdout (default: no)"
+    )
     # -d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="generic_debug", default=False,
-                          action="store_true", help="enable debugging outputs (default: no)")
+    gen_opts.add_argument(
+        "-d", "--debug", dest="generic_debug", default=False,
+        action="store_true", help="enable debugging outputs (default: no)"
+    )
     # -p / --output-path
-    gen_opts.add_argument("-p", "--output-path", dest="output_path",
-                          metavar="PATH", default="", action="store",
-                          help="defines the output path for reports (default: current directory)")
+    gen_opts.add_argument(
+        "-p", "--output-path", dest="output_path",
+        metavar="PATH", default="", action="store",
+        help="defines the output path for reports (default: current directory)"
+    )
 
     # REPORT ARGUMENTS
     # -o / --output-type
-    rep_opts.add_argument("-o", "--output-type", dest="output_type",
-                          metavar="FILE", default="", help="defines the output file type for Pandoc, usually this is "
-                                                           "set automatically based on the template file extension ("
-                                                           "default: no)")
+    rep_opts.add_argument(
+        "-o", "--output-type", dest="output_type",
+        metavar="FILE", default="", help="defines the output file type for Pandoc, usually this is "
+                                         "set automatically based on the template file extension ("
+                                         "default: no)"
+    )
     # -x / --preserve-yaml
-    rep_opts.add_argument("-x", "--preserve-yaml", dest="preserve_yaml",
-                          default=False, action="store_true", help="keeps the YAML metadata after creating the "
-                                                                   "reports, important for debugging (default: no)")
+    rep_opts.add_argument(
+        "-x", "--preserve-yaml", dest="preserve_yaml",
+        default=False, action="store_true", help="keeps the YAML metadata after creating the "
+                                                 "reports, important for debugging (default: no)"
+    )
     # -t / --template
-    rep_opts.add_argument("-t", "--template", dest="template_file",
-                          metavar="FILE", default="", action="store", help="defines a dedicated"
-                                                                           " template file (default: integrated HTML)")
+    rep_opts.add_argument(
+        "-t", "--template", dest="template_file",
+        metavar="FILE", default="", action="store", help="defines a dedicated"
+                                                         " template file (default: integrated HTML)"
+    )
     # snapshot reports
-    rep_opts.add_argument('reports', metavar='FILE', nargs=2,
-                          help='Two snapshot reports (before/after patching)', type=is_valid_report)
+    rep_opts.add_argument(
+        'reports', metavar='FILE', nargs=2,
+        help='Two snapshot reports (before/after patching)', type=is_valid_report
+    )
 
     # parse options and arguments
     options = parser.parse_args()
