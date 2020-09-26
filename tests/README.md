@@ -1,8 +1,6 @@
-This directory contains various tests.
-
 # Overview
 
-The following tests are available:
+This directory contains various tests:
 
 | File          | Type | Description |
 |:------------- |:---- |:----------- |
@@ -18,6 +16,7 @@ Each test has an appropriate JSON configuration file specifying connection detai
 ## Continuous Integration
 
 This directory also contains a [CI configuration stub](.gitlab-ci.yml) (*tested on GitLab CI*) for automating unit tests. You might be able to use this stub on other CI products such as Travis CI after altering it. Before using this configuration, have a look at it and modify it. The stub defines:
+
 - **test** stage with multiple jobs per library
   - enable the tests you need
 - jobs are executed within a Docker image **katprep-centos7** on a local registry
@@ -37,6 +36,7 @@ Credentials are assigned using secret variables containing the appropriate JSON 
 ## Tests for `ForemanAPIClient`
 
 This test checks:
+
 - hostname verification
 - valid/invalid logins
 - denying legacy systems
@@ -49,6 +49,7 @@ This test checks:
 ### Preparation
 
 For this test, you will need:
+
 - a Foreman installation
 - a legacy Foreman installation (*APIv1*)
 - a user per installation with administrative permissions
@@ -61,6 +62,7 @@ For this test, you will need:
 ## Test `SpacewalkAPIClient`
 
 This test checks:
+
 - hostname verification
 - valid/invalid logins
 - denying legacy systems
@@ -68,13 +70,15 @@ This test checks:
 ### Preparation
 
 For this test, you will need:
+
 - a Spacewalk system
-- a legacy Spacewalk system (*< 2.1*)
+- an Uyuni system
 - a user per installation with read-only permissions
 
 ## Test `Icinga2Client`
 
 This test checks:
+
 - valid/invalid logins
 - scheduling/removing downtimes for hosts/hostgroups
 - checking downtimes
@@ -83,6 +87,7 @@ This test checks:
 ### Preparation
 
 For this test, you will need:
+
 - an Icinga2 system
 - an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
 - valid objects:
@@ -93,6 +98,7 @@ For this test, you will need:
 ## Test `NagiosCompatibleCGIClient`
 
 This test checks:
+
 - valid/invalid logins
 - scheduling/removing downtimes for hosts/hostgroups
 - unsupported requests (*e.g. unscheduling downtimes on Nagios systems*)
@@ -106,6 +112,7 @@ I highly recommend using [OMD (*Open Monitoring Distribution*)](http://omdistro.
 ### `Preparation`
 
 For this test, you will need:
+
 - an Icinga system
 - an Nagios system
 - an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
@@ -117,6 +124,7 @@ For this test, you will need:
 ## Test `PyvmomiClient`
 
 This test checks:
+
 - valid/invalid logins
 - checking/creating/reverting/removing snapshots
 - retrieving VM IP information
@@ -128,6 +136,7 @@ This test checks:
 ### Preparation
 
 For this test, you will need:
+
 - a VMware ESXi or vCenter Server system
 - an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
 - a VM that can be restarted, snapshotted, etc. (**Caution: this VM is very likely to break because of numerous restarts**)
@@ -135,11 +144,13 @@ For this test, you will need:
 ## Test `LibvirtClient`
 
 This test checks:
+
 - valid/invalid logins
 - checking/creating/reverting/removing snapshots
 
 ### Preparation
 
 For this test, you will need:
+
 - a hypervisor supported by [libvirt](https://libvirt.org/drivers.html)
 - an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
