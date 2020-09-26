@@ -9,8 +9,7 @@ import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from katprep.clients import SessionException, InvalidCredentialsException, \
-APILevelNotSupportedException, InvalidHostnameFormatException
-
+    APILevelNotSupportedException, InvalidHostnameFormatException
 
 
 class ForemanAPIClient:
@@ -68,22 +67,20 @@ class ForemanAPIClient:
         :param prefix: API prefix (e.g. /katello)
         :type prefix: str
         """
-        #set logging
+        # set logging
         self.LOGGER.setLevel(log_level)
-        #disable SSL warning outputs
+        # disable SSL warning outputs
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-        #set connection information
+        # set connection information
         self.HOSTNAME = hostname
         self.USERNAME = username
         self.PASSWORD = password
         self.VERIFY = verify
         self.URL = "https://{0}{1}/api/v2".format(self.HOSTNAME, prefix)
-        #start session and check API version if Foreman API
+        # start session and check API version if Foreman API
         self.__connect()
         if prefix == "":
             self.validate_api_support()
-
-
 
     def __connect(self):
         """
@@ -93,17 +90,13 @@ class ForemanAPIClient:
         self.SESSION = requests.Session()
         self.SESSION.auth = (self.USERNAME, self.PASSWORD)
 
-
-
     def get_hostname(self):
         """
         Returns the configured hostname of the object instance.
         """
         return self.HOSTNAME
 
-
-
-    #TODO: find a nicer way to displaying _all_ the hits...
+    # TODO: find a nicer way to displaying _all_ the hits...
     def __api_request(self, method, sub_url, payload="", hits=1337, page=1):
         """
         Sends a HTTP request to the Foreman API. This function requires
@@ -130,44 +123,44 @@ class ForemanAPIClient:
 .. seealso:: api_put()
 .. seealso:: api_delete()
         """
-        #send request to API
+        # send request to API
         try:
             if method.lower() not in ["get", "post", "delete", "put"]:
-                #going home
+                # going home
                 raise SessionException("Illegal method '{}' specified".format(method))
 
             self.LOGGER.debug(
                 "%s request to %s%s (payload: %s)", method.upper(), self.URL,
                 sub_url, str(payload)
             )
-            #setting headers
+            # setting headers
             my_headers = self.HEADERS
             if method.lower() != "get":
-                #add special headers for non-GETs
+                # add special headers for non-GETs
                 my_headers["Content-Type"] = "application/json"
                 my_headers["Accept"] = "application/json,version=2"
 
-            #send request
+            # send request
             if method.lower() == "put":
-                #PUT
+                # PUT
                 result = self.SESSION.put(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "delete":
-                #DELETE
+                # DELETE
                 result = self.SESSION.delete(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "post":
-                #POST
+                # POST
                 result = self.SESSION.post(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             else:
-                #GET
+                # GET
                 result = self.SESSION.get(
                     "{}{}?per_page={}&page={}".format(
                         self.URL, sub_url, hits, page),
@@ -179,7 +172,7 @@ class ForemanAPIClient:
                 raise SessionException("{}: HTTP operation not successful {}".format(
                     result.status_code, result.text))
             else:
-                #return result
+                # return result
                 if method.lower() == "get":
                     return result.text
                 else:
@@ -190,12 +183,12 @@ class ForemanAPIClient:
             raise SessionException(err)
             pass
 
-    #Aliases
+    # Aliases
     def api_get(self, sub_url, hits=1337, page=1):
         """
         Sends a GET request to the Foreman API. This function requires a
         sub-URL (such as /hosts) and - optionally - hits/page and page
-        definitons.
+        definitions.
 
         :param sub_url: relative path within the API tree (e.g. /hosts)
         :type sub_url: str
@@ -242,8 +235,6 @@ class ForemanAPIClient:
         """
         return self.__api_request("put", sub_url, payload)
 
-
-
     def validate_api_support(self):
         """
         Checks whether the API version on the Foreman server is supported.
@@ -251,7 +242,7 @@ class ForemanAPIClient:
         exception will be thrown.
         """
         try:
-            #get api version
+            # get api version
             result_obj = json.loads(
                 self.api_get("/status")
             )
@@ -266,13 +257,9 @@ class ForemanAPIClient:
             self.LOGGER.error(err)
             raise APILevelNotSupportedException("Unable to verify API version")
 
-
-
     def get_url(self):
         """Returns the configured URL of the object instance"""
         return self.URL
-
-
 
     def get_name_by_id(self, object_id, api_object):
         """
@@ -289,13 +276,13 @@ class ForemanAPIClient:
         ]
         try:
             if api_object.lower() not in valid_objects:
-                #invalid type
+                # invalid type
                 raise ValueError(
                     "Unable to lookup name by invalid field"
                     " type '{}'".format(api_object)
                 )
             else:
-                #get ID by name
+                # get ID by name
                 result_obj = json.loads(
                     self.api_get("/{}s/{}".format(api_object, object_id))
                 )
@@ -313,8 +300,6 @@ class ForemanAPIClient:
             self.LOGGER.error(err)
             raise SessionException(err)
 
-
-
     def get_id_by_name(self, name, api_object):
         """
         Returns a Foreman object's internal ID by its name.
@@ -329,22 +314,22 @@ class ForemanAPIClient:
             "host"
         ]
         filter_object = {
-            "hostgroup" : "title", "location": "name", "host" : "name",
-            "organization" : "title", "environment" : "name"
+            "hostgroup": "title", "location": "name", "host": "name",
+            "organization": "title", "environment": "name"
         }
         try:
             if api_object.lower() not in valid_objects:
-                #invalid type
+                # invalid type
                 raise ValueError(
                     "Unable to lookup name by invalid field"
                     " type '{}'".format(api_object)
                 )
             else:
-                #get ID by name
+                # get ID by name
                 result_obj = json.loads(
                     self.api_get("/{}s".format(api_object))
                 )
-                #TODO: nicer way than looping? numpy? Direct URL?
+                # TODO: nicer way than looping? numpy? Direct URL?
                 for entry in result_obj["results"]:
                     if entry[filter_object[api_object]].lower() == name.lower():
                         self.LOGGER.debug(
@@ -352,13 +337,11 @@ class ForemanAPIClient:
                             api_object, name, entry["id"]
                         )
                         return entry["id"]
-                #not found
+                # not found
                 raise SessionException("Object not found")
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
-
-
 
     def get_hostparam_id_by_name(self, host, param_name):
         """
@@ -369,13 +352,13 @@ class ForemanAPIClient:
         :param param_name: host parameter name
         :type param_name: str
         """
-        #TODO: Move to get_id_by_name
+        # TODO: Move to get_id_by_name
         try:
             result_obj = json.loads(
                 self.api_get("/hosts/{}/parameters".format(host))
             )
-            #TODO: nicer way than looping? numpy?
-            #TODO allow/return multiple IDs to reduce overhead?
+            # TODO: nicer way than looping? numpy?
+            # TODO allow/return multiple IDs to reduce overhead?
             for entry in result_obj["results"]:
                 if entry["name"].lower() == param_name.lower():
                     self.LOGGER.debug(
@@ -388,13 +371,11 @@ class ForemanAPIClient:
             self.LOGGER.error(err)
             raise SessionException(err)
 
-
-
     def get_host_params(self, host):
         """
         Returns all parameters for a particular host.
 
-        :param host: Forenam host name
+        :param host: Foreman host name
         :type host: str
         """
         try:
@@ -405,8 +386,6 @@ class ForemanAPIClient:
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
-
-
 
     def get_task_by_filter(self, host, task_name, task_date):
         """
@@ -421,19 +400,19 @@ class ForemanAPIClient:
         """
         try:
             my_results = []
-            #get _all_ the results
+            # get _all_ the results
             results = json.loads(
                 self.api_get(
-                    '/../../foreman_tasks/api/tasks?search="{}"' \
+                    '/../../foreman_tasks/api/tasks?search="{}"'
                     '&order="started_at DESC"'.format(task_name)
                 )
             )
-            #print results
+            # print results
             for result in results["results"]:
-                #validate date and host
+                # validate date and host
                 host_info = result["input"]["host"]
                 if host_info["name"] == host and \
-                    task_date in result["started_at"]:
+                        task_date in result["started_at"]:
                     my_results.append(result)
         except KeyError:
             pass

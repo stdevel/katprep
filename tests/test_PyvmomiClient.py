@@ -9,8 +9,7 @@ import logging
 import pytest
 import time
 from katprep.clients.PyvmomiClient import PyvmomiClient
-from katprep.clients import SessionException, InvalidCredentialsException, \
-EmptySetException
+from katprep.clients import SessionException, InvalidCredentialsException, EmptySetException
 
 from .utilities import load_config
 
@@ -93,12 +92,12 @@ def test_restart_vm(client, config, forcefully):
 
 
 @pytest.mark.parametrize("forcefully", [True, False])
-def test_restart_vm_fail(virtClient, nonexisting_vm, forcefully):
+def test_restart_vm_fail(client, nonexisting_vm, forcefully):
     """
     Ensure that restarting non-existing VMs is not possible
     """
     with pytest.raises(SessionException):
-        virtClient.restart_vm(nonexisting_vm, force=forcefully)
+        client.restart_vm(nonexisting_vm, force=forcefully)
 
 
 def test_get_vm_powerstate(client, config):

@@ -1,7 +1,7 @@
 #NOTE: This is _just_ a template tested on GitLab CI
 #
 #You might want to alter it, to:
-#- exlucde/include particular tests
+#- exclude/include particular tests
 #- change Docker image
 #- work on other CI (e.g. Travis CI)
 

@@ -9,8 +9,7 @@ from __future__ import print_function
 import libvirt
 import logging
 from katprep.clients import SessionException, EmptySetException, \
-UnsupportedRequestException, InvalidCredentialsException
-
+    UnsupportedRequestException, InvalidCredentialsException
 
 
 class LibvirtClient:
@@ -49,19 +48,17 @@ class LibvirtClient:
         :param password: corresponding password
         :type password: str
         """
-        #set logging
+        # set logging
         self.LOGGER.setLevel(log_level)
-        #validate and set URI
+        # validate and set URI
         if self.validate_uri(uri):
             self.URI = uri
         else:
             raise SessionException("Invalid URI string specified!")
-        #set connection details and connect
+        # set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
         self.__connect()
-
-
 
     @staticmethod
     def validate_uri(uri):
@@ -78,30 +75,26 @@ class LibvirtClient:
             "vz", "bhyve", "esx", "vpx", "vmwareplayer", "vmwarews",
             "vmwarefusion"
         }
-        #check whether a valid prefix was found
+        # check whether a valid prefix was found
         for prefix in prefixes:
             if prefix in uri and "://" in uri:
                 return True
         return False
 
-
-
     def __connect(self):
         """This function establishes a connection to the hypervisor."""
-        #create weirdo auth dict
+        # create weirdo auth dict
         auth = [
             [libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE],
             self.retrieve_credentials, None
-            ]
-        #authenticate
+        ]
+        # authenticate
         try:
             self.SESSION = libvirt.openAuth(self.URI, auth, 0)
-            if self.SESSION == None:
+            if self.SESSION is None:
                 raise SessionException("Unable to establish connection to hypervisor!")
         except libvirt.libvirtError as err:
             raise InvalidCredentialsException("Invalid credentials")
-
-
 
     def retrieve_credentials(self, credentials, user_data):
         """
@@ -114,7 +107,7 @@ class LibvirtClient:
         :param user_data: some data that will never be used
         :type user_data: None
         """
-        #get credentials for libvirt
+        # get credentials for libvirt
         for credential in credentials:
             if credential[0] == libvirt.VIR_CRED_AUTHNAME:
                 credential[4] = self.USERNAME
@@ -126,11 +119,9 @@ class LibvirtClient:
                 return -1
         return 0
 
-
-
     def __manage_snapshot(
             self, vm_name, snapshot_title, snapshot_text, action="create"
-        ):
+    ):
         """
         Creates/removes a snapshot for a particular virtual machine.
         This requires specifying a VM, comment title and text.
@@ -142,36 +133,33 @@ class LibvirtClient:
         :type snapshot_title: str
         :param snapshot_text: Snapshot text
         :type snapshot_text: str
-        :param remove_snapshot: Removes a snapshot if set to True
-        :type remove_snapshot: bool
-
+        :param action: Snapshot action
+        :type action: str
         """
 
         try:
             target_vm = self.SESSION.lookupByName(vm_name)
             if action.lower() == "remove":
-                #remove snapshot
+                # remove snapshot
                 target_snap = target_vm.snapshotLookupByName(snapshot_title, 0)
                 return target_snap.delete(0)
             elif action.lower() == "revert":
-                #revert snapshot
+                # revert snapshot
                 target_snap = target_vm.snapshotLookupByName(snapshot_title, 0)
                 return target_vm.revertToSnapshot(target_snap)
             else:
-                #create snapshot
+                # create snapshot
                 snap_xml = """<domainsnapshot><name>{}</name><description>{}
                     "</description></domainsnapshot>""".format(
-                        snapshot_title, snapshot_text
-                    )
+                    snapshot_title, snapshot_text
+                )
                 return target_vm.snapshotCreateXML(snap_xml, 0)
         except libvirt.libvirtError as err:
             raise SessionException("Unable to {} snapshot: '{}'".format(
                 action.lower(), err)
             )
 
-
-
-    #Aliases
+    # Aliases
     def create_snapshot(self, vm_name, snapshot_title, snapshot_text):
         """
         Creates a snapshot for a particular virtual machine.
@@ -214,8 +202,6 @@ class LibvirtClient:
             vm_name, snapshot_title, "", action="revert"
         )
 
-
-
     def has_snapshot(self, vm_name, snapshot_title):
         """
         Returns whether a particular virtual machine is currently protected
@@ -227,20 +213,18 @@ class LibvirtClient:
         :type snapshot_title: str
         """
         try:
-            #find VM and get all snapshots
+            # find VM and get all snapshots
             target_vm = self.SESSION.lookupByName(vm_name)
             target_snapshots = target_vm.snapshotListNames(0)
             if snapshot_title in target_snapshots:
                 return True
         except libvirt.libvirtError as err:
             if "no domain with name" in err.message.lower():
-                #snapshot not found
+                # snapshot not found
                 raise EmptySetException("No snapshots found")
             else:
                 self.LOGGER.error("Unable to determine snapshot: '{}'".format(err))
                 raise SessionException(err)
-
-
 
     def get_vm_ips(self):
         """
@@ -248,17 +232,17 @@ class LibvirtClient:
         connection.
         """
         try:
-            #get all VMs
+            # get all VMs
             vms = self.SESSION.listDefinedDomains()
             result = []
 
-            #scan _all_ the VMs
+            # scan _all_ the VMs
             for vm in vms:
-                #get VM and lookup hostname
+                # get VM and lookup hostname
                 target_vm = self.SESSION.lookupByName(vm)
                 target_hostname = target_vm.hostname()
-                #lookup IP
-                #TODO: IPv6 only?
+                # lookup IP
+                # TODO: IPv6 only?
                 target_ip = socket.gethostbyname(target_hostname)
                 result.append(
                     {"hostname": target_hostname, "ip": target_ip}
@@ -270,16 +254,12 @@ class LibvirtClient:
             else:
                 raise SessionException("Unable to get VM IP information: '{}'".format(err))
 
-
-
     def get_vm_hosts(self):
         """
         Returns a list of VMs and their hypervisors available through the
         current connection.
         """
         print("TODO: get_vm_hosts")
-
-
 
     def restart_vm(self, vm_name, force=False):
         """
@@ -293,21 +273,19 @@ class LibvirtClient:
         try:
             target_vm = self.SESSION.lookupByName(vm_name)
             if force:
-                #kill it with fire
+                # kill it with fire
                 target_vm.reboot(1)
             else:
-                #killing me softly
+                # killing me softly
                 target_vm.reboot(0)
         except libvirt.libvirtError as err:
             if "unsupported flags" in err.message.lower():
-                #trying hypervisor default
+                # trying hypervisor default
                 target_vm.reboot(0)
                 self.LOGGER.error(
                     "Forcing reboot impossible, trying hypervisor default")
             else:
                 raise SessionException("Unable to restart VM: '{}'".format(err))
-
-
 
     def powerstate_vm(self, vm_name):
         """
@@ -319,11 +297,9 @@ class LibvirtClient:
         """
         print("TODO: powerstate_vm")
 
-
-
     def __manage_power(
             self, vm_name, action="poweroff"
-        ):
+    ):
         """
         Powers a particual virtual machine on/off forcefully.
 
@@ -335,9 +311,7 @@ class LibvirtClient:
         """
         print("TODO: manage_power")
 
-
-
-    #Aliases
+    # Aliases
     def poweroff_vm(self, vm_name):
         """
         Turns off a particual virtual machine forcefully.

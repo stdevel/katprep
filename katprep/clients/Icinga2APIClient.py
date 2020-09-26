@@ -14,7 +14,6 @@ from datetime import datetime, timedelta
 from katprep.clients import SessionException, EmptySetException
 
 
-
 class Icinga2APIClient:
     """
     Class for communicating with the Icinga2 API
@@ -43,7 +42,7 @@ class Icinga2APIClient:
     """
 
     def __init__(self, log_level, url,
-        username="", password="", verify_ssl=False):
+                 username="", password="", verify_ssl=False):
         """
         Constructor, creating the class. It requires specifying a
         URL, an username and password to access the API.
@@ -57,10 +56,10 @@ class Icinga2APIClient:
         :param password: corresponding password
         :type password: str
         """
-        #set logging
+        # set logging
         self.LOGGER.setLevel(log_level)
 
-        #set connection data
+        # set connection data
         if "/v1" in url:
             self.URL = url
         else:
@@ -68,12 +67,10 @@ class Icinga2APIClient:
         self.USERNAME = username
         self.PASSWORD = password
 
-        #set SSL information and connect
+        # set SSL information and connect
         if verify_ssl:
             self.VERIFY_SSL = True
         self.__connect()
-
-
 
     def __connect(self):
         """
@@ -82,8 +79,6 @@ class Icinga2APIClient:
         self.SESSION = requests.Session()
         if self.USERNAME != "":
             self.SESSION.auth = HTTPBasicAuth(self.USERNAME, self.PASSWORD)
-
-
 
     def __api_request(self, method, sub_url, payload=""):
         """
@@ -99,29 +94,29 @@ class Icinga2APIClient:
         :param payload: payload for POST requests
         :type payload: str
         """
-        #send request to API
+        # send request to API
         try:
             if method.lower() not in ["get", "post"]:
-                #going home
+                # going home
                 raise SessionException("Illegal method '{}' specified".format(method))
             self.LOGGER.debug(
                 "%s request to %s (payload: %s)",
                 method.upper(), sub_url, payload
             )
 
-            #execute request
+            # execute request
             if method.lower() == "post":
-                #POST
+                # POST
                 result = self.SESSION.post(
                     "{}{}".format(self.URL, sub_url),
                     headers=self.HEADERS, data=payload, verify=self.VERIFY_SSL
-                    )
+                )
             else:
-                #GET
+                # GET
                 result = self.SESSION.get(
                     "{}{}".format(self.URL, sub_url),
                     headers=self.HEADERS, verify=self.VERIFY_SSL
-                    )
+                )
 
             if result.status_code == 404:
                 raise EmptySetException("HTTP resource not found: {}".format(
@@ -130,7 +125,7 @@ class Icinga2APIClient:
                 raise SessionException("{}: HTTP operation not successful".format(
                     result.status_code))
             else:
-                #return result
+                # return result
                 self.LOGGER.debug(result.text)
                 return result
 
@@ -138,7 +133,7 @@ class Icinga2APIClient:
             self.LOGGER.error(err)
             raise SessionException(err)
 
-    #Aliases
+    # Aliases
     def __api_get(self, sub_url):
         """
         Sends a HTTP GET request to the Nagios/Icinga API. This function
@@ -161,8 +156,6 @@ class Icinga2APIClient:
         """
         return self.__api_request("post", sub_url, payload)
 
-
-
     def __calculate_time(self, hours):
         """
         Calculates the time range for POST requests in the format the
@@ -176,11 +169,9 @@ class Icinga2APIClient:
         end_time = current_time + timedelta(hours=int(hours))
         return current_time, end_time
 
-
-
     def __manage_downtime(
             self, object_name, object_type, hours, comment, remove_downtime
-        ):
+    ):
         """
         Adds or removes scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
@@ -197,18 +188,18 @@ class Icinga2APIClient:
         :param remove_downtime: Removes a previously scheduled downtime
         :type remove_downtime: bool
         """
-        #calculate timerange
+        # calculate time range
         (current_time, end_time) = self.__calculate_time(hours)
 
         if object_type.lower() == "hostgroup":
             if remove_downtime:
-                #remove hostgroup downtime
+                # remove hostgroup downtime
                 payload = {
                     "type": "Host",
                     "filter": "\"{}\" in host.groups".format(object_name),
                 }
             else:
-                #create hostgroup downtime
+                # create hostgroup downtime
                 payload = {
                     "type": "Host",
                     "filter": "\"{}\" in host.groups".format(object_name),
@@ -220,13 +211,13 @@ class Icinga2APIClient:
                 }
         else:
             if remove_downtime:
-                #remove host downtime
+                # remove host downtime
                 payload = {
                     "type": "Host",
                     "filter": "host.name==\"{}\"".format(object_name),
                 }
             else:
-                #create host downtime
+                # create host downtime
                 payload = {
                     "type": "Host",
                     "filter": "host.name==\"{}\"".format(object_name),
@@ -236,7 +227,7 @@ class Icinga2APIClient:
                     "author": self.USERNAME,
                     "comment": comment,
                 }
-        #send POST
+        # send POST
         result = ""
         if remove_downtime:
             payload["type"] = "Host"
@@ -248,17 +239,15 @@ class Icinga2APIClient:
             result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
             payload["type"] = "Service"
             result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
-        #return result
+        # return result
         result_obj = json.loads(result.text)
         if len(result_obj["results"]) == 0:
             raise EmptySetException("Host/service not found")
         else:
             return result
 
-
-
-    def schedule_downtime(self, object_name, object_type, hours=8, \
-        comment="Downtime managed by katprep"):
+    def schedule_downtime(self, object_name, object_type, hours=8,
+                          comment="Downtime managed by katprep"):
         """
         Adds scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
@@ -274,10 +263,8 @@ class Icinga2APIClient:
         :param comment: Downtime comment
         :type comment: str
         """
-        return self.__manage_downtime(object_name, object_type, hours, \
-            comment, remove_downtime=False)
-
-
+        return self.__manage_downtime(object_name, object_type, hours,
+                                      comment, remove_downtime=False)
 
     def remove_downtime(self, object_name, object_type):
         """
@@ -289,10 +276,8 @@ class Icinga2APIClient:
         :param object_type: host or hostgroup
         :type object_type: str
         """
-        return self.__manage_downtime(object_name, object_type, 8, \
-            "Downtime managed by katprep", remove_downtime=True)
-
-
+        return self.__manage_downtime(object_name, object_type, 8,
+                                      "Downtime managed by katprep", remove_downtime=True)
 
     def has_downtime(self, object_name, object_type="host"):
         """
@@ -304,14 +289,14 @@ class Icinga2APIClient:
         :param object_type: Host or hostgroup (default: host)
         :type object_type: str
         """
-        #retrieve and load data
+        # retrieve and load data
         try:
             result = self.__api_get("/objects/{}s?host={}".format(
-               object_type, object_name)
+                object_type, object_name)
             )
             data = json.loads(result.text)
-            #check if downtime
-            #TODO: how to do this for hostgroups?!
+            # check if downtime
+            # TODO: how to do this for hostgroups?!
             if object_type == "host":
                 for result in data["results"]:
                     if result["attrs"]["downtime_depth"] > 0:
@@ -320,8 +305,6 @@ class Icinga2APIClient:
         except SessionException as err:
             if "404" in err.message:
                 raise EmptySetException("Host not found")
-
-
 
     def get_services(self, object_name, only_failed=True):
         """
@@ -332,32 +315,30 @@ class Icinga2APIClient:
         :param only_failed: True will only report failed services
         :type only_failed: bool
         """
-        #retrieve result
+        # retrieve result
         result = self.__api_get('/objects/services?filter=match("{}",host.name)'.format(
             object_name)
         )
         data = json.loads(result.text)
         services = []
         for result in data["results"]:
-            #get all the service information
+            # get all the service information
             service = result["attrs"]["display_name"]
             state = result["attrs"]["state"]
             self.LOGGER.debug(
                 "Found service '%s' with state '%s'", service, state
             )
-            if only_failed == False or float(state) != 0.0:
-                #append service if ok or state not ok
+            if only_failed is False or float(state) != 0.0:
+                # append service if ok or state not ok
                 this_service = {"name": service, "state": state}
                 services.append(this_service)
         if len(services) == 0:
-            #empty set
+            # empty set
             raise EmptySetException(
                 "No results for host '%s'".format(object_name)
             )
         else:
             return services
-
-
 
     def get_hosts(self, ipv6_only=False):
         """
@@ -366,12 +347,12 @@ class Icinga2APIClient:
         :param ipv6_only: use IPv6 addresses only
         :type ipv6_only: bool
         """
-        #retrieve result
+        # retrieve result
         result = self.__api_get("/objects/hosts")
         data = json.loads(result.text)
         hosts = []
         for result in data["results"]:
-            #get all the host information
+            # get all the host information
             host = result["attrs"]["display_name"]
             if ipv6_only:
                 ip = result["attrs"]["address6"]
@@ -381,16 +362,14 @@ class Icinga2APIClient:
             hosts.append(this_host)
         return hosts
 
-
-
     def is_authenticated(self):
         """
         This function is used for checking whether authorization succeeded.
         It simply retrieves status.cgi
         """
-        #set-up URL
+        # set-up URL
         url = "/"
-        #retrieve data
+        # retrieve data
         result = self.__api_get(url)
         if result != "":
             return True

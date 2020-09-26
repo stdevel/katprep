@@ -24,7 +24,8 @@ setup(
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.5.0',
-    description='Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Red Hat Satellite 6.x',
+    description='Python toolkit for automating system maintenance and generating patch reports along with '
+                'Foreman/Katello and Red Hat Satellite 6.x',
     long_description=long_description,
     url='https://github.com/stdevel/katprep',
     author='Christian Stankowic',
@@ -48,7 +49,8 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
 
-    keywords='foreman katello linux redhat centos satellite6 satellite fedora maintenance maintenance-tasks maintenance-reports iso27001',
+    keywords='foreman katello linux redhat centos satellite6 satellite fedora maintenance maintenance-tasks '
+             'maintenance-reports iso27001',
     packages=find_packages(exclude=['doc', 'tests']),
 
     # List run-time dependencies here.  These will be installed by pip when

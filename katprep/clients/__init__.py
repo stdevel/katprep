@@ -8,7 +8,6 @@ of katprep client libraries
 import socket
 
 
-
 class SessionException(Exception):
     """
     Dummy class for session errors
@@ -16,7 +15,6 @@ class SessionException(Exception):
 .. class:: SessionException
     """
     pass
-
 
 
 class InvalidCredentialsException(Exception):
@@ -28,7 +26,6 @@ class InvalidCredentialsException(Exception):
     pass
 
 
-
 class APILevelNotSupportedException(Exception):
     """
     Dummy class for unsupported API levels
@@ -36,7 +33,6 @@ class APILevelNotSupportedException(Exception):
 .. class:: APILevelNotSupportedException
     """
     pass
-
 
 
 class UnsupportedRequestException(Exception):
@@ -48,7 +44,6 @@ class UnsupportedRequestException(Exception):
     pass
 
 
-
 class InvalidHostnameFormatException(Exception):
     """
     Dummy class for invalid hostname formats (non-FQDN)
@@ -56,7 +51,6 @@ class InvalidHostnameFormatException(Exception):
 .. class:: InvalidHostnameFormatException
     """
     pass
-
 
 
 class UnsupportedFilterException(Exception):
@@ -68,7 +62,6 @@ class UnsupportedFilterException(Exception):
     pass
 
 
-
 class EmptySetException(Exception):
     """
     Dummy class for empty result sets
@@ -78,7 +71,6 @@ class EmptySetException(Exception):
     pass
 
 
-
 class SnapshotExistsException(Exception):
     """
     Dummy class for existing snapshots
@@ -86,7 +78,6 @@ class SnapshotExistsException(Exception):
 .. class:: SnapshotExistsException
     """
     pass
-
 
 
 def validate_hostname(hostname):
@@ -99,10 +90,10 @@ def validate_hostname(hostname):
     """
     try:
         if hostname == "localhost":
-            #get real hostname
+            # get real hostname
             hostname = socket.gethostname()
         if hostname.count('.') != 2:
-            #get convert to FQDN if possible
+            # get convert to FQDN if possible
             hostname = socket.getaddrinfo(
                 socket.getfqdn(hostname), 0, 0, 0, 0,
                 socket.AI_CANONNAME

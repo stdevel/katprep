@@ -19,8 +19,8 @@ from .clients.PyvmomiClient import PyvmomiClient
 from .clients.NagiosCGIClient import NagiosCGIClient
 from .clients.Icinga2APIClient import Icinga2APIClient
 from .clients import EmptySetException, SessionException, \
-InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException
+    InvalidCredentialsException, UnsupportedRequestException, \
+    UnsupportedFilterException
 
 __version__ = "0.5.0"
 """
@@ -48,30 +48,32 @@ NagiosCGIClient: Nagios CGI client handle
 """
 
 
-
 def populate(options):
     """
     Retrieves information from a virtualization system and tries to merge
     data with Foreman/Katello.
+
+    :param options: options dictionary
+    :type options: optparse options dict
     """
-    LOGGER.info("Gathering host inventory information. " \
-        "This *WILL* take some time - please be patient.")
+    LOGGER.info("Gathering host inventory information. "
+                "This *WILL* take some time - please be patient.")
     try:
-        #retrieve host information
+        # retrieve host information
         hosts = json.loads(SAT_CLIENT.api_get("/hosts"))
         required_settings = {}
 
-        #retrieve VM/IP information
+        # retrieve VM/IP information
         if not options.virt_skip:
             vm_hosts = VIRT_CLIENT.get_vm_ips(ipv6_only=options.ipv6_only)
-            #print vm_hosts
+            # print vm_hosts
             for host in vm_hosts:
                 LOGGER.debug(
                     "HYPERVISOR: Found VM '%s' with IP '%s'",
                     host["hostname"], host["ip"]
                 )
 
-        #retrieve monitoring information
+        # retrieve monitoring information
         if not options.mon_skip:
             mon_hosts = MON_CLIENT.get_hosts(ipv6_only=options.ipv6_only)
             for host in mon_hosts:
@@ -80,7 +82,7 @@ def populate(options):
                     host["name"], host["ip"]
                 )
 
-        #check _all_ the hosts
+        # check _all_ the hosts
         if options.ipv6_only:
             ip_filter = "ip6"
         else:
@@ -91,7 +93,7 @@ def populate(options):
                 host["name"], host[ip_filter]
             )
 
-            #check if host parameters set appropriately
+            # check if host parameters set appropriately
             required_settings = {}
 
             if host["ip"] in [x["ip"] for x in vm_hosts]:
@@ -112,7 +114,7 @@ def populate(options):
                 if host["name"] != mon_name[0]:
                     required_settings["katprep_mon_name"] = mon_name[0]
 
-            #set host parameters
+            # set host parameters
             for setting in required_settings:
                 if options.generic_dry_run:
                     LOGGER.info(
@@ -120,26 +122,26 @@ def populate(options):
                         host["name"], setting, required_settings[setting]
                     )
                 else:
-                    #host_id = SAT_CLIENT.get_id_by_name(host["name"], "host")
+                    # host_id = SAT_CLIENT.get_id_by_name(host["name"], "host")
                     host_params = SAT_CLIENT.get_host_params(host["id"])
                     key_exists = [x for x in host_params if x["name"] == setting]
-                    #set payload
+                    # set payload
                     payload = {}
                     payload["parameter"] = {
                         "name": setting, "value": required_settings[setting]
                     }
-                    #update or create parameter
+                    # update or create parameter
                     if len(key_exists) > 0:
                         if options.foreman_update:
                             LOGGER.debug(
                                 "Host '%s' ==> UPDATE parameter/value: %s/%s",
                                 host["name"], setting, required_settings[setting]
                             )
-                            #get parameter ID to update
+                            # get parameter ID to update
                             param_id = SAT_CLIENT.get_hostparam_id_by_name(
                                 host["id"], setting
                             )
-                            #update parameter
+                            # update parameter
                             SAT_CLIENT.api_put(
                                 "/hosts/{}/parameters/{}".format(host["id"], param_id),
                                 json.dumps(payload)
@@ -155,7 +157,7 @@ def populate(options):
                             "Host '%s' ==> CREATE parameter/value: %s/%s",
                             host["name"], setting, required_settings[setting]
                         )
-                        #add parameter
+                        # add parameter
                         SAT_CLIENT.api_post(
                             "/hosts/{}/parameters".format(
                                 host["id"]
@@ -165,7 +167,6 @@ def populate(options):
 
     except ValueError as err:
         LOGGER.error("Unable to populate virtualization data: '%s'", err)
-
 
 
 def parse_options(args=None):
@@ -181,86 +182,85 @@ def parse_options(args=None):
         description=desc, version=__version__, epilog=epilog
     )
 
-    #define option groups
+    # define option groups
     gen_opts = parser.add_argument_group("generic arguments")
     fman_opts = parser.add_argument_group("Foreman arguments")
     virt_opts = parser.add_argument_group("virtualization arguments")
     mon_opts = parser.add_argument_group("monitoring arguments")
 
-    #GENERIC ARGUMENTS
-    #-q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true", \
-    dest="generic_quiet", \
-    default=False, help="don't print status messages to stdout (default: no)")
-    #-d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="generic_debug", \
-    default=False, action="store_true", \
-    help="enable debugging outputs (default: no)")
-    #-n / --dry-run
-    gen_opts.add_argument("-n", "--dry-run", dest="generic_dry_run", \
-    default=False, action="store_true", \
-    help="only simulate what would be done (default: no)")
-    #-C / --auth-container
-    gen_opts.add_argument("-C", "--auth-container", default="", metavar="FILE", \
-    dest="generic_auth_container", action="store", help="defines an " \
-    "authentication container file (default: no)")
-    #-P / --auth-password
-    gen_opts.add_argument("-P", "--auth-password", default="empty", \
-    dest="auth_password", action="store", metavar="PASSWORD", \
-    help="defines the authentication container password in case you don't " \
-    "want to enter it manually (useful for scripted automation)")
-    #--ip-filter
-    gen_opts.add_argument("--ipv6-only", dest="ipv6_only", default=False, \
-    action="store_true", help="Filters for IPv6-only addresses (default: no)")
-    #--insecure
-    gen_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
-    action="store_false", help="Disables SSL verification (default: no)")
+    # GENERIC ARGUMENTS
+    # -q / --quiet
+    gen_opts.add_argument("-q", "--quiet", action="store_true",
+                          dest="generic_quiet",
+                          default=False, help="don't print status messages to stdout (default: no)")
+    # -d / --debug
+    gen_opts.add_argument("-d", "--debug", dest="generic_debug",
+                          default=False, action="store_true",
+                          help="enable debugging outputs (default: no)")
+    # -n / --dry-run
+    gen_opts.add_argument("-n", "--dry-run", dest="generic_dry_run",
+                          default=False, action="store_true",
+                          help="only simulate what would be done (default: no)")
+    # -C / --auth-container
+    gen_opts.add_argument("-C", "--auth-container", default="", metavar="FILE",
+                          dest="generic_auth_container", action="store",
+                          help="defines an authentication container file (default: no)")
+    # -P / --auth-password
+    gen_opts.add_argument("-P", "--auth-password", default="empty",
+                          dest="auth_password", action="store", metavar="PASSWORD",
+                          help="defines the authentication container password in case you don't "
+                               "want to enter it manually (useful for scripted automation)")
+    # --ip-filter
+    gen_opts.add_argument("--ipv6-only", dest="ipv6_only", default=False,
+                          action="store_true", help="Filters for IPv6-only addresses (default: no)")
+    # --insecure
+    gen_opts.add_argument("--insecure", dest="ssl_verify", default=True,
+                          action="store_false", help="Disables SSL verification (default: no)")
 
-    #FOREMAN ARGUMENTS
-    #-s / --foreman-server
-    fman_opts.add_argument("-s", "--foreman-server", \
-    dest="foreman_server", metavar="SERVER", default="localhost", \
-    help="defines the Foreman server to use (default: localhost)")
-    #-u / --update
-    fman_opts.add_argument("-u", "--update", dest="foreman_update", \
-    action="store_true", default=False, help="Updates pre-existing host " \
-    "parameters (default: no)")
+    # FOREMAN ARGUMENTS
+    # -s / --foreman-server
+    fman_opts.add_argument("-s", "--foreman-server",
+                           dest="foreman_server", metavar="SERVER", default="localhost",
+                           help="defines the Foreman server to use (default: localhost)")
+    # -u / --update
+    fman_opts.add_argument("-u", "--update", dest="foreman_update",
+                           action="store_true", default=False, help="Updates pre-existing host "
+                                                                    "parameters (default: no)")
 
-    #VIRTUALIZATION ARGUMENTS
-    virt_opts.add_argument("--virt-uri", dest="virt_uri", \
-    metavar="URI", default="", help="defines an URI to use")
-    #--virt-type
-    virt_opts.add_argument("--virt-type", dest="virt_type", \
-    metavar="libvirt|pyvmomi", default="libvirt", type=str, \
-    help="defines the library used to operate with virtualization host: " \
-    "libvirt or pyvmomi (vSphere). (default: libvirt)")
-    #--skip-virt
-    virt_opts.add_argument("--skip-virt", dest="virt_skip", default=False, \
-    action="store_true", help="skips gathering data from virtualization " \
-    "host (default: no)")
+    # VIRTUALIZATION ARGUMENTS
+    virt_opts.add_argument("--virt-uri", dest="virt_uri",
+                           metavar="URI", default="", help="defines an URI to use")
+    # --virt-type
+    virt_opts.add_argument("--virt-type", dest="virt_type",
+                           metavar="libvirt|pyvmomi", default="libvirt", type=str,
+                           help="defines the library used to operate with virtualization host: "
+                                "libvirt or pyvmomi (vSphere). (default: libvirt)")
+    # --skip-virt
+    virt_opts.add_argument("--skip-virt", dest="virt_skip", default=False,
+                           action="store_true", help="skips gathering data from virtualization "
+                                                     "host (default: no)")
 
-    #MONITORING ARGUMENTS
-    #--mon-url
-    mon_opts.add_argument("--mon-url", dest="mon_url", \
-    metavar="URL", default="", help="defines a monitoring URL to use")
-    #--mon-type
-    mon_opts.add_argument("--mon-type", dest="mon_type", \
-    metavar="nagios|icinga", type=str, choices="nagios|icinga", default="icinga", \
-    help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or" \
-    " icinga (Icinga 2.x). (default: icinga)")
-    #--skip-mon
-    mon_opts.add_argument("--skip-mon", dest="mon_skip", default=False, \
-    action="store_true", help="skips gathering data from monitoring system " \
-    "(default: no)")
+    # MONITORING ARGUMENTS
+    # --mon-url
+    mon_opts.add_argument("--mon-url", dest="mon_url",
+                          metavar="URL", default="", help="defines a monitoring URL to use")
+    # --mon-type
+    mon_opts.add_argument("--mon-type", dest="mon_type",
+                          metavar="nagios|icinga", type=str, choices="nagios|icinga", default="icinga",
+                          help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or"
+                               " icinga (Icinga 2.x). (default: icinga)")
+    # --skip-mon
+    mon_opts.add_argument("--skip-mon", dest="mon_skip", default=False,
+                          action="store_true", help="skips gathering data from monitoring system "
+                                                    "(default: no)")
 
-    #parse options and arguments
+    # parse options and arguments
     options = parser.parse_args()
     while options.auth_password == "empty" or len(options.auth_password) > 32:
         options.auth_password = getpass.getpass(
             "Authentication container password: "
         )
-    return (options, args)
-
+    return options, args
 
 
 def main(options, args):
@@ -283,7 +283,7 @@ def main(options, args):
     if options.generic_dry_run:
         LOGGER.info("This is just a SIMULATION - no changes will be made.")
 
-    #initialize APIs
+    # initialize APIs
     (fman_user, fman_pass) = get_credentials(
         "Foreman", options.foreman_server, options.generic_auth_container,
         options.auth_password
@@ -293,42 +293,41 @@ def main(options, args):
         fman_pass, options.ssl_verify
     )
 
-    #get virtualization host credentials
+    # get virtualization host credentials
     if not options.virt_skip:
         (virt_user, virt_pass) = get_credentials(
             "Virtualization", options.virt_uri, options.generic_auth_container,
             options.auth_password
         )
         if options.virt_type == "pyvmomi":
-            #vSphere Python API
+            # vSphere Python API
             VIRT_CLIENT = PyvmomiClient(
                 LOG_LEVEL, options.virt_uri, virt_user, virt_pass)
         else:
-            #libvirt
+            # libvirt
             VIRT_CLIENT = LibvirtClient(
                 LOG_LEVEL, options.virt_uri, virt_user, virt_pass)
 
-    #get monitoring host credentials
+    # get monitoring host credentials
     if not options.mon_skip:
         (mon_user, mon_pass) = get_credentials(
             "Monitoring", options.mon_url, options.generic_auth_container,
             options.auth_password
         )
         if options.mon_type == "nagios":
-            #Yet another legacy installation
+            # Yet another legacy installation
             MON_CLIENT = NagiosCGIClient(
-                LOG_LEVEL, options.mon_url, mon_user, mon_pass, \
+                LOG_LEVEL, options.mon_url, mon_user, mon_pass,
                 verify=options.ssl_verify
             )
         else:
-            #Icinga 2, yay!
+            # Icinga 2, yay!
             MON_CLIENT = Icinga2APIClient(
                 LOG_LEVEL, options.mon_url, mon_user, mon_pass
             )
 
-    #populate _all_ the things
+    # populate _all_ the things
     populate(options)
-
 
 
 def cli():
@@ -338,7 +337,7 @@ def cli():
     global LOG_LEVEL
     (options, args) = parse_options()
 
-    #set logging level
+    # set logging level
     logging.basicConfig()
     if options.generic_debug:
         LOG_LEVEL = logging.DEBUG
@@ -349,7 +348,6 @@ def cli():
     LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)
-
 
 
 if __name__ == "__main__":

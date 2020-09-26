@@ -27,7 +27,7 @@ def virtualisation(request):
 
 
 @pytest.fixture
-def virtConfigFile(virtualisation):
+def virt_config_file(virtualisation):
     if virtualisation == 'libvirt':
         return "libvirt_config.json"
     elif virtualisation == 'pyvmomi':
@@ -35,30 +35,30 @@ def virtConfigFile(virtualisation):
 
 
 @pytest.fixture
-def virtConfig(virtConfigFile):
-    return load_config(virtConfigFile)
+def virt_config(virt_config_file):
+    return load_config(virt_config_file)
 
 
 @pytest.fixture
-def virtClass(virtualisation):
+def virt_class(virtualisation):
     if virtualisation == 'libvirt':
-        LibvirtClient = pytest.importorskip("katprep.clients.LibvirtClient")
-        return LibvirtClient.LibvirtClient
+        libvirt_client = pytest.importorskip("katprep.clients.LibvirtClient")
+        return libvirt_client.LibvirtClient
     elif virtualisation == 'pyvmomi':
-        PyvmomiClient = pytest.importorskip("katprep.clients.PyvmomiClient")
-        return PyvmomiClient.PyvmomiClient
+        pyvmomi_client = pytest.importorskip("katprep.clients.PyvmomiClient")
+        return pyvmomi_client.PyvmomiClient
 
 
 @pytest.fixture
-def virtClient(virtualisation, virtConfig, virtClass):
+def virt_client(virtualisation, virt_config, virt_class):
     if virtualisation == 'libvirt':
-        address = virtConfig["config"]["uri"],
+        address = virt_config["config"]["uri"],
     elif virtualisation == 'pyvmomi':
-        address = virtConfig["config"]["hostname"],
+        address = virt_config["config"]["hostname"],
 
-    return virtClass(
+    return virt_class(
         logging.ERROR,
         address,
-        virtConfig["config"]["api_user"],
-        virtConfig["config"]["api_pass"]
+        virt_config["config"]["api_user"],
+        virt_config["config"]["api_pass"]
     )

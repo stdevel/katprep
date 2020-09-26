@@ -10,7 +10,7 @@ import ssl
 import sys
 from katprep.clients.katprep_shared import is_ipv4, is_ipv6
 from katprep.clients import SessionException, InvalidCredentialsException, \
-EmptySetException, SnapshotExistsException
+    EmptySetException, SnapshotExistsException
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
@@ -50,32 +50,30 @@ class PyvmomiClient(object):
         :param password: corresponding password
         :type password: str
         """
-        #set logging
+        # set logging
         self.LOGGER.setLevel(log_level)
-        #set custom port
+        # set custom port
         parsed_uri = urlparse(hostname)
         host = '{uri.path}'.format(uri=parsed_uri)
         if ":" in host:
             self.HOSTNAME = host[:host.find(':')]
-            self.PORT = host[host.find(':')+1:]
+            self.PORT = host[host.find(':') + 1:]
         else:
             self.HOSTNAME = hostname
             self.PORT = 443
-        #set connection details and connect
+        # set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
         self.__connect()
-
-
 
     def __connect(self):
         """This function establishes a connection to the hypervisor."""
         global SESSION
         context = None
-        #skip SSL verification for now
+        # skip SSL verification for now
         if hasattr(ssl, '_create_unverified_context'):
             context = ssl._create_unverified_context()
-        #try to connect
+        # try to connect
         try:
             self.SESSION = SmartConnect(
                 host=self.HOSTNAME,
@@ -84,8 +82,6 @@ class PyvmomiClient(object):
             )
         except vim.fault.InvalidLogin:
             raise InvalidCredentialsException("Invalid credentials")
-
-
 
     def __get_obj(self, content, vimtype, name):
         """
@@ -108,11 +104,9 @@ class PyvmomiClient(object):
                 break
         return obj
 
-
-
     def __manage_snapshot(
             self, vm_name, snapshot_title, snapshot_text, action="create"
-        ):
+    ):
         """
         Creates/removes a snapshot for a particular virtual machine.
         This requires specifying a VM, comment title and text.
@@ -125,40 +119,39 @@ class PyvmomiClient(object):
         :param snapshot_text: Snapshot text
         :type snapshot_text: str
         :param action: action (create, remove)
-        :type remove_snapshot: str
-
+        :type action: str
         """
-        #make sure to quiesce and not dump memory
-        #TODO: maybe we should supply an option for this?
+        # make sure to quiesce and not dump memory
+        # TODO: maybe we should supply an option for this?
         dump_memory = False
         quiesce = True
         try:
             content = self.SESSION.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
             if action.lower() != "create":
-                #get _all_ the snapshots
+                # get _all_ the snapshots
                 snapshots = self.__get_snapshots(vm_name)
                 for snapshot in snapshots:
                     childs = snapshot.childSnapshotList
                     if snapshot.name == snapshot_title:
                         if action.lower() == "remove":
-                            #remove snapshot
+                            # remove snapshot
                             snapshot.snapshot.RemoveSnapshot_Task(True)
                         else:
-                            #revert snapshot
+                            # revert snapshot
                             snapshot.snapshot.RevertToSnapshot_Task()
                     if childs:
-                        #also iterate through childs
+                        # also iterate through children
                         for child in childs:
                             if child.name == snapshot_title:
                                 if action.lower() == "remove":
-                                    #remove snapshot
+                                    # remove snapshot
                                     child.snapshot.RemoveSnapshot_Task(True)
                                 else:
-                                    #revert snapshot
+                                    # revert snapshot
                                     child.snapshot.RevertToSnapshot_Task()
             else:
-                #only create snapshot if not already existing
+                # only create snapshot if not already existing
                 try:
                     if not self.has_snapshot(vm_name, snapshot_title):
                         task = vm.CreateSnapshot(
@@ -170,7 +163,7 @@ class PyvmomiClient(object):
                                 snapshot_title, vm_name
                             )
                         )
-                except EmptySetException as err:
+                except EmptySetException:
                     task = vm.CreateSnapshot(
                         snapshot_title, snapshot_text, dump_memory, quiesce
                     )
@@ -188,9 +181,7 @@ class PyvmomiClient(object):
                 "Unable to manage snapshot: '{}'".format(err)
             )
 
-
-
-    #Aliases
+    # Aliases
     def create_snapshot(self, vm_name, snapshot_title, snapshot_text):
         """
         Creates a snapshot for a particular virtual machine.
@@ -231,12 +222,10 @@ class PyvmomiClient(object):
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
-        #TODO: implement revert
+        # TODO: implement revert
         return self.__manage_snapshot(
             vm_name, snapshot_title, "", action="revert"
         )
-
-
 
     def __get_snapshots(self, vm_name):
         """
@@ -257,8 +246,6 @@ class PyvmomiClient(object):
         except AttributeError:
             raise EmptySetException("No snapshots found")
 
-
-
     def has_snapshot(self, vm_name, snapshot_title):
         """
         Returns whether a particular virtual machine is currently protected
@@ -269,24 +256,22 @@ class PyvmomiClient(object):
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
-        #get _all_ the snapshots
+        # get _all_ the snapshots
         snapshots = self.__get_snapshots(vm_name)
         try:
             for snapshot in snapshots:
-                childs = snapshot.childSnapshotList
+                children = snapshot.childSnapshotList
                 if snapshot.name == snapshot_title:
                     return True
-                #also check childs
-                elif childs:
-                    for child in childs:
+                # also check children
+                elif children:
+                    for child in children:
                         if child.name == snapshot_title:
                             return True
             raise EmptySetException("No snapshots found")
         except TypeError:
-            #no snapshots
+            # no snapshots
             raise EmptySetException("No snapshots found")
-
-
 
     def get_vm_ips(self, hide_empty=True, ipv6_only=False):
         """
@@ -299,17 +284,17 @@ class PyvmomiClient(object):
         :type ipv6_only: bool
         """
         try:
-            #get _all_ the VMs
+            # get _all_ the VMs
             content = self.SESSION.RetrieveContent()
-            #result = {}
+            # result = {}
             result = []
-            #create view cotaining VM objects
+            # create view containing VM objects
             object_view = content.viewManager.CreateContainerView(
                 content.rootFolder, [vim.VirtualMachine], True
             )
             for obj in object_view.view:
-                if not hide_empty or obj.summary.guest.ipAddress != None:
-                    #try to find the best IP
+                if not hide_empty or obj.summary.guest.ipAddress is not None:
+                    # try to find the best IP
                     self.LOGGER.debug("Trying to find best IP for VM '%s'", obj.name)
                     if ipv6_only:
                         is_valid_address = is_ipv6
@@ -341,7 +326,7 @@ class PyvmomiClient(object):
                         "Set IP address to '%s'", target_ip
                     )
 
-                    #Adding result
+                    # Adding result
                     result.append(
                         {
                             "object_name": obj.config.name,
@@ -354,18 +339,16 @@ class PyvmomiClient(object):
             self.LOGGER.error("Unable to get VM IP information: '%s'", err)
             raise SessionException(err)
 
-
-
     def get_vm_hosts(self):
         """
         Returns a list of VMs and their hypervisors available through the
         current connection.
         """
         try:
-            #get _all_ the VMs
+            # get _all_ the VMs
             content = self.SESSION.RetrieveContent()
             result = {}
-            #create view cotaining VM objects
+            # create view containing VM objects
             object_view = content.viewManager.CreateContainerView(
                 content.rootFolder, [vim.VirtualMachine], True
             )
@@ -378,8 +361,6 @@ class PyvmomiClient(object):
             self.LOGGER.error("Unable to get VM hypervisor information: '%s'", err)
             raise SessionException(err)
 
-
-
     def restart_vm(self, vm_name, force=False):
         """
         Restarts a particular VM (default: soft reboot using guest tools).
@@ -390,22 +371,20 @@ class PyvmomiClient(object):
         :type force: bool
         """
         try:
-            #get VM
+            # get VM
             content = self.SESSION.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
 
             if force:
-                #kill it with fire
+                # kill it with fire
                 vm.ResetVM_Task()
             else:
-                #killing me softly
+                # killing me softly
                 vm.RebootGuest()
         except:
             raise SessionException("Unable to restart VM: '{}'".format(
                 sys.exc_info()[0]
             ))
-
-
 
     def powerstate_vm(self, vm_name):
         """
@@ -431,11 +410,9 @@ class PyvmomiClient(object):
                 "Unable to get power state: '{}'".format(err)
             )
 
-
-
     def __manage_power(
             self, vm_name, action="poweroff"
-        ):
+    ):
         """
         Powers a particual virtual machine on/off forcefully.
 
@@ -449,10 +426,10 @@ class PyvmomiClient(object):
             content = self.SESSION.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
             if action.lower() == "poweroff":
-                #get down with the vickness
+                # get down with the vickness
                 task = vm.PowerOff()
             else:
-                #fire it up
+                # fire it up
                 task = vm.PowerOn()
         except AttributeError as err:
             raise SessionException(
@@ -463,9 +440,7 @@ class PyvmomiClient(object):
                 "Unable to manage power state: '{}'".format(err)
             )
 
-
-
-    #Aliases
+    # Aliases
     def poweroff_vm(self, vm_name):
         """
         Turns off a particual virtual machine forcefully.

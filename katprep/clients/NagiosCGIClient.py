@@ -16,7 +16,6 @@ from lxml import html
 from katprep.clients import SessionException, UnsupportedRequestException
 
 
-
 class NagiosCGIClient(object):
     """
 .. class:: NagiosCGIClient
@@ -61,12 +60,12 @@ class NagiosCGIClient(object):
         :param password: corresponding password
         :type password: str
         """
-        #set logging
+        # set logging
         self.LOGGER.setLevel(log_level)
-        if url[len(url)-1:] != "/":
-            #add trailing slash
+        if url[len(url) - 1:] != "/":
+            # add trailing slash
             url = "{}/".format(url)
-        #set connection details and connect
+        # set connection details and connect
         self.url = url
         if "nagios" in self.url.lower():
             self.LOGGER.debug(
@@ -78,8 +77,6 @@ class NagiosCGIClient(object):
         self.verify = verify
         self.connect()
 
-
-
     def set_nagios(self, flag):
         """
         This function sets a flag for Nagios systems as there are CGI
@@ -90,8 +87,6 @@ class NagiosCGIClient(object):
         """
         self.obsolete = flag
 
-
-
     def connect(self):
         """
         This function establishes a connection to Nagios/Icinga.
@@ -99,8 +94,6 @@ class NagiosCGIClient(object):
         self.session = requests.Session()
         if self.username != "":
             self.session.auth = HTTPBasicAuth(self.username, self.password)
-
-
 
     def __api_request(self, method, sub_url, payload=""):
         """
@@ -119,30 +112,30 @@ class NagiosCGIClient(object):
 .. seealso:: __api_get()
 .. seealso:: __api_post()
         """
-        #send request to API
+        # send request to API
         self.LOGGER.debug(
             "%s request to URL '%s', payload='%s'", method.upper(), sub_url, payload
         )
         try:
             if method.lower() not in ["get", "post"]:
-                #going home
+                # going home
                 raise SessionException("Illegal method '{}' specified".format(method))
 
-            #execute request
+            # execute request
             if method.lower() == "post":
-                #POST
+                # POST
                 result = self.session.post(
                     "{}{}".format(self.url, sub_url),
                     headers=self.HEADERS, data=payload, verify=self.verify
-                    )
+                )
             else:
-                #GET
+                # GET
                 result = self.session.get(
                     "{}{}".format(self.url, sub_url),
                     headers=self.HEADERS, verify=self.verify
-                    )
-            #this really breaks shit
-            #self.LOGGER.debug("HTML output: %s", result.text)
+                )
+            # this really breaks shit
+            # self.LOGGER.debug("HTML output: %s", result.text)
             if "error" in result.text.lower():
                 tree = html.fromstring(result.text)
                 data = tree.xpath(
@@ -158,7 +151,7 @@ class NagiosCGIClient(object):
                     )
                 )
             else:
-                #return result
+                # return result
                 if method.lower() == "get":
                     return result.text
                 else:
@@ -168,7 +161,7 @@ class NagiosCGIClient(object):
             self.LOGGER.error(err)
             raise
 
-    #Aliases
+    # Aliases
     def __api_get(self, sub_url):
         """
         Sends a HTTP GET request to the Nagios/Icinga API. This function
@@ -191,8 +184,6 @@ class NagiosCGIClient(object):
         """
         return self.__api_request("post", sub_url, payload)
 
-
-
     @staticmethod
     def __calculate_time(hours):
         """
@@ -207,13 +198,11 @@ class NagiosCGIClient(object):
         end_time = format(
             datetime.now() + timedelta(hours=int(hours)),
             '%Y-%m-%d %H:%M:%S')
-        return (current_time, end_time)
-
-
+        return current_time, end_time
 
     def __manage_downtime(
             self, object_name, object_type, hours, comment, remove_downtime
-        ):
+    ):
         """
         Adds or removes scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
@@ -230,16 +219,16 @@ class NagiosCGIClient(object):
         :param remove_downtime: Removes a previously scheduled downtime
         :type remove_downtime: bool
         """
-        #calculate timerange
+        # calculate time range
         (current_time, end_time) = self.__calculate_time(hours)
 
-        #set-up payload
+        # set-up payload
         payload = {}
         if object_type.lower() == "hostgroup":
             if remove_downtime:
-                #there is now way to unschedule downtime for a whole hostgroup
+                # there is now way to unschedule downtime for a whole hostgroup
                 raise UnsupportedRequestException(
-                    "Unscheduling downtimes for whole hostgroups is not " \
+                    "Unscheduling downtimes for whole hostgroups is not "
                     "supported with Nagios/Icinga 1.x!"
                 )
             else:
@@ -254,7 +243,7 @@ class NagiosCGIClient(object):
         else:
             if remove_downtime:
                 if self.obsolete:
-                    #you really like old stuff don't you
+                    # you really like old stuff don't you
                     raise UnsupportedRequestException(
                         "Unscheduling downtimes is not supported with Nagios!"
                     )
@@ -272,20 +261,18 @@ class NagiosCGIClient(object):
                     'com_author': self.username, 'childoptions': '0'
                 }
                 if self.obsolete:
-                    #we need to make two calls as legacy hurts twice
+                    # we need to make two calls as legacy hurts twice
                     payload[1] = payload[0].copy()
                     payload[1]['cmd_typ'] = '55'
 
-        #send POST
+        # send POST
         result = None
         for req in payload:
             result = self.__api_post("/cgi-bin/cmd.cgi", payload[req])
         return result
 
-
-
-    def schedule_downtime(self, object_name, object_type, hours=8, \
-        comment="Downtime managed by katprep"):
+    def schedule_downtime(self, object_name, object_type, hours=8,
+                          comment="Downtime managed by katprep"):
         """
         Adds scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
@@ -301,10 +288,8 @@ class NagiosCGIClient(object):
         :param comment: Downtime comment
         :type comment: str
         """
-        return self.__manage_downtime(object_name, object_type, hours, \
-            comment, remove_downtime=False)
-
-
+        return self.__manage_downtime(object_name, object_type, hours,
+                                      comment, remove_downtime=False)
 
     def remove_downtime(self, object_name, object_type="host"):
         """
@@ -315,12 +300,12 @@ class NagiosCGIClient(object):
 
         :param object_name: Hostname or hostgroup name
         :type object_name: str
+        :param object_type: Object type
+        :type object_type: str
         """
         return self.__manage_downtime(
             object_name, object_type, hours=1, comment="", remove_downtime=True
         )
-
-
 
     def has_downtime(self, object_name):
         """
@@ -330,24 +315,22 @@ class NagiosCGIClient(object):
         :param object_name: Hostname or hostgroup name
         :type object_name: str
         """
-        #retrieve host information
+        # retrieve host information
         result = self.__api_get(
             "/cgi-bin/status.cgi?host={}".format(object_name)
         )
-        #get _all_ the ugly images
+        # get _all_ the ugly images
         tree = html.fromstring(result)
         data = tree.xpath(
             "//td/a/img/@src"
         )
 
-        #check whether downtime image was found
+        # check whether downtime image was found
         downtime_imgs = ["downtime.gif"]
         for item in data:
             if os.path.basename(item) in downtime_imgs:
                 return True
         return False
-
-
 
     @staticmethod
     def __regexp_matches(text, regexp):
@@ -364,8 +347,6 @@ class NagiosCGIClient(object):
         pattern = re.compile(regexp)
         return bool(pattern.match(text))
 
-
-
     @staticmethod
     def __is_blacklisted(text):
         """
@@ -376,34 +357,32 @@ class NagiosCGIClient(object):
         :type text: str
 
         """
-        #blacklisted strings
+        # blacklisted strings
         blacklist = {
             "",
             "\n"
         }
 
-        #blacklisted with regex:
-        #1.Last check
-        #2.State duration
-        #3.Retries
+        # blacklisted with regex:
+        # 1.Last check
+        # 2.State duration
+        # 3.Retries
         blacklist_regex = {
             r"[0-9]{4}-[0-9]{2}-[0-9]{2}\s+[0-9]{2}:[0-9]{2}:[0-9]{2}",
             r"[0-9]{1,}d\s+[0-9]{1,}h\s+[0-9]{1,}m\s+[0-9]{1,}s",
             r"[0-9]{1,3}/[0-9]{1,3}"
         }
         if text not in blacklist:
-            #compile _all_ the regexps!
+            # compile _all_ the regexps!
             for item in blacklist_regex:
-                #result = __regexp_matches(text, item)
+                # result = __regexp_matches(text, item)
                 result = re.match(item, text)
                 if result:
                     return True
-            #good boy
+            # good boy
             return False
         else:
             return True
-
-
 
     @staticmethod
     def __get_state(state):
@@ -420,8 +399,6 @@ class NagiosCGIClient(object):
             if code in state[:8].lower():
                 return codes[code]
 
-
-
     def get_services(self, object_name, only_failed=True):
         """
         Returns all or failed services for a particular host.
@@ -432,11 +409,11 @@ class NagiosCGIClient(object):
         :type only_failed: bool
         """
 
-        #set-up URL
+        # set-up URL
         url = "/cgi-bin/status.cgi?host={}&style=detail".format(object_name)
         if only_failed:
             url = "{}&hoststatustypes=15&servicestatustypes=16".format(url)
-        #retrieve data
+        # retrieve data
         result = self.__api_get(url)
         tree = html.fromstring(result)
         if only_failed:
@@ -458,28 +435,26 @@ class NagiosCGIClient(object):
                 "//td[@class='statusBGCRITICALSCHED']//a/text()"
             )
 
-        #only return service and extended status
+        # only return service and extended status
         hits = []
         for item in data:
             item = item.lstrip()
             if not self.__is_blacklisted(item):
                 hits.append(item)
-        #try building a beautiful array of dicts
-        if len(hits)%2 != 0:
+        # try building a beautiful array of dicts
+        if len(hits) % 2 != 0:
             services = []
             counter = 1
             while counter < len(hits):
                 self.LOGGER.debug(
-                    "Service '%s' has state '%s'", hits[counter], hits[counter+1]
+                    "Service '%s' has state '%s'", hits[counter], hits[counter + 1]
                 )
                 services.append({
                     "name": hits[counter],
-                    "state": self.__get_state(hits[counter+1])
+                    "state": self.__get_state(hits[counter + 1])
                 })
                 counter = counter + 2
             return services
-
-
 
     def get_hosts(self, ipv6_only=False):
         """
@@ -488,59 +463,57 @@ class NagiosCGIClient(object):
         :param ipv6_only: use IPv6 addresses only
         :type ipv6_only: bool
         """
-        #set-up URL
+        # set-up URL
         url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
-        #retrieve data
+        # retrieve data
         result = self.__api_get(url)
         tree = html.fromstring(result)
-        #make sure to get the nested-nested table of the first table
+        # make sure to get the nested-nested table of the first table
         data = tree.xpath(
             "//table[@class='status']//tr//td[1]//table//td//table//td/a/text()"
         )
-        #I want to punish the 'designer' of this 'HTML code'
+        # I want to punish the 'designer' of this 'HTML code'
 
         hosts = []
         for host in data:
-            #get services per host
+            # get services per host
 
-            #set-up URL
+            # set-up URL
             url = "/cgi-bin/extinfo.cgi?type=1&host={}".format(host)
-            #retrieve data
+            # retrieve data
             result = self.__api_get(url)
-            #set-up xpath
+            # set-up xpath
             tree = html.fromstring(result)
             data = tree.xpath(
                 "//div[@class='data']/text()"
             )
 
-            #iterate through services
+            # iterate through services
             target_ip = ""
-            #NOTE: Nagios does not support IPv6, so we don't utilize the flag
+            # NOTE: Nagios does not support IPv6, so we don't utilize the flag
             if ipv6_only:
                 raise UnsupportedRequestException(
                     "IPv6 is not supported by Nagios/Icinga 1.x"
                 )
             ip_regexp = r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]" \
-                r"|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]" \
-                r"[0-9]|25[0-5])$"
+                        r"|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]" \
+                        r"[0-9]|25[0-5])$"
             for entry in data:
                 if self.__regexp_matches(entry, ip_regexp):
-                    #entry is an IP
+                    # entry is an IP
                     target_ip = entry
             this_host = {"name": host, "ip": target_ip}
             hosts.append(this_host)
         return hosts
-
-
 
     def is_authenticated(self):
         """
         This function is used for checking whether authorization succeeded.
         It simply retrieves status.cgi
         """
-        #set-up URL
+        # set-up URL
         url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
-        #retrieve data
+        # retrieve data
         result = self.__api_get(url)
         if result != "":
             return True

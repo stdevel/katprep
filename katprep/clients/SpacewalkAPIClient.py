@@ -74,25 +74,23 @@ class SpacewalkAPIClient(object):
         :param password: corresponding password
         :type password: str
         """
-        #set logging
+        # set logging
         logging.basicConfig(level=log_level)
         self.LOGGER.setLevel(log_level)
         self.LOGGER.debug(
             "About to create Spacewalk client '%s'@'%s'", username, hostname
         )
 
-        #set connection information
+        # set connection information
         self.hostname = hostname
         self.LOGGER.debug("Set hostname to '%s'", self.hostname)
         self.username = username
         self.password = password
         self.url = "https://{0}/rpc/api".format(self.hostname)
 
-        #start session and check API version if Spacewalk API
+        # start session and check API version if Spacewalk API
         self.__connect()
         self.validate_api_support()
-
-
 
     def __exit__(self, exc_type, exc_value, traceback):
         """
@@ -100,13 +98,11 @@ class SpacewalkAPIClient(object):
         """
         self.api_session.auth.logout(self.api_key)
 
-
-
     def __connect(self):
         """
         This function establishes a connection to Spacewalk.
         """
-        #set api session and key
+        # set api session and key
         try:
             self.api_session = Server(self.url)
             self.api_key = self.api_session.auth.login(self.username, self.password)
@@ -120,8 +116,6 @@ class SpacewalkAPIClient(object):
                     "Generic remote communication error: '%s'", err.faultString
                 )
 
-
-
     def validate_api_support(self):
         """
         Checks whether the API version on the Spacewalk server is supported.
@@ -129,7 +123,7 @@ class SpacewalkAPIClient(object):
         exception will be thrown.
         """
         try:
-            #check whether API is supported
+            # check whether API is supported
             api_level = self.api_session.api.getVersion()
             if float(api_level) < self.API_MIN:
                 raise APILevelNotSupportedException(
@@ -144,15 +138,11 @@ class SpacewalkAPIClient(object):
             self.LOGGER.error(err)
             raise APILevelNotSupportedException("Unable to verify API version")
 
-
-
     def get_url(self):
         """
         Returns the configured URL of the object instance.
         """
         return self.url
-
-
 
     def get_hostname(self):
         """
