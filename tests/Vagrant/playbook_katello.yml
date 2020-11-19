@@ -6,13 +6,13 @@
     - name: Install needed repositories
       yum:
         name:
-          - https://yum.theforeman.org/releases/2.0/el7/x86_64/foreman-release.rpm
-          - https://fedorapeople.org/groups/katello/releases/yum/3.15/katello/el7/x86_64/katello-repos-latest.rpm
+          - https://yum.theforeman.org/releases/2.2/el7/x86_64/foreman-release.rpm
+          - https://fedorapeople.org/groups/katello/releases/yum/3.17/katello/el7/x86_64/katello-repos-latest.rpm
           - https://yum.puppet.com/puppet6-release-el-7.noarch.rpm
           - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    - name: Install Foreman SCL release
+    - name: Install CentOS SCL release
       yum:
-        name: foreman-release-scl
+        name: centos-release-scl-rh
 
   roles:
     - role: sean797.foreman_installer
