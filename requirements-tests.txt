@@ -1,5 +1,5 @@
 -r requirements.txt
 pytest < 5.0  # Pytest 5 dropped support for Python 2.7
-pytest-cov < 2.6  # pytest-cov 2.6 dropped support for Python < 3.4
+pytest-cov < 2.12  # pytest-cov 2.6 dropped support for Python < 3.4
 mock
 codecov
