@@ -3,8 +3,11 @@
 A basic monitoring client.
 """
 
+from abc import ABCMeta, abstractmethod
 
-class MonitoringClientBase:
+class MonitoringClientBase(metaclass=ABCMeta):
+
+    @abstractmethod
     def schedule_downtime(
         self, object_name, object_type, hours=8, comment="Downtime managed by katprep"
     ):
@@ -23,8 +26,8 @@ class MonitoringClientBase:
         :param comment: Downtime comment
         :type comment: str
         """
-        raise NotImplementedError("missing schedule_downtime implementation")
 
+    @abstractmethod
     def remove_downtime(self, object_name, object_type):
         """
         Removes scheduled downtime for a host or hostgroup
@@ -35,8 +38,8 @@ class MonitoringClientBase:
         :param object_type: host or hostgroup
         :type object_type: str
         """
-        raise NotImplementedError("missing remove_downtime implementation")
 
+    @abstractmethod
     def has_downtime(self, object_name):
         """
         Returns whether a particular object host is currently in scheduled
@@ -45,8 +48,8 @@ class MonitoringClientBase:
         :param object_name: Hostname or hostgroup name
         :type object_name: str
         """
-        raise NotImplementedError("missing has_downtime implementation")
 
+    @abstractmethod
     def get_hosts(self, ipv6_only=False):
         """
         Returns hosts by their name and IP.
@@ -54,8 +57,8 @@ class MonitoringClientBase:
         :param ipv6_only: use IPv6 addresses only
         :type ipv6_only: bool
         """
-        raise NotImplementedError("missing get_hosts implementation")
 
+    @abstractmethod
     def get_services(self, object_name, only_failed=True):
         """
         Returns all or failed services for a particular host.
@@ -65,4 +68,3 @@ class MonitoringClientBase:
         :param only_failed: True will only report failed services
         :type only_failed: bool
         """
-        raise NotImplementedError("missing get_services implementation")
