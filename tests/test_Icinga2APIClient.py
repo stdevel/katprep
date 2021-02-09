@@ -9,7 +9,7 @@ from __future__ import absolute_import
 import logging
 import pytest
 from katprep.clients.Icinga2APIClient import Icinga2APIClient
-from katprep.clients import EmptySetException, SessionException
+from katprep.management.exceptions import EmptySetException, SessionException
 
 from .utilities import load_config
 

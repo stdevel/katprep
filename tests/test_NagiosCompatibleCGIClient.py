@@ -11,7 +11,7 @@ import time
 import pytest
 
 from katprep.clients.NagiosCGIClient import NagiosCGIClient
-from katprep.clients import SessionException, UnsupportedRequestException
+from katprep.management.exceptions import SessionException, UnsupportedRequestException
 
 from .utilities import load_config
 
