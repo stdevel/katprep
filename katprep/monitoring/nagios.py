@@ -14,10 +14,11 @@ import os
 from requests.auth import HTTPBasicAuth
 from lxml import html
 from katprep.clients import SessionException, UnsupportedRequestException
+from .base import MonitoringClientBase
 
 
 
-class NagiosCGIClient(object):
+class NagiosCGIClient(MonitoringClientBase):
     """
 .. class:: NagiosCGIClient
     """

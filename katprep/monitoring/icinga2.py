@@ -12,10 +12,11 @@ import json
 import time
 from datetime import datetime, timedelta
 from katprep.clients import SessionException, EmptySetException
+from .base import MonitoringClientBase
 
 
 
-class Icinga2APIClient:
+class Icinga2APIClient(MonitoringClientBase):
     """
     Class for communicating with the Icinga2 API
 
