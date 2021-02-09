@@ -19,9 +19,6 @@ class BaseConnector(metaclass=ABCMeta):
         pass
 
 
-# TODO: libvirt und vmware haben Snapshot Features
-
-
 class SnapshotManager(metaclass=ABCMeta):
     """
     Managers with snapshot support.
