@@ -60,8 +60,6 @@ class SpacewalkAPIClient(BaseConnector):
         #set connection information
         self.hostname = hostname
         self.LOGGER.debug("Set hostname to '%s'", self.hostname)
-        self.username = username
-        self.password = password
         self.url = "https://{0}/rpc/api".format(self.hostname)
 
         #start session and check API version if Spacewalk API
