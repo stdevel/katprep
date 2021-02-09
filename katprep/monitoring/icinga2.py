@@ -72,11 +72,11 @@ class Icinga2APIClient(MonitoringClientBase):
         #set SSL information and connect
         if verify_ssl:
             self.VERIFY_SSL = True
-        self.__connect()
+        self._connect()
 
 
 
-    def __connect(self):
+    def _connect(self):
         """
         This function establishes a connection to the Icinga2 API.
         """
@@ -86,7 +86,7 @@ class Icinga2APIClient(MonitoringClientBase):
 
 
 
-    def __api_request(self, method, sub_url, payload=""):
+    def _api_request(self, method, sub_url, payload=""):
         """
         Sends a HTTP request to the Nagios/Icinga API. This function requires
         a valid HTTP method and a sub-URL (such as /cgi-bin/status.cgi).
@@ -140,7 +140,7 @@ class Icinga2APIClient(MonitoringClientBase):
             raise SessionException(err)
 
     #Aliases
-    def __api_get(self, sub_url):
+    def _api_get(self, sub_url):
         """
         Sends a HTTP GET request to the Nagios/Icinga API. This function
         requires a sub-URL (such as /cgi-bin/status.cgi).
@@ -148,9 +148,9 @@ class Icinga2APIClient(MonitoringClientBase):
         :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
         :type sub_url: str
         """
-        return self.__api_request("get", sub_url)
+        return self._api_request("get", sub_url)
 
-    def __api_post(self, sub_url, payload):
+    def _api_post(self, sub_url, payload):
         """
         Sends a HTTP POST request to the Nagios/Icinga API. This function
         requires a sub-URL (such as /cgi-bin/status.cgi).
@@ -160,11 +160,11 @@ class Icinga2APIClient(MonitoringClientBase):
         :param payload: payload data
         :type payload: str
         """
-        return self.__api_request("post", sub_url, payload)
+        return self._api_request("post", sub_url, payload)
 
 
-
-    def __calculate_time(self, hours):
+    @staticmethod
+    def calculate_time_range(hours):
         """
         Calculates the time range for POST requests in the format the
         Icinga 2.x API requires. For this, the current time/date
@@ -179,7 +179,7 @@ class Icinga2APIClient(MonitoringClientBase):
 
 
 
-    def __manage_downtime(
+    def _manage_downtime(
             self, object_name, object_type, hours, comment, remove_downtime
         ):
         """
@@ -199,7 +199,7 @@ class Icinga2APIClient(MonitoringClientBase):
         :type remove_downtime: bool
         """
         #calculate timerange
-        (current_time, end_time) = self.__calculate_time(hours)
+        (current_time, end_time) = self.calculate_time_range(hours)
 
         if object_type.lower() == "hostgroup":
             if remove_downtime:
@@ -241,14 +241,14 @@ class Icinga2APIClient(MonitoringClientBase):
         result = ""
         if remove_downtime:
             payload["type"] = "Host"
-            result = self.__api_post("/actions/remove-downtime", json.dumps(payload))
+            result = self._api_post("/actions/remove-downtime", json.dumps(payload))
             payload["type"] = "Service"
-            result = self.__api_post("/actions/remove-downtime", json.dumps(payload))
+            result = self._api_post("/actions/remove-downtime", json.dumps(payload))
         else:
             payload["type"] = "Host"
-            result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
+            result = self._api_post("/actions/schedule-downtime", json.dumps(payload))
             payload["type"] = "Service"
-            result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
+            result = self._api_post("/actions/schedule-downtime", json.dumps(payload))
         #return result
         result_obj = json.loads(result.text)
         if len(result_obj["results"]) == 0:
@@ -275,7 +275,7 @@ class Icinga2APIClient(MonitoringClientBase):
         :param comment: Downtime comment
         :type comment: str
         """
-        return self.__manage_downtime(object_name, object_type, hours, \
+        return self._manage_downtime(object_name, object_type, hours, \
             comment, remove_downtime=False)
 
 
@@ -290,7 +290,7 @@ class Icinga2APIClient(MonitoringClientBase):
         :param object_type: host or hostgroup
         :type object_type: str
         """
-        return self.__manage_downtime(object_name, object_type, 8, \
+        return self._manage_downtime(object_name, object_type, 8, \
             "Downtime managed by katprep", remove_downtime=True)
 
 
@@ -307,7 +307,7 @@ class Icinga2APIClient(MonitoringClientBase):
         """
         #retrieve and load data
         try:
-            result = self.__api_get("/objects/{}s?host={}".format(
+            result = self._api_get("/objects/{}s?host={}".format(
                object_type, object_name)
             )
             data = json.loads(result.text)
@@ -334,7 +334,7 @@ class Icinga2APIClient(MonitoringClientBase):
         :type only_failed: bool
         """
         #retrieve result
-        result = self.__api_get('/objects/services?filter=match("{}",host.name)'.format(
+        result = self._api_get('/objects/services?filter=match("{}",host.name)'.format(
             object_name)
         )
         data = json.loads(result.text)
@@ -368,7 +368,7 @@ class Icinga2APIClient(MonitoringClientBase):
         :type ipv6_only: bool
         """
         #retrieve result
-        result = self.__api_get("/objects/hosts")
+        result = self._api_get("/objects/hosts")
         data = json.loads(result.text)
         hosts = []
         for result in data["results"]:
@@ -392,7 +392,7 @@ class Icinga2APIClient(MonitoringClientBase):
         #set-up URL
         url = "/"
         #retrieve data
-        result = self.__api_get(url)
+        result = self._api_get(url)
         if result != "":
             return True
         else:

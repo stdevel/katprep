@@ -77,7 +77,7 @@ class NagiosCGIClient(MonitoringClientBase):
         self.username = username
         self.password = password
         self.verify = verify
-        self.connect()
+        self._connect()
 
 
 
@@ -93,7 +93,7 @@ class NagiosCGIClient(MonitoringClientBase):
 
 
 
-    def connect(self):
+    def _connect(self):
         """
         This function establishes a connection to Nagios/Icinga.
         """
@@ -103,7 +103,7 @@ class NagiosCGIClient(MonitoringClientBase):
 
 
 
-    def __api_request(self, method, sub_url, payload=""):
+    def _api_request(self, method, sub_url, payload=""):
         """
         Sends a HTTP request to the Nagios/Icinga API. This function requires
         a valid HTTP method and a sub-URL (such as /cgi-bin/status.cgi).
@@ -117,8 +117,8 @@ class NagiosCGIClient(MonitoringClientBase):
         :param payload: payload for POST requests
         :type payload: str
 
-.. seealso:: __api_get()
-.. seealso:: __api_post()
+.. seealso:: _api_get()
+.. seealso:: _api_post()
         """
         #send request to API
         self.LOGGER.debug(
@@ -170,7 +170,7 @@ class NagiosCGIClient(MonitoringClientBase):
             raise
 
     #Aliases
-    def __api_get(self, sub_url):
+    def _api_get(self, sub_url):
         """
         Sends a HTTP GET request to the Nagios/Icinga API. This function
         requires a sub-URL (such as /cgi-bin/status.cgi).
@@ -178,9 +178,9 @@ class NagiosCGIClient(MonitoringClientBase):
         :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
         :type sub_url: str
         """
-        return self.__api_request("get", sub_url)
+        return self._api_request("get", sub_url)
 
-    def __api_post(self, sub_url, payload):
+    def _api_post(self, sub_url, payload):
         """
         Sends a HTTP POST request to the Nagios/Icinga API. This function
         requires a sub-URL (such as /cgi-bin/status.cgi).
@@ -190,12 +190,12 @@ class NagiosCGIClient(MonitoringClientBase):
         :param payload: payload data
         :type payload: str
         """
-        return self.__api_request("post", sub_url, payload)
+        return self._api_request("post", sub_url, payload)
 
 
 
     @staticmethod
-    def __calculate_time(hours):
+    def calculate_time_range(hours):
         """
         Calculates the time range for POST requests in the format the
         Nagios/Icinga 1.x API requires. For this, the current time/date
@@ -212,7 +212,7 @@ class NagiosCGIClient(MonitoringClientBase):
 
 
 
-    def __manage_downtime(
+    def _manage_downtime(
             self, object_name, object_type, hours, comment, remove_downtime
         ):
         """
@@ -232,7 +232,7 @@ class NagiosCGIClient(MonitoringClientBase):
         :type remove_downtime: bool
         """
         #calculate timerange
-        (current_time, end_time) = self.__calculate_time(hours)
+        (current_time, end_time) = self.calculate_time_range(hours)
 
         #set-up payload
         payload = {}
@@ -280,7 +280,7 @@ class NagiosCGIClient(MonitoringClientBase):
         #send POST
         result = None
         for req in payload:
-            result = self.__api_post("/cgi-bin/cmd.cgi", payload[req])
+            result = self._api_post("/cgi-bin/cmd.cgi", payload[req])
         return result
 
 
@@ -302,7 +302,7 @@ class NagiosCGIClient(MonitoringClientBase):
         :param comment: Downtime comment
         :type comment: str
         """
-        return self.__manage_downtime(object_name, object_type, hours, \
+        return self._manage_downtime(object_name, object_type, hours, \
             comment, remove_downtime=False)
 
 
@@ -317,7 +317,7 @@ class NagiosCGIClient(MonitoringClientBase):
         :param object_name: Hostname or hostgroup name
         :type object_name: str
         """
-        return self.__manage_downtime(
+        return self._manage_downtime(
             object_name, object_type, hours=1, comment="", remove_downtime=True
         )
 
@@ -332,7 +332,7 @@ class NagiosCGIClient(MonitoringClientBase):
         :type object_name: str
         """
         #retrieve host information
-        result = self.__api_get(
+        result = self._api_get(
             "/cgi-bin/status.cgi?host={}".format(object_name)
         )
         #get _all_ the ugly images
@@ -351,7 +351,7 @@ class NagiosCGIClient(MonitoringClientBase):
 
 
     @staticmethod
-    def __regexp_matches(text, regexp):
+    def _regexp_matches(text, regexp):
         """
         Returns whether a text matches a particular regular expression.
         Used internally - isn't that funny outside get_services() or get_hosts().
@@ -368,7 +368,7 @@ class NagiosCGIClient(MonitoringClientBase):
 
 
     @staticmethod
-    def __is_blacklisted(text):
+    def _is_blacklisted(text):
         """
         Returns whether a text received when parsing service information is
         blacklisted. Used internally - isn't that funny outside get_services().
@@ -407,7 +407,7 @@ class NagiosCGIClient(MonitoringClientBase):
 
 
     @staticmethod
-    def __get_state(state):
+    def _get_state(state):
         """
         Returns a numeric plugin return code based on the state
 
@@ -438,7 +438,7 @@ class NagiosCGIClient(MonitoringClientBase):
         if only_failed:
             url = "{}&hoststatustypes=15&servicestatustypes=16".format(url)
         #retrieve data
-        result = self.__api_get(url)
+        result = self._api_get(url)
         tree = html.fromstring(result)
         if only_failed:
             data = tree.xpath(
@@ -463,7 +463,7 @@ class NagiosCGIClient(MonitoringClientBase):
         hits = []
         for item in data:
             item = item.lstrip()
-            if not self.__is_blacklisted(item):
+            if not self._is_blacklisted(item):
                 hits.append(item)
         #try building a beautiful array of dicts
         if len(hits)%2 != 0:
@@ -475,7 +475,7 @@ class NagiosCGIClient(MonitoringClientBase):
                 )
                 services.append({
                     "name": hits[counter],
-                    "state": self.__get_state(hits[counter+1])
+                    "state": self._get_state(hits[counter+1])
                 })
                 counter = counter + 2
             return services
@@ -492,7 +492,7 @@ class NagiosCGIClient(MonitoringClientBase):
         #set-up URL
         url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
         #retrieve data
-        result = self.__api_get(url)
+        result = self._api_get(url)
         tree = html.fromstring(result)
         #make sure to get the nested-nested table of the first table
         data = tree.xpath(
@@ -507,7 +507,7 @@ class NagiosCGIClient(MonitoringClientBase):
             #set-up URL
             url = "/cgi-bin/extinfo.cgi?type=1&host={}".format(host)
             #retrieve data
-            result = self.__api_get(url)
+            result = self._api_get(url)
             #set-up xpath
             tree = html.fromstring(result)
             data = tree.xpath(
@@ -525,7 +525,7 @@ class NagiosCGIClient(MonitoringClientBase):
                 r"|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]" \
                 r"[0-9]|25[0-5])$"
             for entry in data:
-                if self.__regexp_matches(entry, ip_regexp):
+                if self._regexp_matches(entry, ip_regexp):
                     #entry is an IP
                     target_ip = entry
             this_host = {"name": host, "ip": target_ip}
@@ -542,7 +542,7 @@ class NagiosCGIClient(MonitoringClientBase):
         #set-up URL
         url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
         #retrieve data
-        result = self.__api_get(url)
+        result = self._api_get(url)
         if result != "":
             return True
         else:
