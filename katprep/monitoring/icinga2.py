@@ -6,7 +6,6 @@ monitoring systems.
 
 import json
 import logging
-import time
 from datetime import datetime, timedelta
 
 from katprep.clients import SessionException, EmptySetException
