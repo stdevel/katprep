@@ -37,15 +37,13 @@ class MonitoringClientBase:
         """
         raise NotImplementedError("missing remove_downtime implementation")
 
-    def has_downtime(self, object_name, object_type="host"):
+    def has_downtime(self, object_name):
         """
-        Returns whether a particular object (host, hostgroup) is currently in
-        scheduled downtime. This required specifying an object name and type.
+        Returns whether a particular object host is currently in scheduled
+        downtime.
 
         :param object_name: Hostname or hostgroup name
         :type object_name: str
-        :param object_type: Host or hostgroup (default: host)
-        :type object_type: str
         """
         raise NotImplementedError("missing has_downtime implementation")
 
