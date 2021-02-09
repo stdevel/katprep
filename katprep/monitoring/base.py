@@ -11,6 +11,9 @@ from requests.auth import HTTPBasicAuth
 from .exceptions import UnauthenticatedError
 
 
+DOWNTIME_COMMENT = "Downtime managed by katprep"
+
+
 class MonitoringClientBase(metaclass=ABCMeta):
     """
     Base class for creating an monitoring client.
@@ -18,7 +21,7 @@ class MonitoringClientBase(metaclass=ABCMeta):
 
     @abstractmethod
     def schedule_downtime(
-        self, object_name, object_type, hours=8, comment="Downtime managed by katprep"
+        self, object_name, object_type, hours=8, comment=DOWNTIME_COMMENT
     ):
         """
         Adds scheduled downtime for a host or hostgroup.
