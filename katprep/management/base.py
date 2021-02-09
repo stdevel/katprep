@@ -7,6 +7,9 @@ from abc import ABCMeta, abstractmethod
 
 
 class BaseConnector(metaclass=ABCMeta):
+    """
+    Basic management connector that connects on creation.
+    """
 
     def __init__(self, username, password, **kwargs):
         self._username = username
