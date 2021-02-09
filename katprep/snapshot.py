@@ -19,7 +19,7 @@ from .management.exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, UnsupportedFilterException,
 UnsupportedRequestException)
 from .management.foreman import ForemanAPIClient
-from .network import validate_hostname,
+from .network import validate_hostname
 
 __version__ = "0.5.0"
 """
