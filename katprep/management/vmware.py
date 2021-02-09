@@ -8,7 +8,7 @@ just an endless pain when managing VMware products
 import logging
 import ssl
 import sys
-from .network import is_ipv4, is_ipv6
+from ..network import is_ipv4, is_ipv6
 from .exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, SnapshotExistsException)
 from pyVim.connect import SmartConnect, Disconnect

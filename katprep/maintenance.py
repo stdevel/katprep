@@ -20,13 +20,13 @@ from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report, get_host_params_by_report
 from .clients.NagiosCGIClient import NagiosCGIClient
 from .clients.Icinga2APIClient import Icinga2APIClient
-from .management import validate_hostname
 from .management.exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, SnapshotExistsException,
 UnsupportedFilterException, UnsupportedRequestException)
 from .management.foreman import ForemanAPIClient
 from .management.libvirt import LibvirtClient
 from .management.vmware import PyvmomiClient
+from .network import validate_hostname
 
 __version__ = "0.5.0"
 """
