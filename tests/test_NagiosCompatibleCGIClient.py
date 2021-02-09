@@ -37,7 +37,7 @@ def monitoringClient(config, nagiosType):
             config[nagiosType]["hostname"],
             config[nagiosType]["cgi_user"],
             config[nagiosType]["cgi_pass"],
-            verify=False
+            verify_ssl=False
         )
     finally:
         time.sleep(8)
@@ -51,7 +51,7 @@ def icingaClient(config):
             config["main"]["hostname"],
             config["main"]["cgi_user"],
             config["main"]["cgi_pass"],
-            verify=False
+            verify_ssl=False
         )
     finally:
         time.sleep(8)
@@ -65,7 +65,7 @@ def nagiosClient(config):
             config["legacy"]["hostname"],
             config["legacy"]["cgi_user"],
             config["legacy"]["cgi_pass"],
-            verify=False
+            verify_ssl=False
         )
     finally:
         time.sleep(8)
@@ -88,7 +88,7 @@ def test_invalid_login(config, nagiosType):
             config[nagiosType]["hostname"],
             "giertz",
             "paulapinkepank",
-            verify=False
+            verify_ssl=False
         )
         client.is_authenticated()
 

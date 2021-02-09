@@ -318,12 +318,13 @@ def main(options, args):
             #Yet another legacy installation
             MON_CLIENT = NagiosCGIClient(
                 LOG_LEVEL, options.mon_url, mon_user, mon_pass, \
-                verify=options.ssl_verify
+                verify_ssl=options.ssl_verify
             )
         else:
             #Icinga 2, yay!
             MON_CLIENT = Icinga2APIClient(
-                LOG_LEVEL, options.mon_url, mon_user, mon_pass
+                LOG_LEVEL, options.mon_url, mon_user, mon_pass,
+                verify_ssl=options.ssl_verify
             )
 
     #populate _all_ the things

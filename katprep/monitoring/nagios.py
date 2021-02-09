@@ -33,7 +33,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
     bool: Nagios system
     """
 
-    def __init__(self, log_level, url, username, password, verify=True):
+    def __init__(self, log_level, url, username, password, verify_ssl=True):
         """
         Constructor, creating the class. It requires specifying a
         URL. Optionally you can specify a username and password to access
@@ -60,9 +60,8 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             )
             self.set_nagios(True)
 
-
         super().__init__(url=url, username=username, password=password,
-                         verify_ssl=verify)
+                         verify_ssl=verify_ssl)
 
     def set_nagios(self, flag):
         """
