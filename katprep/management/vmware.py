@@ -27,10 +27,6 @@ class PyvmomiClient(object):
     """
     logging: Logger instance
     """
-    SESSION = None
-    """
-    session: pyvmomi session
-    """
 
     def __init__(self, log_level, hostname, username, password):
         """
@@ -63,6 +59,7 @@ class PyvmomiClient(object):
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
+        self.SESSION = None
         self._connect()
 
 
