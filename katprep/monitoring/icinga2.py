@@ -393,7 +393,4 @@ class Icinga2APIClient(MonitoringClientBase):
         url = "/"
         #retrieve data
         result = self._api_get(url)
-        if result != "":
-            return True
-        else:
-            return False
+        return bool(result)

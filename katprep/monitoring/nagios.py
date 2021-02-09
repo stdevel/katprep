@@ -543,7 +543,4 @@ class NagiosCGIClient(MonitoringClientBase):
         url = "/cgi-bin/status.cgi?host=all&style=hostdetail&limit=0&start=1"
         #retrieve data
         result = self._api_get(url)
-        if result != "":
-            return True
-        else:
-            return False
+        return bool(result)
