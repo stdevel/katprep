@@ -1,1 +1,13 @@
-{"config": {"hostname": "https://localhost:8665", "api_user": "omdadmin", "api_pass": "omd"}, "valid_objects": {"host": "dummyA", "hostgroup": "dummy-hosts", "host_service": "PING", "host_services": 3}}
+{
+  "config": {
+    "hostname": "https://localhost:8665",
+    "api_user": "omdadmin",
+    "api_pass": "omd"
+  },
+  "valid_objects": {
+    "host": "dummyA",
+    "hostgroup": "dummy-hosts",
+    "host_service": "PING",
+    "host_services": 3
+  }
+}
