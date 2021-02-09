@@ -12,6 +12,9 @@ from .exceptions import UnauthenticatedError
 
 
 class MonitoringClientBase(metaclass=ABCMeta):
+    """
+    Base class for creating an monitoring client.
+    """
 
     @abstractmethod
     def schedule_downtime(
@@ -80,7 +83,6 @@ class HttpApiClient:
     """
     Base client for HTTP API interaction.
 
-    You have to at least implement the functions `_connect` and `_api_request`.
     The functions `_api_get` and `_api_post` are aliases for easier use.
     """
 
