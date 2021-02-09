@@ -16,11 +16,11 @@ from . import get_credentials
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
-from .clients.NagiosCGIClient import NagiosCGIClient
-from .clients.Icinga2APIClient import Icinga2APIClient
 from .clients import EmptySetException, SessionException, \
 InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
+from .monitoring.icinga2 import Icinga2APIClient
+from .monitoring.nagios import NagiosCGIClient
 
 __version__ = "0.5.0"
 """

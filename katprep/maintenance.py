@@ -21,11 +21,11 @@ get_required_hosts_by_report, get_host_params_by_report
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
-from .clients.NagiosCGIClient import NagiosCGIClient
-from .clients.Icinga2APIClient import Icinga2APIClient
 from .clients import validate_hostname, EmptySetException, \
 SessionException, InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException, SnapshotExistsException
+from .monitoring.nagios import NagiosCGIClient
+from .monitoring.icinga2 import Icinga2APIClient
 
 __version__ = "0.5.0"
 """
