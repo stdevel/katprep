@@ -7,12 +7,12 @@ from __future__ import print_function
 
 import libvirt
 import logging
-from .base import BaseConnector
+from .base import BaseConnector, SnapshotManager
 from .exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, UnsupportedRequestException)
 
 
-class LibvirtClient(BaseConnector):
+class LibvirtClient(BaseConnector, SnapshotManager):
     """
     Class for communicating with libvirt
 
@@ -113,9 +113,7 @@ class LibvirtClient(BaseConnector):
                 return -1
         return 0
 
-
-
-    def __manage_snapshot(
+    def _manage_snapshot(
             self, vm_name, snapshot_title, snapshot_text, action="create"
         ):
         """
@@ -127,13 +125,11 @@ class LibvirtClient(BaseConnector):
         :type vm_name: str
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
-        :param snapshot_text: Snapshot text
+        :param snapshot_text: Descriptive text for the snapshot
         :type snapshot_text: str
-        :param remove_snapshot: Removes a snapshot if set to True
-        :type remove_snapshot: bool
-
+        :param action: The action to perform. create, remove or revert.
+        :type action: str
         """
-
         try:
             target_vm = self._session.lookupByName(vm_name)
             if action.lower() == "remove":
@@ -155,53 +151,6 @@ class LibvirtClient(BaseConnector):
             raise SessionException("Unable to {} snapshot: '{}'".format(
                 action.lower(), err)
             )
-
-
-
-    #Aliases
-    def create_snapshot(self, vm_name, snapshot_title, snapshot_text):
-        """
-        Creates a snapshot for a particular virtual machine.
-        This requires specifying a VM, comment title and text.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        :param snapshot_text: Snapshot text
-        :type snapshot_text: str
-        """
-        return self.__manage_snapshot(vm_name, snapshot_title, snapshot_text)
-
-    def remove_snapshot(self, vm_name, snapshot_title):
-        """
-        Removes a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, "", action="remove"
-        )
-
-    def revert_snapshot(self, vm_name, snapshot_title):
-        """
-        Reverts to  a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, "", action="revert"
-        )
-
-
 
     def has_snapshot(self, vm_name, snapshot_title):
         """

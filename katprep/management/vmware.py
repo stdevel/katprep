@@ -8,6 +8,7 @@ import logging
 import ssl
 import sys
 from ..network import is_ipv4, is_ipv6
+from .base import BaseConnector, SnapshotManager
 from .exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, SnapshotExistsException)
 from pyVim.connect import SmartConnect, Disconnect
@@ -19,7 +20,7 @@ except ImportError:
     from urlparse import urlparse
 
 
-class PyvmomiClient(object):
+class PyvmomiClient(BaseConnector, SnapshotManager):
     """
 .. class:: PyvmomiClient
     """
@@ -113,7 +114,7 @@ class PyvmomiClient(object):
         :type snapshot_title: str
         :param snapshot_text: Snapshot text
         :type snapshot_text: str
-        :param action: action (create, remove)
+        :param action: The action to perform. create, remove or revert.
         :type remove_snapshot: str
 
         """
@@ -124,7 +125,10 @@ class PyvmomiClient(object):
         try:
             content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
-            if action.lower() != "create":
+            if action.lower() == "revert":
+                #TODO: implement revert
+                raise NotImplementedError("Reverting snapshots not supported")
+            elif action.lower() == "remove":
                 #get _all_ the snapshots
                 snapshots = self.__get_snapshots(vm_name)
                 for snapshot in snapshots:
@@ -177,56 +181,6 @@ class PyvmomiClient(object):
                 "Unable to manage snapshot: '{}'".format(err)
             )
 
-
-
-    #Aliases
-    def create_snapshot(self, vm_name, snapshot_title, snapshot_text):
-        """
-        Creates a snapshot for a particular virtual machine.
-        This requires specifying a VM, comment title and text.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        :param snapshot_text: Snapshot text
-        :type snapshot_text: str
-        """
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, snapshot_text, action="create"
-        )
-
-    def remove_snapshot(self, vm_name, snapshot_title):
-        """
-        Removes a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, "", action="remove"
-        )
-
-    def revert_snapshot(self, vm_name, snapshot_title):
-        """
-        Reverts to  a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        #TODO: implement revert
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, "", action="revert"
-        )
-
-
-
     def __get_snapshots(self, vm_name):
         """
         Returns a set of all snapshots for a particular VM.
@@ -245,8 +199,6 @@ class PyvmomiClient(object):
                     return snapshots
         except AttributeError:
             raise EmptySetException("No snapshots found")
-
-
 
     def has_snapshot(self, vm_name, snapshot_title):
         """
