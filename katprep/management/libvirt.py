@@ -8,9 +8,8 @@ from __future__ import print_function
 
 import libvirt
 import logging
-from katprep.clients import SessionException, EmptySetException, \
-UnsupportedRequestException, InvalidCredentialsException
-
+from .exceptions import (EmptySetException, InvalidCredentialsException,
+SessionException, UnsupportedRequestException)
 
 
 class LibvirtClient:

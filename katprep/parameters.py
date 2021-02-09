@@ -13,10 +13,10 @@ import logging
 import json
 import getpass
 from . import get_credentials, validate_filters, get_filter
-from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients import EmptySetException, SessionException, \
-InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException
+from .management.foreman import ForemanAPIClient
+from .management.exceptions import (EmptySetException,
+InvalidCredentialsException, SessionException, UnsupportedFilterException,
+UnsupportedRequestException)
 
 try:
     raw_input

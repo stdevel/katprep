@@ -13,14 +13,14 @@ import logging
 import json
 import getpass
 from . import get_credentials
-from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients.LibvirtClient import LibvirtClient
-from .clients.PyvmomiClient import PyvmomiClient
 from .clients.NagiosCGIClient import NagiosCGIClient
 from .clients.Icinga2APIClient import Icinga2APIClient
-from .clients import EmptySetException, SessionException, \
+from .management.exceptions import EmptySetException, SessionException, \
 InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
+from .management.foreman import ForemanAPIClient
+from .management.libvirt import LibvirtClient
+from .management.vmare import PyvmomiClient
 
 __version__ = "0.5.0"
 """

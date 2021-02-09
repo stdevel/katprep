@@ -6,8 +6,8 @@ depending exception classes
 """
 
 import logging
-from katprep.clients import (SessionException, InvalidCredentialsException,
-                             APILevelNotSupportedException)
+from .exceptions import (APILevelNotSupportedException, InvalidCredentialsException,
+                         SessionException)
 
 try:
     from xmlrpc.server import SimpleXMLRPCServer as Server

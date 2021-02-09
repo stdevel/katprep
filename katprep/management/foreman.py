@@ -8,9 +8,9 @@ import logging
 import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from katprep.clients import SessionException, InvalidCredentialsException, \
-APILevelNotSupportedException, InvalidHostnameFormatException
-
+from .exceptions import (APILevelNotSupportedException,
+InvalidCredentialsException, InvalidHostnameFormatException
+SessionException)
 
 
 class ForemanAPIClient:
