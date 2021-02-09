@@ -69,7 +69,6 @@ class PyvmomiClient(object):
 
     def __connect(self):
         """This function establishes a connection to the hypervisor."""
-        global SESSION
         context = None
         #skip SSL verification for now
         if hasattr(ssl, '_create_unverified_context'):
