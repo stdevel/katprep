@@ -50,7 +50,8 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
         """
         #set logging
         self.LOGGER.setLevel(log_level)
-        if url[len(url)-1:] != "/":
+
+        if not url.endswith("/"):
             #add trailing slash
             url = "{}/".format(url)
 
