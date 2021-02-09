@@ -78,13 +78,13 @@ class ForemanAPIClient:
         self.VERIFY = verify
         self.URL = "https://{0}{1}/api/v2".format(self.HOSTNAME, prefix)
         #start session and check API version if Foreman API
-        self.__connect()
+        self._connect()
         if prefix == "":
             self.validate_api_support()
 
 
 
-    def __connect(self):
+    def _connect(self):
         """
         This function establishes a connection to Foreman.
         """

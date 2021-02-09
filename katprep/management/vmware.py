@@ -63,11 +63,11 @@ class PyvmomiClient(object):
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
-        self.__connect()
+        self._connect()
 
 
 
-    def __connect(self):
+    def _connect(self):
         """This function establishes a connection to the hypervisor."""
         context = None
         #skip SSL verification for now

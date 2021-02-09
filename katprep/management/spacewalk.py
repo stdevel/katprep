@@ -88,7 +88,7 @@ class SpacewalkAPIClient(object):
         self.url = "https://{0}/rpc/api".format(self.hostname)
 
         #start session and check API version if Spacewalk API
-        self.__connect()
+        self._connect()
         self.validate_api_support()
 
 
@@ -101,7 +101,7 @@ class SpacewalkAPIClient(object):
 
 
 
-    def __connect(self):
+    def _connect(self):
         """
         This function establishes a connection to Spacewalk.
         """

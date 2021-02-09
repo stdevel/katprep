@@ -57,7 +57,7 @@ class LibvirtClient:
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
-        self.__connect()
+        self._connect()
 
 
 
@@ -84,7 +84,7 @@ class LibvirtClient:
 
 
 
-    def __connect(self):
+    def _connect(self):
         """This function establishes a connection to the hypervisor."""
         #create weirdo auth dict
         auth = [
