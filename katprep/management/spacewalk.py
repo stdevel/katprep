@@ -133,6 +133,6 @@ class SpacewalkAPIClient(object):
 
     def get_hostname(self):
         """
-        Returns the configured hostname of the objecti nstance.
+        Returns the configured hostname of the object instance.
         """
         return self.hostname
