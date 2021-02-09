@@ -10,8 +10,6 @@ class SessionException(Exception):
     .. class:: SessionException
     """
 
-    pass
-
 
 class InvalidCredentialsException(Exception):
     """
@@ -19,8 +17,6 @@ class InvalidCredentialsException(Exception):
 
     .. class:: InvalidCredentialsException
     """
-
-    pass
 
 
 class APILevelNotSupportedException(Exception):
@@ -30,8 +26,6 @@ class APILevelNotSupportedException(Exception):
     .. class:: APILevelNotSupportedException
     """
 
-    pass
-
 
 class UnsupportedRequestException(Exception):
     """
@@ -39,8 +33,6 @@ class UnsupportedRequestException(Exception):
 
     .. class:: UnsupportedRequest
     """
-
-    pass
 
 
 class InvalidHostnameFormatException(Exception):
@@ -50,8 +42,6 @@ class InvalidHostnameFormatException(Exception):
     .. class:: InvalidHostnameFormatException
     """
 
-    pass
-
 
 class UnsupportedFilterException(Exception):
     """
@@ -59,8 +49,6 @@ class UnsupportedFilterException(Exception):
 
     .. class:: UnsupportedFilterException
     """
-
-    pass
 
 
 class EmptySetException(Exception):
@@ -70,8 +58,6 @@ class EmptySetException(Exception):
     .. class:: EmptySetException
     """
 
-    pass
-
 
 class SnapshotExistsException(Exception):
     """
@@ -79,5 +65,3 @@ class SnapshotExistsException(Exception):
 
     .. class:: SnapshotExistsException
     """
-
-    pass
