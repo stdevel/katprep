@@ -5,17 +5,18 @@ Class for sending some very basic commands to Nagios/Icinga 1.x legacy
 monitoring systems.
 """
 
-import time
 import logging
-from datetime import datetime, timedelta
-import re
-import requests
 import os
-from requests.auth import HTTPBasicAuth
-from lxml import html
+import re
+import time
+from datetime import datetime, timedelta
+
 from katprep.clients import SessionException, UnsupportedRequestException
 from .base import MonitoringClientBase
 
+from lxml import html
+from requests import Session
+from requests.auth import HTTPBasicAuth
 
 
 class NagiosCGIClient(MonitoringClientBase):
@@ -97,7 +98,7 @@ class NagiosCGIClient(MonitoringClientBase):
         """
         This function establishes a connection to Nagios/Icinga.
         """
-        self.session = requests.Session()
+        self.session = Session()
         if self.username != "":
             self.session.auth = HTTPBasicAuth(self.username, self.password)
 

@@ -5,15 +5,16 @@ Class for sending some very basic commands to Icinga 2.x
 monitoring systems.
 """
 
-import logging
-import requests
-from requests.auth import HTTPBasicAuth
 import json
+import logging
 import time
 from datetime import datetime, timedelta
+
 from katprep.clients import SessionException, EmptySetException
 from .base import MonitoringClientBase
 
+from requests import Session
+from requests.auth import HTTPBasicAuth
 
 
 class Icinga2APIClient(MonitoringClientBase):
@@ -80,7 +81,7 @@ class Icinga2APIClient(MonitoringClientBase):
         """
         This function establishes a connection to the Icinga2 API.
         """
-        self.SESSION = requests.Session()
+        self.SESSION = Session()
         if self.USERNAME != "":
             self.SESSION.auth = HTTPBasicAuth(self.USERNAME, self.PASSWORD)
 
