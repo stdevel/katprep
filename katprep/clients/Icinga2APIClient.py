@@ -11,7 +11,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import time
 from datetime import datetime, timedelta
-from katprep.clients import SessionException, EmptySetException
+from ..management.exceptions import EmptySetException, SessionException
 
 
 

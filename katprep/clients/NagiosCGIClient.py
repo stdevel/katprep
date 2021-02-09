@@ -13,7 +13,7 @@ import requests
 import os
 from requests.auth import HTTPBasicAuth
 from lxml import html
-from katprep.clients import SessionException, UnsupportedRequestException
+from ..management.exceptions import SessionException, UnsupportedRequestException
 
 
 
