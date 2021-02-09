@@ -7,12 +7,12 @@ from __future__ import print_function
 
 import libvirt
 import logging
-from .base import BaseConnector, SnapshotManager
+from .base import BaseConnector, PowerManager, SnapshotManager
 from .exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, UnsupportedRequestException)
 
 
-class LibvirtClient(BaseConnector, SnapshotManager):
+class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
     """
     Class for communicating with libvirt
 
@@ -242,7 +242,6 @@ class LibvirtClient(BaseConnector, SnapshotManager):
                 raise SessionException("Unable to restart VM: '{}'".format(err))
 
 
-
     def powerstate_vm(self, vm_name):
         """
         Returns the power state of a particular virtual machine.
@@ -253,7 +252,7 @@ class LibvirtClient(BaseConnector, SnapshotManager):
         """
         raise NotImplementedError("powerstate_vm hasn't been implemented yet")
 
-    def __manage_power(
+    def _manage_power(
             self, vm_name, action="poweroff"
         ):
         """
@@ -265,28 +264,4 @@ class LibvirtClient(BaseConnector, SnapshotManager):
         :type action: str
 
         """
-        raise NotImplementedError("__manage_power hasn't been implemented yet")
-
-
-    #Aliases
-    def poweroff_vm(self, vm_name):
-        """
-        Turns off a particual virtual machine forcefully.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        """
-        return self.__manage_power(
-            vm_name
-        )
-
-    def poweron_vm(self, vm_name):
-        """
-        Turns on a particual virtual machine forecully.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        """
-        return self.__manage_power(
-            vm_name, action="poweron"
-        )
+        raise NotImplementedError("_manage_power hasn't been implemented yet")

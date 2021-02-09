@@ -8,7 +8,7 @@ import logging
 import ssl
 import sys
 from ..network import is_ipv4, is_ipv6
-from .base import BaseConnector, SnapshotManager
+from .base import BaseConnector, PowerManager, SnapshotManager
 from .exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, SnapshotExistsException)
 from pyVim.connect import SmartConnect, Disconnect
@@ -20,7 +20,7 @@ except ImportError:
     from urlparse import urlparse
 
 
-class PyvmomiClient(BaseConnector, SnapshotManager):
+class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
     """
 .. class:: PyvmomiClient
     """
@@ -319,8 +319,6 @@ class PyvmomiClient(BaseConnector, SnapshotManager):
             self.LOGGER.error("Unable to get VM hypervisor information: '%s'", err)
             raise SessionException(err)
 
-
-
     def restart_vm(self, vm_name, force=False):
         """
         Restarts a particular VM (default: soft reboot using guest tools).
@@ -346,45 +344,16 @@ class PyvmomiClient(BaseConnector, SnapshotManager):
                 sys.exc_info()[0]
             ))
 
-
-
-    def powerstate_vm(self, vm_name):
-        """
-        Returns the power state of a particular virtual machine.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-
-        """
-        try:
-            content = self._session.RetrieveContent()
-            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
-            if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
-                return "poweredOn"
-            elif vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOff:
-                return "poweredOff"
-        except AttributeError as err:
-            raise SessionException(
-                "Unable to get power state: '{}'".format(err)
-            )
-        except ValueError as err:
-            raise SessionException(
-                "Unable to get power state: '{}'".format(err)
-            )
-
-
-
-    def __manage_power(
+    def _manage_power(
             self, vm_name, action="poweroff"
         ):
         """
         Powers a particual virtual machine on/off forcefully.
 
-        :param vm_name: Name of a virtual machine
+        :param vm_name: Name of the virtual machine
         :type vm_name: str
         :param action: action (poweroff, poweron)
         :type action: str
-
         """
         try:
             content = self._session.RetrieveContent()
@@ -405,26 +374,25 @@ class PyvmomiClient(BaseConnector, SnapshotManager):
             )
 
 
-
-    #Aliases
-    def poweroff_vm(self, vm_name):
+    def powerstate_vm(self, vm_name):
         """
-        Turns off a particual virtual machine forcefully.
+        Returns the power state of a particular virtual machine.
 
         :param vm_name: Name of a virtual machine
         :type vm_name: str
         """
-        return self.__manage_power(
-            vm_name
-        )
-
-    def poweron_vm(self, vm_name):
-        """
-        Turns on a particual virtual machine forcefully.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        """
-        return self.__manage_power(
-            vm_name, action="poweron"
-        )
+        try:
+            content = self._session.RetrieveContent()
+            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
+            if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
+                return "poweredOn"
+            elif vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOff:
+                return "poweredOff"
+        except AttributeError as err:
+            raise SessionException(
+                "Unable to get power state: '{}'".format(err)
+            )
+        except ValueError as err:
+            raise SessionException(
+                "Unable to get power state: '{}'".format(err)
+            )
