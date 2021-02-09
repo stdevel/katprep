@@ -268,9 +268,7 @@ class LibvirtClient:
         Returns a list of VMs and their hypervisors available through the
         current connection.
         """
-        print("TODO: get_vm_hosts")
-
-
+        raise NotImplementedError("get_vm_hosts hasn't been implemented yet")
 
     def restart_vm(self, vm_name, force=False):
         """
@@ -308,9 +306,7 @@ class LibvirtClient:
         :type vm_name: str
 
         """
-        print("TODO: powerstate_vm")
-
-
+        raise NotImplementedError("powerstate_vm hasn't been implemented yet")
 
     def __manage_power(
             self, vm_name, action="poweroff"
@@ -324,8 +320,7 @@ class LibvirtClient:
         :type action: str
 
         """
-        print("TODO: manage_power")
-
+        raise NotImplementedError("__manage_power hasn't been implemented yet")
 
 
     #Aliases
