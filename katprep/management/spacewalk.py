@@ -33,30 +33,6 @@ class SpacewalkAPIClient(object):
     """
     dict: Default headers set for every HTTP request
     """
-    hostname = ""
-    """
-    str: Spacewalk API hostname
-    """
-    url = ""
-    """
-    str: Spacewalk API base URL
-    """
-    username = ""
-    """
-    str: API username
-    """
-    password = ""
-    """
-    str: API password
-    """
-    api_session = None
-    """
-    Session: HTTP session to Spacewalk host
-    """
-    api_key = None
-    """
-    str: Session key
-    """
 
     def __init__(self, log_level, hostname, username, password):
         """
@@ -66,7 +42,7 @@ class SpacewalkAPIClient(object):
 
         :param log_level: log level
         :type log_level: logging
-        :param hostname: Spacewalk host
+        :param hostname: Spacewalk API hostname
         :type hostname: str
         :param username: API username
         :type username: str
@@ -88,6 +64,8 @@ class SpacewalkAPIClient(object):
         self.url = "https://{0}/rpc/api".format(self.hostname)
 
         #start session and check API version if Spacewalk API
+        self.api_session = None
+        self.api_key = None
         self._connect()
         self.validate_api_support()
 

@@ -30,22 +30,6 @@ class ForemanAPIClient:
     """
     dict: Default headers set for every HTTP request
     """
-    HOSTNAME = ""
-    """
-    str: Foreman API hostname
-    """
-    URL = ""
-    """
-    str: Foreman API base URL
-    """
-    SESSION = None
-    """
-    Session: HTTP session to Foreman host
-    """
-    VERIFY = True
-    """
-    bool: Boolean whether force SSL verification
-    """
 
     def __init__(self, log_level, hostname,
                  username, password, verify=True, prefix=""):
@@ -56,7 +40,7 @@ class ForemanAPIClient:
 
         :param log_level: log level
         :type log_level: logging
-        :param hostname: Foreman host
+        :param hostname: Foreman API hostname
         :type hostname: str
         :param username: API username
         :type username: str
@@ -78,6 +62,7 @@ class ForemanAPIClient:
         self.VERIFY = verify
         self.URL = "https://{0}{1}/api/v2".format(self.HOSTNAME, prefix)
         #start session and check API version if Foreman API
+        self.SESSION = None
         self._connect()
         if prefix == "":
             self.validate_api_support()
@@ -88,7 +73,6 @@ class ForemanAPIClient:
         """
         This function establishes a connection to Foreman.
         """
-        global SESSION
         self.SESSION = requests.Session()
         self.SESSION.auth = (self.USERNAME, self.PASSWORD)
 

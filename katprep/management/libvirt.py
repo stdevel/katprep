@@ -21,14 +21,6 @@ class LibvirtClient:
     """
     logging: Logger instance
     """
-    URI = ""
-    """
-    str: libvirt URI
-    """
-    SESSION = None
-    """
-    session: libvirt session
-    """
 
     def __init__(self, log_level, uri, username, password):
         """
@@ -57,6 +49,7 @@ class LibvirtClient:
         #set connection details and connect
         self.USERNAME = username
         self.PASSWORD = password
+        self.SESSION = None
         self._connect()
 
 
