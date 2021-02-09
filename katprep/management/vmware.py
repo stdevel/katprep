@@ -51,8 +51,7 @@ class PyvmomiClient(object):
         parsed_uri = urlparse(hostname)
         host = '{uri.path}'.format(uri=parsed_uri)
         if ":" in host:
-            self.HOSTNAME = host[:host.find(':')]
-            self.PORT = host[host.find(':')+1:]
+            self.HOSTNAME, self.PORT = host.split(':', 1)
         else:
             self.HOSTNAME = hostname
             self.PORT = 443
