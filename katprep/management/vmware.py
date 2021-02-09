@@ -56,13 +56,8 @@ class PyvmomiClient(object):
         else:
             self.HOSTNAME = hostname
             self.PORT = 443
-        #set connection details and connect
-        self.USERNAME = username
-        self.PASSWORD = password
-        self.SESSION = None
-        self._connect()
 
-
+        super().__init__(username, password)
 
     def _connect(self):
         """This function establishes a connection to the hypervisor."""
@@ -72,9 +67,9 @@ class PyvmomiClient(object):
             context = ssl._create_unverified_context()
         #try to connect
         try:
-            self.SESSION = SmartConnect(
+            self._session = SmartConnect(
                 host=self.HOSTNAME,
-                user=self.USERNAME, pwd=self.PASSWORD,
+                user=self._username, pwd=self._password,
                 port=self.PORT, sslContext=context
             )
         except vim.fault.InvalidLogin:
@@ -128,7 +123,7 @@ class PyvmomiClient(object):
         dump_memory = False
         quiesce = True
         try:
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
             if action.lower() != "create":
                 #get _all_ the snapshots
@@ -241,7 +236,7 @@ class PyvmomiClient(object):
         :type vm_name: str
         """
         try:
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             container = content.viewManager.CreateContainerView(
                 content.rootFolder, [vim.VirtualMachine], True
             )
@@ -295,7 +290,7 @@ class PyvmomiClient(object):
         """
         try:
             #get _all_ the VMs
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             #result = {}
             result = []
             #create view cotaining VM objects
@@ -358,7 +353,7 @@ class PyvmomiClient(object):
         """
         try:
             #get _all_ the VMs
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             result = {}
             #create view cotaining VM objects
             object_view = content.viewManager.CreateContainerView(
@@ -386,7 +381,7 @@ class PyvmomiClient(object):
         """
         try:
             #get VM
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
 
             if force:
@@ -411,7 +406,7 @@ class PyvmomiClient(object):
 
         """
         try:
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
             if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
                 return "poweredOn"
@@ -441,7 +436,7 @@ class PyvmomiClient(object):
 
         """
         try:
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
             if action.lower() == "poweroff":
                 #get down with the vickness

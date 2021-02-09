@@ -5,6 +5,7 @@ depending exception classes
 """
 
 import logging
+from .base import BaseConnector
 from .exceptions import (APILevelNotSupportedException, InvalidCredentialsException,
                          SessionException)
 
@@ -15,7 +16,7 @@ except ImportError:
     from xmlrpclib import Server, Fault
 
 
-class SpacewalkAPIClient(object):
+class SpacewalkAPIClient(BaseConnector):
     """
     Class for communicating with the Spacewalk API
 
@@ -64,9 +65,8 @@ class SpacewalkAPIClient(object):
         self.url = "https://{0}/rpc/api".format(self.hostname)
 
         #start session and check API version if Spacewalk API
-        self.api_session = None
         self.api_key = None
-        self._connect()
+        super().__init__(username, password)
         self.validate_api_support()
 
 
@@ -85,8 +85,8 @@ class SpacewalkAPIClient(object):
         """
         #set api session and key
         try:
-            self.api_session = Server(self.url)
-            self.api_key = self.api_session.auth.login(self.username, self.password)
+            self._session = Server(self.url)
+            self.api_key = self._session.auth.login(self._username, self._password)
         except Fault as err:
             if err.faultCode == 2950:
                 raise InvalidCredentialsException(
@@ -107,7 +107,7 @@ class SpacewalkAPIClient(object):
         """
         try:
             #check whether API is supported
-            api_level = self.api_session.api.getVersion()
+            api_level = self._session.api.getVersion()
             if float(api_level) < self.API_MIN:
                 raise APILevelNotSupportedException(
                     "Your API version ({0}) does not support the required calls. "

@@ -7,11 +7,12 @@ from __future__ import print_function
 
 import libvirt
 import logging
+from .base import BaseConnector
 from .exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, UnsupportedRequestException)
 
 
-class LibvirtClient:
+class LibvirtClient(BaseConnector):
     """
     Class for communicating with libvirt
 
@@ -46,13 +47,8 @@ class LibvirtClient:
             self.URI = uri
         else:
             raise SessionException("Invalid URI string specified!")
-        #set connection details and connect
-        self.USERNAME = username
-        self.PASSWORD = password
-        self.SESSION = None
-        self._connect()
 
-
+        super().__init__(username, password)
 
     @staticmethod
     def validate_uri(uri):
@@ -86,8 +82,8 @@ class LibvirtClient:
             ]
         #authenticate
         try:
-            self.SESSION = libvirt.openAuth(self.URI, auth, 0)
-            if self.SESSION == None:
+            self._session = libvirt.openAuth(self.URI, auth, 0)
+            if not self._session:
                 raise SessionException("Unable to establish connection to hypervisor!")
         except libvirt.libvirtError as err:
             raise InvalidCredentialsException("Invalid credentials")
@@ -108,11 +104,11 @@ class LibvirtClient:
         #get credentials for libvirt
         for credential in credentials:
             if credential[0] == libvirt.VIR_CRED_AUTHNAME:
-                credential[4] = self.USERNAME
+                credential[4] = self._username
                 if len(credential[4]) == 0:
                     credential[4] = credential[3]
             elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
-                credential[4] = self.PASSWORD
+                credential[4] = self._password
             else:
                 return -1
         return 0
@@ -139,7 +135,7 @@ class LibvirtClient:
         """
 
         try:
-            target_vm = self.SESSION.lookupByName(vm_name)
+            target_vm = self._session.lookupByName(vm_name)
             if action.lower() == "remove":
                 #remove snapshot
                 target_snap = target_vm.snapshotLookupByName(snapshot_title, 0)
@@ -219,7 +215,7 @@ class LibvirtClient:
         """
         try:
             #find VM and get all snapshots
-            target_vm = self.SESSION.lookupByName(vm_name)
+            target_vm = self._session.lookupByName(vm_name)
             target_snapshots = target_vm.snapshotListNames(0)
             if snapshot_title in target_snapshots:
                 return True
@@ -235,18 +231,18 @@ class LibvirtClient:
 
     def get_vm_ips(self):
         """
-        Returns a list of VMs and their IPs available through the current 
+        Returns a list of VMs and their IPs available through the current
         connection.
         """
         try:
             #get all VMs
-            vms = self.SESSION.listDefinedDomains()
+            vms = self._session.listDefinedDomains()
             result = []
 
             #scan _all_ the VMs
             for vm in vms:
                 #get VM and lookup hostname
-                target_vm = self.SESSION.lookupByName(vm)
+                target_vm = self._session.lookupByName(vm)
                 target_hostname = target_vm.hostname()
                 #lookup IP
                 #TODO: IPv6 only?
@@ -280,7 +276,7 @@ class LibvirtClient:
         :type force: bool
         """
         try:
-            target_vm = self.SESSION.lookupByName(vm_name)
+            target_vm = self._session.lookupByName(vm_name)
             if force:
                 #kill it with fire
                 target_vm.reboot(1)

@@ -7,12 +7,13 @@ import logging
 import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from .base import BaseConnector
 from .exceptions import (APILevelNotSupportedException,
 InvalidCredentialsException, InvalidHostnameFormatException,
 SessionException)
 
 
-class ForemanAPIClient:
+class ForemanAPIClient(BaseConnector):
     """
     Class for communicating with the Foreman API
 
@@ -57,25 +58,22 @@ class ForemanAPIClient:
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         #set connection information
         self.HOSTNAME = hostname
-        self.USERNAME = username
-        self.PASSWORD = password
         self.VERIFY = verify
         self.URL = "https://{0}{1}/api/v2".format(self.HOSTNAME, prefix)
-        #start session and check API version if Foreman API
-        self.SESSION = None
-        self._connect()
+
+        # start session and check API version if Foreman API
+        super().__init__(username, password)
+
         if prefix == "":
             self.validate_api_support()
-
 
 
     def _connect(self):
         """
         This function establishes a connection to Foreman.
         """
-        self.SESSION = requests.Session()
-        self.SESSION.auth = (self.USERNAME, self.PASSWORD)
-
+        self._session = requests.Session()
+        self._session.auth = (self._username, self._password)
 
 
     def get_hostname(self):
@@ -133,25 +131,25 @@ class ForemanAPIClient:
             #send request
             if method.lower() == "put":
                 #PUT
-                result = self.SESSION.put(
+                result = self._session.put(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "delete":
                 #DELETE
-                result = self.SESSION.delete(
+                result = self._session.delete(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "post":
                 #POST
-                result = self.SESSION.post(
+                result = self._session.post(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             else:
                 #GET
-                result = self.SESSION.get(
+                result = self._session.get(
                     "{}{}?per_page={}&page={}".format(
                         self.URL, sub_url, hits, page),
                     headers=self.HEADERS, verify=self.VERIFY
