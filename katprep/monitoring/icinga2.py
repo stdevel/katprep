@@ -10,13 +10,10 @@ import time
 from datetime import datetime, timedelta
 
 from katprep.clients import SessionException, EmptySetException
-from .base import MonitoringClientBase
-
-from requests import Session
-from requests.auth import HTTPBasicAuth
+from .base import HttpApiClient, MonitoringClientBase
 
 
-class Icinga2APIClient(MonitoringClientBase):
+class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
     """
     Class for communicating with the Icinga2 API
 
@@ -33,14 +30,6 @@ class Icinga2APIClient(MonitoringClientBase):
     }
     """
     dict: Default headers set for every HTTP request
-    """
-    SESSION = None
-    """
-    session: API session
-    """
-    VERIFY_SSL = False
-    """
-    bool: Setting whether to check SSL certificate
     """
 
     def __init__(self, log_level, url,
@@ -61,30 +50,11 @@ class Icinga2APIClient(MonitoringClientBase):
         #set logging
         self.LOGGER.setLevel(log_level)
 
-        #set connection data
-        if "/v1" in url:
-            self.URL = url
-        else:
-            self.URL = "{}/v1".format(url)
-        self.USERNAME = username
-        self.PASSWORD = password
+        if "/v1" not in url:
+            url = "{}/v1".format(url)
 
-        #set SSL information and connect
-        if verify_ssl:
-            self.VERIFY_SSL = True
-        self._connect()
-
-
-
-    def _connect(self):
-        """
-        This function establishes a connection to the Icinga2 API.
-        """
-        self.SESSION = Session()
-        if self.USERNAME != "":
-            self.SESSION.auth = HTTPBasicAuth(self.USERNAME, self.PASSWORD)
-
-
+        super().__init__(url=url, username=username, password=password,
+                         verify_ssl=verify_ssl)
 
     def _api_request(self, method, sub_url, payload=""):
         """
@@ -113,15 +83,15 @@ class Icinga2APIClient(MonitoringClientBase):
             #execute request
             if method.lower() == "post":
                 #POST
-                result = self.SESSION.post(
-                    "{}{}".format(self.URL, sub_url),
-                    headers=self.HEADERS, data=payload, verify=self.VERIFY_SSL
+                result = self._session.post(
+                    "{}{}".format(self._url, sub_url),
+                    headers=self.HEADERS, data=payload, verify=self._verify_ssl
                     )
             else:
                 #GET
-                result = self.SESSION.get(
-                    "{}{}".format(self.URL, sub_url),
-                    headers=self.HEADERS, verify=self.VERIFY_SSL
+                result = self._session.get(
+                    "{}{}".format(self._url, sub_url),
+                    headers=self.HEADERS, verify=self._verify_ssl
                     )
 
             if result.status_code == 404:
@@ -138,29 +108,6 @@ class Icinga2APIClient(MonitoringClientBase):
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
-
-    #Aliases
-    def _api_get(self, sub_url):
-        """
-        Sends a HTTP GET request to the Nagios/Icinga API. This function
-        requires a sub-URL (such as /cgi-bin/status.cgi).
-
-        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
-        :type sub_url: str
-        """
-        return self._api_request("get", sub_url)
-
-    def _api_post(self, sub_url, payload):
-        """
-        Sends a HTTP POST request to the Nagios/Icinga API. This function
-        requires a sub-URL (such as /cgi-bin/status.cgi).
-
-        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
-        :type sub_url: str
-        :param payload: payload data
-        :type payload: str
-        """
-        return self._api_request("post", sub_url, payload)
 
 
     @staticmethod
@@ -216,7 +163,7 @@ class Icinga2APIClient(MonitoringClientBase):
                     "start_time": current_time.timestamp(),
                     "end_time": end_time.timestamp(),
                     "fixed": True,
-                    "author": self.USERNAME,
+                    "author": self._username,
                     "comment": comment,
                 }
         else:
@@ -234,7 +181,7 @@ class Icinga2APIClient(MonitoringClientBase):
                     "start_time": current_time.timestamp(),
                     "end_time": end_time.timestamp(),
                     "fixed": True,
-                    "author": self.USERNAME,
+                    "author": self._username,
                     "comment": comment,
                 }
         #send POST

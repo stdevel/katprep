@@ -10,15 +10,13 @@ import re
 import time
 from datetime import datetime, timedelta
 
-from katprep.clients import SessionException, UnsupportedRequestException
-from .base import MonitoringClientBase
-
 from lxml import html
-from requests import Session
-from requests.auth import HTTPBasicAuth
+
+from katprep.clients import SessionException, UnsupportedRequestException
+from .base import HttpApiClient, MonitoringClientBase
 
 
-class NagiosCGIClient(MonitoringClientBase):
+class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
     """
 .. class:: NagiosCGIClient
     """
@@ -30,21 +28,9 @@ class NagiosCGIClient(MonitoringClientBase):
     """
     dict: Default headers set for every HTTP request
     """
-    url = ""
-    """
-    str: Nagios/Icinga URL
-    """
     obsolete = False
     """
     bool: Nagios system
-    """
-    verify = True
-    """
-    bool: SSL verification
-    """
-    session = None
-    """
-    session: API session
     """
 
     def __init__(self, log_level, url, username, password, verify=True):
@@ -67,19 +53,16 @@ class NagiosCGIClient(MonitoringClientBase):
         if url[len(url)-1:] != "/":
             #add trailing slash
             url = "{}/".format(url)
-        #set connection details and connect
-        self.url = url
-        if "nagios" in self.url.lower():
+
+        if "nagios" in url.lower():
             self.LOGGER.debug(
                 "The 90s called, they want their monitoring system back"
             )
             self.set_nagios(True)
-        self.username = username
-        self.password = password
-        self.verify = verify
-        self._connect()
 
 
+        super().__init__(url=url, username=username, password=password,
+                         verify_ssl=verify)
 
     def set_nagios(self, flag):
         """
@@ -90,18 +73,6 @@ class NagiosCGIClient(MonitoringClientBase):
         :type flag: bool
         """
         self.obsolete = flag
-
-
-
-    def _connect(self):
-        """
-        This function establishes a connection to Nagios/Icinga.
-        """
-        self.session = Session()
-        if self.username != "":
-            self.session.auth = HTTPBasicAuth(self.username, self.password)
-
-
 
     def _api_request(self, method, sub_url, payload=""):
         """
@@ -132,15 +103,15 @@ class NagiosCGIClient(MonitoringClientBase):
             #execute request
             if method.lower() == "post":
                 #POST
-                result = self.session.post(
-                    "{}{}".format(self.url, sub_url),
-                    headers=self.HEADERS, data=payload, verify=self.verify
+                result = self._session.post(
+                    "{}{}".format(self._url, sub_url),
+                    headers=self.HEADERS, data=payload, verify=self._verify_ssl
                     )
             else:
                 #GET
-                result = self.session.get(
-                    "{}{}".format(self.url, sub_url),
-                    headers=self.HEADERS, verify=self.verify
+                result = self._session.get(
+                    "{}{}".format(self._url, sub_url),
+                    headers=self.HEADERS, verify=self._verify_ssl
                     )
             #this really breaks shit
             #self.LOGGER.debug("HTML output: %s", result.text)
@@ -168,30 +139,6 @@ class NagiosCGIClient(MonitoringClientBase):
         except ValueError as err:
             self.LOGGER.error(err)
             raise
-
-    #Aliases
-    def _api_get(self, sub_url):
-        """
-        Sends a HTTP GET request to the Nagios/Icinga API. This function
-        requires a sub-URL (such as /cgi-bin/status.cgi).
-
-        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
-        :type sub_url: str
-        """
-        return self._api_request("get", sub_url)
-
-    def _api_post(self, sub_url, payload):
-        """
-        Sends a HTTP POST request to the Nagios/Icinga API. This function
-        requires a sub-URL (such as /cgi-bin/status.cgi).
-
-        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
-        :type sub_url: str
-        :param payload: payload data
-        :type payload: str
-        """
-        return self._api_request("post", sub_url, payload)
-
 
 
     @staticmethod
@@ -249,7 +196,7 @@ class NagiosCGIClient(MonitoringClientBase):
                     'com_data': comment, 'trigger': '0', 'fixed': '1',
                     'hours': hours, 'minutes': '0', 'start_time': current_time,
                     'end_time': end_time, 'btnSubmit': 'Commit',
-                    'com_author': self.username, 'childoptions': '0',
+                    'com_author': self._username, 'childoptions': '0',
                     'ahas': 'on'
                 }
         else:
@@ -270,7 +217,7 @@ class NagiosCGIClient(MonitoringClientBase):
                     'com_data': comment, 'trigger': '0', 'fixed': '1',
                     'hours': hours, 'minutes': '0', 'start_time': current_time,
                     'end_time': end_time, 'btnSubmit': 'Commit',
-                    'com_author': self.username, 'childoptions': '0'
+                    'com_author': self._username, 'childoptions': '0'
                 }
                 if self.obsolete:
                     #we need to make two calls as legacy hurts twice
