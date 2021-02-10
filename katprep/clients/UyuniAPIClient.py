@@ -9,7 +9,8 @@ from xmlrpc.client import ServerProxy, Fault
 import ssl
 from katprep.clients import (SessionException, InvalidCredentialsException,
                              APILevelNotSupportedException,
-                             SSLCertVerificationError)
+                             SSLCertVerificationError,
+                             EmptySetException)
 
 
 class UyuniAPIClient:
@@ -121,7 +122,9 @@ class UyuniAPIClient:
                 context = ssl.create_default_context()
 
             self.api_session = ServerProxy(self.url, context=context)
-            key = self.api_session.auth.login(self.username, self.password)
+            self.api_key = self.api_session.auth.login(
+                self.username, self.password
+                )
         except ssl.SSLCertVerificationError as err:
             self.LOGGER.error(err)
             raise SSLCertVerificationError
@@ -130,11 +133,10 @@ class UyuniAPIClient:
                 raise InvalidCredentialsException(
                     "Wrong credentials supplied: '%s'" % err.faultString
                 )
-            else:
-                raise SessionException(
-                    "Generic remote communication error: '%s'"
-                    % err.faultString
-                )
+            raise SessionException(
+                "Generic remote communication error: '%s'"
+                % err.faultString
+            )
 
     def validate_api_support(self):
         """
@@ -152,8 +154,7 @@ class UyuniAPIClient:
                         api_level, self.API_MIN
                     )
                 )
-            else:
-                self.LOGGER.info("Supported API version %s found.", api_level)
+            self.LOGGER.info("Supported API version %s found.", api_level)
         except ValueError as err:
             self.LOGGER.error(err)
             raise APILevelNotSupportedException("Unable to verify API version")
@@ -166,6 +167,49 @@ class UyuniAPIClient:
 
     def get_hostname(self):
         """
-        Returns the configured hostname of the objecti nstance.
+        Returns the configured hostname of the object instance.
         """
         return self.hostname
+
+    def get_host_id(self, hostname):
+        """
+        Returns the profile ID of a particular system
+        """
+        try:
+            host_id = self.api_session.system.getId(self.api_key, hostname)
+            if len(host_id) > 0:
+                return host_id[0]["id"]
+            raise EmptySetException(
+                "System not found: '%s'"
+                % hostname
+            )
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise EmptySetException(
+                    "System not found: '%s'"
+                    % hostname
+                )
+            raise SessionException(
+                "Generic remote communication error: '%s'"
+                % err.faultString
+            )
+
+    def get_host_params(self, system_id):
+        """
+        Returns the parameters of a particular system
+        """
+        try:
+            params = self.api_session.system.getCustomValues(
+                self.api_key, system_id
+                )
+            return params
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException(
+                    "System not found: '%s'"
+                    % system_id
+                )
+            raise SessionException(
+                "Generic remote communication error: '%s'"
+                % err.faultString
+            )
