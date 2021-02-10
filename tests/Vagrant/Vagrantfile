@@ -154,4 +154,21 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "playbook_uyuni.yml"
     end
   end
+
+  # Uyuni client
+  config.vm.define "uyuniclient" do |uyuniclient|
+    uyuniclient.vm.hostname = "uyuniclient.example.com"
+    uyuniclient.vm.box = "generic/opensuse15"
+    uyuniclient.vm.box_version = "3.1.6"
+    # copy files
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+    # add private network
+    uyuniclient.vm.network "private_network", ip: "192.168.23.71"
+    # configure system
+    uyuniclient.vm.provision "ansible_local" do |ansible|
+      ansible.galaxy_roles_path = "/etc/ansible/roles"
+      ansible.playbook = "playbook_uyuniclient.yml"
+    end
+  end
+
 end

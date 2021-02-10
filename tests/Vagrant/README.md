@@ -15,7 +15,7 @@ Every box forwards some ports directly so that you can use the endpoints for uni
 | ``kvm`` | yes | EL7 running KVM and dummy VM with networking (**WIP**) | |
 | ``esxi`` | no | vSphere ESXi 6.7 running a dummy VM with networking (**WIP**) | |
 | ``katello`` | yes | EL7 running Foreman/Katello (**WIP**) | 80=>8083 (*http*), 443=>8446 (*https*) |
-| ``uyuni`` | yes | openSUSE 15.1 running Uyuni | 80=>8084 (*http*), 443=>8447 (*https*) |
+| ``uyuni`` | yes | openSUSE running Uyuni | 80=>8084 (*http*), 443=>8447 (*https*) |
 
 ## Requirements
 
@@ -37,6 +37,7 @@ $ vagrant up
 To create non-autostart boxes, run one of the following commands:
 
 ```bash
+$ vagrant up uyuni_client
 $ vagrant up zabbix
 $ vagrant up kvm
 $ vagrant up esxi
@@ -50,4 +51,4 @@ $ vagrant destroy
 
 ## Running tests in VMs
 
-TODO: will follow soon
+See [here](../README.md)

@@ -2,6 +2,55 @@
 - hosts: uyuni
   remote_user: root
   become: true
+  vars:
+    username: admin
+    password: admin
+  pre_tasks:
+    - name: "Update /etc/hosts"
+      template:
+        src: "hosts.j2"
+        dest: /etc/hosts
   roles:
     - role: stdevel.uyuni
-      use_lvm: false
+      uyuni_use_lvm: false
+      uyuni_org_login: "{{ username }}"
+      uyuni_org_passowrd: "{{ password }}"
+      uyuni_channels:
+        - name: opensuse_leap15_2
+          arch: x86_64
+        - name: opensuse_leap15_2-updates
+          arch: x86_64
+        - name: opensuse_leap15_2-uyuni-client
+          arch: x86_64
+  post_tasks:
+    - name: Create activation key
+      block:
+        - name: Create key
+          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_create -n ak-opensuse-15_2-default -d 'openSUSE Leap 15.2 default' -b opensuse_leap15_2-x86_64"
+        - name: Add child channels
+          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_addchildchannels 1-ak-opensuse-15_2-default opensuse_leap15_2-x86_64-updates opensuse_leap15_2-uyuni-client-x86_64"
+      ignore_errors: true
+    - name: Create filters
+      command: spacecmd -u "{{ username }}" -p "{{ password }}" "repo_setfilters '{{ item.channel }}' '{{ item.filter }}'"
+      loop:
+        - channel: 'External - openSUSE Leap 15.2 x86_64'
+          filter: '+cowsay,openscap-utils,apache2,apache2-utils,system-user-wwwrun,libapr1,screen,timezone,salt*,python3*'
+        - channel: 'External - openSUSE Leap 15.2 Updates x86_64'
+          filter: '+salt*,python3*,kernel*'
+    - name: Sync channels
+      command: spacewalk-repo-sync -c "{{ item }}"
+      loop:
+        - opensuse_leap15_2-x86_64
+        - opensuse_leap15_2-x86_64-updates
+        - opensuse_leap15_2-uyuni-client-x86_64
+    - name: Create bootstrap script
+      block:
+        - name: Create script
+          command: mgr-bootstrap
+          args:
+            creates: /srv/www/htdocs/pub/bootstrap/bootstrap.sh
+        - name: Set activation key
+          lineinfile:
+            path: /srv/www/htdocs/pub/bootstrap/bootstrap.sh
+            regexp: '^ACTIVATION_KEYS='
+            line: 'ACTIVATION_KEYS=1-ak-opensuse-15_2-default'
