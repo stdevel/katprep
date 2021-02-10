@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  remote_user: root
+  become: true
+  tasks:
+    - name: Assign custominfo keys
+      command: spacecmd "system_addcustomvalue '{{ item.key }}' '{{ item.value }}' uyuniclient.example.com"
+      loop:
+        - key: 'katprep_mon'
+          value: 'http://localhost:8665'
+        - key: 'katprep_mon_name'
+          value: 'uyuniclient'
+        - key: 'katprep_mon_type'
+          value: 'icinga'

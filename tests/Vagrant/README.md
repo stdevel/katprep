@@ -49,6 +49,23 @@ To destroy the VMs after testing integrations, run the following command:
 $ vagrant destroy
 ```
 
+### `uyuni` and `uyuniclient`
+
+After having `uyuni` prepared you can start `uyuniclient`:
+
+```shell
+$ vagrant up uyuniclient`
+```
+
+Once the playbook succeeded, you will need to enable the client's Salt key from within the Uyuni web interface.
+
+After this, you can run a post-playbook on `uyuni` in order to assign custominfo keys to `uyuniclient`:
+
+```shell
+$ vagrant ssh uyuni
+$ sudo ansible-playbook /vagrant/playbook_uyuni_host.yml
+```
+
 ## Running tests in VMs
 
 See [here](../README.md)

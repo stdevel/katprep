@@ -6,6 +6,13 @@
         "api_pass": "admin"
     },
     "valid_objects": {
-        "host": {"name": "dummy", "id": 4}
+        "host": {
+            "name": "uyuniclient.example.com",
+            "id": 1000010000
+        },
+        "hostparams": {
+            "katprep_mon_name": "uyuniclient",
+            "katprep_mon_type": "icinga"
+        }
     }
 }
