@@ -1,32 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This file contains the SpacewalkAPIClient and
-depending exception classes
+Uyuni XMLRPC API client
 """
 
 import logging
+from xmlrpc.client import ServerProxy, Fault
+import ssl
 from katprep.clients import (SessionException, InvalidCredentialsException,
-                             APILevelNotSupportedException)
-
-try:
-    from xmlrpc.server import SimpleXMLRPCServer as Server
-    from xmlrpc.client import Fault
-except ImportError:
-    from xmlrpclib import Server, Fault
+                             APILevelNotSupportedException,
+                             SSLCertVerificationError)
 
 
-class SpacewalkAPIClient(object):
+class UyuniAPIClient:
     """
-    Class for communicating with the Spacewalk API
+    Class for communicating with the Uyuni API
 
-.. class:: SpacewalkAPIClient
+.. class:: UyuniAPIClient
     """
-    LOGGER = logging.getLogger('SpacewalkAPIClient')
+    LOGGER = logging.getLogger('UyuniAPIClient')
     """
     logging: Logger instance
     """
-    API_MIN = 14.0
+    API_MIN = 22
     """
     int: Minimum supported API version.
     """
@@ -36,11 +32,11 @@ class SpacewalkAPIClient(object):
     """
     hostname = ""
     """
-    str: Spacewalk API hostname
+    str: Uyuni API hostname
     """
     url = ""
     """
-    str: Spacewalk API base URL
+    str: Uyuni API base URL
     """
     username = ""
     """
@@ -50,49 +46,62 @@ class SpacewalkAPIClient(object):
     """
     str: API password
     """
+    port = 443
+    """
+    int: HTTPS port
+    """
+    skip_ssl = False
+    """
+    bool: Flag whether to ignore SSL verification
+    """
     api_session = None
     """
-    Session: HTTP session to Spacewalk host
+    Session: HTTP session to Uyuni host
     """
     api_key = None
     """
     str: Session key
     """
 
-    def __init__(self, log_level, hostname, username, password):
+    def __init__(
+            self, log_level, hostname, username, password,
+            port, skip_ssl=False
+    ):
         """
-        Constructor, creating the class. It requires specifying a
+        Constructor creating the class. It requires specifying a
         hostname, username and password to access the API. After
         initialization, a connected is established.
 
         :param log_level: log level
         :type log_level: logging
-        :param hostname: Spacewalk host
+        :param hostname: Uyuni host
         :type hostname: str
         :param username: API username
         :type username: str
         :param password: corresponding password
         :type password: str
+        :param port: HTTPS port
+        :type port: int
         """
-        #set logging
+        # set logging
         logging.basicConfig(level=log_level)
         self.LOGGER.setLevel(log_level)
         self.LOGGER.debug(
-            "About to create Spacewalk client '%s'@'%s'", username, hostname
+            "About to create Uyuni client '%s'@'%s'", username, hostname
         )
 
-        #set connection information
+        # set connection information
         self.hostname = hostname
         self.LOGGER.debug("Set hostname to '%s'", self.hostname)
         self.username = username
         self.password = password
-        self.url = "https://{0}/rpc/api".format(self.hostname)
+        self.port = port
+        self.url = "https://{0}:{1}/rpc/api".format(self.hostname, self.port)
+        self.skip_ssl = skip_ssl
 
-        #start session and check API version if Spacewalk API
+        # start session and check API version if Uyuni API
         self.__connect()
         self.validate_api_support()
-
-
 
     def __exit__(self, exc_type, exc_value, traceback):
         """
@@ -100,59 +109,60 @@ class SpacewalkAPIClient(object):
         """
         self.api_session.auth.logout(self.api_key)
 
-
-
     def __connect(self):
         """
-        This function establishes a connection to Spacewalk.
+        This function establishes a connection to Uyuni.
         """
-        #set api session and key
+        # set API session and key
         try:
-            self.api_session = Server(self.url)
-            self.api_key = self.api_session.auth.login(self.username, self.password)
+            if self.skip_ssl:
+                context = ssl._create_unverified_context()
+            else:
+                context = ssl.create_default_context()
+
+            self.api_session = ServerProxy(self.url, context=context)
+            key = self.api_session.auth.login(self.username, self.password)
+        except ssl.SSLCertVerificationError as err:
+            self.LOGGER.error(err)
+            raise SSLCertVerificationError
         except Fault as err:
             if err.faultCode == 2950:
                 raise InvalidCredentialsException(
-                    "Wrong credentials supplied: '%s'", err.faultString
+                    "Wrong credentials supplied: '%s'" % err.faultString
                 )
             else:
                 raise SessionException(
-                    "Generic remote communication error: '%s'", err.faultString
+                    "Generic remote communication error: '%s'"
+                    % err.faultString
                 )
-
-
 
     def validate_api_support(self):
         """
-        Checks whether the API version on the Spacewalk server is supported.
-        Using older versions than 11.1 is not recommended. In this case, an
+        Checks whether the API version on the Uyuni server is supported.
+        Using older versions than 24 is not recommended. In this case, an
         exception will be thrown.
         """
         try:
-            #check whether API is supported
+            # check whether API is supported
             api_level = self.api_session.api.getVersion()
             if float(api_level) < self.API_MIN:
                 raise APILevelNotSupportedException(
-                    "Your API version ({0}) does not support the required calls. "
+                    "Your API version ({0}) doesn't support required calls."
                     "You'll need API version ({1}) or higher!".format(
                         api_level, self.API_MIN
                     )
                 )
             else:
-                self.LOGGER.info("Supported API version (" + api_level + ") found.")
+                self.LOGGER.info("Supported API version %s found.", api_level)
         except ValueError as err:
             self.LOGGER.error(err)
             raise APILevelNotSupportedException("Unable to verify API version")
-
-
 
     def get_url(self):
         """
         Returns the configured URL of the object instance.
         """
         return self.url
-
-
 
     def get_hostname(self):
         """

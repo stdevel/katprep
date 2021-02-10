@@ -29,6 +29,16 @@ class InvalidCredentialsException(Exception):
 
 
 
+class SSLCertVerificationError(Exception):
+    """
+    Dummy class for invalid SSL certificates
+
+.. class:: SSLCertVerificationError
+    """
+    pass
+
+
+
 class APILevelNotSupportedException(Exception):
     """
     Dummy class for unsupported API levels

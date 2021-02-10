@@ -1,0 +1,8 @@
+---
+"MD013": false  # line-length
+"MD014": false  # show commands output
+"MD024": false  # duplicate headings
+"MD025": false  # multiple level 1 headings
+"MD026": false  # no trailing punction (? at the end)
+"MD036": true   # no emphasis as heading (command descriptions)
+"MD041": false  # leading comments (beginning not heading)

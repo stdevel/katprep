@@ -5,9 +5,9 @@ This directory contains various tests:
 | File          | Type | Description |
 |:------------- |:---- |:----------- |
 | `test_ForemanAPIClient.py` | Unit test | Foreman API integration |
-| `test_SpacewalkAPIClient.py` | Unit test | Spacewalk API integration |
+| `test_UyuniAPIClient.py` | Unit test | Uyuni API integration |
 | `test_Icinga2APIClient.py` | Unit test | Icinga 2.x API integration |
-| `test_NagiosCompatibleCGIClient.py` | Unit test | Nagios/Icinga 1.x CGI integration |
+| `test_NagiosCompatibleCGIClient.py` | Unit test | Nagios CGI integration |
 | `test_PyvmomiClient.py` | Unit test | Pyvmomi integration |
 | `test_LibvirtClient.py` | Unit test | Libvirt integration |
 
@@ -31,126 +31,26 @@ Credentials are assigned using secret variables containing the appropriate JSON 
 | `icinga2_config` | `icinga2_config.json` | Icinga2 test configuration |
 | `pyvmomi_config` | `pyvmomi_config.json` | Pyvmomi test configuration |
 | `libvirt_config` | `libvirt_config.json` | Libvirt test configuration |
-| `spw_config` | `spw_config.json` | Spacewalk test configuration |
+| `uyuni_config` | `uyuni_config.json` | Uyuni test configuration |
 
-## Tests for `ForemanAPIClient`
+## Running tests using Vagrantboxes
 
-This test checks:
+This directory contains a [`Vagrantfile`](Vagrantfile) for creating your own testing environment. Simply start it using:
 
-- hostname verification
-- valid/invalid logins
-- denying legacy systems
-- `GET`/`POST`/`PUT`/`DELETE` API calls
-- invalid API calls
-- retrieving object names by their ID
-- retrieving object IDs by their names
-- retrieving host params
+```shell
+$ vagrant up
+```
 
-### Preparation
+After having the machines up and running you can link your tests again the Vagrant test configurations:
 
-For this test, you will need:
+```shell
+$ ln -s icinga2_config.json.vagrant icinga2_config.json
+$ ln -s nagios_config.json.vagrant nagios_config.json
+$ ln -s uyuni_config.json.vagrant uyuni_config.json
+```
 
-- a Foreman installation
-- a legacy Foreman installation (*APIv1*)
-- a user per installation with administrative permissions
-- valid objects:
-  - host
-  - hostgroup
-  - location
-  - organization
+Now you can run `pytest` against the APIs running in VMs - e.g.:
 
-## Test `SpacewalkAPIClient`
-
-This test checks:
-
-- hostname verification
-- valid/invalid logins
-- denying legacy systems
-
-### Preparation
-
-For this test, you will need:
-
-- a Spacewalk system
-- an Uyuni system
-- a user per installation with read-only permissions
-
-## Test `Icinga2Client`
-
-This test checks:
-
-- valid/invalid logins
-- scheduling/removing downtimes for hosts/hostgroups
-- checking downtimes
-- retrieving host and service information
-
-### Preparation
-
-For this test, you will need:
-
-- an Icinga2 system
-- an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
-- valid objects:
-  - host
-  - hostgroup
-  - at least one service per host
-
-## Test `NagiosCompatibleCGIClient`
-
-This test checks:
-
-- valid/invalid logins
-- scheduling/removing downtimes for hosts/hostgroups
-- unsupported requests (*e.g. unscheduling downtimes on Nagios systems*)
-- checking downtimes
-- retrieving host and service information
-
-The tests are run for Nagios and Icinga 1.x
-
-I highly recommend using [OMD (*Open Monitoring Distribution*)](http://omdistro.org/) as it is simple to deploy dummy sites and hosts. Make sure to use **Basic Auth** rather than check_mk authorization before running your tests.
-
-### `Preparation`
-
-For this test, you will need:
-
-- an Icinga system
-- an Nagios system
-- an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
-- valid objects:
-  - host
-  - hostgroup
-  - at least one service per host
-
-## Test `PyvmomiClient`
-
-This test checks:
-
-- valid/invalid logins
-- checking/creating/reverting/removing snapshots
-- retrieving VM IP information
-- retrieving VM/cluster node mappings
-- restarting VMs
-- retrieving VM power state information
-- power on/off VMs
-
-### Preparation
-
-For this test, you will need:
-
-- a VMware ESXi or vCenter Server system
-- an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
-- a VM that can be restarted, snapshotted, etc. (**Caution: this VM is very likely to break because of numerous restarts**)
-
-## Test `LibvirtClient`
-
-This test checks:
-
-- valid/invalid logins
-- checking/creating/reverting/removing snapshots
-
-### Preparation
-
-For this test, you will need:
-
-- a hypervisor supported by [libvirt](https://libvirt.org/drivers.html)
-- an API user with permissions [as mentioned in documentation](https://stdevel.github.io/katprep/installation.html#api-users)
+```shell
+$ pytest test_UyuniAPICLient.py
+```

@@ -1,0 +1,11 @@
+{
+    "config": {
+        "hostname": "localhost",
+        "port": 8447,
+        "api_user": "admin",
+        "api_pass": "admin"
+    },
+    "valid_objects": {
+        "host": {"name": "dummy", "id": 4}
+    }
+}
