@@ -1,0 +1,331 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>katprep.authconfig &#8212; katprep 0.5.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../katprep.html" accesskey="U">katprep</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for katprep.authconfig</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=not-callable</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A script which maintains entries in a authentication container.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">.AuthContainer</span> <span class="kn">import</span> <span class="n">AuthContainer</span><span class="p">,</span> <span class="n">ContainerException</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">raw_input</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>  <span class="c1"># Python 3</span>
+    <span class="n">raw_input</span> <span class="o">=</span> <span class="nb">input</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;katprep_authconfig&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">logging: Logger instance</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">logging: Logger level</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">CONTAINER</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">AuthContainer: authentication container file</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<div class="viewcode-block" id="list_entries"><a class="viewcode-back" href="../../katprep.html#katprep.authconfig.list_entries">[docs]</a><span class="k">def</span> <span class="nf">list_entries</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function lists entries from the authentication container.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">hostname</span> <span class="ow">in</span> <span class="n">CONTAINER</span><span class="o">.</span><span class="n">get_hostnames</span><span class="p">():</span>
+        <span class="c1">#get credentials</span>
+        <span class="n">credentials</span> <span class="o">=</span> <span class="n">CONTAINER</span><span class="o">.</span><span class="n">get_credential</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">show_passwords</span><span class="p">:</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="n">credentials</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;xxx&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (Username: </span><span class="si">{}</span><span class="s2"> / Password: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">hostname</span><span class="p">,</span> <span class="n">credentials</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">password</span>
+        <span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../katprep.html#katprep.authconfig.add">[docs]</a><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function adds/modifies an entry to/from the authentication container.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="c1">#prompt for hostname</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;Hostname: &quot;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_username</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="c1">#prompt for hostname</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">entry_username</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Username: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">password_prompted</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_password</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="c1">#prompt for password</span>
+        <span class="n">password_prompted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">entry_password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Password: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="c1">#prompt again</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">password_prompted</span><span class="p">:</span>
+        <span class="n">verification</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_password</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">verification</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">while</span> <span class="n">verification</span> <span class="o">!=</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_password</span><span class="p">:</span>
+        <span class="n">verification</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span>
+            <span class="s2">&quot;Verify </span><span class="si">{}</span><span class="s2"> Password: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="s2">&quot;Adding entry hostname=&#39;</span><span class="si">%s</span><span class="s2">&#39;, username=&#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_username</span>
+    <span class="p">)</span>
+    <span class="n">CONTAINER</span><span class="o">.</span><span class="n">add_credentials</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_username</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_password</span>
+    <span class="p">)</span>
+    <span class="n">CONTAINER</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="remove"><a class="viewcode-back" href="../../katprep.html#katprep.authconfig.remove">[docs]</a><span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function removes an entry from the authentication container.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="c1">#prompt for hostname</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;Hostname: &quot;</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="s2">&quot;Removing entry hostname=&#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span>
+    <span class="p">)</span>
+    <span class="n">CONTAINER</span><span class="o">.</span><span class="n">remove_credentials</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">entry_hostname</span><span class="p">)</span>
+    <span class="n">CONTAINER</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="set_password"><a class="viewcode-back" href="../../katprep.html#katprep.authconfig.set_password">[docs]</a><span class="k">def</span> <span class="nf">set_password</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function sets/changes/removes the authentication container password.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#get password and build new container</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">file_password</span><span class="p">:</span>
+        <span class="n">new_pass</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">file_password</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_pass</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;New file password (max. 32 chars): &quot;</span><span class="p">)</span>
+    <span class="c1">#fix too long passwords</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_pass</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">32</span><span class="p">:</span>
+        <span class="n">new_pass</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;New file password (max. 32 chars!): &quot;</span><span class="p">)</span>
+    <span class="n">confirm</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">while</span> <span class="n">confirm</span> <span class="o">!=</span> <span class="n">new_pass</span><span class="p">:</span>
+        <span class="n">confirm</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Confirm password: &quot;</span><span class="p">)</span>
+    <span class="n">new_container</span> <span class="o">=</span> <span class="n">AuthContainer</span><span class="p">(</span><span class="n">LOG_LEVEL</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_pass</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#encrypt/change _all_ the passwords!</span>
+        <span class="k">for</span> <span class="n">hostname</span> <span class="ow">in</span> <span class="n">CONTAINER</span><span class="o">.</span><span class="n">get_hostnames</span><span class="p">():</span>
+            <span class="c1">#get credentials</span>
+            <span class="n">credentials</span> <span class="o">=</span> <span class="n">CONTAINER</span><span class="o">.</span><span class="n">get_credential</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
+            <span class="c1">#add new entry</span>
+            <span class="n">new_container</span><span class="o">.</span><span class="n">add_credentials</span><span class="p">(</span>
+                <span class="n">hostname</span><span class="p">,</span> <span class="n">credentials</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">credentials</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="c1">#save new container</span>
+        <span class="n">new_container</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">ContainerException</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to change password (Hint: wrong old password?)&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="parse_options"><a class="viewcode-back" href="../../katprep.html#katprep.authconfig.parse_options">[docs]</a><span class="k">def</span> <span class="nf">parse_options</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parses options and arguments.&quot;&quot;&quot;</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="si">%(prog)s</span><span class="s1"> is used for creating, modifying and</span>
+<span class="s1">    removing entries in/from an authentication container.</span>
+<span class="s1">    Authentication containers include various authentication credentials for</span>
+<span class="s1">    external systems that can be accessed from the katprep utilities (e.g.</span>
+<span class="s1">    monitoring systems, hypervisor connections, etc.).</span>
+<span class="s1">    This will make system maintenance automation easier as you don&#39;t have to</span>
+<span class="s1">    enter credentials every time.</span>
+<span class="s1">    &#39;&#39;&#39;</span>
+    <span class="n">epilog</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;Check-out the website for more details:</span>
+<span class="s1">     http://github.com/stdevel/katprep&#39;&#39;&#39;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span> <span class="n">epilog</span><span class="o">=</span><span class="n">epilog</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">__version__</span><span class="p">)</span>
+
+    <span class="c1">#define option groups</span>
+    <span class="n">gen_opts</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s2">&quot;generic arguments&quot;</span><span class="p">)</span>
+
+    <span class="c1">#GENERIC ARGUMENTS</span>
+    <span class="c1">#-q / --quiet</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-q&quot;</span><span class="p">,</span> <span class="s2">&quot;--quiet&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;generic_quiet&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;don&#39;t print status messages to stdout (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-d / --debug</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="s2">&quot;--debug&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;generic_debug&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;enable debugging outputs (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#authentication container</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;An authentication container&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="c1">#COMMANDS</span>
+    <span class="n">subparsers</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;commands&#39;</span><span class="p">,</span> \
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;controlling maintenance stages&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;additional help&#39;</span><span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;listing entries&quot;</span><span class="p">)</span>
+    <span class="n">cmd_list</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;--show-passwords&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;show_passwords&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;also shows passwords &quot;</span> \
+    <span class="s2">&quot;(default: no)&quot;</span><span class="p">)</span>
+    <span class="n">cmd_list</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">list_entries</span><span class="p">)</span>
+
+    <span class="n">cmd_add</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;adding/modifying entries&quot;</span><span class="p">)</span>
+    <span class="n">cmd_add</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-H&quot;</span><span class="p">,</span> <span class="s2">&quot;--hostname&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;entry_hostname&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;HOSTNAME&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;hostname entry&quot;</span><span class="p">)</span>
+    <span class="n">cmd_add</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-u&quot;</span><span class="p">,</span> <span class="s2">&quot;--username&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;entry_username&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;USERNAME&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+    <span class="n">cmd_add</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--password&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;entry_password&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;PASSWORD&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;corresponding password&quot;</span><span class="p">)</span>
+    <span class="n">cmd_add</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">add</span><span class="p">)</span>
+
+    <span class="n">cmd_remove</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;remove&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;removing entries&quot;</span><span class="p">)</span>
+    <span class="n">cmd_remove</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-H&quot;</span><span class="p">,</span> <span class="s2">&quot;--hostname&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;entry_hostname&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;HOSTNAME&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;hostname entry&quot;</span><span class="p">)</span>
+    <span class="n">cmd_remove</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">remove</span><span class="p">)</span>
+
+    <span class="n">cmd_password</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;add/change/remove &quot;</span> \
+    <span class="s2">&quot;encryption password&quot;</span><span class="p">)</span>
+    <span class="n">cmd_password</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--password&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;file_password&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;PASSWORD&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+    <span class="n">cmd_password</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">set_password</span><span class="p">)</span>
+
+    <span class="c1">#parse options and arguments</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../katprep.html#katprep.authconfig.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main function, starts the logic based on parameters.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">CONTAINER</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Options: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Arguments: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+    <span class="c1">#prompt for password</span>
+    <span class="n">container_pass</span> <span class="o">=</span> <span class="s2">&quot;JaHaloIBimsDiPaulaPinkePank#Ohman&quot;</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">container_pass</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">32</span><span class="p">:</span>
+        <span class="n">container_pass</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;File password (max. 32 chars): &quot;</span><span class="p">)</span>
+    <span class="c1">#load container</span>
+    <span class="n">CONTAINER</span> <span class="o">=</span> <span class="n">AuthContainer</span><span class="p">(</span><span class="n">LOG_LEVEL</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">container_pass</span><span class="p">)</span>
+
+    <span class="c1">#start action</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">options</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cli"><a class="viewcode-back" href="../../katprep.html#katprep.authconfig.cli">[docs]</a><span class="k">def</span> <span class="nf">cli</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This functions initializes the CLI interface</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">LOG_LEVEL</span>
+    <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">parse_options</span><span class="p">()</span>
+
+    <span class="c1">#set logging level</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_debug</span><span class="p">:</span>
+        <span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+    <span class="k">elif</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_quiet</span><span class="p">:</span>
+        <span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">LOG_LEVEL</span><span class="p">)</span>
+
+    <span class="n">main</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">cli</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../katprep.html" >katprep</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

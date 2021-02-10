@@ -1,0 +1,973 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>katprep.maintenance &#8212; katprep 0.5.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../katprep.html" accesskey="U">katprep</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for katprep.maintenance</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=not-callable</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A script which prepares, executes and controls maintenance tasks on systems</span>
+<span class="sd">managed with Foreman/Katello or Red Hat Satellite 6.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">__version__</span><span class="p">,</span> <span class="n">is_valid_report</span><span class="p">,</span> <span class="n">get_json</span><span class="p">,</span> <span class="n">get_credentials</span><span class="p">,</span>
+    <span class="n">get_required_hosts_by_report</span><span class="p">,</span> <span class="n">get_host_params_by_report</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.clients.ForemanAPIClient</span> <span class="kn">import</span> <span class="n">ForemanAPIClient</span>
+<span class="kn">from</span> <span class="nn">.clients.LibvirtClient</span> <span class="kn">import</span> <span class="n">LibvirtClient</span>
+<span class="kn">from</span> <span class="nn">.clients.PyvmomiClient</span> <span class="kn">import</span> <span class="n">PyvmomiClient</span>
+<span class="kn">from</span> <span class="nn">.clients.NagiosCGIClient</span> <span class="kn">import</span> <span class="n">NagiosCGIClient</span>
+<span class="kn">from</span> <span class="nn">.clients.Icinga2APIClient</span> <span class="kn">import</span> <span class="n">Icinga2APIClient</span>
+<span class="kn">from</span> <span class="nn">.clients</span> <span class="kn">import</span> <span class="n">validate_hostname</span><span class="p">,</span> <span class="n">EmptySetException</span><span class="p">,</span> \
+<span class="n">SessionException</span><span class="p">,</span> <span class="n">InvalidCredentialsException</span><span class="p">,</span> <span class="n">UnsupportedRequestException</span><span class="p">,</span> \
+<span class="n">UnsupportedFilterException</span><span class="p">,</span> <span class="n">SnapshotExistsException</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ForemanAPIClient: Foreman API client handle</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;katprep_maintenance&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">logging: Logger instance</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">logging: Logger level</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">SAT_CLIENT</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ForemanAPIClient: Foreman API client handle</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">VIRT_CLIENTS</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">dict: libvirt API client handles</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">MON_CLIENTS</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">dict: Nagios CGI client handles</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">REPORT</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">dict: Snapshot report</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">REPORT_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">str: Date prefix for snapshots and downtimes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<div class="viewcode-block" id="is_blacklisted"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.is_blacklisted">[docs]</a><span class="k">def</span> <span class="nf">is_blacklisted</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">blacklist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function checks whether a host is matched by an exclude pattern</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">blacklist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">host</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="get_host_param_from_report"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.get_host_param_from_report">[docs]</a><span class="k">def</span> <span class="nf">get_host_param_from_report</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function retrieves a host parameter value from a report.</span>
+
+<span class="sd">    :param report: snapshot report data</span>
+<span class="sd">    :type report: dict</span>
+<span class="sd">    :param host: hostname</span>
+<span class="sd">    :type host: str</span>
+<span class="sd">    :param param: parameter name</span>
+<span class="sd">    :type param: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">report</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span> <span class="ow">and</span> \
+        <span class="n">report</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">param</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">report</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">param</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="manage_host_preparation"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.manage_host_preparation">[docs]</a><span class="k">def</span> <span class="nf">manage_host_preparation</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">cleanup</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function prepares or cleans up maintenance tasks for a particular</span>
+<span class="sd">    host. This includes creating/removing snapshots and scheduled downtimes.</span>
+
+<span class="sd">    :param host: hostname</span>
+<span class="sd">    :type host: str</span>
+<span class="sd">    :param cleanup: Flag whether preparations should be undone (default: no)</span>
+<span class="sd">    :type cleanup: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#create snapshot if applicable</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">virt_skip_snapshot</span> <span class="ow">and</span> \
+        <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_snapshot&quot;</span><span class="p">)</span> \
+        <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;fixmepls&quot;</span><span class="p">]:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; needs to be protected by a snapshot&quot;</span><span class="p">,</span> <span class="n">host</span>
+        <span class="p">)</span>
+        <span class="c1">#use customized VM name if applicable</span>
+        <span class="k">if</span> <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_name&quot;</span><span class="p">)</span> \
+            <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+            <span class="n">vm_name</span> <span class="o">=</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_name&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vm_name</span> <span class="o">=</span> <span class="n">host</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cleanup</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; remove snapshot (katprep_</span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> \
+                    <span class="n">host</span><span class="p">,</span> <span class="n">REPORT_PREFIX</span><span class="p">,</span> <span class="n">vm_name</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; create snapshot (katprep_</span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> \
+                        <span class="n">host</span><span class="p">,</span> <span class="n">REPORT_PREFIX</span><span class="p">,</span> <span class="n">vm_name</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="n">SnapshotExistsException</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cleanup</span><span class="p">:</span>
+                    <span class="c1">#remove snapshot</span>
+                    <span class="n">VIRT_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_snapshot</span><span class="p">(</span>
+                        <span class="n">vm_name</span><span class="p">,</span> <span class="s2">&quot;katprep_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">REPORT_PREFIX</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#create snapshot</span>
+                    <span class="n">VIRT_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">create_snapshot</span><span class="p">(</span>
+                        <span class="n">vm_name</span><span class="p">,</span> <span class="s2">&quot;katprep_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">REPORT_PREFIX</span><span class="p">),</span>
+                        <span class="s2">&quot;Snapshot created automatically by katprep&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="n">InvalidCredentialsException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid crendentials supplied&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">SnapshotExistsException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Snapshot for host &#39;</span><span class="si">%s</span><span class="s2">&#39; already exists: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">EmptySetException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Snapshot for host &#39;</span><span class="si">%s</span><span class="s2">&#39; already removed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">SessionException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to manage snapshot for host &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+
+    <span class="c1">#get errata reboot flags</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">errata_reboot</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;reboot_suggested&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;errata&quot;</span><span class="p">]]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1">#no reboot suggested</span>
+        <span class="n">errata_reboot</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">pass</span>
+
+    <span class="c1">#schedule downtime if applicable</span>
+    <span class="c1">#TODO: only schedule downtime if a patch suggests it?</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">mon_skip_downtime</span> <span class="ow">and</span> \
+        <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon&quot;</span><span class="p">)</span> \
+        <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;fixmepls&quot;</span><span class="p">])</span> <span class="ow">or</span> \
+        <span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">mon_suggested</span> <span class="ow">and</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">errata_reboot</span><span class="p">):</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Downtime needs to be scheduled for host &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">host</span>
+        <span class="p">)</span>
+        <span class="c1">#use customized monitoring name if applicable</span>
+        <span class="k">if</span> <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon_name&quot;</span><span class="p">)</span> \
+        <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+            <span class="n">mon_name</span> <span class="o">=</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon_name&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mon_name</span> <span class="o">=</span> <span class="n">host</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cleanup</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; remove downtime&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; schedule downtime&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cleanup</span><span class="p">:</span>
+                    <span class="c1">#remove downtime</span>
+                    <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_downtime</span><span class="p">(</span><span class="n">mon_name</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#schedule downtime</span>
+                    <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">schedule_downtime</span><span class="p">(</span>
+                        <span class="n">mon_name</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="n">hours</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">mon_downtime</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="n">InvalidCredentialsException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to maintain downtime: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">UnsupportedRequestException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Unable to maintain downtime for host &#39;</span><span class="si">%s</span><span class="s2">&#39;: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="set_verification_value"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.set_verification_value">[docs]</a><span class="k">def</span> <span class="nf">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function stores verification data in a snapshot report. This is done</span>
+<span class="sd">    by altering the host information dictionary and storing the changes in the</span>
+<span class="sd">    JSON catalog.</span>
+
+<span class="sd">    :param host: hostname</span>
+<span class="sd">    :type host: str</span>
+<span class="sd">    :param setting: setting name</span>
+<span class="sd">    :type setting: str</span>
+<span class="sd">    :param value: setting value</span>
+<span class="sd">    :type value: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">REPORT</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#set value</span>
+        <span class="n">REPORT</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;verification&quot;</span><span class="p">][</span><span class="n">setting</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1">#store file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">report</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">target</span><span class="p">:</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">REPORT</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to store report: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to set verification setting &#39;</span><span class="si">%s</span><span class="s2">=</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">value</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="prepare"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.prepare">[docs]</a><span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function prepares maintenance tasks, which might include creating</span>
+<span class="sd">    snapshots and scheduling downtime.</span>
+
+<span class="sd">    :param args: argparse options dictionary containing parameters</span>
+<span class="sd">    :type args: argparse options dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#create snapshot/downtime per host</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Preparing host &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#prepare host</span>
+            <span class="n">manage_host_preparation</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#verify preparation</span>
+            <span class="c1">#if not options.generic_dry_run:</span>
+                <span class="c1">#verify(options, args)</span>
+
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error preparing maintenance: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function executes maintenance tasks, which might include applying</span>
+<span class="sd">    errata.</span>
+
+<span class="sd">    :param args: argparse options dictionary containing parameters</span>
+<span class="sd">    :type args: argparse options dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Patching host &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#installing errata</span>
+            <span class="n">errata_target</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;errata_id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;errata&quot;</span><span class="p">]]</span>
+            <span class="n">errata_target</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">errata_target</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errata_target</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1">#errata found</span>
+                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; install: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errata_target</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">api_put</span><span class="p">(</span>
+                        <span class="s2">&quot;/hosts/</span><span class="si">{}</span><span class="s2">/errata/apply&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">)</span>
+                        <span class="p">),</span>
+                        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;errata_ids&quot;</span><span class="p">:</span> <span class="n">errata_target</span><span class="p">})</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No errata for host </span><span class="si">%s</span><span class="s2"> available&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#install package upgrades</span>
+            <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">upgrade_packages</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; install package upgrades&quot;</span><span class="p">,</span> <span class="n">host</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">api_put</span><span class="p">(</span>
+                        <span class="s2">&quot;/hosts/</span><span class="si">{}</span><span class="s2">/packages/upgrade_all&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">)</span>
+                        <span class="p">),</span>
+                        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({})</span>
+                    <span class="p">)</span>
+
+            <span class="c1">#get errata reboot flags</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">errata_reboot</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;reboot_suggested&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;errata&quot;</span><span class="p">]]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="c1">#no reboot suggested</span>
+                <span class="n">errata_reboot</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">pass</span>
+
+            <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">foreman_reboot</span> <span class="ow">or</span> \
+                <span class="p">(</span><span class="kc">True</span> <span class="ow">in</span> <span class="n">errata_reboot</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">foreman_no_reboot</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; reboot host&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">api_put</span><span class="p">(</span>
+                        <span class="s2">&quot;/hosts/</span><span class="si">{}</span><span class="s2">/power&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">)</span>
+                        <span class="p">),</span>
+                        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;power_action&quot;</span><span class="p">:</span> <span class="s2">&quot;soft&quot;</span><span class="p">})</span>
+                    <span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error maintaining host: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="revert"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.revert">[docs]</a><span class="k">def</span> <span class="nf">revert</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function reverts maintenance tasks.</span>
+<span class="sd">    As the Foreman APIs lacks possibilities, only VM snapshots are restored</span>
+<span class="sd">    currently.</span>
+
+<span class="sd">    :param args: argparse options dictionary containing parameters</span>
+<span class="sd">    :type args: argparse options dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#restore snapshots per host</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Restoring host &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#create snapshot if applicable</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">virt_skip_snapshot</span> <span class="ow">and</span> \
+                <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_snapshot&quot;</span><span class="p">)</span> \
+                <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;fixmepls&quot;</span><span class="p">]:</span>
+                <span class="c1">#use customized VM name if applicable</span>
+                <span class="k">if</span> <span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_name&quot;</span><span class="p">)</span> \
+                    <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+                    <span class="n">vm_name</span> <span class="o">=</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                        <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_name&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vm_name</span> <span class="o">=</span> <span class="n">host</span>
+
+                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Host &#39;</span><span class="si">%s</span><span class="s2">&#39; --&gt; revert snapshot (katprep_</span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="n">host</span><span class="p">,</span> <span class="n">REPORT_PREFIX</span><span class="p">,</span> <span class="n">vm_name</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#revert snapshot</span>
+                    <span class="n">VIRT_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">revert_snapshot</span><span class="p">(</span>
+                        <span class="n">vm_name</span><span class="p">,</span> <span class="s2">&quot;katprep_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">REPORT_PREFIX</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="c1">#power-on VM?</span>
+                    <span class="c1">#VIRT_CLIENTS[get_host_param_from_report(REPORT, host, &quot;katprep_virt&quot;)].poweron_vm(</span>
+                    <span class="c1">#    vm_name</span>
+                    <span class="c1">#)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error reverting maintenance: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="verify"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.verify">[docs]</a><span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function verifies maintenance tasks (such as creating snapshots and</span>
+<span class="sd">    installing errata) and stores status information in a verification log.</span>
+<span class="sd">    These information are included into host reports by katprep_report.</span>
+
+<span class="sd">    :param args: argparse options dictionary containing parameters</span>
+<span class="sd">    :type args: argparse options dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#verify snapshot/downtime per host</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Verifying host &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#check snapshot</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">virt_skip_snapshot</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                        <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_name&quot;</span>
+                <span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+                    <span class="c1">#customized name</span>
+                    <span class="n">vm_name</span> <span class="o">=</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                        <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt_name&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#FQDN</span>
+                    <span class="n">vm_name</span> <span class="o">=</span> <span class="n">host</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">VIRT_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_virt&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">has_snapshot</span><span class="p">(</span>
+                            <span class="n">vm_name</span><span class="p">,</span> <span class="s2">&quot;katprep_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">REPORT_PREFIX</span><span class="p">)</span>
+                        <span class="p">):</span>
+                        <span class="c1">#set flag</span>
+                        <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;virt_snapshot&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Snapshot for host &#39;</span><span class="si">%s</span><span class="s2">&#39; found.&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1">#set flag</span>
+                        <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;virt_cleanup&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No snapshot for host &#39;</span><span class="si">%s</span><span class="s2">&#39; found, probably cleaned-up.&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">EmptySetException</span><span class="p">:</span>
+                    <span class="c1">#set flag</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;virt_cleanup&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No snapshot for host &#39;</span><span class="si">%s</span><span class="s2">&#39; found, probably cleaned-up.&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#check downtime</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">mon_skip_downtime</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                        <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon_name&quot;</span>
+                <span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+                    <span class="c1">#customized name</span>
+                    <span class="n">mon_name</span> <span class="o">=</span> <span class="n">get_host_param_from_report</span><span class="p">(</span>
+                        <span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon_name&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#FQDN</span>
+                    <span class="n">mon_name</span> <span class="o">=</span> <span class="n">host</span>
+                <span class="c1">#check scheduled downtime</span>
+                <span class="k">if</span> <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">has_downtime</span><span class="p">(</span><span class="n">mon_name</span><span class="p">):</span>
+                    <span class="c1">#set flag</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;mon_downtime&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downtime for host &#39;</span><span class="si">%s</span><span class="s2">&#39; found.&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#set flag</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;mon_cleanup&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No downtime for host &#39;</span><span class="si">%s</span><span class="s2">&#39; found, probably cleaned-up.&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+                <span class="c1">#check critical services</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">crit_services</span> <span class="o">=</span> <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">get_host_param_from_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;katprep_mon&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">get_services</span><span class="p">(</span><span class="n">mon_name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">EmptySetException</span><span class="p">:</span>
+                    <span class="n">crit_services</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">crit_services</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">services</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;Critical services: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">crit_services</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="n">crit_services</span><span class="p">:</span>
+                        <span class="n">services</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2"> - </span><span class="si">{}</span><span class="s2">, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">services</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="p">)</span>
+                    <span class="c1">#add status to verfication values</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;mon_status&quot;</span><span class="p">,</span> <span class="s2">&quot;Warning/Critical&quot;</span><span class="p">)</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;mon_status_detail&quot;</span><span class="p">,</span> <span class="n">services</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;mon_status&quot;</span><span class="p">,</span> <span class="s2">&quot;Ok&quot;</span><span class="p">)</span>
+                    <span class="n">set_verification_value</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;mon_status_detail&quot;</span><span class="p">,</span> <span class="s2">&quot;All services OK&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1">#host with either no virt/mon</span>
+        <span class="k">pass</span>
+        <span class="c1">#TODO: seems not to work...</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error verifying host: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="status"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.status">[docs]</a><span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function shows current Foreman/Katello software maintenance task</span>
+<span class="sd">    status.</span>
+
+<span class="sd">    :param args: argparse options dictionary containing parameters</span>
+<span class="sd">    :type args: argparse options dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#verify snapshot/downtime per host</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting &#39;</span><span class="si">%s</span><span class="s2">&#39; task status...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#check maintenance progress</span>
+            <span class="n">tasks</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;Erratum&quot;</span><span class="p">:</span> <span class="s2">&quot;Actions::Katello::Host::Erratum::Install&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Package&quot;</span><span class="p">:</span> <span class="s2">&quot;Actions::Katello::Host::Update&quot;</span>
+            <span class="p">}</span>
+            <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+                    <span class="c1">#print task</span>
+                    <span class="n">results</span> <span class="o">=</span> <span class="n">SAT_CLIENT</span><span class="o">.</span><span class="n">get_task_by_filter</span><span class="p">(</span>
+                        <span class="n">host</span><span class="p">,</span> <span class="n">tasks</span><span class="p">[</span><span class="n">task</span><span class="p">],</span> <span class="n">today</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                            <span class="c1">#print result</span>
+                            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="s2">&quot;Found &#39;</span><span class="si">%s</span><span class="s2">&#39; task </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (state </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">],</span>
+                                <span class="n">result</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;started_at&quot;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                            <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span>
+                                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> task for host &#39;</span><span class="si">%s</span><span class="s2">&#39; succeeded&quot;</span><span class="p">,</span>
+                                    <span class="n">task</span><span class="p">,</span> <span class="n">host</span>
+                                <span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+                                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> task for host &#39;</span><span class="si">%s</span><span class="s2">&#39; FAILED!&quot;</span><span class="p">,</span>
+                                    <span class="n">task</span><span class="p">,</span> <span class="n">host</span>
+                                <span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> task for host &#39;</span><span class="si">%s</span><span class="s2">&#39; has state &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+                                    <span class="n">task</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span>
+                                <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;package&quot;</span><span class="p">:</span>
+                            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No </span><span class="si">%s</span><span class="s2"> task for &#39;</span><span class="si">%s</span><span class="s2">&#39; found!&quot;</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">host</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No </span><span class="si">%s</span><span class="s2"> task for &#39;</span><span class="si">%s</span><span class="s2">&#39; found!&quot;</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">host</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1">#host with either no virt/mon</span>
+        <span class="k">pass</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error getting &#39;</span><span class="si">%s</span><span class="s2">&#39; task status...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cleanup"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.cleanup">[docs]</a><span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function cleans things up after executing maintenance tasks. This</span>
+<span class="sd">    might include removing snapshots and scheduled downtimes.</span>
+
+<span class="sd">    :param args: argparse options dictionary containing parameters</span>
+<span class="sd">    :type args: argparse options dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#remove snapshot/downtime per host</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">REPORT</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cleaning-up host &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+            <span class="c1">#clean-up host</span>
+            <span class="n">manage_host_preparation</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error cleaning-up maintenance: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_configuration"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.load_configuration">[docs]</a><span class="k">def</span> <span class="nf">load_configuration</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function imports parameters and values from a YAML configuration</span>
+<span class="sd">    file.</span>
+
+<span class="sd">    :param config_file: Path to configuration file</span>
+<span class="sd">    :type config_file: str</span>
+<span class="sd">    :param options: argparse options dictionary containing the settings</span>
+<span class="sd">    :type options: argparse options dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#try to apply settings from configuration file</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">yml_file</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">yml_file</span><span class="p">)</span>
+        <span class="c1">#TODO: load configuration</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TODO: load_configuration&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Error: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">options</span></div>
+
+
+
+<div class="viewcode-block" id="parse_options"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.parse_options">[docs]</a><span class="k">def</span> <span class="nf">parse_options</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parses options and arguments.&quot;&quot;&quot;</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="si">%(prog)s</span><span class="s1"> is used for preparing, executing and</span>
+<span class="s1">    controlling maintenance tasks on systems managed with Foreman/Katello</span>
+<span class="s1">    or Red Hat Satellite 6.</span>
+<span class="s1">    You can automatically create snapshots and schedule monitoring downtimes</span>
+<span class="s1">    if you have set all necessary host parameters using katprep_parameters.</span>
+<span class="s1">    It is also possible to trigger errata installation using the Foreman API.</span>
+<span class="s1">    After completing maintenance, it is also possible to remove snapshots and</span>
+<span class="s1">    downtimes.</span>
+<span class="s1">    &#39;&#39;&#39;</span>
+    <span class="n">epilog</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;Check-out the website for more details:</span>
+<span class="s1">     http://github.com/stdevel/katprep&#39;&#39;&#39;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span> <span class="n">epilog</span><span class="o">=</span><span class="n">epilog</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">__version__</span><span class="p">)</span>
+
+    <span class="c1">#define option groups</span>
+    <span class="n">gen_opts</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s2">&quot;generic arguments&quot;</span><span class="p">)</span>
+    <span class="n">fman_opts</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s2">&quot;Foreman arguments&quot;</span><span class="p">)</span>
+    <span class="n">virt_opts</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s2">&quot;virtualization arguments&quot;</span><span class="p">)</span>
+    <span class="n">mon_opts</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s2">&quot;monitoring arguments&quot;</span><span class="p">)</span>
+    <span class="n">filter_opts_excl</span> <span class="o">=</span> <span class="n">fman_opts</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
+
+    <span class="c1">#GENERIC ARGUMENTS</span>
+    <span class="c1">#-q / --quiet</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-q&quot;</span><span class="p">,</span> <span class="s2">&quot;--quiet&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;generic_quiet&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;don&#39;t print status messages to stdout (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-d / --debug</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="s2">&quot;--debug&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;generic_debug&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;enable debugging outputs (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-n / --dry-run</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="s2">&quot;--dry-run&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;generic_dry_run&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;only simulate what would be done (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-C / --auth-container</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span> <span class="s2">&quot;--auth-container&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;generic_auth_container&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;FILE&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;defines an authentication container file (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-P / --auth-password</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-P&quot;</span><span class="p">,</span> <span class="s2">&quot;--auth-password&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;auth_password&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;PASSWORD&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;defines the authentication container password in case you don&#39;t &quot;</span> \
+    <span class="s2">&quot;want to enter it manually (useful for scripted automation)&quot;</span><span class="p">)</span>
+    <span class="c1">#-c / --config</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> \
+    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;FILE&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;use a configuration rather than 1337 parameters (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#snapshot reports</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;A snapshot report&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">is_valid_report</span><span class="p">)</span>
+    <span class="c1">#--insecure</span>
+    <span class="n">gen_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--insecure&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;ssl_verify&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
+    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_false&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Disables SSL verification (default: no)&quot;</span><span class="p">)</span>
+
+    <span class="c1">#FOREMAN ARGUMENTS</span>
+    <span class="c1">#-s / --foreman-server</span>
+    <span class="n">fman_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--foreman-server&quot;</span><span class="p">,</span> \
+    <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;foreman_server&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;SERVER&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;defines the Foreman server to use (default: localhost)&quot;</span><span class="p">)</span>
+    <span class="c1">#-r / --reboot-systems</span>
+    <span class="n">fman_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;--reboot-systems&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;foreman_reboot&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;always reboot systems after successful errata installation &quot;</span> \
+    <span class="s2">&quot;(default: no, only if reboot_suggested set)&quot;</span><span class="p">)</span>
+    <span class="c1">#suppress reboot</span>
+    <span class="n">fman_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-R&quot;</span><span class="p">,</span> <span class="s2">&quot;--no-reboot&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;foreman_no_reboot&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_false&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;suppresses rebooting the &quot;</span> \
+    <span class="s2">&quot;system under any circumstances (default: no)&quot;</span><span class="p">)</span>
+
+    <span class="c1">#VIRTUALIZATION ARGUMENTS</span>
+    <span class="c1">#--virt-uri</span>
+    <span class="c1">#TODO: validate URI</span>
+    <span class="n">virt_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--virt-uri&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;virt_uri&quot;</span><span class="p">,</span> \
+    <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;URI&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;defines a libvirt URI to use&quot;</span><span class="p">)</span>
+    <span class="c1">#-k / --skip-snapshot</span>
+    <span class="n">virt_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-k&quot;</span><span class="p">,</span> <span class="s2">&quot;--skip-snapshot&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;virt_skip_snapshot&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;skips creating snapshots (default: no)&quot;</span><span class="p">)</span>
+
+    <span class="c1">#MONITORING ARGUMENTS</span>
+    <span class="c1">#--mon-url</span>
+    <span class="n">mon_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--mon-url&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;mon_url&quot;</span><span class="p">,</span> \
+    <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;URL&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;defines a monitoring URL to use&quot;</span><span class="p">)</span>
+    <span class="c1">#--mon-type</span>
+    <span class="n">mon_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--mon-type&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;mon_type&quot;</span><span class="p">,</span> \
+    <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;TYPE&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="s2">&quot;nagios|icinga&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;icinga&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;defines the monitoring system type: nagios (Nagios/Icinga 1.x) or&quot;</span> \
+    <span class="s2">&quot; icinga (Icinga 2.x). (default: icinga)&quot;</span><span class="p">)</span>
+    <span class="c1">#-K / --skip-downtime</span>
+    <span class="n">mon_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-K&quot;</span><span class="p">,</span> <span class="s2">&quot;--skip-downtime&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;mon_skip_downtime&quot;</span><span class="p">,</span> \
+    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;skips scheduling downtimes (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-S / --mon-suggested</span>
+    <span class="n">mon_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-S&quot;</span><span class="p">,</span> <span class="s2">&quot;--mon-suggested&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;mon_suggested&quot;</span><span class="p">,</span> \
+    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;only schedules downtime if &quot;</span> \
+    <span class="s2">&quot;suggested (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-t / --mon-downtime</span>
+    <span class="n">mon_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--mon-downtime&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;mon_downtime&quot;</span><span class="p">,</span> \
+    <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;HOURS&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;downtime period (default: 8 hours)&quot;</span><span class="p">)</span>
+
+    <span class="c1">#FILTER ARGUMENTS</span>
+    <span class="c1">#-l / --location</span>
+    <span class="n">filter_opts_excl</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;--location&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;filter_location&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;NAME&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filters by a particular location (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-o / --organization</span>
+    <span class="n">filter_opts_excl</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--organization&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;filter_organization&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;NAME&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filters by an particular organization (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-e / --environment</span>
+    <span class="n">filter_opts_excl</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="s2">&quot;--environment&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;filter_environment&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;NAME&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filters by an particular environment (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-E / --exclude</span>
+    <span class="n">fman_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-E&quot;</span><span class="p">,</span> <span class="s2">&quot;--exclude&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> \
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;filter_exclude&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;NAME&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;excludes particular hosts (default: no)&quot;</span><span class="p">)</span>
+    <span class="c1">#-I / --include-only</span>
+    <span class="n">fman_opts</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-I&quot;</span><span class="p">,</span> <span class="s2">&quot;--include-only&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> \
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;filter_include&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;NAME&quot;</span><span class="p">,</span> \
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;only includes particular hosts (default: no)&quot;</span><span class="p">)</span>
+
+    <span class="c1">#COMMANDS</span>
+    <span class="n">subparsers</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;commands&#39;</span><span class="p">,</span> \
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;controlling maintenance stages&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Additional help&#39;</span><span class="p">)</span>
+    <span class="n">cmd_prepare</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;prepare&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Preparing maintenance&quot;</span><span class="p">)</span>
+    <span class="n">cmd_prepare</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">prepare</span><span class="p">)</span>
+    <span class="n">cmd_execute</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;execute&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Installing errata&quot;</span><span class="p">)</span>
+    <span class="n">cmd_execute</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">execute</span><span class="p">)</span>
+    <span class="n">cmd_execute</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--include-packages&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> \
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;upgrade_packages&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;installs available package&quot;</span> \
+    <span class="s2">&quot; upgrades (default: no)&quot;</span><span class="p">)</span>
+    <span class="n">cmd_status</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Display software &quot;</span> \
+    <span class="s2">&quot;maintenance progress&quot;</span><span class="p">)</span>
+    <span class="n">cmd_status</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
+    <span class="n">cmd_revert</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;revert&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Reverting changes&quot;</span><span class="p">)</span>
+    <span class="n">cmd_revert</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">revert</span><span class="p">)</span>
+    <span class="n">cmd_verify</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;verify&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Verifying status&quot;</span><span class="p">)</span>
+    <span class="n">cmd_verify</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">verify</span><span class="p">)</span>
+    <span class="n">cmd_cleanup</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;cleanup&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Cleaning-up&quot;</span><span class="p">)</span>
+    <span class="n">cmd_cleanup</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">cleanup</span><span class="p">)</span>
+
+    <span class="c1">#parse options and arguments</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="c1">#load configuration file</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">config</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">load_configuration</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="c1">#validate hostname</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">foreman_server</span> <span class="o">=</span> <span class="n">validate_hostname</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">foreman_server</span><span class="p">)</span>
+    <span class="c1">#set password</span>
+    <span class="k">while</span> <span class="n">options</span><span class="o">.</span><span class="n">auth_password</span> <span class="o">==</span> <span class="s2">&quot;empty&quot;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">auth_password</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">32</span><span class="p">:</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">auth_password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span>
+            <span class="s2">&quot;Authentication container password: &quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_filter"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.set_filter">[docs]</a><span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">report</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function filters a report&#39;s hosts by organization, location</span>
+<span class="sd">    or environment. Also, it evaluates exclude filters.</span>
+
+<span class="sd">    :param options: argparse options dictionary containing parameters</span>
+<span class="sd">    :type options: argparse options dict</span>
+<span class="sd">    :param report: report data</span>
+<span class="sd">    :type report: JSON data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">remove</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">report</span><span class="p">:</span>
+        <span class="c1">#removing filtered/blacklisted hosts</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_organization</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> \
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;organization_name&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_organization</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="n">remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_location</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> \
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;location_name&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_location</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="n">remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_environment</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> \
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;environment_name&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_environment</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="n">remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_blacklisted</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_exclude</span><span class="p">):</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="n">remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">filter_include</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
+            <span class="ow">not</span> <span class="n">is_blacklisted</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">filter_include</span><span class="p">):</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="n">remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+
+    <span class="c1">#remove entries</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">remove</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">report</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">report</span></div>
+
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main function, starts the logic based on parameters.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">REPORT</span><span class="p">,</span> <span class="n">REPORT_PREFIX</span><span class="p">,</span> <span class="n">SAT_CLIENT</span>
+    <span class="k">global</span> <span class="n">VIRT_CLIENTS</span><span class="p">,</span> <span class="n">MON_CLIENTS</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Options: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Arguments: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_dry_run</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;This is just a SIMULATION - no changes will be made.&quot;</span><span class="p">)</span>
+
+    <span class="c1">#load report</span>
+    <span class="n">REPORT</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">get_json</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">report</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">REPORT_PREFIX</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+        <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">report</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1">#set filter</span>
+    <span class="n">REPORT</span> <span class="o">=</span> <span class="n">set_filter</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">REPORT</span><span class="p">)</span>
+
+    <span class="c1">#warn if user tends to do something stupid</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">virt_skip_snapshot</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;You decided to skip creating snapshots - I&#39;ve warned you!&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">mon_skip_downtime</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;You decided to skip scheduling downtimes - happy flodding!&quot;</span><span class="p">)</span>
+
+    <span class="c1">#initialize APIs</span>
+    <span class="p">(</span><span class="n">fman_user</span><span class="p">,</span> <span class="n">fman_pass</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_credentials</span><span class="p">(</span>
+        <span class="s2">&quot;Foreman&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">foreman_server</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_auth_container</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">auth_password</span>
+    <span class="p">)</span>
+    <span class="n">SAT_CLIENT</span> <span class="o">=</span> <span class="n">ForemanAPIClient</span><span class="p">(</span>
+        <span class="n">LOG_LEVEL</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">foreman_server</span><span class="p">,</span> <span class="n">fman_user</span><span class="p">,</span>
+        <span class="n">fman_pass</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">ssl_verify</span>
+    <span class="p">)</span>
+
+    <span class="c1">#get virtualization host credentials</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">virt_skip_snapshot</span><span class="p">:</span>
+        <span class="n">required_virt</span> <span class="o">=</span> <span class="n">get_required_hosts_by_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="s2">&quot;katprep_virt&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">required_virt</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">virt_user</span><span class="p">,</span> <span class="n">virt_pass</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_credentials</span><span class="p">(</span>
+                <span class="s2">&quot;Virtualization </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">host</span><span class="p">),</span>
+                <span class="n">host</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_auth_container</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">auth_password</span>
+            <span class="p">)</span>
+            <span class="c1">#create client based on type</span>
+            <span class="n">host_params</span> <span class="o">=</span> <span class="n">get_host_params_by_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;katprep_virt_type&quot;</span> <span class="ow">in</span> <span class="n">host_params</span> <span class="ow">and</span> \
+                <span class="n">host_params</span><span class="p">[</span><span class="s2">&quot;katprep_virt_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pyvmomi&quot;</span><span class="p">:</span>
+                <span class="c1">#VIRT_CLIENTS[host] = PyvmomiClient(host, virt_user, virt_pass)</span>
+                <span class="n">VIRT_CLIENTS</span><span class="p">[</span><span class="n">host</span><span class="p">]</span> <span class="o">=</span> <span class="n">PyvmomiClient</span><span class="p">(</span>
+                    <span class="n">LOG_LEVEL</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">virt_user</span><span class="p">,</span> <span class="n">virt_pass</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;katprep_virt_type&quot;</span> <span class="ow">in</span> <span class="n">host_params</span><span class="p">:</span>
+                <span class="n">VIRT_CLIENTS</span><span class="p">[</span><span class="n">host</span><span class="p">]</span> <span class="o">=</span> <span class="n">LibvirtClient</span><span class="p">(</span>
+                    <span class="n">LOG_LEVEL</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">virt_user</span><span class="p">,</span> <span class="n">virt_pass</span><span class="p">)</span>
+
+    <span class="c1">#get monitoring host credentials</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">mon_skip_downtime</span><span class="p">:</span>
+        <span class="n">required_mon</span> <span class="o">=</span> <span class="n">get_required_hosts_by_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="s2">&quot;katprep_mon&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">required_mon</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">mon_user</span><span class="p">,</span> <span class="n">mon_pass</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_credentials</span><span class="p">(</span>
+                <span class="s2">&quot;Monitoring </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">host</span><span class="p">),</span>
+                <span class="n">host</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_auth_container</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">auth_password</span>
+            <span class="p">)</span>
+            <span class="n">host_params</span> <span class="o">=</span> <span class="n">get_host_params_by_report</span><span class="p">(</span><span class="n">REPORT</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;katprep_mon_type&quot;</span> <span class="ow">in</span> <span class="n">host_params</span> <span class="ow">and</span> \
+                <span class="n">host_params</span><span class="p">[</span><span class="s2">&quot;katprep_mon_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;nagios&quot;</span><span class="p">:</span>
+                <span class="c1">#Yet another legacy installation</span>
+                <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">host</span><span class="p">]</span> <span class="o">=</span> <span class="n">NagiosCGIClient</span><span class="p">(</span>
+                    <span class="n">LOG_LEVEL</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">mon_user</span><span class="p">,</span> <span class="n">mon_pass</span><span class="p">,</span> \
+                    <span class="n">verify</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">ssl_verify</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;katprep_mon_type&quot;</span> <span class="ow">in</span> <span class="n">host_params</span><span class="p">:</span>
+                <span class="c1">#Icinga 2, yay!</span>
+                <span class="n">MON_CLIENTS</span><span class="p">[</span><span class="n">host</span><span class="p">]</span> <span class="o">=</span> <span class="n">Icinga2APIClient</span><span class="p">(</span>
+                    <span class="n">LOG_LEVEL</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">mon_user</span><span class="p">,</span> <span class="n">mon_pass</span>
+                <span class="p">)</span>
+
+    <span class="c1">#start action</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">func</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cli"><a class="viewcode-back" href="../../katprep.html#katprep.maintenance.cli">[docs]</a><span class="k">def</span> <span class="nf">cli</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This functions initializes the CLI interface</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">LOG_LEVEL</span>
+    <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">parse_options</span><span class="p">()</span>
+
+    <span class="c1">#set logging level</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_debug</span><span class="p">:</span>
+        <span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+    <span class="k">elif</span> <span class="n">options</span><span class="o">.</span><span class="n">generic_quiet</span><span class="p">:</span>
+        <span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">LOG_LEVEL</span><span class="p">)</span>
+
+    <span class="n">main</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">cli</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../katprep.html" >katprep</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Christian Stankowic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>
