@@ -10,6 +10,7 @@ from __future__ import absolute_import, print_function
 import argparse
 import logging
 import getpass
+from . import __version__
 from .AuthContainer import AuthContainer, ContainerException
 
 try:
@@ -17,7 +18,6 @@ try:
 except NameError:  # Python 3
     raw_input = input
 
-__version__ = "0.5.0"
 LOGGER = logging.getLogger('katprep_authconfig')
 """
 logging: Logger instance
@@ -149,9 +149,8 @@ def parse_options(args=None):
     '''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(
-        description=desc, version=__version__, epilog=epilog
-    )
+    parser = argparse.ArgumentParser(description=desc, epilog=epilog)
+    parser.add_argument('--version', action='version', version=__version__)
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")

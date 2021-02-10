@@ -12,7 +12,7 @@ import argparse
 import logging
 import json
 import getpass
-from . import get_credentials
+from . import __version__, get_credentials
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
@@ -22,7 +22,6 @@ from .clients import EmptySetException, SessionException, \
 InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
 
-__version__ = "0.5.0"
 """
 ForemanAPIClient: Foreman API client handle
 """
@@ -177,9 +176,8 @@ def parse_options(args=None):
     '''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(
-        description=desc, version=__version__, epilog=epilog
-    )
+    parser = argparse.ArgumentParser(description=desc, epilog=epilog)
+    parser.add_argument('--version', action='version', version=__version__)
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
