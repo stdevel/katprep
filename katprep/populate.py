@@ -16,11 +16,11 @@ from . import get_credentials
 from .clients.ForemanAPIClient import ForemanAPIClient
 from .clients.LibvirtClient import LibvirtClient
 from .clients.PyvmomiClient import PyvmomiClient
-from .clients.NagiosCGIClient import NagiosCGIClient
-from .clients.Icinga2APIClient import Icinga2APIClient
 from .clients import EmptySetException, SessionException, \
 InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
+from .monitoring.icinga2 import Icinga2APIClient
+from .monitoring.nagios import NagiosCGIClient
 
 __version__ = "0.5.0"
 """
@@ -318,12 +318,13 @@ def main(options, args):
             #Yet another legacy installation
             MON_CLIENT = NagiosCGIClient(
                 LOG_LEVEL, options.mon_url, mon_user, mon_pass, \
-                verify=options.ssl_verify
+                verify_ssl=options.ssl_verify
             )
         else:
             #Icinga 2, yay!
             MON_CLIENT = Icinga2APIClient(
-                LOG_LEVEL, options.mon_url, mon_user, mon_pass
+                LOG_LEVEL, options.mon_url, mon_user, mon_pass,
+                verify_ssl=options.ssl_verify
             )
 
     #populate _all_ the things
