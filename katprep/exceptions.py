@@ -65,3 +65,8 @@ class SnapshotExistsException(Exception):
 
     .. class:: SnapshotExistsException
     """
+
+class UnauthenticatedError(RuntimeError):
+    """
+    Exception for showing that a client wasn't able to authenticate itself.
+    """

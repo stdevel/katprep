@@ -18,9 +18,9 @@ import datetime
 import yaml
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report, get_host_params_by_report
-from .management.exceptions import (EmptySetException,
+from .exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, SnapshotExistsException,
-UnsupportedFilterException, UnsupportedRequestException)
+UnsupportedRequestException)
 from .management.foreman import ForemanAPIClient
 from .management.libvirt import LibvirtClient
 from .management.vmware import PyvmomiClient

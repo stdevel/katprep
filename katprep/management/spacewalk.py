@@ -5,8 +5,9 @@ depending exception classes
 """
 
 import logging
+
 from .base import BaseConnector
-from .exceptions import (APILevelNotSupportedException, InvalidCredentialsException,
+from ..exceptions import (APILevelNotSupportedException, InvalidCredentialsException,
                          SessionException)
 
 try:

@@ -5,10 +5,12 @@ Class for sending requests to libvirt
 
 from __future__ import print_function
 
-import libvirt
 import logging
+
+import libvirt
+
 from .base import BaseConnector, PowerManager, SnapshotManager
-from .exceptions import (EmptySetException, InvalidCredentialsException,
+from ..exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, UnsupportedRequestException)
 
 

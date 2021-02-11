@@ -9,7 +9,7 @@ import logging
 from datetime import datetime, timedelta
 
 from .base import DOWNTIME_COMMENT, HttpApiClient, MonitoringClientBase
-from ..management.exceptions import EmptySetException, SessionException
+from ..exceptions import EmptySetException, SessionException
 
 
 class Icinga2APIClient(MonitoringClientBase, HttpApiClient):

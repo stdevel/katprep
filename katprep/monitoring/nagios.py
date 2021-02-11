@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from lxml import html
 
 from .base import DOWNTIME_COMMENT, HttpApiClient, MonitoringClientBase
-from ..management.exceptions import SessionException, UnsupportedRequestException
+from ..exceptions import SessionException, UnsupportedRequestException
 
 
 class NagiosCGIClient(MonitoringClientBase, HttpApiClient):

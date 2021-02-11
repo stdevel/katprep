@@ -8,8 +8,7 @@ from abc import ABCMeta, abstractmethod
 from requests import Session
 from requests.auth import HTTPBasicAuth
 
-from .exceptions import UnauthenticatedError
-
+from ..exceptions import UnauthenticatedError
 
 DOWNTIME_COMMENT = "Downtime managed by katprep"
 

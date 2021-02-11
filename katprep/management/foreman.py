@@ -5,12 +5,13 @@ This file contains the ForemanAPIClient class
 
 import logging
 import json
+
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 from .base import BaseConnector
-from .exceptions import (APILevelNotSupportedException,
-InvalidCredentialsException, InvalidHostnameFormatException,
-SessionException)
+from ..exceptions import (APILevelNotSupportedException,
+InvalidCredentialsException, SessionException)
 
 
 class ForemanAPIClient(BaseConnector):
