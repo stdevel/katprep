@@ -851,7 +851,7 @@ def main(options, args):
                 #Yet another legacy installation
                 MON_CLIENTS[host] = NagiosCGIClient(
                     LOG_LEVEL, host, mon_user, mon_pass, \
-                    verify=options.ssl_verify
+                    verify_ssl=options.ssl_verify
                 )
             elif "katprep_mon_type" in host_params:
                 #Icinga 2, yay!
