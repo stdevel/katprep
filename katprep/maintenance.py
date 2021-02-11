@@ -856,7 +856,8 @@ def main(options, args):
             elif "katprep_mon_type" in host_params:
                 #Icinga 2, yay!
                 MON_CLIENTS[host] = Icinga2APIClient(
-                    LOG_LEVEL, host, mon_user, mon_pass
+                    LOG_LEVEL, host, mon_user, mon_pass,
+                    verify_ssl=options.ssl_verify
                 )
 
     #start action
