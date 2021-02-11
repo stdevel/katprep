@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 This file contains the ForemanAPIClient class
@@ -8,12 +7,13 @@ import logging
 import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from katprep.clients import SessionException, InvalidCredentialsException, \
-APILevelNotSupportedException, InvalidHostnameFormatException
+from .base import BaseConnector
+from .exceptions import (APILevelNotSupportedException,
+InvalidCredentialsException, InvalidHostnameFormatException,
+SessionException)
 
 
-
-class ForemanAPIClient:
+class ForemanAPIClient(BaseConnector):
     """
     Class for communicating with the Foreman API
 
@@ -31,22 +31,6 @@ class ForemanAPIClient:
     """
     dict: Default headers set for every HTTP request
     """
-    HOSTNAME = ""
-    """
-    str: Foreman API hostname
-    """
-    URL = ""
-    """
-    str: Foreman API base URL
-    """
-    SESSION = None
-    """
-    Session: HTTP session to Foreman host
-    """
-    VERIFY = True
-    """
-    bool: Boolean whether force SSL verification
-    """
 
     def __init__(self, log_level, hostname,
                  username, password, verify=True, prefix=""):
@@ -57,7 +41,7 @@ class ForemanAPIClient:
 
         :param log_level: log level
         :type log_level: logging
-        :param hostname: Foreman host
+        :param hostname: Foreman API hostname
         :type hostname: str
         :param username: API username
         :type username: str
@@ -74,25 +58,22 @@ class ForemanAPIClient:
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         #set connection information
         self.HOSTNAME = hostname
-        self.USERNAME = username
-        self.PASSWORD = password
         self.VERIFY = verify
         self.URL = "https://{0}{1}/api/v2".format(self.HOSTNAME, prefix)
-        #start session and check API version if Foreman API
-        self.__connect()
+
+        # start session and check API version if Foreman API
+        super().__init__(username, password)
+
         if prefix == "":
             self.validate_api_support()
 
 
-
-    def __connect(self):
+    def _connect(self):
         """
         This function establishes a connection to Foreman.
         """
-        global SESSION
-        self.SESSION = requests.Session()
-        self.SESSION.auth = (self.USERNAME, self.PASSWORD)
-
+        self._session = requests.Session()
+        self._session.auth = (self._username, self._password)
 
 
     def get_hostname(self):
@@ -150,25 +131,25 @@ class ForemanAPIClient:
             #send request
             if method.lower() == "put":
                 #PUT
-                result = self.SESSION.put(
+                result = self._session.put(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "delete":
                 #DELETE
-                result = self.SESSION.delete(
+                result = self._session.delete(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             elif method.lower() == "post":
                 #POST
-                result = self.SESSION.post(
+                result = self._session.post(
                     "{}{}".format(self.URL, sub_url),
                     data=payload, headers=my_headers, verify=self.VERIFY
                 )
             else:
                 #GET
-                result = self.SESSION.get(
+                result = self._session.get(
                     "{}{}?per_page={}&page={}".format(
                         self.URL, sub_url, hits, page),
                     headers=self.HEADERS, verify=self.VERIFY

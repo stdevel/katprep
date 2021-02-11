@@ -8,8 +8,8 @@ import json
 import logging
 from datetime import datetime, timedelta
 
-from katprep.clients import SessionException, EmptySetException
 from .base import DOWNTIME_COMMENT, HttpApiClient, MonitoringClientBase
+from ..management.exceptions import EmptySetException, SessionException
 
 
 class Icinga2APIClient(MonitoringClientBase, HttpApiClient):

@@ -18,14 +18,15 @@ import datetime
 import yaml
 from . import is_valid_report, get_json, get_credentials, \
 get_required_hosts_by_report, get_host_params_by_report
-from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients.LibvirtClient import LibvirtClient
-from .clients.PyvmomiClient import PyvmomiClient
-from .clients import validate_hostname, EmptySetException, \
-SessionException, InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException, SnapshotExistsException
+from .management.exceptions import (EmptySetException,
+InvalidCredentialsException, SessionException, SnapshotExistsException,
+UnsupportedFilterException, UnsupportedRequestException)
+from .management.foreman import ForemanAPIClient
+from .management.libvirt import LibvirtClient
+from .management.vmware import PyvmomiClient
 from .monitoring.nagios import NagiosCGIClient
 from .monitoring.icinga2 import Icinga2APIClient
+from .network import validate_hostname
 
 __version__ = "0.5.0"
 """

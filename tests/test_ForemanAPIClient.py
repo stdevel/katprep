@@ -10,8 +10,8 @@ import json
 import logging
 import pytest
 import random
-from katprep.clients.ForemanAPIClient import ForemanAPIClient
-from katprep.clients import SessionException
+from katprep.management.foreman import ForemanAPIClient
+from katprep.management.exceptions import SessionException
 
 from .utilities import load_config
 

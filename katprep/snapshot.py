@@ -15,10 +15,11 @@ import time
 import getpass
 from . import get_credentials, is_writable, validate_filters, \
 get_filter
-from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients import validate_hostname, EmptySetException, \
-SessionException, InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException
+from .management.exceptions import (EmptySetException,
+InvalidCredentialsException, SessionException, UnsupportedFilterException,
+UnsupportedRequestException)
+from .management.foreman import ForemanAPIClient
+from .network import validate_hostname
 
 __version__ = "0.5.0"
 """
