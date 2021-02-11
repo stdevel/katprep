@@ -11,7 +11,7 @@ import mock
 import pytest
 import ssl
 from katprep.management.spacewalk import SpacewalkAPIClient
-from katprep.management.exceptions import (APILevelNotSupportedException,
+from katprep.exceptions import (APILevelNotSupportedException,
 InvalidCredentialsException)
 
 from .utilities import load_config

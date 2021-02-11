@@ -10,7 +10,7 @@ import logging
 import time
 import pytest
 
-from katprep.management.exceptions import SessionException, UnsupportedRequestException
+from katprep.exceptions import SessionException, UnsupportedRequestException
 from katprep.monitoring.nagios import NagiosCGIClient
 
 from .utilities import load_config

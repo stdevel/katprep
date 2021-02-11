@@ -8,8 +8,7 @@ from __future__ import absolute_import
 
 import logging
 import pytest
-from katprep.clients.Icinga2APIClient import Icinga2APIClient
-from katprep.management.exceptions import EmptySetException, SessionException
+from katprep.exceptions import EmptySetException, SessionException
 from katprep.monitoring.icinga2 import Icinga2APIClient
 
 from .utilities import load_config

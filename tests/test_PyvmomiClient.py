@@ -9,8 +9,8 @@ import logging
 import pytest
 import time
 from katprep.management.vmware import PyvmomiClient
-from katprep.management.exceptions import (EmptySetException,
-InvalidCredentialsException, SessionException)
+from katprep.exceptions import (EmptySetException, InvalidCredentialsException,
+SessionException)
 
 from .utilities import load_config
 

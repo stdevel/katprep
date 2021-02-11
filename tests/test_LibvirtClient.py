@@ -8,7 +8,7 @@ from __future__ import absolute_import, print_function
 
 import logging
 import pytest
-from katprep.management.exceptions import (EmptySetException,
+from katprep.exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException)
 
 from .utilities import load_config

@@ -8,10 +8,12 @@ from __future__ import absolute_import
 
 import json
 import logging
-import pytest
 import random
+
+import pytest
+
+from katprep.exceptions import SessionException
 from katprep.management.foreman import ForemanAPIClient
-from katprep.management.exceptions import SessionException
 
 from .utilities import load_config
 
