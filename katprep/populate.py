@@ -18,7 +18,7 @@ InvalidCredentialsException, UnsupportedRequestException, \
 UnsupportedFilterException
 from .management.foreman import ForemanAPIClient
 from .management.libvirt import LibvirtClient
-from .management.vmare import PyvmomiClient
+from .management.vmware import PyvmomiClient
 from .monitoring.icinga2 import Icinga2APIClient
 from .monitoring.nagios import NagiosCGIClient
 
