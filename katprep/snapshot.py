@@ -13,13 +13,12 @@ import logging
 import json
 import time
 import getpass
-from . import get_credentials, is_writable, validate_filters, \
-get_filter
+from . import (
+    __version__, get_credentials, is_writable, validate_filters, get_filter)
 from .exceptions import SessionException
 from .management.foreman import ForemanAPIClient
 from .network import validate_hostname
 
-__version__ = "0.5.0"
 """
 str: Program version
 """
@@ -45,7 +44,6 @@ str: Output file
 """
 
 
-
 def parse_options(args=None):
     """Parses options and arguments."""
 
@@ -62,8 +60,8 @@ def parse_options(args=None):
     '''
     epilog = '''Check-out the website for more details:
 http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(description=desc, version=__version__, \
-    epilog=epilog)
+    parser = argparse.ArgumentParser(description=desc, epilog=epilog)
+    parser.add_argument('--version', action='version', version=__version__)
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")

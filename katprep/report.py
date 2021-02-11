@@ -15,9 +15,8 @@ import datetime
 import os
 #import pypandoc
 import yaml
-from . import is_writable, which, is_valid_report, get_json
+from . import __version__, is_writable, which, is_valid_report, get_json
 
-__version__ = "0.5.0"
 """
 str: Program version
 """
@@ -49,8 +48,8 @@ def parse_options(args=None):
     command line.'''
     epilog = '''Check-out the website for more details:
     http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(description=desc, version=__version__, \
-    epilog=epilog)
+    parser = argparse.ArgumentParser(description=desc, epilog=epilog)
+    parser.add_argument('--version', action='version', version=__version__)
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")

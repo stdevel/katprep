@@ -12,7 +12,8 @@ import argparse
 import logging
 import json
 import getpass
-from . import get_credentials, validate_filters, get_filter
+
+from . import __version__, get_credentials, validate_filters, get_filter
 from .management.foreman import ForemanAPIClient
 
 try:
@@ -20,7 +21,6 @@ try:
 except NameError:  # Python 3
     raw_input = input
 
-__version__ = "0.5.0"
 """
 str: Program version
 """
@@ -214,9 +214,8 @@ def parse_options(args=None):
     '''
     epilog = '''Check-out the website for more details:
      http://github.com/stdevel/katprep'''
-    parser = argparse.ArgumentParser(
-        description=desc, version=__version__, epilog=epilog
-    )
+    parser = argparse.ArgumentParser(description=desc, epilog=epilog)
+    parser.add_argument('--version', action='version', version=__version__)
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
