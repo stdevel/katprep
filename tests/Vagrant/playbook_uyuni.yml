@@ -33,9 +33,9 @@
     - name: Create filters
       command: spacecmd "repo_setfilters '{{ item.channel }}' '{{ item.filter }}'"
       loop:
-        - channel: 'External - openSUSE Leap 15.2 x86_64'
+        - channel: 'External - openSUSE Leap 15.2 (x86_64)'
           filter: '+cowsay,openscap-utils,apache2,apache2-utils,system-user-wwwrun,libapr1,screen,timezone,salt*,python3*'
-        - channel: 'External - openSUSE Leap 15.2 Updates x86_64'
+        - channel: 'External - openSUSE Leap 15.2 Updates (x86_64)'
           filter: '+salt*,python3*,kernel*'
     - name: Sync channels
       command: spacewalk-repo-sync -c "{{ item }}"
