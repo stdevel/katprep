@@ -9,11 +9,13 @@ from __future__ import absolute_import
 import logging
 import random
 import pytest
-from katprep.clients.UyuniAPIClient import UyuniAPIClient
-from katprep.clients import (InvalidCredentialsException,
-                             SSLCertVerificationError,
-                             SessionException,
-                             EmptySetException)
+from katprep.management.uyuni import UyuniAPIClient
+from katprep.exceptions import (
+    SSLCertVerificationError,
+    SessionException,
+    EmptySetException,
+    InvalidCredentialsException
+)
 
 from .utilities import load_config
 
@@ -33,9 +35,9 @@ def client(config):
     """
     return UyuniAPIClient(
         logging.ERROR,
-        config["config"]["hostname"],
         config["config"]["api_user"],
         config["config"]["api_pass"],
+        config["config"]["hostname"],
         port=config["config"]["port"],
         skip_ssl=True
     )
@@ -47,9 +49,9 @@ def test_valid_login(config):
     """
     assert UyuniAPIClient(
         logging.ERROR,
-        config["config"]["hostname"],
         config["config"]["api_user"],
         config["config"]["api_pass"],
+        config["config"]["hostname"],
         port=config["config"]["port"],
         skip_ssl=True
     )
@@ -62,9 +64,9 @@ def test_invalid_login(config):
     with pytest.raises(InvalidCredentialsException):
         UyuniAPIClient(
             logging.ERROR,
-            config["config"]["hostname"],
             "giertz",
             "paulapinkepank",
+            config["config"]["hostname"],
             port=config["config"]["port"],
             skip_ssl=True
         )
@@ -77,9 +79,9 @@ def test_invalid_ssl(config):
     with pytest.raises(SSLCertVerificationError):
         UyuniAPIClient(
             logging.ERROR,
-            config["config"]["hostname"],
             config["config"]["api_user"],
             config["config"]["api_pass"],
+            config["config"]["hostname"],
             port=config["config"]["port"],
             skip_ssl=False
         )

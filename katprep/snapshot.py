@@ -15,10 +15,9 @@ import time
 import getpass
 from . import (
     __version__, get_credentials, is_writable, validate_filters, get_filter)
-from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients import validate_hostname, EmptySetException, \
-SessionException, InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException
+from .exceptions import SessionException
+from .management.foreman import ForemanAPIClient
+from .network import validate_hostname
 
 """
 str: Program version

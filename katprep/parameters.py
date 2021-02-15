@@ -12,11 +12,9 @@ import argparse
 import logging
 import json
 import getpass
+
 from . import __version__, get_credentials, validate_filters, get_filter
-from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients import EmptySetException, SessionException, \
-InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException
+from .management.foreman import ForemanAPIClient
 
 try:
     raw_input

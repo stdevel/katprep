@@ -19,14 +19,15 @@ import yaml
 from . import (
     __version__, is_valid_report, get_json, get_credentials,
     get_required_hosts_by_report, get_host_params_by_report)
-from .clients.ForemanAPIClient import ForemanAPIClient
-from .clients.LibvirtClient import LibvirtClient
-from .clients.PyvmomiClient import PyvmomiClient
-from .clients.NagiosCGIClient import NagiosCGIClient
-from .clients.Icinga2APIClient import Icinga2APIClient
-from .clients import validate_hostname, EmptySetException, \
-SessionException, InvalidCredentialsException, UnsupportedRequestException, \
-UnsupportedFilterException, SnapshotExistsException
+from .exceptions import (EmptySetException,
+InvalidCredentialsException, SessionException, SnapshotExistsException,
+UnsupportedRequestException)
+from .management.foreman import ForemanAPIClient
+from .management.libvirt import LibvirtClient
+from .management.vmware import PyvmomiClient
+from .monitoring.nagios import NagiosCGIClient
+from .monitoring.icinga2 import Icinga2APIClient
+from .network import validate_hostname
 
 """
 ForemanAPIClient: Foreman API client handle
@@ -850,12 +851,13 @@ def main(options, args):
                 #Yet another legacy installation
                 MON_CLIENTS[host] = NagiosCGIClient(
                     LOG_LEVEL, host, mon_user, mon_pass, \
-                    verify=options.ssl_verify
+                    verify_ssl=options.ssl_verify
                 )
             elif "katprep_mon_type" in host_params:
                 #Icinga 2, yay!
                 MON_CLIENTS[host] = Icinga2APIClient(
-                    LOG_LEVEL, host, mon_user, mon_pass
+                    LOG_LEVEL, host, mon_user, mon_pass,
+                    verify_ssl=options.ssl_verify
                 )
 
     #start action

@@ -1,4 +1,4 @@
-lxml < 4.4  # Support for Python 3.4 was removed in 4.4.0
+lxml>=4.6.2
 pyvmomi
 pyyaml
 fernet
