@@ -26,9 +26,9 @@
     - name: Create activation key
       block:
         - name: Create key
-          command: spacecmd "activationkey_create -n ak-opensuse-15_2-default -d 'openSUSE Leap 15.2 default' -b opensuse_leap15_2-x86_64"
+          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_create -n ak-opensuse-15_2-default -d 'openSUSE Leap 15.2 default' -b opensuse_leap15_2-x86_64"
         - name: Add child channels
-          command: spacecmd "activationkey_addchildchannels 1-ak-opensuse-15_2-default opensuse_leap15_2-x86_64-updates opensuse_leap15_2-uyuni-client-x86_64"
+          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_addchildchannels 1-ak-opensuse-15_2-default opensuse_leap15_2-x86_64-updates opensuse_leap15_2-uyuni-client-x86_64"
       ignore_errors: true
     - name: Create filters
       command: spacecmd "repo_setfilters '{{ item.channel }}' '{{ item.filter }}'"
@@ -55,7 +55,7 @@
             regexp: '^ACTIVATION_KEYS='
             line: 'ACTIVATION_KEYS=1-ak-opensuse-15_2-default'
     - name: Create custominfo keys
-      command: spacecmd "custominfo_createkey '{{ item.name }}' '{{ item.description }}'"
+      command: spacecmd -u "{{ username }}" -p "{{ password }}" "custominfo_createkey '{{ item.name }}' '{{ item.description }}'"
       loop:
         - name: 'katprep_mon'
           description: 'URL of the monitoring system'
