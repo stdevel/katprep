@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Class for sending requests to pyvmomi as libvirt is still
@@ -8,11 +7,14 @@ just an endless pain when managing VMware products
 import logging
 import ssl
 import sys
-from katprep.clients.katprep_shared import is_ipv4, is_ipv6
-from katprep.clients import SessionException, InvalidCredentialsException, \
-EmptySetException, SnapshotExistsException
+
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
+
+from .base import BaseConnector, PowerManager, SnapshotManager
+from ..exceptions import (EmptySetException, InvalidCredentialsException,
+SessionException, SnapshotExistsException)
+from ..network import is_ipv4, is_ipv6
 
 try:
     from urllib.parse import urlparse
@@ -20,17 +22,13 @@ except ImportError:
     from urlparse import urlparse
 
 
-class PyvmomiClient(object):
+class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
     """
 .. class:: PyvmomiClient
     """
     LOGGER = logging.getLogger('PyvmomiClient')
     """
     logging: Logger instance
-    """
-    SESSION = None
-    """
-    session: pyvmomi session
     """
 
     def __init__(self, log_level, hostname, username, password):
@@ -56,30 +54,24 @@ class PyvmomiClient(object):
         parsed_uri = urlparse(hostname)
         host = '{uri.path}'.format(uri=parsed_uri)
         if ":" in host:
-            self.HOSTNAME = host[:host.find(':')]
-            self.PORT = host[host.find(':')+1:]
+            self.HOSTNAME, self.PORT = host.split(':', 1)
         else:
             self.HOSTNAME = hostname
             self.PORT = 443
-        #set connection details and connect
-        self.USERNAME = username
-        self.PASSWORD = password
-        self.__connect()
 
+        super().__init__(username, password)
 
-
-    def __connect(self):
+    def _connect(self):
         """This function establishes a connection to the hypervisor."""
-        global SESSION
         context = None
         #skip SSL verification for now
         if hasattr(ssl, '_create_unverified_context'):
             context = ssl._create_unverified_context()
         #try to connect
         try:
-            self.SESSION = SmartConnect(
+            self._session = SmartConnect(
                 host=self.HOSTNAME,
-                user=self.USERNAME, pwd=self.PASSWORD,
+                user=self._username, pwd=self._password,
                 port=self.PORT, sslContext=context
             )
         except vim.fault.InvalidLogin:
@@ -124,7 +116,7 @@ class PyvmomiClient(object):
         :type snapshot_title: str
         :param snapshot_text: Snapshot text
         :type snapshot_text: str
-        :param action: action (create, remove)
+        :param action: The action to perform. create, remove or revert.
         :type remove_snapshot: str
 
         """
@@ -133,9 +125,12 @@ class PyvmomiClient(object):
         dump_memory = False
         quiesce = True
         try:
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
-            if action.lower() != "create":
+            if action.lower() == "revert":
+                #TODO: implement revert
+                raise NotImplementedError("Reverting snapshots not supported")
+            elif action.lower() == "remove":
                 #get _all_ the snapshots
                 snapshots = self.__get_snapshots(vm_name)
                 for snapshot in snapshots:
@@ -188,56 +183,6 @@ class PyvmomiClient(object):
                 "Unable to manage snapshot: '{}'".format(err)
             )
 
-
-
-    #Aliases
-    def create_snapshot(self, vm_name, snapshot_title, snapshot_text):
-        """
-        Creates a snapshot for a particular virtual machine.
-        This requires specifying a VM, comment title and text.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        :param snapshot_text: Snapshot text
-        :type snapshot_text: str
-        """
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, snapshot_text, action="create"
-        )
-
-    def remove_snapshot(self, vm_name, snapshot_title):
-        """
-        Removes a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, "", action="remove"
-        )
-
-    def revert_snapshot(self, vm_name, snapshot_title):
-        """
-        Reverts to  a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        #TODO: implement revert
-        return self.__manage_snapshot(
-            vm_name, snapshot_title, "", action="revert"
-        )
-
-
-
     def __get_snapshots(self, vm_name):
         """
         Returns a set of all snapshots for a particular VM.
@@ -246,7 +191,7 @@ class PyvmomiClient(object):
         :type vm_name: str
         """
         try:
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             container = content.viewManager.CreateContainerView(
                 content.rootFolder, [vim.VirtualMachine], True
             )
@@ -256,8 +201,6 @@ class PyvmomiClient(object):
                     return snapshots
         except AttributeError:
             raise EmptySetException("No snapshots found")
-
-
 
     def has_snapshot(self, vm_name, snapshot_title):
         """
@@ -300,7 +243,7 @@ class PyvmomiClient(object):
         """
         try:
             #get _all_ the VMs
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             #result = {}
             result = []
             #create view cotaining VM objects
@@ -363,7 +306,7 @@ class PyvmomiClient(object):
         """
         try:
             #get _all_ the VMs
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             result = {}
             #create view cotaining VM objects
             object_view = content.viewManager.CreateContainerView(
@@ -378,8 +321,6 @@ class PyvmomiClient(object):
             self.LOGGER.error("Unable to get VM hypervisor information: '%s'", err)
             raise SessionException(err)
 
-
-
     def restart_vm(self, vm_name, force=False):
         """
         Restarts a particular VM (default: soft reboot using guest tools).
@@ -391,7 +332,7 @@ class PyvmomiClient(object):
         """
         try:
             #get VM
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
 
             if force:
@@ -405,48 +346,19 @@ class PyvmomiClient(object):
                 sys.exc_info()[0]
             ))
 
-
-
-    def powerstate_vm(self, vm_name):
-        """
-        Returns the power state of a particular virtual machine.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-
-        """
-        try:
-            content = self.SESSION.RetrieveContent()
-            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
-            if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
-                return "poweredOn"
-            elif vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOff:
-                return "poweredOff"
-        except AttributeError as err:
-            raise SessionException(
-                "Unable to get power state: '{}'".format(err)
-            )
-        except ValueError as err:
-            raise SessionException(
-                "Unable to get power state: '{}'".format(err)
-            )
-
-
-
-    def __manage_power(
+    def _manage_power(
             self, vm_name, action="poweroff"
         ):
         """
         Powers a particual virtual machine on/off forcefully.
 
-        :param vm_name: Name of a virtual machine
+        :param vm_name: Name of the virtual machine
         :type vm_name: str
         :param action: action (poweroff, poweron)
         :type action: str
-
         """
         try:
-            content = self.SESSION.RetrieveContent()
+            content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
             if action.lower() == "poweroff":
                 #get down with the vickness
@@ -464,26 +376,25 @@ class PyvmomiClient(object):
             )
 
 
-
-    #Aliases
-    def poweroff_vm(self, vm_name):
+    def powerstate_vm(self, vm_name):
         """
-        Turns off a particual virtual machine forcefully.
+        Returns the power state of a particular virtual machine.
 
         :param vm_name: Name of a virtual machine
         :type vm_name: str
         """
-        return self.__manage_power(
-            vm_name
-        )
-
-    def poweron_vm(self, vm_name):
-        """
-        Turns on a particual virtual machine forcefully.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        """
-        return self.__manage_power(
-            vm_name, action="poweron"
-        )
+        try:
+            content = self._session.RetrieveContent()
+            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
+            if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
+                return "poweredOn"
+            elif vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOff:
+                return "poweredOff"
+        except AttributeError as err:
+            raise SessionException(
+                "Unable to get power state: '{}'".format(err)
+            )
+        except ValueError as err:
+            raise SessionException(
+                "Unable to get power state: '{}'".format(err)
+            )

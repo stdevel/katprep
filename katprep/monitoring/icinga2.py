@@ -1,49 +1,38 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Class for sending some very basic commands to Icinga 2.x
 monitoring systems.
 """
 
-import logging
-import requests
-from requests.auth import HTTPBasicAuth
 import json
-import time
+import logging
 from datetime import datetime, timedelta
-from katprep.clients import SessionException, EmptySetException
+
+from .base import DOWNTIME_COMMENT, HttpApiClient, MonitoringClientBase
+from ..exceptions import EmptySetException, SessionException
 
 
-
-class Icinga2APIClient:
+class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
     """
     Class for communicating with the Icinga2 API
 
-.. class:: Icinga2APIClient
+    .. class:: Icinga2APIClient
     """
-    LOGGER = logging.getLogger('Icinga2APIClient')
+
+    LOGGER = logging.getLogger("Icinga2APIClient")
     """
     logging: Logger instance
     """
     HEADERS = {
-        'User-Agent': 'katprep (https://github.com/stdevel/katprep)',
-        'Accept': 'application/json',
-        'Content-Type': "application/json"
+        "User-Agent": "katprep (https://github.com/stdevel/katprep)",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
     }
     """
     dict: Default headers set for every HTTP request
     """
-    SESSION = None
-    """
-    session: API session
-    """
-    VERIFY_SSL = False
-    """
-    bool: Setting whether to check SSL certificate
-    """
 
-    def __init__(self, log_level, url,
-        username="", password="", verify_ssl=False):
+    def __init__(self, log_level, url, username="", password="", verify_ssl=False):
         """
         Constructor, creating the class. It requires specifying a
         URL, an username and password to access the API.
@@ -57,35 +46,17 @@ class Icinga2APIClient:
         :param password: corresponding password
         :type password: str
         """
-        #set logging
+        # set logging
         self.LOGGER.setLevel(log_level)
 
-        #set connection data
-        if "/v1" in url:
-            self.URL = url
-        else:
-            self.URL = "{}/v1".format(url)
-        self.USERNAME = username
-        self.PASSWORD = password
+        if "/v1" not in url:
+            url = "{}/v1".format(url)
 
-        #set SSL information and connect
-        if verify_ssl:
-            self.VERIFY_SSL = True
-        self.__connect()
+        super().__init__(
+            url=url, username=username, password=password, verify_ssl=verify_ssl
+        )
 
-
-
-    def __connect(self):
-        """
-        This function establishes a connection to the Icinga2 API.
-        """
-        self.SESSION = requests.Session()
-        if self.USERNAME != "":
-            self.SESSION.auth = HTTPBasicAuth(self.USERNAME, self.PASSWORD)
-
-
-
-    def __api_request(self, method, sub_url, payload=""):
+    def _api_request(self, method, sub_url, payload=""):
         """
         Sends a HTTP request to the Nagios/Icinga API. This function requires
         a valid HTTP method and a sub-URL (such as /cgi-bin/status.cgi).
@@ -99,71 +70,48 @@ class Icinga2APIClient:
         :param payload: payload for POST requests
         :type payload: str
         """
-        #send request to API
+        # send request to API
         try:
             if method.lower() not in ["get", "post"]:
-                #going home
+                # going home
                 raise SessionException("Illegal method '{}' specified".format(method))
             self.LOGGER.debug(
-                "%s request to %s (payload: %s)",
-                method.upper(), sub_url, payload
+                "%s request to %s (payload: %s)", method.upper(), sub_url, payload
             )
 
-            #execute request
+            # execute request
             if method.lower() == "post":
-                #POST
-                result = self.SESSION.post(
-                    "{}{}".format(self.URL, sub_url),
-                    headers=self.HEADERS, data=payload, verify=self.VERIFY_SSL
-                    )
+                # POST
+                result = self._session.post(
+                    "{}{}".format(self._url, sub_url),
+                    headers=self.HEADERS,
+                    data=payload,
+                    verify=self._verify_ssl,
+                )
             else:
-                #GET
-                result = self.SESSION.get(
-                    "{}{}".format(self.URL, sub_url),
-                    headers=self.HEADERS, verify=self.VERIFY_SSL
-                    )
+                # GET
+                result = self._session.get(
+                    "{}{}".format(self._url, sub_url),
+                    headers=self.HEADERS,
+                    verify=self._verify_ssl,
+                )
 
             if result.status_code == 404:
-                raise EmptySetException("HTTP resource not found: {}".format(
-                    sub_url))
+                raise EmptySetException("HTTP resource not found: {}".format(sub_url))
             elif result.status_code != 200:
-                raise SessionException("{}: HTTP operation not successful".format(
-                    result.status_code))
-            else:
-                #return result
-                self.LOGGER.debug(result.text)
-                return result
+                raise SessionException(
+                    "{}: HTTP operation not successful".format(result.status_code)
+                )
 
+            # return result
+            self.LOGGER.debug(result.text)
+            return result
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
 
-    #Aliases
-    def __api_get(self, sub_url):
-        """
-        Sends a HTTP GET request to the Nagios/Icinga API. This function
-        requires a sub-URL (such as /cgi-bin/status.cgi).
-
-        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
-        :type sub_url: str
-        """
-        return self.__api_request("get", sub_url)
-
-    def __api_post(self, sub_url, payload):
-        """
-        Sends a HTTP POST request to the Nagios/Icinga API. This function
-        requires a sub-URL (such as /cgi-bin/status.cgi).
-
-        :param sub_url: relative path (e.g. /cgi-bin/status.cgi)
-        :type sub_url: str
-        :param payload: payload data
-        :type payload: str
-        """
-        return self.__api_request("post", sub_url, payload)
-
-
-
-    def __calculate_time(self, hours):
+    @staticmethod
+    def calculate_time_range(hours):
         """
         Calculates the time range for POST requests in the format the
         Icinga 2.x API requires. For this, the current time/date
@@ -174,13 +122,11 @@ class Icinga2APIClient:
         """
         current_time = datetime.now()
         end_time = current_time + timedelta(hours=int(hours))
-        return current_time, end_time
+        return (current_time, end_time)
 
-
-
-    def __manage_downtime(
-            self, object_name, object_type, hours, comment, remove_downtime
-        ):
+    def _manage_downtime(
+        self, object_name, object_type, hours, comment, remove_downtime
+    ):
         """
         Adds or removes scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
@@ -197,68 +143,69 @@ class Icinga2APIClient:
         :param remove_downtime: Removes a previously scheduled downtime
         :type remove_downtime: bool
         """
-        #calculate timerange
-        (current_time, end_time) = self.__calculate_time(hours)
+        # calculate timerange
+        (current_time, end_time) = self.calculate_time_range(hours)
 
         if object_type.lower() == "hostgroup":
             if remove_downtime:
-                #remove hostgroup downtime
+                # remove hostgroup downtime
                 payload = {
                     "type": "Host",
-                    "filter": "\"{}\" in host.groups".format(object_name),
+                    "filter": '"{}" in host.groups'.format(object_name),
                 }
             else:
-                #create hostgroup downtime
+                # create hostgroup downtime
                 payload = {
                     "type": "Host",
-                    "filter": "\"{}\" in host.groups".format(object_name),
+                    "filter": '"{}" in host.groups'.format(object_name),
                     "start_time": current_time.timestamp(),
                     "end_time": end_time.timestamp(),
                     "fixed": True,
-                    "author": self.USERNAME,
+                    "author": self._username,
                     "comment": comment,
                 }
         else:
             if remove_downtime:
-                #remove host downtime
+                # remove host downtime
                 payload = {
                     "type": "Host",
-                    "filter": "host.name==\"{}\"".format(object_name),
+                    "filter": 'host.name=="{}"'.format(object_name),
                 }
             else:
-                #create host downtime
+                # create host downtime
                 payload = {
                     "type": "Host",
-                    "filter": "host.name==\"{}\"".format(object_name),
+                    "filter": 'host.name=="{}"'.format(object_name),
                     "start_time": current_time.timestamp(),
                     "end_time": end_time.timestamp(),
                     "fixed": True,
-                    "author": self.USERNAME,
+                    "author": self._username,
                     "comment": comment,
                 }
-        #send POST
+
+        # send POST
         result = ""
         if remove_downtime:
             payload["type"] = "Host"
-            result = self.__api_post("/actions/remove-downtime", json.dumps(payload))
+            result = self._api_post("/actions/remove-downtime", json.dumps(payload))
             payload["type"] = "Service"
-            result = self.__api_post("/actions/remove-downtime", json.dumps(payload))
+            result = self._api_post("/actions/remove-downtime", json.dumps(payload))
         else:
             payload["type"] = "Host"
-            result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
+            result = self._api_post("/actions/schedule-downtime", json.dumps(payload))
             payload["type"] = "Service"
-            result = self.__api_post("/actions/schedule-downtime", json.dumps(payload))
-        #return result
+            result = self._api_post("/actions/schedule-downtime", json.dumps(payload))
+
+        # return result
         result_obj = json.loads(result.text)
         if len(result_obj["results"]) == 0:
             raise EmptySetException("Host/service not found")
-        else:
-            return result
 
+        return result
 
-
-    def schedule_downtime(self, object_name, object_type, hours=8, \
-        comment="Downtime managed by katprep"):
+    def schedule_downtime(
+        self, object_name, object_type, hours=8, comment=DOWNTIME_COMMENT
+    ):
         """
         Adds scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
@@ -274,10 +221,9 @@ class Icinga2APIClient:
         :param comment: Downtime comment
         :type comment: str
         """
-        return self.__manage_downtime(object_name, object_type, hours, \
-            comment, remove_downtime=False)
-
-
+        return self._manage_downtime(
+            object_name, object_type, hours, comment, remove_downtime=False
+        )
 
     def remove_downtime(self, object_name, object_type):
         """
@@ -289,10 +235,13 @@ class Icinga2APIClient:
         :param object_type: host or hostgroup
         :type object_type: str
         """
-        return self.__manage_downtime(object_name, object_type, 8, \
-            "Downtime managed by katprep", remove_downtime=True)
-
-
+        return self._manage_downtime(
+            object_name,
+            object_type,
+            8,
+            "Downtime managed by katprep",
+            remove_downtime=True,
+        )
 
     def has_downtime(self, object_name, object_type="host"):
         """
@@ -304,14 +253,14 @@ class Icinga2APIClient:
         :param object_type: Host or hostgroup (default: host)
         :type object_type: str
         """
-        #retrieve and load data
+        # retrieve and load data
         try:
-            result = self.__api_get("/objects/{}s?host={}".format(
-               object_type, object_name)
+            result = self._api_get(
+                "/objects/{}s?host={}".format(object_type, object_name)
             )
             data = json.loads(result.text)
-            #check if downtime
-            #TODO: how to do this for hostgroups?!
+            # check if downtime
+            # TODO: how to do this for hostgroups?!
             if object_type == "host":
                 for result in data["results"]:
                     if result["attrs"]["downtime_depth"] > 0:
@@ -320,8 +269,6 @@ class Icinga2APIClient:
         except SessionException as err:
             if "404" in err.message:
                 raise EmptySetException("Host not found")
-
-
 
     def get_services(self, object_name, only_failed=True):
         """
@@ -332,32 +279,27 @@ class Icinga2APIClient:
         :param only_failed: True will only report failed services
         :type only_failed: bool
         """
-        #retrieve result
-        result = self.__api_get('/objects/services?filter=match("{}",host.name)'.format(
-            object_name)
+        # retrieve result
+        result = self._api_get(
+            '/objects/services?filter=match("{}",host.name)'.format(object_name)
         )
         data = json.loads(result.text)
         services = []
         for result in data["results"]:
-            #get all the service information
+            # get all the service information
             service = result["attrs"]["display_name"]
             state = result["attrs"]["state"]
-            self.LOGGER.debug(
-                "Found service '%s' with state '%s'", service, state
-            )
-            if only_failed == False or float(state) != 0.0:
-                #append service if ok or state not ok
+            self.LOGGER.debug("Found service '%s' with state '%s'", service, state)
+            if not only_failed or float(state) != 0.0:
+                # append service if ok or state not ok
                 this_service = {"name": service, "state": state}
                 services.append(this_service)
+
         if len(services) == 0:
-            #empty set
-            raise EmptySetException(
-                "No results for host '%s'".format(object_name)
-            )
-        else:
-            return services
+            # empty set
+            raise EmptySetException("No results for host '%s'".format(object_name))
 
-
+        return services
 
     def get_hosts(self, ipv6_only=False):
         """
@@ -366,12 +308,12 @@ class Icinga2APIClient:
         :param ipv6_only: use IPv6 addresses only
         :type ipv6_only: bool
         """
-        #retrieve result
-        result = self.__api_get("/objects/hosts")
+        # retrieve result
+        result = self._api_get("/objects/hosts")
         data = json.loads(result.text)
         hosts = []
         for result in data["results"]:
-            #get all the host information
+            # get all the host information
             host = result["attrs"]["display_name"]
             if ipv6_only:
                 ip = result["attrs"]["address6"]
@@ -379,20 +321,13 @@ class Icinga2APIClient:
                 ip = result["attrs"]["address"]
             this_host = {"name": host, "ip": ip}
             hosts.append(this_host)
+
         return hosts
-
-
 
     def is_authenticated(self):
         """
         This function is used for checking whether authorization succeeded.
         It simply retrieves status.cgi
         """
-        #set-up URL
-        url = "/"
-        #retrieve data
-        result = self.__api_get(url)
-        if result != "":
-            return True
-        else:
-            return False
+        result = self._api_get("/")
+        return bool(result)

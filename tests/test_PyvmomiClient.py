@@ -8,9 +8,9 @@ from __future__ import absolute_import
 import logging
 import pytest
 import time
-from katprep.clients.PyvmomiClient import PyvmomiClient
-from katprep.clients import SessionException, InvalidCredentialsException, \
-EmptySetException
+from katprep.management.vmware import PyvmomiClient
+from katprep.exceptions import (EmptySetException, InvalidCredentialsException,
+SessionException)
 
 from .utilities import load_config
 

@@ -13,7 +13,7 @@ import os
 import json
 import argparse
 from .AuthContainer import AuthContainer, ContainerException
-from .clients import SessionException
+from .exceptions import SessionException
 
 try:
     raw_input

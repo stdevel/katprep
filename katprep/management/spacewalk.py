@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 This file contains the SpacewalkAPIClient and
@@ -6,8 +5,10 @@ depending exception classes
 """
 
 import logging
-from katprep.clients import (SessionException, InvalidCredentialsException,
-                             APILevelNotSupportedException)
+
+from .base import BaseConnector
+from ..exceptions import (APILevelNotSupportedException, InvalidCredentialsException,
+                         SessionException)
 
 try:
     from xmlrpc.server import SimpleXMLRPCServer as Server
@@ -16,7 +17,7 @@ except ImportError:
     from xmlrpclib import Server, Fault
 
 
-class SpacewalkAPIClient(object):
+class SpacewalkAPIClient(BaseConnector):
     """
     Class for communicating with the Spacewalk API
 
@@ -34,30 +35,6 @@ class SpacewalkAPIClient(object):
     """
     dict: Default headers set for every HTTP request
     """
-    hostname = ""
-    """
-    str: Spacewalk API hostname
-    """
-    url = ""
-    """
-    str: Spacewalk API base URL
-    """
-    username = ""
-    """
-    str: API username
-    """
-    password = ""
-    """
-    str: API password
-    """
-    api_session = None
-    """
-    Session: HTTP session to Spacewalk host
-    """
-    api_key = None
-    """
-    str: Session key
-    """
 
     def __init__(self, log_level, hostname, username, password):
         """
@@ -67,7 +44,7 @@ class SpacewalkAPIClient(object):
 
         :param log_level: log level
         :type log_level: logging
-        :param hostname: Spacewalk host
+        :param hostname: Spacewalk API hostname
         :type hostname: str
         :param username: API username
         :type username: str
@@ -84,12 +61,11 @@ class SpacewalkAPIClient(object):
         #set connection information
         self.hostname = hostname
         self.LOGGER.debug("Set hostname to '%s'", self.hostname)
-        self.username = username
-        self.password = password
         self.url = "https://{0}/rpc/api".format(self.hostname)
 
         #start session and check API version if Spacewalk API
-        self.__connect()
+        self.api_key = None
+        super().__init__(username, password)
         self.validate_api_support()
 
 
@@ -102,14 +78,14 @@ class SpacewalkAPIClient(object):
 
 
 
-    def __connect(self):
+    def _connect(self):
         """
         This function establishes a connection to Spacewalk.
         """
         #set api session and key
         try:
-            self.api_session = Server(self.url)
-            self.api_key = self.api_session.auth.login(self.username, self.password)
+            self._session = Server(self.url)
+            self.api_key = self._session.auth.login(self._username, self._password)
         except Fault as err:
             if err.faultCode == 2950:
                 raise InvalidCredentialsException(
@@ -130,7 +106,7 @@ class SpacewalkAPIClient(object):
         """
         try:
             #check whether API is supported
-            api_level = self.api_session.api.getVersion()
+            api_level = self._session.api.getVersion()
             if float(api_level) < self.API_MIN:
                 raise APILevelNotSupportedException(
                     "Your API version ({0}) does not support the required calls. "
@@ -156,6 +132,6 @@ class SpacewalkAPIClient(object):
 
     def get_hostname(self):
         """
-        Returns the configured hostname of the objecti nstance.
+        Returns the configured hostname of the object instance.
         """
         return self.hostname
