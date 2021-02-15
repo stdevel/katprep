@@ -297,7 +297,7 @@ class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
 
         if len(services) == 0:
             # empty set
-            raise EmptySetException("No results for host '%s'".format(object_name))
+            raise EmptySetException("No results for host {!r}".format(object_name))
 
         return services
 
