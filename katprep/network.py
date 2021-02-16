@@ -5,6 +5,8 @@ Functions useful for work with networking.
 
 import socket
 
+from .exceptions import InvalidHostnameFormatException
+
 
 def is_ipv4(address):
     """
