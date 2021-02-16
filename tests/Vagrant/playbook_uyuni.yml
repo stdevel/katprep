@@ -30,12 +30,25 @@
           command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_addchildchannels 1-ak-opensuse-15_2-default opensuse_leap15_2-x86_64-updates opensuse_leap15_2-uyuni-client-x86_64"
       ignore_errors: true
     - name: Create filters
-      command: spacecmd "repo_setfilters '{{ item.channel }}' '{{ item.filter }}'"
-      loop:
-        - channel: 'External - openSUSE Leap 15.2 (x86_64)'
-          filter: '+cowsay,openscap-utils,apache2,apache2-utils,system-user-wwwrun,libapr1,screen,timezone,salt*,python3*'
-        - channel: 'External - openSUSE Leap 15.2 Updates (x86_64)'
-          filter: '+salt*,python3*,kernel*'
+      block:
+        - name: Create openSUSE filters
+          command: spacecmd repo_addfilters -- 'External - openSUSE Leap 15.2 (x86_64)' '{{ item }}'
+          loop:
+            - +cowsay
+            - +openscap-utils
+            - +apache2*
+            - +system-user-wwwrun
+            - +libapr1
+            - +screen
+            - +timezone
+            - +salt*
+            - +python3*
+        - name: Create openSUSE Update filters
+          command: spacecmd repo_addfilters -- 'External - openSUSE Leap 15.2 Updates (x86_64)' '{{ item }}'
+          loop:
+            - +salt*
+            - +python3*
+            - +kernel*
     - name: Sync channels
       command: spacewalk-repo-sync -c "{{ item }}"
       loop:
@@ -54,7 +67,7 @@
             regexp: '^ACTIVATION_KEYS='
             line: 'ACTIVATION_KEYS=1-ak-opensuse-15_2-default'
     - name: Create custominfo keys
-      command: spacecmd -u "{{ username }}" -p "{{ password }}" "custominfo_createkey '{{ item.name }}' '{{ item.description }}'"
+      command: spacecmd -u "{{ username }}" -p "{{ password }}" "custominfo_createkey -- {{ item.name }} {{ item.description }}"
       loop:
         - name: 'katprep_mon'
           description: 'URL of the monitoring system'
