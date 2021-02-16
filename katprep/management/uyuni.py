@@ -43,7 +43,8 @@ class UyuniAPIClient(BaseConnector):
     """
 
     def __init__(
-            self, log_level, username, password, hostname, port=443, skip_ssl=False
+            self, log_level, username, password,
+            hostname, port=443, skip_ssl=False
     ):
         """
         Constructor creating the class. It requires specifying a
@@ -64,7 +65,10 @@ class UyuniAPIClient(BaseConnector):
         # set logging
         logging.basicConfig(level=log_level)
         self.LOGGER.setLevel(log_level)
-        self.LOGGER.debug("About to create Uyuni client '%s'@'%s'", username, hostname)
+        self.LOGGER.debug(
+            "About to create Uyuni client '%s'@'%s'",
+            username, hostname
+            )
 
         # set connection information
         self.LOGGER.debug("Set hostname to '%s'", hostname)
@@ -94,7 +98,9 @@ class UyuniAPIClient(BaseConnector):
                 context = ssl.create_default_context()
 
             self._session = ServerProxy(self.url, context=context)
-            self._api_key = self._session.auth.login(self._username, self._password)
+            self._api_key = self._session.auth.login(
+                self._username, self._password
+            )
         except ssl.SSLCertVerificationError as err:
             self.LOGGER.error(err)
             raise SSLCertVerificationError
@@ -139,7 +145,9 @@ class UyuniAPIClient(BaseConnector):
         Returns the profile ID of a particular system
         """
         try:
-            host_id = self._session.system.getId(self._api_key, hostname)
+            host_id = self._session.system.getId(
+                self._api_key, hostname
+            )
             if len(host_id) > 0:
                 return host_id[0]["id"]
             raise EmptySetException("System not found: '%s'" % hostname)
@@ -155,8 +163,90 @@ class UyuniAPIClient(BaseConnector):
         Returns the parameters of a particular system
         """
         try:
-            params = self._session.system.getCustomValues(self._api_key, system_id)
+            params = self._session.system.getCustomValues(
+                self._api_key, system_id
+            )
             return params
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException("System not found: '%s'" % system_id)
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def get_host_patches(self, system_id):
+        """
+        Returns available patches
+        """
+        try:
+            errata = self._session.system.getRelevantErrata(
+                self._api_key, system_id
+            )
+            return errata
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException("System not found: '%s'" % system_id)
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def get_host_upgrades(self, system_id):
+        """
+        Returns available package upgrades
+        """
+        try:
+            packages = self._session.system.listLatestUpgradablePackages(
+                self._api_key, system_id
+            )
+            return packages
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException("System not found: '%s'" % system_id)
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def get_host_groups(self, system_id):
+        """
+        Returns groups for a given system
+        """
+        try:
+            groups = self._session.system.listGroups(
+                self._api_key, system_id
+            )
+            return groups
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException("System not found: '%s'" % system_id)
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def get_host_details(self, system_id):
+        """
+        Returns details for a given system
+        """
+        try:
+            details = self._session.system.getDetails(
+                self._api_key, system_id
+            )
+            return details
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException("System not found: '%s'" % system_id)
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def get_host_tasks(self, system_id):
+        """
+        Returns tasks for a given system
+        """
+        try:
+            tasks = self._session.system.listSystemEvents(
+                self._api_key, system_id
+            )
+            return tasks
         except Fault as err:
             if "no such system" in err.faultString.lower():
                 raise SessionException("System not found: '%s'" % system_id)
