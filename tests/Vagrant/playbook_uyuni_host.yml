@@ -1,10 +1,13 @@
 ---
 - hosts: localhost
-  remote_user: root
   become: true
   tasks:
+    - name: Assign hostgroup
+      command: spacecmd "group_addsystems -- {{ item }} uyuniclient.example.com"
+      loop:
+        - demo
     - name: Assign custominfo keys
-      command: spacecmd "system_addcustomvalue '{{ item.key }}' '{{ item.value }}' uyuniclient.example.com"
+      command: spacecmd "system_addcustomvalue -- {{ item.key }} {{ item.value }} uyuniclient.example.com"
       loop:
         - key: 'katprep_mon'
           value: 'http://localhost:8665'

@@ -1,6 +1,5 @@
 ---
 - hosts: uyuni
-  remote_user: root
   become: true
   vars:
     username: admin
@@ -71,4 +70,10 @@
           description: 'Object name within hypervisor if not FQDN'
         - name: 'katprep_virt_snapshot'
           description: 'Boolean whether system needs to be procted with a snapshot'
+      ignore_errors: true
+    - name: Create host groups
+      command: spacecmd -u "{{ username }}" -p "{{ password }}" "group_create -- {{ item.name }} {{ item.description }}"
+      loop:
+        - name: 'demo'
+          description: 'Demo hosts'
       ignore_errors: true
