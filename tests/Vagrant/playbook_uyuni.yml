@@ -9,6 +9,19 @@
       template:
         src: "hosts.j2"
         dest: /etc/hosts
+    - name: Configure NTP
+      block:
+        - name: Install chrony
+          zypper:
+            name: chrony
+        - name: Enable service
+          service:
+            name: chronyd
+            state: started
+            enabled: true
+        - name: Set timezone
+          timezone:
+            name: Europe/Berlin
   roles:
     - role: stdevel.uyuni
       uyuni_use_lvm: false
