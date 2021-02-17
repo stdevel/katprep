@@ -7,7 +7,8 @@ Uyuni XMLRPC API client
 import logging
 import ssl
 
-from xmlrpc.client import ServerProxy, Fault
+from xmlrpc.client import ServerProxy, Fault, DateTime
+from datetime import datetime
 from .base import BaseConnector
 from ..exceptions import (
     SessionException,
@@ -132,13 +133,28 @@ class UyuniAPIClient(BaseConnector):
             self.LOGGER.info("Supported API version %s found.", api_level)
         except ValueError as err:
             self.LOGGER.error(err)
-            raise APILevelNotSupportedException("Unable to verify API version")
+            raise APILevelNotSupportedException(
+                "Unable to verify API version"
+            )
 
-    def get_url(self):
+    def get_hosts(self):
         """
-        Returns the configured URL of the object instance.
+        Returns all active system IDs
         """
-        return self.url
+        try:
+            hosts = self._session.system.listActiveSystems(
+                self._api_key
+            )
+            if len(hosts) > 0:
+                _hosts = [x["id"] for x in hosts]
+                return _hosts
+            raise EmptySetException(
+                "No systems found"
+            )
+        except Fault as err:
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
 
     def get_host_id(self, hostname):
         """
@@ -150,10 +166,14 @@ class UyuniAPIClient(BaseConnector):
             )
             if len(host_id) > 0:
                 return host_id[0]["id"]
-            raise EmptySetException("System not found: '%s'" % hostname)
+            raise EmptySetException(
+                "System not found: '%s'" % hostname
+            )
         except Fault as err:
             if "no such system" in err.faultString.lower():
-                raise EmptySetException("System not found: '%s'" % hostname)
+                raise EmptySetException(
+                    "System not found: '%s'" % hostname
+                )
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
@@ -163,29 +183,59 @@ class UyuniAPIClient(BaseConnector):
         Returns the parameters of a particular system
         """
         try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
             params = self._session.system.getCustomValues(
                 self._api_key, system_id
             )
             return params
         except Fault as err:
             if "no such system" in err.faultString.lower():
-                raise SessionException("System not found: '%s'" % system_id)
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
 
     def get_host_patches(self, system_id):
         """
-        Returns available patches
+        Returns available patches for a particular system
         """
         try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
             errata = self._session.system.getRelevantErrata(
                 self._api_key, system_id
             )
             return errata
         except Fault as err:
             if "no such system" in err.faultString.lower():
-                raise SessionException("System not found: '%s'" % system_id)
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def get_patch_by_name(self, patch_name):
+        """
+        Returns a patch by name
+        """
+        try:
+            patch = self._session.errata.getDetails(
+                self._api_key, patch_name
+            )
+            return patch
+        except Fault as err:
+            if "no such patch" in err.faultString.lower():
+                raise SessionException(
+                    "Patch not found: '%s'" % patch_name
+                )
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
@@ -195,13 +245,27 @@ class UyuniAPIClient(BaseConnector):
         Returns available package upgrades
         """
         try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
             packages = self._session.system.listLatestUpgradablePackages(
                 self._api_key, system_id
             )
-            return packages
+            _packages = []
+            for pkg in packages:
+                # exclude if it part of an errata
+                erratum = self._session.packages.listProvidingErrata(
+                    self._api_key, pkg["to_package_id"]
+                )
+                if len(erratum) == 0:
+                    _packages.append(pkg)
+            return _packages
         except Fault as err:
             if "no such system" in err.faultString.lower():
-                raise SessionException("System not found: '%s'" % system_id)
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
@@ -211,13 +275,19 @@ class UyuniAPIClient(BaseConnector):
         Returns groups for a given system
         """
         try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
             groups = self._session.system.listGroups(
                 self._api_key, system_id
             )
             return groups
         except Fault as err:
             if "no such system" in err.faultString.lower():
-                raise SessionException("System not found: '%s'" % system_id)
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
@@ -227,13 +297,19 @@ class UyuniAPIClient(BaseConnector):
         Returns details for a given system
         """
         try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
             details = self._session.system.getDetails(
                 self._api_key, system_id
             )
             return details
         except Fault as err:
             if "no such system" in err.faultString.lower():
-                raise SessionException("System not found: '%s'" % system_id)
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
@@ -243,13 +319,101 @@ class UyuniAPIClient(BaseConnector):
         Returns tasks for a given system
         """
         try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
             tasks = self._session.system.listSystemEvents(
                 self._api_key, system_id
             )
             return tasks
         except Fault as err:
             if "no such system" in err.faultString.lower():
-                raise SessionException("System not found: '%s'" % system_id)
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def install_patches(self, system_id, patches):
+        """
+        Install patches on a given system
+        """
+        try:
+            # remove non-integer values
+            _patches = [x for x in patches if isinstance(x, int)]
+            if len(_patches) == 0:
+                raise EmptySetException(
+                    "No patches supplied - use patch ID"
+                )
+            # install _all_ the patches
+            action_id = self._session.system.scheduleApplyErrata(
+                self._api_key, system_id, _patches
+            )
+            return action_id
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
+            if "invalid errata" in err.faultString.lower():
+                raise EmptySetException(
+                    "Errata not found: '%s'" % err.faultString
+                )
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def install_upgrades(self, system_id, upgrades):
+        """
+        Install package upgrades on a given system
+        """
+        try:
+            # remove non-integer values
+            _upgrades = [x for x in upgrades if isinstance(x, int)]
+            if len(_upgrades) == 0:
+                raise EmptySetException(
+                    "No upgrades supplied - use package ID"
+                )
+            # install _all_ the upgrades
+            action_id = self._session.system.schedulePackageInstall(
+                self._api_key, system_id, _upgrades,
+                DateTime(datetime.now().timetuple())
+            )
+            return action_id
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException(
+                    "System not found: '%s'" % system_id
+                )
+            if "cannot find package" in err.faultString.lower():
+                raise EmptySetException(
+                    "Upgrade not found: '%s'" % err.faultString
+                )
+            raise SessionException(
+                "Generic remote communication error: '%s'" % err.faultString
+            )
+
+    def host_reboot(self, system_id):
+        """
+        Reboots a system immediately
+        """
+        try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
+            action_id = self._session.system.scheduleReboot(
+                self._api_key, system_id,
+                DateTime(datetime.now().timetuple())
+            )
+            return action_id
+        except Fault as err:
+            if "could not find server" in err.faultString.lower():
+                raise EmptySetException(
+                    "System not found: '%s'" % system_id
+                )
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )

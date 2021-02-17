@@ -8,6 +8,7 @@ from __future__ import absolute_import
 
 import logging
 import random
+import re
 import pytest
 from katprep.management.uyuni import UyuniAPIClient
 from katprep.exceptions import (
@@ -87,6 +88,15 @@ def test_invalid_ssl(config):
         )
 
 
+def test_get_hosts(client):
+    """
+    Ensure that all hosts can be listed
+    """
+    for host in client.get_hosts():
+        # we only deal with integers
+        assert isinstance(host, int)
+
+
 def test_get_host_id(client, config):
     """
     Ensure that host ID can retrieved by name
@@ -97,7 +107,7 @@ def test_get_host_id(client, config):
     assert system_id == config["valid_objects"]["host"]["id"]
 
 
-def test_get_host_id_invalid(client):
+def test_get_host_id_nonexistent(client):
     """
     Ensure that host ID cannot retrieved by invalid name
     """
@@ -116,7 +126,15 @@ def test_get_host_params(client, config):
         assert host_params[key] == value
 
 
-def test_get_host_params_invalid(client):
+def test_get_host_params_invalid_format(client):
+    """
+    Ensure that host params cannot be retrieved by supplying invalid format
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_params("web1337")
+
+
+def test_get_host_params_nonexistent(client):
     """
     Ensure that host params cannot be retrieved by supplying invalid IDs
     """
@@ -134,7 +152,15 @@ def test_get_host_patches(client, config):
     assert len(host_patches) > 0
 
 
-def test_get_host_patches_invalid(client):
+def test_get_host_patches_invalid_format(client):
+    """
+    Ensure that invalid formats will be discovered
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_patches("web1337")
+
+
+def test_get_host_patches_nonexistent(client):
     """
     Ensure that patches for invalid hosts cannot be gathered
     """
@@ -152,7 +178,15 @@ def test_get_host_upgrades(client, config):
     assert len(host_upgrades) > 0
 
 
-def test_get_host_upgrades_invalid(client):
+def test_get_host_upgrades_invalid_format(client):
+    """
+    Ensure that invalid formats will be discovered
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_upgrades("web1337")
+
+
+def test_get_host_upgrades_nonexistent(client):
     """
     Ensure that package upgrades for invalid hosts cannot be gathered
     """
@@ -171,7 +205,15 @@ def test_get_host_groups(client, config):
     assert config["valid_objects"]["host"]["group"] in _groups
 
 
-def test_get_host_groups_invalid(client):
+def test_get_host_groups_invalid_format(client):
+    """
+    Ensure that invalid formats will be discovered
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_groups("web1337")
+
+
+def test_get_host_groups_nonexistent(client):
     """
     Ensure that host groups for invalid hosts cannot be gathered
     """
@@ -197,7 +239,15 @@ def test_get_host_details(client, config):
         assert key in host_details.keys()
 
 
-def test_get_host_details_invalid(client):
+def test_get_host_details_invalid_format(client):
+    """
+    Ensure that invalid formats will be discovered
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_details("web1337")
+
+
+def test_get_host_details_nonexistent(client):
     """
     Ensure that details for invalid hosts cannot be gathered
     """
@@ -205,7 +255,7 @@ def test_get_host_details_invalid(client):
         client.get_host_details(random.randint(800, 1500))
 
 
-def test_host_tasks(client, config):
+def test_get_host_tasks(client, config):
     """
     Ensure that host tasks can be found
     """
@@ -224,9 +274,179 @@ def test_host_tasks(client, config):
             assert key in task.keys()
 
 
-def test_host_tasks_invalid(client):
+def test_get_host_tasks_invalid_format(client):
+    """
+    Ensure that invalid formats will be discovered
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_tasks("web1337")
+
+
+def test_get_host_tasks_nonexistent(client):
     """
     Ensure that tasks for invalid hosts cannot be gathered
     """
     with pytest.raises(SessionException):
         client.get_host_tasks(random.randint(800, 1500))
+
+
+def test_host_patch_do_install(client, config):
+    """
+    Ensure that patches can be installed
+    """
+    # get available patches
+    patches = client.get_host_patches(
+        config["valid_objects"]["host"]["id"]
+    )
+    # select random patch
+    _patches = [x["id"] for x in patches]
+    _index = random.randint(0, len(_patches)-1)
+    # install patch
+    action_id = client.install_patches(
+        config["valid_objects"]["host"]["id"],
+        [_patches[_index]]
+    )
+    assert isinstance(action_id[0], int)
+    # TODO: wait to allow later tests to succeed?
+
+
+def test_host_patch_invalid_format(client, config):
+    """
+    Ensure that patches cannot be installed when supplying
+    invalid formats (strings instead of integers)
+    """
+    with pytest.raises(EmptySetException):
+        client.install_patches(
+            config["valid_objects"]["host"]["id"],
+            ["BA-libpinkepank", "gcc-13.37"]
+        )
+
+
+def test_host_patch_nonexistent(client, config):
+    """
+    Ensure that non-existing patches cannot be installed
+    """
+    with pytest.raises(EmptySetException):
+        client.install_patches(
+            config["valid_objects"]["host"]["id"],
+            [random.randint(64000, 128000)]
+        )
+
+
+def test_host_patch_already_installed(client, config):
+    """
+    Ensure that already installed patches cannot be installed
+    """
+    # find already installed errata by searching actions
+    actions = client.get_host_tasks(
+        config["valid_objects"]["host"]["id"]
+    )
+    _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
+    pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
+    errata = [re.search(pattern, x)[0] for x in _actions]
+    # find errata ID by patch CVE
+    _errata = [client.get_patch_by_name(x)["id"] for x in errata]
+
+    # try to install patch
+    with pytest.raises(EmptySetException):
+        client.install_patches(
+            config["valid_objects"]["host"]["id"],
+            _errata
+        )
+
+
+def test_host_upgrade_do_install(client, config):
+    """
+    Ensure that package upgrades can be installed
+    """
+    # get available upgrades
+    upgrades = client.get_host_upgrades(
+        config["valid_objects"]["host"]["id"]
+    )
+    # select random patch
+    _upgrades = [x["to_package_id"] for x in upgrades]
+    _index = random.randint(0, len(_upgrades)-1)
+    # install upgrade
+    action_id = client.install_upgrades(
+        config["valid_objects"]["host"]["id"],
+        [_upgrades[_index]]
+    )
+    assert isinstance(action_id, int)
+    # TODO: wait to allow later tests to succeed?
+
+
+def test_host_upgrade_invalid_format(client, config):
+    """
+    Ensure that upgrades cannot be installed when supplying
+    invalid formats (strings instead of integers)
+    """
+    with pytest.raises(EmptySetException):
+        client.install_upgrades(
+            config["valid_objects"]["host"]["id"],
+            ["BA-libpinkepank", "gcc-13.37"]
+        )
+
+
+def test_host_upgrade_nonexistent(client, config):
+    """
+    Ensure that non-existing upgrades cannot be installed
+    """
+    with pytest.raises(EmptySetException):
+        client.install_upgrades(
+            config["valid_objects"]["host"]["id"],
+            [random.randint(64000, 128000)]
+        )
+
+
+def test_host_upgrade_already_installed(client, config):
+    """
+    Ensure that already installed upgrades cannot be installed
+    """
+    # find already installed errata by searching actions
+    actions = client.get_host_tasks(
+        config["valid_objects"]["host"]["id"]
+    )
+    _packages = [x["additional_info"][0]["detail"] for x in actions if "package install/upgrade" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
+    print(_packages)
+    # pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
+    # errata = [re.search(pattern, x)[0] for x in _actions]
+    # find errata ID by patch CVE
+    # _errata = [client.get_patch_by_name(x)["id"] for x in errata]
+
+    # try to install patch
+    # with pytest.raises(EmptySetException):
+    #    client.install_patches(
+    #        config["valid_objects"]["host"]["id"],
+    #        _errata
+    #    )
+    # TODO: how to check?
+
+
+def test_host_reboot(client, config):
+    """
+    Ensures that hosts can be rebooted
+    """
+    action_id = client.host_reboot(
+        config["valid_objects"]["host"]["id"]
+    )
+    assert isinstance(action_id, int)
+
+
+def test_host_reboot_invalid_format(client):
+    """
+    Ensure that hosts with invalid format can't be rebooted
+    """
+    with pytest.raises(EmptySetException):
+        client.host_reboot(
+            "pinepank.giertz.loc"
+        )
+
+
+def test_host_reboot_nonexistent(client):
+    """
+    Ensure that non-existing hosts can't be rebooted
+    """
+    with pytest.raises(EmptySetException):
+        client.host_reboot(
+            random.randint(64000, 128000)
+        )
