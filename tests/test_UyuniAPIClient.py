@@ -423,30 +423,6 @@ def test_host_upgrade_nonexistent(client, host_id):
         )
 
 
-def test_host_upgrade_already_installed(client, host_id):
-    """
-    Ensure that already installed upgrades cannot be installed
-    """
-    # find already installed errata by searching actions
-    actions = client.get_host_actions(
-        host_id
-    )
-    _packages = [x["additional_info"][0]["detail"] for x in actions if "package install/upgrade" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
-    print(_packages)
-    # pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
-    # errata = [re.search(pattern, x)[0] for x in _actions]
-    # find errata ID by patch CVE
-    # _errata = [client.get_patch_by_name(x)["id"] for x in errata]
-
-    # try to install patch
-    # with pytest.raises(EmptySetException):
-    #    client.install_patches(
-    #        host_id,
-    #        _errata
-    #    )
-    # TODO: how to check?
-
-
 def test_host_reboot(client, host_id):
     """
     Ensures that hosts can be rebooted
