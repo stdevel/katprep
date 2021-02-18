@@ -9,6 +9,7 @@ from __future__ import absolute_import
 import logging
 import random
 import re
+import time
 import pytest
 from katprep.management.uyuni import UyuniAPIClient
 from katprep.exceptions import (
@@ -50,6 +51,20 @@ def host_id(config):
     Return host ID from configuration
     """
     return config["valid_objects"]["host"]["id"]
+
+
+def task_completed(task):
+    """
+    Returns whether a task is completed
+    """
+    try:
+        if task["successful_count"] > 0:
+            return True
+        if task["failed_count"] > 0:
+            return True
+    except KeyError:
+        pass
+    return False
 
 
 def test_valid_login(config):
@@ -157,7 +172,7 @@ def test_get_host_patches(client, host_id):
     host_patches = client.get_host_patches(
         host_id
     )
-    assert len(host_patches) > 0
+    assert host_patches
 
 
 def test_get_host_patches_invalid_format(client):
@@ -183,7 +198,7 @@ def test_get_host_upgrades(client, host_id):
     host_upgrades = client.get_host_upgrades(
         host_id
     )
-    assert len(host_upgrades) > 0
+    assert host_upgrades
 
 
 def test_get_host_upgrades_invalid_format(client):
@@ -296,14 +311,21 @@ def test_host_patch_do_install(client, host_id):
     patches = client.get_host_patches(
         host_id
     )
-    # install random patch
-    _patches = [x["id"] for x in patches]
-    action_id = client.install_patches(
-        host_id,
-        [random.choice(_patches)]
-    )
-    assert isinstance(action_id[0], int)
-    # TODO: wait to allow later tests to succeed?
+    if patches:
+        # install random patch
+        _patches = [x["id"] for x in patches]
+        action_id = client.install_patches(
+            host_id,
+            [random.choice(_patches)]
+        )
+        # wait until task finished before continuing
+        while not task_completed(
+                client.get_host_action(host_id, action_id[0])[0]
+        ):
+            # task not finished
+            time.sleep(10)
+    else:
+        raise EmptySetException("No patches available - reset uyuniclient VM")
 
 
 def test_host_patch_invalid_format(client, host_id):
@@ -359,15 +381,23 @@ def test_host_upgrade_do_install(client, host_id):
     upgrades = client.get_host_upgrades(
         host_id
     )
-    # install random upgrade
-    _upgrades = [x["to_package_id"] for x in upgrades]
-    # install upgrade
-    action_id = client.install_upgrades(
-        host_id,
-        [random.choice(_upgrades)]
-    )
-    assert isinstance(action_id, int)
-    # TODO: wait to allow later tests to succeed?
+    if upgrades:
+        # install random upgrade
+        _upgrades = [x["to_package_id"] for x in upgrades]
+        # install upgrade
+        action_id = client.install_upgrades(
+            host_id,
+            [random.choice(_upgrades)]
+        )
+        assert isinstance(action_id[0], int)
+        # wait until task finished before continuing
+        while not task_completed(
+                client.get_host_action(host_id, action_id[0])[0]
+        ):
+            # task not finished
+            time.sleep(10)
+    else:
+        raise EmptySetException("No upgrades available - reset uyuniclient VM")
 
 
 def test_host_upgrade_invalid_format(client, host_id):

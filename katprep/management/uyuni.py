@@ -381,7 +381,8 @@ class UyuniAPIClient(BaseConnector):
                 self._api_key, system_id, _upgrades,
                 DateTime(datetime.now().timetuple())
             )
-            return action_id
+            # returning an array to be consistent with install_patches
+            return [action_id]
         except Fault as err:
             if "no such system" in err.faultString.lower():
                 raise SessionException(
