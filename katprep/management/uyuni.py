@@ -9,6 +9,7 @@ import ssl
 
 from xmlrpc.client import ServerProxy, Fault, DateTime
 from datetime import datetime
+from . import splitFilename
 from .base import BaseConnector
 from ..exceptions import (
     SessionException,
@@ -235,6 +236,32 @@ class UyuniAPIClient(BaseConnector):
             if "no such patch" in err.faultString.lower():
                 raise EmptySetException(
                     f"Patch not found: {patch_name!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def get_package_by_name(self, package_name):
+        """
+        Returns a package by name
+        """
+        try:
+            # split file name
+            package_nvrea = splitFilename(package_name)
+            # return information
+            package = self._session.packages.findByNvrea(
+                self._api_key,
+                package_nvrea[0],
+                package_nvrea[1],
+                package_nvrea[2],
+                package_nvrea[3],
+                package_nvrea[4]
+            )
+            return package
+        except Fault as err:
+            if "no such package" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Package not found: {package_name!r}"
                 )
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
