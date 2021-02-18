@@ -263,11 +263,11 @@ def test_get_host_details_nonexistent(client):
         client.get_host_details(random.randint(800, 1500))
 
 
-def test_get_host_tasks(client, host_id):
+def test_get_host_actions(client, host_id):
     """
-    Ensure that host tasks can be found
+    Ensure that host actions can be found
     """
-    host_tasks = client.get_host_tasks(
+    host_actions = client.get_host_actions(
         host_id
     )
     keys = [
@@ -277,25 +277,25 @@ def test_get_host_tasks(client, host_id):
         "completion_time",
         "result_msg"
     ]
-    for task in host_tasks:
+    for action in host_actions:
         for key in keys:
-            assert key in task.keys()
+            assert key in action.keys()
 
 
-def test_get_host_tasks_invalid_format(client):
+def test_get_host_actions_invalid_format(client):
     """
     Ensure that invalid formats will be discovered
     """
     with pytest.raises(EmptySetException):
-        client.get_host_tasks("web1337")
+        client.get_host_actions("web1337")
 
 
-def test_get_host_tasks_nonexistent(client):
+def test_get_host_actions_nonexistent(client):
     """
-    Ensure that tasks for invalid hosts cannot be gathered
+    Ensure that actions for invalid hosts cannot be gathered
     """
     with pytest.raises(SessionException):
-        client.get_host_tasks(random.randint(800, 1500))
+        client.get_host_actions(random.randint(800, 1500))
 
 
 def test_host_patch_do_install(client, host_id):
@@ -344,7 +344,7 @@ def test_host_patch_already_installed(client, host_id):
     Ensure that already installed patches cannot be installed
     """
     # find already installed errata by searching actions
-    actions = client.get_host_tasks(
+    actions = client.get_host_actions(
         host_id
     )
     _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
@@ -408,7 +408,7 @@ def test_host_upgrade_already_installed(client, host_id):
     Ensure that already installed upgrades cannot be installed
     """
     # find already installed errata by searching actions
-    actions = client.get_host_tasks(
+    actions = client.get_host_actions(
         host_id
     )
     _packages = [x["additional_info"][0]["detail"] for x in actions if "package install/upgrade" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501

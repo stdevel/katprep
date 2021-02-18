@@ -314,19 +314,19 @@ class UyuniAPIClient(BaseConnector):
                 "Generic remote communication error: '%s'" % err.faultString
             )
 
-    def get_host_tasks(self, system_id):
+    def get_host_actions(self, system_id):
         """
-        Returns tasks for a given system
+        Returns actions for a given system
         """
         try:
             if not isinstance(system_id, int):
                 raise EmptySetException(
                     "No system found - use system profile IDs"
                 )
-            tasks = self._session.system.listSystemEvents(
+            actions = self._session.system.listSystemEvents(
                 self._api_key, system_id
             )
-            return tasks
+            return actions
         except Fault as err:
             if "no such system" in err.faultString.lower():
                 raise SessionException(
@@ -417,5 +417,3 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
-
-    # TODO: task_get(self, task_id):
