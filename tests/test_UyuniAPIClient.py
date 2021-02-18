@@ -44,6 +44,14 @@ def client(config):
     )
 
 
+@pytest.fixture
+def host_id(config):
+    """
+    Return host ID from configuration
+    """
+    return config["valid_objects"]["host"]["id"]
+
+
 def test_valid_login(config):
     """
     Ensure valid logins are possible
@@ -97,14 +105,14 @@ def test_get_hosts(client):
         assert isinstance(host, int)
 
 
-def test_get_host_id(client, config):
+def test_get_host_id(client, config, host_id):
     """
     Ensure that host ID can retrieved by name
     """
     system_id = client.get_host_id(
         config["valid_objects"]["host"]["name"]
     )
-    assert system_id == config["valid_objects"]["host"]["id"]
+    assert system_id == host_id
 
 
 def test_get_host_id_nonexistent(client):
@@ -115,12 +123,12 @@ def test_get_host_id_nonexistent(client):
         client.get_host_id("web%s" % random.randint(800, 1500))
 
 
-def test_get_host_params(client, config):
+def test_get_host_params(client, config, host_id):
     """
     Ensure that host params can be retrieved
     """
     host_params = client.get_host_params(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     for key, value in config["valid_objects"]["hostparams"].items():
         assert host_params[key] == value
@@ -142,12 +150,12 @@ def test_get_host_params_nonexistent(client):
         client.get_host_params(random.randint(800, 1500))
 
 
-def test_get_host_patches(client, config):
+def test_get_host_patches(client, host_id):
     """
     Ensure that host patches can be found
     """
     host_patches = client.get_host_patches(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     assert len(host_patches) > 0
 
@@ -168,12 +176,12 @@ def test_get_host_patches_nonexistent(client):
         client.get_host_patches(random.randint(800, 1500))
 
 
-def test_get_host_upgrades(client, config):
+def test_get_host_upgrades(client, host_id):
     """
     Ensure that host package upgrades can be found
     """
     host_upgrades = client.get_host_upgrades(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     assert len(host_upgrades) > 0
 
@@ -194,12 +202,12 @@ def test_get_host_upgrades_nonexistent(client):
         client.get_host_upgrades(random.randint(800, 1500))
 
 
-def test_get_host_groups(client, config):
+def test_get_host_groups(client, config, host_id):
     """
     Ensure that host groups can be found
     """
     host_groups = client.get_host_groups(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     _groups = [x['system_group_name'] for x in host_groups]
     assert config["valid_objects"]["host"]["group"] in _groups
@@ -221,12 +229,12 @@ def test_get_host_groups_nonexistent(client):
         client.get_host_groups(random.randint(800, 1500))
 
 
-def test_get_host_details(client, config):
+def test_get_host_details(client, host_id):
     """
     Ensure that host details can be found
     """
     host_details = client.get_host_details(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     # check some keys
     keys = [
@@ -255,12 +263,12 @@ def test_get_host_details_nonexistent(client):
         client.get_host_details(random.randint(800, 1500))
 
 
-def test_get_host_tasks(client, config):
+def test_get_host_tasks(client, host_id):
     """
     Ensure that host tasks can be found
     """
     host_tasks = client.get_host_tasks(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     keys = [
         "name",
@@ -290,56 +298,54 @@ def test_get_host_tasks_nonexistent(client):
         client.get_host_tasks(random.randint(800, 1500))
 
 
-def test_host_patch_do_install(client, config):
+def test_host_patch_do_install(client, host_id):
     """
     Ensure that patches can be installed
     """
     # get available patches
     patches = client.get_host_patches(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
-    # select random patch
+    # install random patch
     _patches = [x["id"] for x in patches]
-    _index = random.randint(0, len(_patches)-1)
-    # install patch
     action_id = client.install_patches(
-        config["valid_objects"]["host"]["id"],
-        [_patches[_index]]
+        host_id,
+        [random.choice(_patches)]
     )
     assert isinstance(action_id[0], int)
     # TODO: wait to allow later tests to succeed?
 
 
-def test_host_patch_invalid_format(client, config):
+def test_host_patch_invalid_format(client, host_id):
     """
     Ensure that patches cannot be installed when supplying
     invalid formats (strings instead of integers)
     """
     with pytest.raises(EmptySetException):
         client.install_patches(
-            config["valid_objects"]["host"]["id"],
+            host_id,
             ["BA-libpinkepank", "gcc-13.37"]
         )
 
 
-def test_host_patch_nonexistent(client, config):
+def test_host_patch_nonexistent(client, host_id):
     """
     Ensure that non-existing patches cannot be installed
     """
     with pytest.raises(EmptySetException):
         client.install_patches(
-            config["valid_objects"]["host"]["id"],
+            host_id,
             [random.randint(64000, 128000)]
         )
 
 
-def test_host_patch_already_installed(client, config):
+def test_host_patch_already_installed(client, host_id):
     """
     Ensure that already installed patches cannot be installed
     """
     # find already installed errata by searching actions
     actions = client.get_host_tasks(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
     pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
@@ -350,61 +356,60 @@ def test_host_patch_already_installed(client, config):
     # try to install patch
     with pytest.raises(EmptySetException):
         client.install_patches(
-            config["valid_objects"]["host"]["id"],
+            host_id,
             _errata
         )
 
 
-def test_host_upgrade_do_install(client, config):
+def test_host_upgrade_do_install(client, host_id):
     """
     Ensure that package upgrades can be installed
     """
     # get available upgrades
     upgrades = client.get_host_upgrades(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
-    # select random patch
+    # install random upgrade
     _upgrades = [x["to_package_id"] for x in upgrades]
-    _index = random.randint(0, len(_upgrades)-1)
     # install upgrade
     action_id = client.install_upgrades(
-        config["valid_objects"]["host"]["id"],
-        [_upgrades[_index]]
+        host_id,
+        [random.choice(_upgrades)]
     )
     assert isinstance(action_id, int)
     # TODO: wait to allow later tests to succeed?
 
 
-def test_host_upgrade_invalid_format(client, config):
+def test_host_upgrade_invalid_format(client, host_id):
     """
     Ensure that upgrades cannot be installed when supplying
     invalid formats (strings instead of integers)
     """
     with pytest.raises(EmptySetException):
         client.install_upgrades(
-            config["valid_objects"]["host"]["id"],
+            host_id,
             ["BA-libpinkepank", "gcc-13.37"]
         )
 
 
-def test_host_upgrade_nonexistent(client, config):
+def test_host_upgrade_nonexistent(client, host_id):
     """
     Ensure that non-existing upgrades cannot be installed
     """
     with pytest.raises(EmptySetException):
         client.install_upgrades(
-            config["valid_objects"]["host"]["id"],
+            host_id,
             [random.randint(64000, 128000)]
         )
 
 
-def test_host_upgrade_already_installed(client, config):
+def test_host_upgrade_already_installed(client, host_id):
     """
     Ensure that already installed upgrades cannot be installed
     """
     # find already installed errata by searching actions
     actions = client.get_host_tasks(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     _packages = [x["additional_info"][0]["detail"] for x in actions if "package install/upgrade" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
     print(_packages)
@@ -416,18 +421,18 @@ def test_host_upgrade_already_installed(client, config):
     # try to install patch
     # with pytest.raises(EmptySetException):
     #    client.install_patches(
-    #        config["valid_objects"]["host"]["id"],
+    #        host_id,
     #        _errata
     #    )
     # TODO: how to check?
 
 
-def test_host_reboot(client, config):
+def test_host_reboot(client, host_id):
     """
     Ensures that hosts can be rebooted
     """
     action_id = client.host_reboot(
-        config["valid_objects"]["host"]["id"]
+        host_id
     )
     assert isinstance(action_id, int)
 

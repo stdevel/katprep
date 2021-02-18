@@ -145,7 +145,7 @@ class UyuniAPIClient(BaseConnector):
             hosts = self._session.system.listActiveSystems(
                 self._api_key
             )
-            if len(hosts) > 0:
+            if hosts:
                 _hosts = [x["id"] for x in hosts]
                 return _hosts
             raise EmptySetException(
@@ -164,7 +164,7 @@ class UyuniAPIClient(BaseConnector):
             host_id = self._session.system.getId(
                 self._api_key, hostname
             )
-            if len(host_id) > 0:
+            if host_id:
                 return host_id[0]["id"]
             raise EmptySetException(
                 "System not found: '%s'" % hostname
@@ -233,7 +233,7 @@ class UyuniAPIClient(BaseConnector):
             return patch
         except Fault as err:
             if "no such patch" in err.faultString.lower():
-                raise SessionException(
+                raise EmptySetException(
                     "Patch not found: '%s'" % patch_name
                 )
             raise SessionException(
@@ -258,7 +258,7 @@ class UyuniAPIClient(BaseConnector):
                 erratum = self._session.packages.listProvidingErrata(
                     self._api_key, pkg["to_package_id"]
                 )
-                if len(erratum) == 0:
+                if not erratum:
                     _packages.append(pkg)
             return _packages
         except Fault as err:
@@ -343,7 +343,7 @@ class UyuniAPIClient(BaseConnector):
         try:
             # remove non-integer values
             _patches = [x for x in patches if isinstance(x, int)]
-            if len(_patches) == 0:
+            if not _patches:
                 raise EmptySetException(
                     "No patches supplied - use patch ID"
                 )
@@ -372,7 +372,7 @@ class UyuniAPIClient(BaseConnector):
         try:
             # remove non-integer values
             _upgrades = [x for x in upgrades if isinstance(x, int)]
-            if len(_upgrades) == 0:
+            if not _upgrades:
                 raise EmptySetException(
                     "No upgrades supplied - use package ID"
                 )
@@ -417,3 +417,5 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 "Generic remote communication error: '%s'" % err.faultString
             )
+
+    # TODO: task_get(self, task_id):
