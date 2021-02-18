@@ -267,19 +267,9 @@ def test_get_host_actions(client, host_id):
     """
     Ensure that host actions can be found
     """
-    host_actions = client.get_host_actions(
+    assert client.get_host_actions(
         host_id
     )
-    keys = [
-        "name",
-        "id",
-        "pickup_time",
-        "completion_time",
-        "result_msg"
-    ]
-    for action in host_actions:
-        for key in keys:
-            assert key in action.keys()
 
 
 def test_get_host_actions_invalid_format(client):
@@ -443,7 +433,7 @@ def test_host_reboot_invalid_format(client):
     """
     with pytest.raises(EmptySetException):
         client.host_reboot(
-            "pinepank.giertz.loc"
+            "pinkepank.giertz.loc"
         )
 
 
@@ -454,4 +444,43 @@ def test_host_reboot_nonexistent(client):
     with pytest.raises(EmptySetException):
         client.host_reboot(
             random.randint(64000, 128000)
+        )
+
+
+def test_get_host_action(client, host_id):
+    """
+    Ensure that reading information about a
+    particular host action is possible
+    """
+    # select random action
+    actions = client.get_host_actions(
+        host_id
+    )
+    action = random.choice(actions)
+    # get action details
+    details = client.get_host_action(
+        host_id, action['id']
+    )
+    assert details
+
+
+def test_get_host_action_invalid_format(client, host_id):
+    """
+    Ensure that reading information about a particular
+    host action is not possible when supplying invalid formats
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_action(
+            host_id, "uffgabe0815"
+        )
+
+
+def test_get_host_action_nonexistent(client, host_id):
+    """
+    Ensure that reading information about
+    non-existent host actions is not possible
+    """
+    with pytest.raises(EmptySetException):
+        client.get_host_action(
+            host_id, random.randint(1337, 6667)
         )
