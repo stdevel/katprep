@@ -154,7 +154,7 @@ def test_get_host_params_invalid_format(client):
     Ensure that host params cannot be retrieved by supplying invalid format
     """
     with pytest.raises(EmptySetException):
-        client.get_host_params("web1337")
+        client.get_host_params("simone.giertz.loc")
 
 
 def test_get_host_params_nonexistent(client):
@@ -180,7 +180,7 @@ def test_get_host_patches_invalid_format(client):
     Ensure that invalid formats will be discovered
     """
     with pytest.raises(EmptySetException):
-        client.get_host_patches("web1337")
+        client.get_host_patches("drageekeksi.monitoringlove.local")
 
 
 def test_get_host_patches_nonexistent(client):
@@ -206,7 +206,7 @@ def test_get_host_upgrades_invalid_format(client):
     Ensure that invalid formats will be discovered
     """
     with pytest.raises(EmptySetException):
-        client.get_host_upgrades("web1337")
+        client.get_host_upgrades("ssibio-13.3-7.noarch")
 
 
 def test_get_host_upgrades_nonexistent(client):
@@ -233,7 +233,7 @@ def test_get_host_groups_invalid_format(client):
     Ensure that invalid formats will be discovered
     """
     with pytest.raises(EmptySetException):
-        client.get_host_groups("web1337")
+        client.get_host_groups("shittyrobots")
 
 
 def test_get_host_groups_nonexistent(client):
@@ -267,7 +267,7 @@ def test_get_host_details_invalid_format(client):
     Ensure that invalid formats will be discovered
     """
     with pytest.raises(EmptySetException):
-        client.get_host_details("web1337")
+        client.get_host_details("sibio.tannenbusch.mitte")
 
 
 def test_get_host_details_nonexistent(client):
@@ -292,7 +292,7 @@ def test_get_host_actions_invalid_format(client):
     Ensure that invalid formats will be discovered
     """
     with pytest.raises(EmptySetException):
-        client.get_host_actions("web1337")
+        client.get_host_actions("t1000.cyberdyne.sys")
 
 
 def test_get_host_actions_nonexistent(client):
@@ -362,14 +362,19 @@ def test_host_patch_already_installed(client, host_id):
     _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
     pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
     errata = [re.search(pattern, x)[0] for x in _actions]
-    # find errata ID by patch CVE
-    _errata = [client.get_patch_by_name(x)["id"] for x in errata]
+    if errata:
+        # find errata ID by patch CVE
+        _errata = [client.get_patch_by_name(x)["id"] for x in errata]
 
-    # try to install patch
-    with pytest.raises(EmptySetException):
-        client.install_patches(
-            host_id,
-            _errata
+        # try to install patch
+        with pytest.raises(EmptySetException):
+            client.install_patches(
+                host_id,
+                _errata
+            )
+    else:
+        raise EmptySetException(
+            "No patches installed - install patch and rerun test"
         )
 
 
@@ -408,7 +413,7 @@ def test_host_upgrade_invalid_format(client, host_id):
     with pytest.raises(EmptySetException):
         client.install_upgrades(
             host_id,
-            ["BA-libpinkepank", "gcc-13.37"]
+            ["csgo-0.8-15", "doge-12.3-4"]
         )
 
 
