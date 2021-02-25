@@ -146,10 +146,8 @@ def manage_host_preparation(options, host, cleanup=False):
                 LOGGER.error("Invalid crendentials supplied")
             except SnapshotExistsException as err:
                 LOGGER.info("Snapshot for host '%s' already exists: %s", host, err)
-                pass
             except EmptySetException as err:
                 LOGGER.info("Snapshot for host '%s' already removed: %s", host, err)
-                pass
             except SessionException as err:
                 LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
 
@@ -159,7 +157,6 @@ def manage_host_preparation(options, host, cleanup=False):
     except KeyError:
         #no reboot suggested
         errata_reboot = []
-        pass
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
@@ -198,8 +195,6 @@ def manage_host_preparation(options, host, cleanup=False):
                 LOGGER.error("Unable to maintain downtime: '%s'", err)
             except UnsupportedRequestException as err:
                 LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host, err)
-                pass
-
 
 
 def set_verification_value(options, host, setting, value):
