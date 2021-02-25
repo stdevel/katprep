@@ -22,11 +22,9 @@ from . import (
 from .exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, SnapshotExistsException,
 UnsupportedRequestException)
+from .management import get_management_client
 from .management.foreman import ForemanAPIClient
-from .management.libvirt import LibvirtClient
-from .management.vmware import PyvmomiClient
-from .monitoring.nagios import NagiosCGIClient
-from .monitoring.icinga2 import Icinga2APIClient
+from .monitoring import get_monitoring_client
 from .network import validate_hostname
 
 """
@@ -826,16 +824,14 @@ def main(options, args):
                 "Virtualization {}".format(host),
                 host, options.generic_auth_container, options.auth_password
             )
-            #create client based on type
-            host_params = get_host_params_by_report(REPORT, host)
-            if "katprep_virt_type" in host_params and \
-                host_params["katprep_virt_type"] == "pyvmomi":
-                #VIRT_CLIENTS[host] = PyvmomiClient(host, virt_user, virt_pass)
-                VIRT_CLIENTS[host] = PyvmomiClient(
-                    LOG_LEVEL, host, virt_user, virt_pass)
-            elif "katprep_virt_type" in host_params:
-                VIRT_CLIENTS[host] = LibvirtClient(
-                    LOG_LEVEL, host, virt_user, virt_pass)
+
+            try:
+                virt_type = host_params["katprep_virt_type"] or "libvirt"
+            except KeyError:
+                # no virtualization configured
+                continue
+
+            VIRT_CLIENTS[host] = get_management_client(virt_type, LOG_LEVEL, host, virt_user, virt_pass)
 
     #get monitoring host credentials
     if not options.mon_skip_downtime:
@@ -845,20 +841,16 @@ def main(options, args):
                 "Monitoring {}".format(host),
                 host, options.generic_auth_container, options.auth_password
             )
+
             host_params = get_host_params_by_report(REPORT, host)
-            if "katprep_mon_type" in host_params and \
-                host_params["katprep_mon_type"] == "nagios":
-                #Yet another legacy installation
-                MON_CLIENTS[host] = NagiosCGIClient(
-                    LOG_LEVEL, host, mon_user, mon_pass, \
-                    verify_ssl=options.ssl_verify
-                )
-            elif "katprep_mon_type" in host_params:
-                #Icinga 2, yay!
-                MON_CLIENTS[host] = Icinga2APIClient(
-                    LOG_LEVEL, host, mon_user, mon_pass,
-                    verify_ssl=options.ssl_verify
-                )
+
+            try:
+                monitoring_type = host_params["katprep_mon_type"]
+            except KeyError:
+                # No monitoring type configured
+                continue
+
+            MON_CLIENTS[host] = get_monitoring_client(monitoring_type, LOG_LEVEL, host, mon_user, mon_pass, verify_ssl=options.ssl_verify)
 
     #start action
     options.func(options, options.func)
