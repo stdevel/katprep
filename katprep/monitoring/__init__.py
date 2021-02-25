@@ -15,6 +15,12 @@ def get_monitoring_client(
     if monitoring_type == "nagios":
         from .nagios import NagiosCGIClient
 
+        client = NagiosCGIClient(log_level, host, username, password, *args, **kwargs)
+        client.set_nagios(True)
+        return client
+    if monitoring_type == "icinga":
+        from .nagios import NagiosCGIClient
+
         return NagiosCGIClient(log_level, host, username, password, *args, **kwargs)
     elif monitoring_type == "icinga2":
         from .icinga2 import Icinga2APIClient
