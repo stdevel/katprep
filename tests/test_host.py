@@ -17,6 +17,20 @@ def test_getting_virt_name():
     assert host.virtualisation_id == "my.hostname"
 
 
+def test_getting_custom_monitoring_id():
+    host = Host("my.hostname", {"katprep_mon_name": "doge.coin.up"}, None)
+
+    assert host.hostname != host.monitoring_id
+    assert host.monitoring_id == "doge.coin.up"
+
+
+def test_getting_monitoring_id():
+    host = Host("my.hostname", {}, None)
+
+    assert host.hostname == host.monitoring_id
+    assert host.monitoring_id == "my.hostname"
+
+
 @pytest.mark.parametrize(
     "first, second",
     [
