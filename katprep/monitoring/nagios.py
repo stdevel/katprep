@@ -29,10 +29,6 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
     """
     dict: Default headers set for every HTTP request
     """
-    obsolete = False
-    """
-    bool: Nagios system
-    """
 
     def __init__(self, log_level, url, username, password, verify_ssl=True):
         """
@@ -56,6 +52,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             # add trailing slash
             url = "{}/".format(url)
 
+        self._obsolete = False
         if "nagios" in url.lower():
             self.LOGGER.debug("The 90s called, they want their monitoring system back")
             self.set_nagios(True)
@@ -72,7 +69,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
         :param flag: boolean whether Nagios system
         :type flag: bool
         """
-        self.obsolete = flag
+        self._obsolete = flag
 
     def _api_request(self, method, sub_url, payload=""):
         """
@@ -206,7 +203,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                 }
         else:
             if remove_downtime:
-                if self.obsolete:
+                if self._obsolete:
                     # you really like old stuff don't you
                     raise UnsupportedRequestException(
                         "Unscheduling downtimes is not supported with Nagios!"
@@ -234,7 +231,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                     "com_author": self._username,
                     "childoptions": "0",
                 }
-                if self.obsolete:
+                if self._obsolete:
                     # we need to make two calls as legacy hurts twice
                     payload[1] = payload[0].copy()
                     payload[1]["cmd_typ"] = "55"
