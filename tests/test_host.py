@@ -61,13 +61,18 @@ def test_host_with_custom_location():
             marks=pytest.mark.xfail(reason="Different everything"),
         ),
         pytest.param(
-            Host("a", {"here": True}, "org a", "loc 1"),
-            Host("b", {"There": False}, "org b"),
+            Host("a", {"here": True}, "org a", "loc a"),
+            Host("b", {"There": False}, "org b", "fabolous location"),
+            marks=pytest.mark.xfail(reason="Different everything with location"),
+        ),
+        pytest.param(
+            Host("a", {}, "org a", "loc 1"),
+            Host("a", {}, "org a"),
             marks=pytest.mark.xfail(reason="Missing location"),
         ),
         pytest.param(
-            Host("a", {"here": True}, "org a", "loc 1"),
-            Host("b", {"There": False}, "org b", "loc 2"),
+            Host("a", {}, "org a", "loc 1"),
+            Host("a", {}, "org a", "loc 2"),
             marks=pytest.mark.xfail(reason="Different location"),
         ),
     ],
