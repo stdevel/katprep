@@ -106,14 +106,10 @@ def manage_host_preparation(options, host, cleanup=False):
         LOGGER.debug(
             "Host '%s' needs to be protected by a snapshot", host
         )
+
         #use customized VM name if applicable
-        if get_host_param_from_report(REPORT, host, "katprep_virt_name") \
-            not in ["", None]:
-            vm_name = get_host_param_from_report(
-                REPORT, host, "katprep_virt_name"
-            )
-        else:
-            vm_name = host
+        katprep_virt_name = get_host_param_from_report(REPORT, host, "katprep_virt_name")
+        vm_name = katprep_virt_name or host
 
         if options.generic_dry_run:
             if cleanup:
@@ -168,13 +164,8 @@ def manage_host_preparation(options, host, cleanup=False):
             "Downtime needs to be scheduled for host '%s'", host
         )
         #use customized monitoring name if applicable
-        if get_host_param_from_report(REPORT, host, "katprep_mon_name") \
-        not in ["", None]:
-            mon_name = get_host_param_from_report(
-                REPORT, host, "katprep_mon_name"
-            )
-        else:
-            mon_name = host
+        katprep_mon_name = get_host_param_from_report(REPORT, host, "katprep_mon_name")
+        mon_name = katprep_mon_name or host
 
         if options.generic_dry_run:
             if cleanup:
@@ -386,16 +377,9 @@ def verify(options, args):
 
             #check snapshot
             if not options.virt_skip_snapshot:
-                if get_host_param_from_report(
-                        REPORT, host, "katprep_virt_name"
-                ) not in ["", None]:
-                    #customized name
-                    vm_name = get_host_param_from_report(
-                        REPORT, host, "katprep_virt_name"
-                    )
-                else:
-                    #FQDN
-                    vm_name = host
+                katprep_virt_name = get_host_param_from_report(REPORT, host, "katprep_virt_name")
+                vm_name = katprep_virt_name or host
+
                 try:
                     if VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].has_snapshot(
                             vm_name, "katprep_{}".format(REPORT_PREFIX)
@@ -414,16 +398,9 @@ def verify(options, args):
 
             #check downtime
             if not options.mon_skip_downtime:
-                if get_host_param_from_report(
-                        REPORT, host, "katprep_mon_name"
-                ) not in ["", None]:
-                    #customized name
-                    mon_name = get_host_param_from_report(
-                        REPORT, host, "katprep_mon_name"
-                    )
-                else:
-                    #FQDN
-                    mon_name = host
+                katprep_mon_name = get_host_param_from_report(REPORT, host, "katprep_mon_name")
+                mon_name = katprep_mon_name or host
+
                 #check scheduled downtime
                 if MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].has_downtime(mon_name):
                     #set flag
