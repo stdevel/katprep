@@ -30,6 +30,11 @@ def test_getting_monitoring_id():
     assert host.hostname == host.monitoring_id
     assert host.monitoring_id == "my.hostname"
 
+def test_host_with_custom_location():
+    host = Host("a", {}, "org", "my loc")
+
+    assert host.location == "my loc"
+
 
 @pytest.mark.parametrize(
     "first, second",
