@@ -71,24 +71,6 @@ def is_blacklisted(host, blacklist):
     return False
 
 
-
-def get_host_param_from_report(report, host, param):
-    """
-    This function retrieves a host parameter value from a report.
-
-    :param report: snapshot report data
-    :type report: dict
-    :param host: hostname
-    :type host: str
-    :param param: parameter name
-    :type param: str
-    """
-    if param in report[host]["params"] and \
-        report[host]["params"][param] != "":
-        return report[host]["params"][param]
-
-
-
 def manage_host_preparation(options, host, cleanup=False):
     """
     This function prepares or cleans up maintenance tasks for a particular
@@ -99,43 +81,41 @@ def manage_host_preparation(options, host, cleanup=False):
     :param cleanup: Flag whether preparations should be undone (default: no)
     :type cleanup: bool
     """
+    snapshots_to_skip = [None, "", "fixmepls"]
+    snapshot = host.get_param("katprep_virt_snapshot")
+
     #create snapshot if applicable
-    if not options.virt_skip_snapshot and \
-        get_host_param_from_report(REPORT, host, "katprep_virt_snapshot") \
-        not in [None, "", "fixmepls"]:
+    if not options.virt_skip_snapshot and snapshot not in snapshots_to_skip:
         LOGGER.debug(
             "Host '%s' needs to be protected by a snapshot", host
         )
 
-        #use customized VM name if applicable
-        katprep_virt_name = get_host_param_from_report(REPORT, host, "katprep_virt_name")
-        vm_name = katprep_virt_name or host
+        vm_name = host.virtualisation_id
+        snapshot_name = "katprep_{}".format(REPORT_PREFIX)
 
         if options.generic_dry_run:
             if cleanup:
                 LOGGER.info(
-                    "Host '%s' --> remove snapshot (katprep_%s@%s)", \
-                    host, REPORT_PREFIX, vm_name
+                    "Host '%s' --> remove snapshot (%s@%s)",
+                        host, snapshot_name, vm_name
                 )
             else:
-                try:
-                    LOGGER.info(
-                        "Host '%s' --> create snapshot (katprep_%s@%s)", \
-                        host, REPORT_PREFIX, vm_name
-                    )
-                except SnapshotExistsException:
-                    pass
+                LOGGER.info(
+                    "Host '%s' --> create snapshot (%s@%s)",
+                    host, snapshot_name, vm_name
+                )
         else:
+            virt_type = host.get_param("katprep_virt")
+            virt_client = VIRT_CLIENTS[virt_type]
+
             try:
                 if cleanup:
-                    #remove snapshot
-                    VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].remove_snapshot(
-                        vm_name, "katprep_{}".format(REPORT_PREFIX)
-                    )
+                    # remove snapshot
+                    virt_client.remove_snapshot(vm_name, snapshot_name)
                 else:
-                    #create snapshot
-                    VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].create_snapshot(
-                        vm_name, "katprep_{}".format(REPORT_PREFIX),
+                    # create snapshot
+                    virt_client.create_snapshot(
+                        vm_name, snapshot_name,
                         "Snapshot created automatically by katprep"
                     )
             except InvalidCredentialsException as err:
@@ -156,16 +136,20 @@ def manage_host_preparation(options, host, cleanup=False):
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
-    if (not options.mon_skip_downtime and \
-        get_host_param_from_report(REPORT, host, "katprep_mon") \
-        not in [None, "", "fixmepls"]) or \
+    if options.mon_skip_downtime:
+        return
+
+    monitoring_type = host.get_param("katprep_mon")
+    unwanted_monitoring_types = [None, "", "fixmepls"]
+
+    if monitoring_type not in unwanted_monitoring_types or \
         (options.mon_suggested and True in errata_reboot):
+
         LOGGER.debug(
             "Downtime needs to be scheduled for host '%s'", host
         )
-        #use customized monitoring name if applicable
-        katprep_mon_name = get_host_param_from_report(REPORT, host, "katprep_mon_name")
-        mon_name = katprep_mon_name or host
+
+        mon_name = host.monitoring_id
 
         if options.generic_dry_run:
             if cleanup:
@@ -173,15 +157,13 @@ def manage_host_preparation(options, host, cleanup=False):
             else:
                 LOGGER.info("Host '%s' --> schedule downtime", host)
         else:
+            monitoring_client = MON_CLIENTS[monitoring_type]
             try:
                 if cleanup:
-                    #remove downtime
-                    MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].remove_downtime(mon_name, "host")
+                    monitoring_client.remove_downtime(mon_name, "host")
                 else:
-                    #schedule downtime
-                    MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].schedule_downtime(
-                        mon_name, "host", hours=options.mon_downtime
-                    )
+                    monitoring_client.schedule_downtime(mon_name, "host",
+                                                        hours=options.mon_downtime)
             except InvalidCredentialsException as err:
                 LOGGER.error("Unable to maintain downtime: '%s'", err)
             except UnsupportedRequestException as err:
@@ -324,41 +306,33 @@ def revert(options, args):
     :type args: argparse options dict
     """
     #restore snapshots per host
-    try:
-        for host in REPORT:
-            LOGGER.debug("Restoring host '%s'...", host)
+    if options.virt_skip_snapshot:
+        return
 
-            #create snapshot if applicable
-            if not options.virt_skip_snapshot and \
-                get_host_param_from_report(REPORT, host, "katprep_virt_snapshot") \
-                not in [None, "", "fixmepls"]:
-                #use customized VM name if applicable
-                if get_host_param_from_report(REPORT, host, "katprep_virt_name") \
-                    not in ["", None]:
-                    vm_name = get_host_param_from_report(
-                        REPORT, host, "katprep_virt_name"
-                    )
-                else:
-                    vm_name = host
+    snapshots_to_skip = [None, "", "fixmepls"]
 
-                if options.generic_dry_run:
-                    LOGGER.info(
-                        "Host '%s' --> revert snapshot (katprep_%s@%s)",
-                        host, REPORT_PREFIX, vm_name
-                    )
-                else:
-                    #revert snapshot
-                    VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].revert_snapshot(
-                        vm_name, "katprep_{}".format(REPORT_PREFIX)
-                    )
-                    #power-on VM?
-                    #VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].poweron_vm(
-                    #    vm_name
-                    #)
-    except ValueError as err:
-        LOGGER.error("Error reverting maintenance: '%s'", err)
+    for host in REPORT:
+        LOGGER.debug("Restoring host '%s'...", host)
 
+        # create snapshot if applicable
+        if host.get_param("katprep_virt_snapshot") in snapshots_to_skip:
+            continue
 
+        vm_name = host.virtualisation_id
+        snapshot_name = "katprep_{}".format(REPORT_PREFIX)
+
+        try:
+            if options.generic_dry_run:
+                LOGGER.info(
+                    "Host '%s' --> revert snapshot (%s@%s)",
+                    host, snapshot_name, vm_name
+                )
+            else:
+                virt_type = host.get_param("katprep_virt")
+                virt_client = VIRT_CLIENTS[virt_type]
+                virt_client.revert_snapshot(vm_name, snapshot_name)
+        except ValueError as err:
+            LOGGER.error("Error reverting maintenance: '%s'", err)
 
 
 def verify(options, args):
@@ -377,13 +351,14 @@ def verify(options, args):
 
             #check snapshot
             if not options.virt_skip_snapshot:
-                katprep_virt_name = get_host_param_from_report(REPORT, host, "katprep_virt_name")
-                vm_name = katprep_virt_name or host
+                vm_name = host.virtualisation_id
+                snapshot_name = "katprep_{}".format(REPORT_PREFIX)
+
+                virt_type = host.get_param("katprep_virt")
+                virt_client = VIRT_CLIENTS[virt_type]
 
                 try:
-                    if VIRT_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_virt")].has_snapshot(
-                            vm_name, "katprep_{}".format(REPORT_PREFIX)
-                        ):
+                    if virt_client.has_snapshot(vm_name, snapshot_name):
                         #set flag
                         set_verification_value(options, host, "virt_snapshot", True)
                         LOGGER.info("Snapshot for host '%s' found.", host)
@@ -398,12 +373,12 @@ def verify(options, args):
 
             #check downtime
             if not options.mon_skip_downtime:
-                katprep_mon_name = get_host_param_from_report(REPORT, host, "katprep_mon_name")
-                mon_name = katprep_mon_name or host
+                mon_name = host.monitoring_id
+                monitoring_type = host.get_param("katprep_mon")
+                monitoring_client = MON_CLIENTS[monitoring_type]
 
                 #check scheduled downtime
-                if MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].has_downtime(mon_name):
-                    #set flag
+                if monitoring_client.has_downtime(mon_name):
                     set_verification_value(options, host, "mon_downtime", True)
                     LOGGER.info("Downtime for host '%s' found.", host)
                 else:
@@ -412,7 +387,7 @@ def verify(options, args):
                     LOGGER.info("No downtime for host '%s' found, probably cleaned-up.", host)
                 #check critical services
                 try:
-                    crit_services = MON_CLIENTS[get_host_param_from_report(REPORT, host, "katprep_mon")].get_services(mon_name)
+                    crit_services = monitoring_client.get_services(mon_name)
                 except EmptySetException:
                     crit_services = {}
                 if len(crit_services) > 0:

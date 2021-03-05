@@ -43,6 +43,24 @@ class Host:
 
         return monitoring_id or self._hostname
 
+    def get_param(self, key):
+        """
+        Get the parameter from the host.
+
+        If the `key` is unknown it will return None.
+
+        :param key: parameter name
+        :type key: str
+        """
+        try:
+            value = self.params[key]
+            if value != "":
+                return value
+        except KeyError:
+            pass  # will return None
+
+        return None
+
     def to_dict(self):
         host_dict = {
             "hostname": self._hostname,
