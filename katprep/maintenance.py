@@ -437,10 +437,9 @@ def status(options, args):
             today = datetime.datetime.now().strftime("%Y-%m-%d")
 
             try:
-                for task in tasks:
-                    #print task
+                for task, task_filter in tasks.items():
                     results = SAT_CLIENT.get_task_by_filter(
-                        host, tasks[task], today
+                        host, task_filter, today
                     )
                     if results:
                         for result in results:
