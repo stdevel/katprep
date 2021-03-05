@@ -87,6 +87,9 @@ class Host:
             self._hostname, self.params, self._organisation
         )
 
+    def __str__(self):
+        return self._hostname
+
     def __eq__(self, other):
         if self.hostname != other.hostname:
             return False
