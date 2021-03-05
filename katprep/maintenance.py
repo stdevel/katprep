@@ -424,15 +424,16 @@ def status(options, args):
     :type args: argparse options dict
     """
     #verify snapshot/downtime per host
+    tasks = {
+        "Erratum": "Actions::Katello::Host::Erratum::Install",
+        "Package": "Actions::Katello::Host::Update"
+    }
+
     try:
         for host in REPORT:
             LOGGER.debug("Getting '%s' task status...", host)
 
             #check maintenance progress
-            tasks = {
-                "Erratum": "Actions::Katello::Host::Erratum::Install",
-                "Package": "Actions::Katello::Host::Update"
-            }
             today = datetime.datetime.now().strftime("%Y-%m-%d")
 
             try:
