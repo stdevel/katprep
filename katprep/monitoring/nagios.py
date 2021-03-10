@@ -120,7 +120,11 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             if "error" in result.text.lower():
                 tree = html.fromstring(result.text)
                 data = tree.xpath("//div[@class='errorMessage']/text()")
-                raise SessionException("CGI error: {}".format(data[0]))
+                if data:
+                    try:
+                        raise SessionException("CGI error: {}".format(data[0]))
+                    except IndexError:
+                        raise SessionException("CGI error: {}".format(data))
 
             if result.status_code in [401, 403]:
                 raise SessionException("Unauthorized")
