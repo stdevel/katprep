@@ -14,10 +14,10 @@ import json
 import getpass
 from . import __version__, get_credentials
 from .management.foreman import ForemanAPIClient
-from .management.libvirt import LibvirtClient
-from .management.vmware import PyvmomiClient
 from .monitoring.icinga2 import Icinga2APIClient
 from .monitoring.nagios import NagiosCGIClient
+from .virtualization.libvirt import LibvirtClient
+from .virtualization.vmware import PyvmomiClient
 
 """
 ForemanAPIClient: Foreman API client handle

@@ -6,11 +6,13 @@ Unit tests for Pyvmomi integration
 from __future__ import absolute_import
 
 import logging
-import pytest
 import time
-from katprep.management.vmware import PyvmomiClient
+
+import pytest
+
 from katprep.exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException)
+from katprep.virtualization.vmware import PyvmomiClient
 
 from .utilities import load_config
 

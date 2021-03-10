@@ -23,11 +23,11 @@ from .exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, SnapshotExistsException,
 UnsupportedRequestException)
 from .management.foreman import ForemanAPIClient
-from .management.libvirt import LibvirtClient
-from .management.vmware import PyvmomiClient
 from .monitoring.nagios import NagiosCGIClient
 from .monitoring.icinga2 import Icinga2APIClient
 from .network import validate_hostname
+from .virtualization.libvirt import LibvirtClient
+from .virtualization.vmware import PyvmomiClient
 
 """
 ForemanAPIClient: Foreman API client handle

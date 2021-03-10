@@ -42,11 +42,11 @@ def virtConfig(virtConfigFile):
 @pytest.fixture
 def virtClass(virtualisation):
     if virtualisation == 'libvirt':
-        LibvirtClient = pytest.importorskip("katprep.clients.LibvirtClient")
-        return LibvirtClient.LibvirtClient
+        libvirt = pytest.importorskip("katprep.virtualization.libvirt")
+        return libvirt.LibvirtClient
     elif virtualisation == 'pyvmomi':
-        PyvmomiClient = pytest.importorskip("katprep.clients.PyvmomiClient")
-        return PyvmomiClient.PyvmomiClient
+        vmware = pytest.importorskip("katprep.virtualization.vmware")
+        return vmware.PyvmomiClient
 
 
 @pytest.fixture

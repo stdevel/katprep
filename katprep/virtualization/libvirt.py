@@ -10,9 +10,10 @@ import socket
 
 import libvirt
 
-from .base import BaseConnector, PowerManager, SnapshotManager
+from .base import PowerManager, SnapshotManager
 from ..exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, UnsupportedRequestException)
+from ..management.base import BaseConnector
 
 
 class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
