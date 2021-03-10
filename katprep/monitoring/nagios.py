@@ -97,11 +97,12 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                 # going home
                 raise SessionException("Illegal method '{}' specified".format(method))
 
+            address = "{}{}".format(self._url, sub_url)
             # execute request
             if method.lower() == "post":
                 # POST
                 result = self._session.post(
-                    "{}{}".format(self._url, sub_url),
+                    address,
                     headers=self.HEADERS,
                     data=payload,
                     verify=self._verify_ssl,
@@ -109,7 +110,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             else:
                 # GET
                 result = self._session.get(
-                    "{}{}".format(self._url, sub_url),
+                    address,
                     headers=self.HEADERS,
                     verify=self._verify_ssl,
                 )
