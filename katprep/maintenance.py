@@ -22,7 +22,7 @@ from . import (
 from .exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, SnapshotExistsException,
 UnsupportedRequestException)
-from .management import get_management_client
+from .management import get_virtualization_client
 from .management.foreman import ForemanAPIClient
 from .monitoring import get_monitoring_client
 from .network import validate_hostname
@@ -778,7 +778,7 @@ def main(options, args):
                 # no virtualization configured
                 continue
 
-            VIRT_CLIENTS[host] = get_management_client(virt_type, LOG_LEVEL, host, virt_user, virt_pass)
+            VIRT_CLIENTS[host] = get_virtualization_client(virt_type, LOG_LEVEL, host, virt_user, virt_pass)
 
     #get monitoring host credentials
     if not options.mon_skip_downtime:
