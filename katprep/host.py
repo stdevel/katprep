@@ -3,6 +3,26 @@ Host class to make working with hosts easier in the scripts.
 """
 
 
+def from_dict(some_dict):
+    """
+    Function for easy dict deserialisation.
+
+    :param some_dict: The dict you want to deserialise.
+    :type some_dict: dict
+    """
+    try:
+        object_type = some_dict["type"]
+    except KeyError:
+        raise ValueError("Unable to get type of object from {!r}".format(some_dict))
+
+    if object_type == "host":
+        return Host.from_dict(some_dict)
+    elif object_type == "hostgroup":
+        return HostGroup.from_dict(some_dict)
+    else:
+        raise ValueError("Unknown type {!r}".format(object_type))
+
+
 class Host:
 
     _OBJECT_TYPE = "host"
@@ -124,6 +144,10 @@ class HostGroup:
     @property
     def type(self):
         return self._OBJECT_TYPE
+
+    @property
+    def name(self):
+        return self._groupname
 
     @property
     def monitoring_id(self):
