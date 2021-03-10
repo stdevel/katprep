@@ -30,6 +30,7 @@ def test_getting_monitoring_id():
     assert host.hostname == host.monitoring_id
     assert host.monitoring_id == "my.hostname"
 
+
 def test_host_with_custom_location():
     host = Host("a", {}, "org", "my loc")
 
@@ -100,6 +101,7 @@ def test_converting_host_to_dict():
         "hostname": "my.hostname",
         "params": {"some_param"},
         "organisation": "my orga",
+        "type": "host",
     }
 
 
@@ -109,8 +111,19 @@ def test_host_json_conversion():
         "params": {"sesame": "street"},
         "organisation": "Funky town",
         "location": "Digges B",
+        "type": "host",
     }
     host = Host.from_dict(original_dict)
     new_dict = host.to_dict()
 
     assert original_dict == new_dict
+
+
+def test_host_str_contains_hostname():
+    hostname = "some.hostname"
+    assert hostname in str(Host(hostname, {}, None))
+
+
+def test_host_type_identifier():
+    host = Host("bla", {}, None)
+    assert host.type == "host"

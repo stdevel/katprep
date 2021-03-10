@@ -149,8 +149,6 @@ def manage_host_preparation(options, host, cleanup=False):
             "Downtime needs to be scheduled for host '%s'", host
         )
 
-        mon_name = host.monitoring_id
-
         if options.generic_dry_run:
             if cleanup:
                 LOGGER.info("Host '%s' --> remove downtime", host)
@@ -160,9 +158,9 @@ def manage_host_preparation(options, host, cleanup=False):
             monitoring_client = MON_CLIENTS[monitoring_type]
             try:
                 if cleanup:
-                    monitoring_client.remove_downtime(mon_name, "host")
+                    monitoring_client.remove_downtime(host)
                 else:
-                    monitoring_client.schedule_downtime(mon_name, "host",
+                    monitoring_client.schedule_downtime(host,
                                                         hours=options.mon_downtime)
             except InvalidCredentialsException as err:
                 LOGGER.error("Unable to maintain downtime: '%s'", err)
@@ -373,23 +371,24 @@ def verify(options, args):
 
             #check downtime
             if not options.mon_skip_downtime:
-                mon_name = host.monitoring_id
                 monitoring_type = host.get_param("katprep_mon")
                 monitoring_client = MON_CLIENTS[monitoring_type]
 
                 #check scheduled downtime
-                if monitoring_client.has_downtime(mon_name):
+                if monitoring_client.has_downtime(host):
                     set_verification_value(options, host, "mon_downtime", True)
                     LOGGER.info("Downtime for host '%s' found.", host)
                 else:
                     #set flag
                     set_verification_value(options, host, "mon_cleanup", True)
                     LOGGER.info("No downtime for host '%s' found, probably cleaned-up.", host)
+
                 #check critical services
                 try:
-                    crit_services = monitoring_client.get_services(mon_name)
+                    crit_services = monitoring_client.get_services(host)
                 except EmptySetException:
                     crit_services = {}
+
                 if len(crit_services) > 0:
                     services = ""
                     LOGGER.debug(

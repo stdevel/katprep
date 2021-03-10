@@ -9,6 +9,7 @@ from __future__ import absolute_import
 import logging
 import pytest
 from katprep.exceptions import EmptySetException, SessionException
+from katprep.host import Host, HostGroup
 from katprep.monitoring.icinga2 import Icinga2APIClient
 
 from .utilities import load_config
@@ -54,59 +55,65 @@ def test_scheduling_downtime_for_host(client, config):
     """
     Ensure that host downtimes can be scheduled
     """
-    host = config["valid_objects"]["host"]
-    client.schedule_downtime(host, "host")
+    host = Host(config["valid_objects"]["host"], {}, None)
+
+    client.schedule_downtime(host)
     assert client.has_downtime(host)
-    assert client.remove_downtime(host, "host")
+    assert client.remove_downtime(host)
 
 
 def test_sched_dt_host_fail(client, config):
     """
     Ensure that host downtimes cannot be scheduled when using invalid hosts
     """
+    host = Host("giertz.pinkepank.loc", {}, None)
     with pytest.raises(EmptySetException):
-        client.schedule_downtime("giertz.pinkepank.loc", "host")
+        client.schedule_downtime(host)
 
 
 def test_schedule_downtime_for_hostgrp(client, config):
     """
     Ensure that hostgroup downtimes can be scheduled
     """
-    hostgroup = config["valid_objects"]["hostgroup"]
-    assert client.schedule_downtime(hostgroup, "hostgroup")
-    assert client.remove_downtime(hostgroup, "hostgroup")
+    hostgroup = HostGroup(config["valid_objects"]["hostgroup"])
+    assert client.schedule_downtime(hostgroup)
+    assert client.remove_downtime(hostgroup)
 
 
 def test_sched_dt_hostgrp_fail(client):
     """
     Ensure that hostgroup downtimes cannot be scheduled with invalid names
     """
+    group = HostGroup("giertz.pinkepank.loc")
     with pytest.raises(EmptySetException):
-        client.schedule_downtime("giertz.pinkepank.loc", "hostgroup")
+        client.schedule_downtime(group)
 
 
 def test_sched_has_downtime_fail(client):
     """
     Ensure that checking downtime fails for non-existing hosts
     """
+    host = Host("giertz.pinkepank.loc", {}, None)
     with pytest.raises(EmptySetException):
-        client.has_downtime("giertz.pinkepank.loc")
+        client.has_downtime(host)
 
 
 def test_unsched_dt_host_fail(client):
     """
     Ensure that unscheduling downtimes fails for non-existing hosts
     """
+    host = Host("giertz.pinkepank.loc", {}, None)
     with pytest.raises(SessionException):
-        client.remove_downtime("giertz.pinkepank.loc", "host")
+        client.remove_downtime(host)
 
 
 def test_unsched_dt_hostgrp_fail(client):
     """
     Ensure that unscheduling downtimes fails for non-existing hostgroups
     """
+    group = HostGroup("giertz-hosts")
     with pytest.raises(SessionException):
-        client.remove_downtime("giertz-hosts", "hostgroup")
+        client.remove_downtime(group)
 
 
 def test_get_hosts(client, config):
@@ -121,10 +128,8 @@ def test_get_services(client, config):
     """
     Ensure that hosts include existing services
     """
-    services = client.get_services(
-        config["valid_objects"]["host"],
-        only_failed=False
-    )
+    host = Host(config["valid_objects"]["host"], {}, None)
+    services = client.get_services(host, only_failed=False)
     assert config["valid_objects"]["host_service"] in [service['name'] for service in services]
 
 
@@ -132,5 +137,6 @@ def test_get_services_fail(client):
     """
     Ensure that checking services of non-existing hosts fails
     """
+    host = Host("giertz.pinkepank.loc", {}, None)
     with pytest.raises(EmptySetException):
-        client.get_services("giertz.pinkepank.loc", only_failed=False)
+        client.get_services(host, only_failed=False)

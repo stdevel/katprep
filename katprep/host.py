@@ -4,11 +4,18 @@ Host class to make working with hosts easier in the scripts.
 
 
 class Host:
+
+    _OBJECT_TYPE = "host"
+
     def __init__(self, hostname, host_parameters, organisation, location=None):
         self._hostname = hostname
         self.params = host_parameters
         self._organisation = organisation
         self._location = location
+
+    @property
+    def type(self):
+        return self._OBJECT_TYPE
 
     @property
     def hostname(self):
@@ -66,6 +73,7 @@ class Host:
             "hostname": self._hostname,
             "params": self.params,
             "organisation": self._organisation,
+            "type": self.type,
         }
 
         if self._location:
@@ -101,6 +109,44 @@ class Host:
             return False
 
         if self.location != other.location:
+            return False
+
+        return True
+
+
+class HostGroup:
+
+    _OBJECT_TYPE = "hostgroup"
+
+    def __init__(self, groupname):
+        self._groupname = groupname
+
+    @property
+    def type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def monitoring_id(self):
+        return self._groupname
+
+    def to_dict(self):
+        return {
+            "groupname": self._groupname,
+            "type": self.type,
+        }
+
+    @classmethod
+    def from_dict(cls, host_dict):
+        return HostGroup(host_dict["groupname"])
+
+    def __repr__(self):
+        return "HostGroup({!r})".format(self._groupname)
+
+    def __str__(self):
+        return self._groupname
+
+    def __eq__(self, other):
+        if self._groupname != other._groupname:
             return False
 
         return True
