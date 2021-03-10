@@ -61,13 +61,16 @@ def icingaClient(config):
 @pytest.fixture
 def nagiosClient(config):
     try:
-        yield NagiosCGIClient(
+        client = NagiosCGIClient(
             logging.ERROR,
             config["legacy"]["hostname"],
             config["legacy"]["cgi_user"],
             config["legacy"]["cgi_pass"],
             verify_ssl=False
         )
+        client.set_nagios(True)
+
+        yield client
     finally:
         time.sleep(8)
 
