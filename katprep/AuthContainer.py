@@ -9,6 +9,8 @@ import os
 import stat
 import json
 import base64
+from collections import namedtuple
+
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
 
@@ -16,6 +18,8 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+
+Credentials = namedtuple('Credentials', 'username password')
 
 
 class ContainerException(Exception):
@@ -227,31 +231,29 @@ class AuthContainer:
             host = snippet
         return host
 
-
-
     def get_credential(self, hostname):
         """
         This function returns credentials for a particular hostname.
-        
+
         :param hostname: hostname
         :type hostname: str
         """
         hostname = self.cut_hostname(hostname)
         try:
+            username = self.CREDENTIALS[hostname]["username"]
+
             if self.is_encrypted():
                 self.LOGGER.debug("Decrypting crendentials")
-                crypto = Fernet(self.KEY.decode())
-                return (
-                    self.CREDENTIALS[hostname]["username"],
-                    crypto.decrypt(self.CREDENTIALS[hostname]["password"][2:].encode())
-                    )
+                crypto = Fernet(self.KEY)
+                password = crypto.decrypt(self.CREDENTIALS[hostname]["password"][2:].encode())
             else:
-                #return plain information
                 self.LOGGER.debug("Plain login data")
-                return (
-                    self.CREDENTIALS[hostname]["username"],
-                    self.CREDENTIALS[hostname]["password"]
-                    )
+                password = self.CREDENTIALS[hostname]["password"]
+
+            return Credentials(
+                username,
+                password
+            )
         except InvalidToken:
             raise ContainerException("Invalid password specified!")
         except KeyError:
