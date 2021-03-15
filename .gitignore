@@ -8,7 +8,6 @@
 errata-*.html
 errata-*.yml
 errata-*.md
-test*.py
 test*.yml
 TODO
 .buildinfo
