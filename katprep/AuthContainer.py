@@ -36,18 +36,6 @@ class AuthContainer:
     """
     logging: Logger instance
     """
-    FILENAME = ""
-    """
-    str: correspending file
-    """
-    CREDENTIALS = {}
-    """
-    dict: authentication credentials
-    """
-    KEY = ""
-    """
-    str: encryption key
-    """
 
     def __init__(self, log_level, filename, key=""):
         """
@@ -59,6 +47,10 @@ class AuthContainer:
         :param filename: filename
         :type filename: str
         """
+
+        self.CREDENTIALS = {}
+        self.KEY = ""
+
         #set logging
         self.LOGGER.setLevel(log_level)
         #set key if defined
