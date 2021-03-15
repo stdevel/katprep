@@ -68,7 +68,8 @@ class AuthContainer:
         self.FILENAME = filename
         try:
             self.__import()
-        except ValueError:
+        except FileNotFoundError:
+            # file does not exist yet
             pass
 
 
@@ -84,7 +85,7 @@ class AuthContainer:
             #fill up to 32 chars
             key = key.zfill(32)[-32:]
             #set key
-            self.KEY = base64.b64encode(key)
+            self.KEY = base64.b64encode(key.encode('UTF-8'))
         except ValueError as err:
             self.LOGGER.error("Empty password specified")
 
@@ -104,14 +105,12 @@ class AuthContainer:
 
     def __import(self):
         """This function imports definitions from the file."""
-        global CREDENTIALS
-
-        if os.path.exists(self.FILENAME) and \
-            oct(stat.S_IMODE(os.lstat(self.FILENAME).st_mode)) == "0600":
-            #loading file
+        try:
             self.CREDENTIALS = json.loads(self.get_json(self.FILENAME))
-        else:
-            raise ValueError("File non-existent or file mode not 0600!")
+        except Exception as err:
+            if not stat.S_IMODE(os.lstat(self.FILENAME).st_mode) == 0o0600:
+                raise OSError("File mode of {!r} not 0600!".format(self.FILENAME))
+            raise err
 
 
 
@@ -179,7 +178,7 @@ class AuthContainer:
                 self.CREDENTIALS[hostname]["username"] = username
                 #add encrypted or plain password
                 if self.KEY:
-                    crypto = Fernet(self.KEY)
+                    crypto = Fernet(self.KEY.decode())
                     self.CREDENTIALS[hostname]["password"] = "s/{0}".format(
                         crypto.encrypt(password.encode()))
                 else:
@@ -249,7 +248,7 @@ class AuthContainer:
         try:
             if self.is_encrypted():
                 self.LOGGER.debug("Decrypting crendentials")
-                crypto = Fernet(self.KEY)
+                crypto = Fernet(self.KEY.decode())
                 return (
                     self.CREDENTIALS[hostname]["username"],
                     crypto.decrypt(self.CREDENTIALS[hostname]["password"][2:].encode())
