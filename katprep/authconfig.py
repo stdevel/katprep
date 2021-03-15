@@ -41,11 +41,11 @@ def list_entries(options):
         #get credentials
         credentials = CONTAINER.get_credential(hostname)
         if options.show_passwords:
-            password = credentials[1]
+            password = credentials[1].decode()
         else:
             password = "xxx"
         print("{} (Username: {} / Password: {})".format(
-            hostname, credentials[0], password
+            hostname, credentials[0].decode(), password
         ))
 
 
