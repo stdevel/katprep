@@ -23,8 +23,6 @@ class ContainerException(Exception):
     .. class:: ContainerException
     """
 
-    pass
-
 
 class AuthContainer:
     """
