@@ -13,22 +13,22 @@ from urllib.parse import urlparse
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
 
-Credentials = namedtuple('Credentials', 'username password')
+Credentials = namedtuple("Credentials", "username password")
 
 
 class ContainerException(Exception):
     """
-    Dummy class for authentication container errors
+        Dummy class for authentication container errors
 
-.. class:: ContainerException
+    .. class:: ContainerException
     """
-    pass
 
+    pass
 
 
 class AuthContainer:
     """
-.. class:: AuthContainer
+    .. class:: AuthContainer
     """
 
     def __init__(self, log_level, filename, key=""):
@@ -46,7 +46,7 @@ class AuthContainer:
         self.__credentials = {}
         self._encryption_marker = b"s/"
 
-        self.LOGGER = logging.getLogger('AuthContainer')
+        self.LOGGER = logging.getLogger("AuthContainer")
         self.LOGGER.setLevel(log_level)
 
         self.__key = ""
@@ -113,10 +113,10 @@ class AuthContainer:
         This function stores the changed authentication container to disk.
         """
         try:
-            with open(self._filename, 'w') as target:
+            with open(self._filename, "w") as target:
                 target.write(json.dumps(self.__credentials))
 
-            #setting the good perms
+            # setting the good perms
             os.chmod(self._filename, 0o600)
         except IOError as err:
             raise ContainerException(err)
@@ -175,9 +175,9 @@ class AuthContainer:
         :type snippet: str
         """
         parsed_uri = urlparse(snippet)
-        host = '{uri.netloc}'.format(uri=parsed_uri)
+        host = "{uri.netloc}".format(uri=parsed_uri)
         if host == "":
-            #non-URL/URI
+            # non-URL/URI
             host = snippet
         return host
 
@@ -194,12 +194,14 @@ class AuthContainer:
             username = credentials["username"]
             password = credentials["password"]
         except KeyError as kerr:
-            self.LOGGER.debug("Unable to retrieve credentials for {!r} ({})".format(hostname, kerr))
+            self.LOGGER.debug(
+                "Unable to retrieve credentials for {!r} ({})".format(hostname, kerr)
+            )
             return
 
         if self.is_encrypted():
             # Remove leading encryption marker
-            password = password[len(self._encryption_marker):]
+            password = password[len(self._encryption_marker) :]
 
             try:
                 crypto = Fernet(self.__key)
