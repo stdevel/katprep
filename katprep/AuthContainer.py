@@ -30,10 +30,6 @@ class AuthContainer:
     """
 .. class:: AuthContainer
     """
-    LOGGER = logging.getLogger('AuthContainer')
-    """
-    logging: Logger instance
-    """
 
     def __init__(self, log_level, filename, key=""):
         """
@@ -51,7 +47,7 @@ class AuthContainer:
 
         self.CREDENTIALS = {}
 
-        #set logging
+        self.LOGGER = logging.getLogger('AuthContainer')
         self.LOGGER.setLevel(log_level)
         #set key if defined
         self.KEY = ""
