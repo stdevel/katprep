@@ -80,10 +80,7 @@ class AuthContainer:
         This functions returns whether the authentication container is
         encrypted.
         """
-        if self.__key:
-            return True
-        else:
-            return False
+        return bool(self.__key)
 
     def __import(self):
         """This function imports definitions from the file."""
