@@ -70,12 +70,9 @@ class AuthContainer:
             return
 
         assert isinstance(key, str)
-        try:
-            key = key.zfill(32)[-32:]
-            key = key.encode()
-            self.__key = base64.urlsafe_b64encode(key)
-        except ValueError as err:
-            self.LOGGER.error("Empty password specified")
+        key = key.zfill(32)[-32:]
+        key = key.encode()
+        self.__key = base64.urlsafe_b64encode(key)
 
     def is_encrypted(self):
         """
