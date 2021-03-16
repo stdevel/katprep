@@ -50,8 +50,7 @@ class AuthContainer:
         self.LOGGER.setLevel(log_level)
 
         self.__key = ""
-        if key:
-            self.set_key(key)
+        self.set_key(key)
 
         self._filename = filename
         try:
@@ -67,6 +66,9 @@ class AuthContainer:
         :param key: key
         :type key: str
         """
+        if not key:
+            return
+
         assert isinstance(key, str)
         try:
             key = key.zfill(32)[-32:]
