@@ -126,52 +126,6 @@ class AuthContainer:
         except IOError as err:
             raise ContainerException(err)
 
-
-
-    def __manage_credentials(self, hostname, username, password,
-        remove_entry=False):
-        """
-        This functions adds or removes credentials to/from the authentication
-        container.
-        Adding credentials requires a hostname, username and corresponding
-        password. Removing credentials only requires a hostname.
-
-        There are two alias functions for credentials management:
-        add_credentials() and remove_credentials()
-
-        :param hostname: hostname
-        :type hostname: str
-        :param username: username
-        :type username: str
-        :param password: corresponding password
-        :type password: str
-        :param remove_entry: setting True will remove an entry
-        :type remove_entry: bool
-        """
-        global CREDENTIALS
-        hostname = self.cut_hostname(hostname)
-
-        try:
-            if remove_entry:
-                #remove entry
-                del self.CREDENTIALS[hostname]
-            else:
-                #add entry
-                self.CREDENTIALS[hostname] = {}
-                self.CREDENTIALS[hostname]["username"] = username
-                #add encrypted or plain password
-                if self.KEY:
-                    crypto = Fernet(self.KEY.decode())
-                    self.CREDENTIALS[hostname]["password"] = "s/{0}".format(
-                        crypto.encrypt(password.encode()))
-                else:
-                    self.CREDENTIALS[hostname]["password"] = password
-        except InvalidToken:
-            raise ContainerException("Invalid password specified!")
-        except KeyError:
-            pass
-
-    #aliases
     def add_credentials(self, hostname, username, password):
         """
         Adds credentials to the authentication container.
@@ -183,7 +137,20 @@ class AuthContainer:
         :param password: corresponding password
         :type password: str
         """
-        return self.__manage_credentials(hostname, username, password)
+        hostname = self.cut_hostname(hostname)
+
+        try:
+            if self.KEY:
+                crypto = Fernet(self.KEY)
+                password = self._encryption_marker + crypto.encrypt(password.encode())
+                password = password.decode()
+        except InvalidToken:
+            raise ContainerException("Invalid password specified!")
+
+        self.CREDENTIALS[hostname] = {
+            "username": username,
+            "password": password,
+        }
 
     def remove_credentials(self, hostname):
         """
@@ -192,9 +159,12 @@ class AuthContainer:
         :param hostname: hostname
         :type hostname: str
         """
-        return self.__manage_credentials(hostname, "", "", True)
+        hostname = self.cut_hostname(hostname)
 
-
+        try:
+            del self.CREDENTIALS[hostname]
+        except KeyError:
+            pass
 
     def get_hostnames(self):
         """This function returns hostnames"""
