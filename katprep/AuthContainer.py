@@ -174,7 +174,7 @@ class AuthContainer:
         :type snippet: str
         """
         parsed_uri = urlparse(snippet)
-        host = "{uri.netloc}".format(uri=parsed_uri)
+        host = str(parsed_uri.netloc)
         if host == "":
             # non-URL/URI
             host = snippet
