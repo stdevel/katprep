@@ -43,18 +43,17 @@ class AuthContainer:
         :param key: The key used for encryption / decryption of secrets.
         :type key: str
         """
+        self.__credentials = {}
         self._encryption_marker = b"s/"
-
-        self.CREDENTIALS = {}
 
         self.LOGGER = logging.getLogger('AuthContainer')
         self.LOGGER.setLevel(log_level)
-        #set key if defined
-        self.KEY = ""
+
+        self.__key = ""
         if key:
             self.set_key(key)
-        #set filename and import data
-        self.FILENAME = filename
+
+        self._filename = filename
         try:
             self.__import()
         except FileNotFoundError:
@@ -72,7 +71,7 @@ class AuthContainer:
         try:
             key = key.zfill(32)[-32:]
             key = key.encode()
-            self.KEY = base64.urlsafe_b64encode(key)
+            self.__key = base64.urlsafe_b64encode(key)
         except ValueError as err:
             self.LOGGER.error("Empty password specified")
 
@@ -81,7 +80,7 @@ class AuthContainer:
         This functions returns whether the authentication container is
         encrypted.
         """
-        if self.KEY:
+        if self.__key:
             return True
         else:
             return False
@@ -89,10 +88,10 @@ class AuthContainer:
     def __import(self):
         """This function imports definitions from the file."""
         try:
-            self.CREDENTIALS = json.loads(self.get_json(self.FILENAME))
+            self.__credentials = json.loads(self.get_json(self._filename))
         except Exception as err:
-            if not stat.S_IMODE(os.lstat(self.FILENAME).st_mode) == 0o0600:
-                raise OSError("File mode of {!r} not 0600!".format(self.FILENAME))
+            if not stat.S_IMODE(os.lstat(self._filename).st_mode) == 0o0600:
+                raise OSError("File mode of {!r} not 0600!".format(self._filename))
             raise err
 
     def get_json(self, filename):
@@ -114,11 +113,11 @@ class AuthContainer:
         This function stores the changed authentication container to disk.
         """
         try:
-            with open(self.FILENAME, 'w') as target:
-                target.write(json.dumps(self.CREDENTIALS))
+            with open(self._filename, 'w') as target:
+                target.write(json.dumps(self.__credentials))
 
             #setting the good perms
-            os.chmod(self.FILENAME, 0o600)
+            os.chmod(self._filename, 0o600)
         except IOError as err:
             raise ContainerException(err)
 
@@ -135,15 +134,15 @@ class AuthContainer:
         """
         hostname = self.cut_hostname(hostname)
 
-        try:
-            if self.KEY:
-                crypto = Fernet(self.KEY)
+        if self.__key:
+            try:
+                crypto = Fernet(self.__key)
                 password = self._encryption_marker + crypto.encrypt(password.encode())
                 password = password.decode()
-        except InvalidToken:
-            raise ContainerException("Invalid password specified!")
+            except InvalidToken:
+                raise ContainerException("Invalid password specified!")
 
-        self.CREDENTIALS[hostname] = {
+        self.__credentials[hostname] = {
             "username": username,
             "password": password,
         }
@@ -158,13 +157,13 @@ class AuthContainer:
         hostname = self.cut_hostname(hostname)
 
         try:
-            del self.CREDENTIALS[hostname]
+            del self.__credentials[hostname]
         except KeyError:
             pass
 
     def get_hostnames(self):
         """This function returns hostnames"""
-        return list(self.CREDENTIALS.keys())
+        return list(self.__credentials.keys())
 
     @staticmethod
     def cut_hostname(snippet):
@@ -191,7 +190,7 @@ class AuthContainer:
         """
         hostname = self.cut_hostname(hostname)
         try:
-            credentials = self.CREDENTIALS[hostname]
+            credentials = self.__credentials[hostname]
             username = credentials["username"]
             password = credentials["password"]
         except KeyError as kerr:
@@ -203,7 +202,7 @@ class AuthContainer:
             password = password[len(self._encryption_marker):]
 
             try:
-                crypto = Fernet(self.KEY)
+                crypto = Fernet(self.__key)
                 password = crypto.decrypt(password.encode())
             except InvalidToken:
                 raise ContainerException("Invalid password specified!")
