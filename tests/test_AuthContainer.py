@@ -18,8 +18,35 @@ def test_reading_from_unencrypted_file(temp_filename):
     password = 'ebbelwoi'
     container = AuthContainer(logging.DEBUG, temp_filename)
     container.add_credentials(hostname, username, password)
+    container.save()
 
-    assert container.CREDENTIALS
-    creds = container.get_credential(hostname)
-    assert creds[0] == username
-    assert creds[1] == password
+    new_container = AuthContainer(logging.DEBUG, temp_filename)
+    creds = new_container.get_credential(hostname)
+    assert creds.username == username
+    assert creds.password == password
+
+
+def test_reading_from_encrypted_file(temp_filename):
+    key = 'hall0w3lt!'
+    hostname = 'meinhost.some.domain'
+    username = 'ingo'
+    password = 'ebbelwoi'
+    container = AuthContainer(logging.DEBUG, temp_filename, key)
+    container.add_credentials(hostname, username, password)
+    container.save()
+
+    new_container = AuthContainer(logging.DEBUG, temp_filename, key)
+    creds = new_container.get_credential(hostname)
+    assert creds.username == username
+    assert creds.password == password
+
+
+def test_listing_hostnames(temp_filename):
+    hostname = 'meinhost.some.domain'
+    username = 'ingo'
+    password = 'ebbelwoi'
+    container = AuthContainer(logging.DEBUG, temp_filename)
+    assert not container.get_hostnames()
+    container.add_credentials(hostname, username, password)
+
+    assert [hostname] == container.get_hostnames()
