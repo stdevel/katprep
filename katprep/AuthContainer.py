@@ -44,14 +44,17 @@ class AuthContainer:
         :type log_level: logging
         :param filename: filename
         :type filename: str
+        :param key: The key used for encryption / decryption of secrets.
+        :type key: str
         """
+        self._encryption_marker = b"s/"
 
         self.CREDENTIALS = {}
-        self.KEY = ""
 
         #set logging
         self.LOGGER.setLevel(log_level)
         #set key if defined
+        self.KEY = ""
         if key:
             self.set_key(key)
         #set filename and import data
@@ -62,8 +65,6 @@ class AuthContainer:
             # file does not exist yet
             pass
 
-
-
     def set_key(self, key):
         """
         This function set or changes the key used for encryption/decryption.
@@ -72,14 +73,11 @@ class AuthContainer:
         :type key: str
         """
         try:
-            #fill up to 32 chars
-            key = key.zfill(32)[-32:]
-            #set key
-            self.KEY = base64.b64encode(key.encode('UTF-8'))
+            key = key.zfill(32)
+            key = key.encode()
+            self.KEY = base64.urlsafe_b64encode(key)
         except ValueError as err:
             self.LOGGER.error("Empty password specified")
-
-
 
     def is_encrypted(self):
         """
@@ -91,8 +89,6 @@ class AuthContainer:
         else:
             return False
 
-
-
     def __import(self):
         """This function imports definitions from the file."""
         try:
@@ -101,8 +97,6 @@ class AuthContainer:
             if not stat.S_IMODE(os.lstat(self.FILENAME).st_mode) == 0o0600:
                 raise OSError("File mode of {!r} not 0600!".format(self.FILENAME))
             raise err
-
-
 
     def get_json(self, filename):
         """
@@ -117,8 +111,6 @@ class AuthContainer:
             return json_data
         except IOError as err:
             self.LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
-
-
 
     def save(self):
         """
@@ -207,8 +199,6 @@ class AuthContainer:
         """This function returns hostnames"""
         return list(self.CREDENTIALS.keys())
 
-
-
     @staticmethod
     def cut_hostname(snippet):
         """
@@ -234,21 +224,25 @@ class AuthContainer:
         """
         hostname = self.cut_hostname(hostname)
         try:
-            username = self.CREDENTIALS[hostname]["username"]
+            credentials = self.CREDENTIALS[hostname]
+            username = credentials["username"]
+            password = credentials["password"]
+        except KeyError as kerr:
+            self.LOGGER.debug("Unable to retrieve credentials for {!r} ({})".format(hostname, kerr))
+            return
 
-            if self.is_encrypted():
-                self.LOGGER.debug("Decrypting crendentials")
+        if self.is_encrypted():
+            # Remove leading encryption marker
+            password = password[len(self._encryption_marker):]
+
+            try:
                 crypto = Fernet(self.KEY)
-                password = crypto.decrypt(self.CREDENTIALS[hostname]["password"][2:].encode())
-            else:
-                self.LOGGER.debug("Plain login data")
-                password = self.CREDENTIALS[hostname]["password"]
+                password = crypto.decrypt(password.encode())
+            except InvalidToken:
+                raise ContainerException("Invalid password specified!")
 
-            return Credentials(
-                username,
-                password
-            )
-        except InvalidToken:
-            raise ContainerException("Invalid password specified!")
-        except KeyError:
-            pass
+            password = password.decode()
+        else:
+            self.LOGGER.debug("Plain login data")
+
+        return Credentials(username, password)
