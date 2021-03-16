@@ -72,8 +72,9 @@ class AuthContainer:
         :param key: key
         :type key: str
         """
+        assert isinstance(key, str)
         try:
-            key = key.zfill(32)
+            key = key.zfill(32)[-32:]
             key = key.encode()
             self.KEY = base64.urlsafe_b64encode(key)
         except ValueError as err:
