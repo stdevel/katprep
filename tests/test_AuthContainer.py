@@ -76,3 +76,14 @@ def test_setting_key(temp_filename):
     container = AuthContainer(logging.DEBUG, temp_filename)
     container.set_key("sosecret")
     assert container.is_encrypted()
+
+
+def test_removing_credential(temp_filename, hostname, username, password):
+    container = AuthContainer(logging.DEBUG, temp_filename)
+    assert None == container.get_credential(hostname)
+
+    container.add_credentials(hostname, username, password)
+    assert container.get_credential(hostname)
+
+    container.remove_credentials(hostname)
+    assert None == container.get_credential(hostname)
