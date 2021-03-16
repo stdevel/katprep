@@ -55,7 +55,7 @@ class AuthContainer:
 
         self._filename = filename
         try:
-            self.__import()
+            self._import()
         except FileNotFoundError:
             # file does not exist yet
             pass
@@ -82,7 +82,7 @@ class AuthContainer:
         """
         return bool(self.__key)
 
-    def __import(self):
+    def _import(self):
         """This function imports definitions from the file."""
         try:
             self.__credentials = json.loads(self.get_json(self._filename))
