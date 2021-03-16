@@ -132,9 +132,12 @@ class AuthContainer:
         hostname = self.cut_hostname(hostname)
 
         if self.__key:
+            assert isinstance(password, str)
+
             try:
                 crypto = Fernet(self.__key)
-                password = self._encryption_marker + crypto.encrypt(password.encode())
+                password = crypto.encrypt(password.encode())
+                password = self._encryption_marker + password
                 password = password.decode()
             except InvalidToken:
                 raise ContainerException("Invalid password specified!")
