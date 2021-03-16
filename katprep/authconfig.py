@@ -41,11 +41,12 @@ def list_entries(options):
         #get credentials
         credentials = CONTAINER.get_credential(hostname)
         if options.show_passwords:
-            password = credentials[1].decode()
+            password = credentials.password.decode()
         else:
             password = "xxx"
+
         print("{} (Username: {} / Password: {})".format(
-            hostname, credentials[0].decode(), password
+            hostname, credentials.username.decode(), password
         ))
 
 
@@ -128,7 +129,7 @@ def set_password(options):
             credentials = CONTAINER.get_credential(hostname)
             #add new entry
             new_container.add_credentials(
-                hostname, credentials[0], credentials[1]
+                hostname, credentials.username, credentials.password
             )
         #save new container
         new_container.save()
