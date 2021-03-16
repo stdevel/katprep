@@ -8,14 +8,10 @@ import stat
 import json
 import base64
 from collections import namedtuple
+from urllib.parse import urlparse
 
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
-
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 
 Credentials = namedtuple('Credentials', 'username password')
 
