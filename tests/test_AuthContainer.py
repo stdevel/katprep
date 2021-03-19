@@ -134,6 +134,8 @@ def test_importing_python_2_file(py2container):
 
     hostnames = container.get_hostnames()
     assert 1 == len(hostnames)
+    hostname = hostnames[0]
+    assert hostname == 'hostname'
 
     creds = container.get_credential(hostnames[0])
     assert creds.username == "username"
