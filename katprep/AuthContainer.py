@@ -126,11 +126,12 @@ class AuthContainer:
         :param password: corresponding password
         :type password: str
         """
+        if not isinstance(password, str):
+            raise TypeError("Expecting password as a str instead of {}".format(type(password)))
+
         hostname = self.cut_hostname(hostname)
 
         if self.__key:
-            assert isinstance(password, str)
-
             try:
                 crypto = Fernet(self.__key)
                 password = crypto.encrypt(password.encode())

@@ -136,3 +136,11 @@ def test_import_encrypted_python_2_file_with_wrong_keyword(encrypted_py2_file):
 
     with pytest.raises(ContainerException):
         container.get_credential(hostnames[0])
+
+
+@pytest.mark.parametrize("password", [b"some_fancy_bytes", 123])
+def test_password_is_required_to_be_a_str(temp_filename, hostname, username, password):
+    container = AuthContainer(logging.DEBUG, temp_filename)
+
+    with pytest.raises(TypeError):
+        container.add_credentials(hostname, username, password)
