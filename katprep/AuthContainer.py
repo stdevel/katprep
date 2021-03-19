@@ -47,7 +47,7 @@ class AuthContainer:
         self.LOGGER = logging.getLogger("AuthContainer")
         self.LOGGER.setLevel(log_level)
 
-        self.__key = ""
+        self.__key = None
         self.set_key(key)
 
         self._filename = filename
