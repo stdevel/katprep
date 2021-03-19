@@ -144,3 +144,10 @@ def test_password_is_required_to_be_a_str(temp_filename, hostname, username, pas
 
     with pytest.raises(TypeError):
         container.add_credentials(hostname, username, password)
+
+
+def test_deleting_missing_hostname_does_not_fail(temp_filename, hostname):
+    container = AuthContainer(logging.DEBUG, temp_filename)
+    assert not container.get_hostnames()
+
+    container.remove_credentials(hostname)
