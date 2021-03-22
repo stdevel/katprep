@@ -81,12 +81,13 @@ class AuthContainer:
 
     def _import(self):
         """This function imports definitions from the file."""
+
+        if not stat.S_IMODE(os.lstat(self._filename).st_mode) == 0o0600:
+            raise OSError("File mode of {!r} not 0600!".format(self._filename))
+
         try:
             self.__credentials = json.loads(self._get_json())
         except Exception as err:
-            if not stat.S_IMODE(os.lstat(self._filename).st_mode) == 0o0600:
-                raise OSError("File mode of {!r} not 0600!".format(self._filename))
-
             raise err
 
     def _get_json(self):
