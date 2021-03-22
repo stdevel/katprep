@@ -99,6 +99,8 @@ class AuthContainer:
             with open(filename, "r") as json_file:
                 json_data = json_file.read().replace("\n", "")
             return json_data
+        except FileNotFoundError as err:
+            self.LOGGER.debug("File {!r} is missing: {}".format(filename, err))
         except IOError as err:
             self.LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
 
