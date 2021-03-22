@@ -82,19 +82,22 @@ class AuthContainer:
     def _import(self):
         """This function imports definitions from the file."""
         try:
-            self.__credentials = json.loads(self.get_json(self._filename))
+            self.__credentials = json.loads(self._get_json())
         except Exception as err:
             if not stat.S_IMODE(os.lstat(self._filename).st_mode) == 0o0600:
                 raise OSError("File mode of {!r} not 0600!".format(self._filename))
+
             raise err
 
-    def get_json(self, filename):
+    def _get_json(self):
         """
         Reads a JSON file and returns the whole content as one-liner.
 
         :param filename: the JSON filename
         :type filename: str
         """
+        filename = self._filename
+
         try:
             with open(filename, "r") as json_file:
                 json_data = json_file.read().replace("\n", "")
