@@ -107,6 +107,7 @@ class AuthContainer:
             self.LOGGER.debug("File {!r} is missing: {}".format(filename, err))
         except IOError as err:
             self.LOGGER.error("Unable to read file {!r}: {}".format(filename, err))
+            raise err
 
     def save(self):
         """
