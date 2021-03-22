@@ -13,11 +13,6 @@ import getpass
 from . import __version__
 from .AuthContainer import AuthContainer, ContainerException
 
-try:
-    raw_input
-except NameError:  # Python 3
-    raw_input = input
-
 LOGGER = logging.getLogger('katprep_authconfig')
 """
 logging: Logger instance
@@ -57,10 +52,10 @@ def add(options):
     """
     while options.entry_hostname == "":
         #prompt for hostname
-        options.entry_hostname = raw_input("Hostname: ")
+        options.entry_hostname = input("Hostname: ")
     while options.entry_username == "":
         #prompt for hostname
-        options.entry_username = raw_input(
+        options.entry_username = input(
             "{} Username: ".format(options.entry_hostname)
         )
     password_prompted = False
@@ -96,7 +91,7 @@ def remove(options):
     """
     while options.entry_hostname == "":
         #prompt for hostname
-        options.entry_hostname = raw_input("Hostname: ")
+        options.entry_hostname = input("Hostname: ")
     LOGGER.debug(
         "Removing entry hostname='%s'...", options.entry_hostname
     )
