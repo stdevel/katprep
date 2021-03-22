@@ -171,7 +171,8 @@ def parse_options(args=None):
 
     #COMMANDS
     subparsers = parser.add_subparsers(title='commands', \
-    description='controlling maintenance stages', help='additional help')
+    description='controlling maintenance stages', help='additional help', dest='command')
+    subparsers.required = True
     cmd_list = subparsers.add_parser("list", help="listing entries")
     cmd_list.add_argument("-a", "--show-passwords", action="store_true", \
     dest="show_passwords", default=False, help="also shows passwords " \
