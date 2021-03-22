@@ -106,7 +106,9 @@ class AuthContainer:
         except FileNotFoundError as err:
             self.LOGGER.debug("File {!r} is missing: {}".format(filename, err))
         except IOError as err:
-            self.LOGGER.error("Unable to read file {!r}: {}".format(filename, err))
+            self.LOGGER.error(
+                "Unable to read file {!r}: {}".format(filename, err)
+            )
             raise err
 
     def save(self):
@@ -134,7 +136,11 @@ class AuthContainer:
         :type password: str
         """
         if not isinstance(password, str):
-            raise TypeError("Expecting password as a str instead of {}".format(type(password)))
+            raise TypeError(
+                "Expecting password as a str instead of {}".format(
+                    type(password)
+                )
+            )
 
         hostname = self.cut_hostname(hostname)
 
@@ -200,13 +206,15 @@ class AuthContainer:
             password = credentials["password"]
         except KeyError as kerr:
             self.LOGGER.debug(
-                "Unable to retrieve credentials for {!r} ({})".format(hostname, kerr)
+                "Unable to retrieve credentials for {!r} ({})".format(
+                    hostname, kerr
+                )
             )
             return
 
         if self.is_encrypted():
             # Remove leading encryption marker
-            password = password[len(self._encryption_marker) :]
+            password = password[len(self._encryption_marker):]
 
             try:
                 crypto = Fernet(self.__key)
