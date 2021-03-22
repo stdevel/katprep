@@ -52,10 +52,12 @@ def get_credentials(prefix, hostname=None, auth_container=None, auth_pass=None):
                 logging.ERROR, auth_container, auth_pass)
             s_creds = None
             s_creds = container.get_credential(hostname)
-            if len(s_creds) == 2:
-                return (s_creds[0], s_creds[1])
-            else:
+            if not s_creds:
+                raise TypeError("Empty response")
+            elif not 2 == len(s_creds):
                 raise TypeError("Invalid response")
+
+            return (s_creds.username, s_creds.password)
         except ContainerException as e:
             LOGGER.error(e)
             exit(1)
@@ -199,11 +201,10 @@ def validate_filters(options, api_client):
         if options.environment and options.environment.isdigit() == False:
             options.environment = api_client.get_id_by_name(
                 options.environment, "environment")
-    except Exception as err:
-        print(err)
     except SessionException:
         pass
-
+    except Exception as err:
+        print(err)
 
 
 def get_filter(options, api_object):
