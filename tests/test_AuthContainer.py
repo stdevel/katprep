@@ -121,6 +121,8 @@ def py2container(python_2_files):
     filename = python_2_files.filename
     key = python_2_files.key
 
+    os.chmod(filename, 0o0600)
+
     if key:
         container = AuthContainer(logging.DEBUG, filename, key)
     else:
