@@ -89,24 +89,29 @@ def populate(options):
 
             #check if host parameters set appropriately
             required_settings = {}
+            try:
+                if host["ip"] in [x["ip"] for x in vm_hosts]:
+                    LOGGER.debug("Host '%s' is a VM", host["name"])
 
-            if host["ip"] in [x["ip"] for x in vm_hosts]:
-                LOGGER.debug("Host '%s' is a VM", host["name"])
+                    required_settings["katprep_virt"] = options.virt_uri
+                    required_settings["katprep_virt_type"] = options.virt_type
+                    vm_name = [x["object_name"] for x in vm_hosts if x["ip"] == host["ip"]]
+                    if host["name"] != vm_name[0]:
+                        required_settings["katprep_virt_name"] = vm_name[0]
+            except UnboundLocalError:
+                pass
 
-                required_settings["katprep_virt"] = options.virt_uri
-                required_settings["katprep_virt_type"] = options.virt_type
-                vm_name = [x["object_name"] for x in vm_hosts if x["ip"] == host["ip"]]
-                if host["name"] != vm_name[0]:
-                    required_settings["katprep_virt_name"] = vm_name[0]
+            try:
+                if host["ip"] in [x["ip"] for x in mon_hosts]:
+                    LOGGER.debug("Host '%s' is monitored", host["name"])
 
-            if host["ip"] in [x["ip"] for x in mon_hosts]:
-                LOGGER.debug("Host '%s' is monitored", host["name"])
-
-                required_settings["katprep_mon"] = options.mon_url
-                required_settings["katprep_mon_type"] = options.mon_type
-                mon_name = [x["name"] for x in mon_hosts if x["ip"] == host["ip"]]
-                if host["name"] != mon_name[0]:
-                    required_settings["katprep_mon_name"] = mon_name[0]
+                    required_settings["katprep_mon"] = options.mon_url
+                    required_settings["katprep_mon_type"] = options.mon_type
+                    mon_name = [x["name"] for x in mon_hosts if x["ip"] == host["ip"]]
+                    if host["name"] != mon_name[0]:
+                        required_settings["katprep_mon_name"] = mon_name[0]
+            except UnboundLocalError:
+                pass
 
             #set host parameters
             for setting in required_settings:
