@@ -701,19 +701,19 @@ def set_filter(options, report):
     remove = []
     for hostname, host in report.items():
         if filter_org and host.organisation != filter_org:
-            LOGGER.debug("Removing '%s'", hostname)
+            LOGGER.debug("Removing '%s' because of org", hostname)
             remove.append(hostname)
         elif filter_location and host.location != filter_location
-            LOGGER.debug("Removing '%s'", hostname)
+            LOGGER.debug("Removing '%s' because of location", hostname)
             remove.append(hostname)
         elif filter_env and host.get_param("environment_name") != filter_env:
-            LOGGER.debug("Removing '%s'", hostname)
+            LOGGER.debug("Removing '%s' because of environment_name", hostname)
             remove.append(hostname)
         elif is_blacklisted(host, filter_exclude):
-            LOGGER.debug("Removing '%s'", hostname)
+            LOGGER.debug("Removing '%s' because of exclusion filter", hostname)
             remove.append(hostname)
         elif len(filter_include) > 0 and not is_blacklisted(host, filter_include):
-            LOGGER.debug("Removing '%s'", hostname)
+            LOGGER.debug("Removing '%s' because of inclusion filter", hostname)
             remove.append(hostname)
 
     #remove entries
