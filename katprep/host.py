@@ -27,11 +27,12 @@ class Host:
 
     _OBJECT_TYPE = "host"
 
-    def __init__(self, hostname, host_parameters, organisation, location=None):
+    def __init__(self, hostname, host_parameters, organisation, location=None, verifications=None):
         self._hostname = hostname
         self.params = host_parameters
         self._organisation = organisation
         self._location = location
+        self._verifications = verifications or {}
 
     @property
     def type(self):
@@ -88,12 +89,29 @@ class Host:
 
         return None
 
+    def get_verifications(self):
+        """
+        Return the available verifications.
+
+        :rtype: (str, )
+        """
+        return tuple(self._verifications.keys())
+
+    def get_verification(self, name):
+        "Return the status of the verification of `name`."
+        return self._verifications[name]
+
+    def set_verification(self, name, value):
+        "Set a verification with a given value"
+        self._verifications[name] = value
+
     def to_dict(self):
         host_dict = {
             "hostname": self._hostname,
             "params": self.params,
             "organisation": self._organisation,
             "type": self.type,
+            "verifications": self._verifications,
         }
 
         if self._location:
@@ -108,6 +126,7 @@ class Host:
             host_dict["params"],
             host_dict["organisation"],
             host_dict.get("location"),
+            host_dict.get("verification"),
         )
 
     def __repr__(self):
