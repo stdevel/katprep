@@ -20,6 +20,20 @@ def load_report(filename):
 
 
 def write_report(filename, report):
-    # TODO: Convert hosts to report hosts
+    """
+    Write the given `report` to `filename`.
+
+    :param filename: The path of the file to write to.
+    :type filename: str
+    :param report: The host collection to write into the file.
+    :type report: dict
+    """
+    def convert_hosts(o):
+        try:
+            return o.to_dict()
+        except AttributeError:
+            raise TypeError(f"{o.__class__.__name__} does not support"
+                            " converting to dict")
+
     with open(filename, "w") as target:
-        target.write(json.dumps(report))
+        target.write(json.dumps(report, default=convert_hosts))
