@@ -703,7 +703,7 @@ def set_filter(options, report):
         if filter_org and host.organization != filter_org:
             LOGGER.debug("Removing '%s' because of org", hostname)
             remove.append(hostname)
-        elif filter_location and host.location != filter_location
+        elif filter_location and host.location != filter_location:
             LOGGER.debug("Removing '%s' because of location", hostname)
             remove.append(hostname)
         elif filter_env and host.get_param("environment_name") != filter_env:
