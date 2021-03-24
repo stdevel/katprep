@@ -16,7 +16,7 @@ import os
 import getpass
 import datetime
 import yaml
-from . import __version__, is_valid_report, get_json, get_credentials
+from . import __version__, get_credentials
 from .exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, SnapshotExistsException,
 UnsupportedRequestException)
@@ -24,7 +24,7 @@ from .management import get_virtualization_client
 from .management.foreman import ForemanAPIClient
 from .monitoring import get_monitoring_client
 from .network import validate_hostname
-from .reports import load_report, write_report
+from .reports import is_valid_report, load_report, write_report
 
 """
 ForemanAPIClient: Foreman API client handle

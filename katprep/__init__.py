@@ -149,34 +149,6 @@ def get_json(filename):
         LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
 
 
-
-def is_valid_report(filename):
-    """
-    Checks whether a JSON file contains a valid snapshot report.
-
-    :param filename: the JSON filename
-    :type filename: str
-    """
-    if not os.path.exists(filename) or not os.access(filename, os.R_OK):
-        raise argparse.ArgumentTypeError("File '{}' non-existent or not" \
-            " readable".format(filename))
-    #check whether valid json
-    try:
-        json_obj = json.loads(get_json(filename))
-        #check whether at least one host with a params dict is found
-        if "params" not in iter(json_obj.values()).next().keys():
-            raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
-                " snapshot report.".format(filename))
-    except StopIteration as err:
-        raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
-            " snapshot report.".format(filename))
-    except ValueError as err:
-        raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
-            " document: '{}'".format(filename, err))
-    return filename
-
-
-
 def validate_filters(options, api_client):
     """
     Ensures using IDs for the Foreman API rather than human-readable names.
