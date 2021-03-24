@@ -19,6 +19,11 @@ def test_hostgroup_comparison(first, second):
     assert second == first
 
 
+def test_hostgroup_name():
+    group = HostGroup("meine_gruppe")
+    assert group.name == "meine_gruppe"
+
+
 def test_hostgroup_monitoring_id():
     group = HostGroup("meine_gruppe")
     assert group.monitoring_id == "meine_gruppe"
