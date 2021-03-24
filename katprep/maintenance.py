@@ -167,12 +167,14 @@ def manage_host_preparation(options, host, cleanup=False):
                 LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host, err)
 
 
-def set_verification_value(options, host, setting, value):
+def set_verification_value(filename, host, setting, value):
     """
     This function stores verification data in a snapshot report. This is done
     by altering the host information dictionary and storing the changes in the
     JSON catalog.
 
+    :param filename: The file to save the information to
+    :type filename: str
     :param host: hostname
     :type host: str
     :param setting: setting name
@@ -182,13 +184,12 @@ def set_verification_value(options, host, setting, value):
     """
     global REPORT
 
-    try:
-        #set value
-        REPORT[host]["verification"][setting] = value
+    host = REPORT[host.hostname]
+    host.set_verification(setting, value)
+    REPORT[host.hostname] = host
 
-        #store file
-        with open(options.report[0], 'w') as target:
-            target.write(json.dumps(REPORT))
+    try:
+        write_report(filename, REPORT)
     except IOError as err:
         LOGGER.error("Unable to store report: '%s'", err)
     except ValueError as err:
@@ -342,6 +343,8 @@ def verify(options, args):
     :type args: argparse options dict
     """
     #verify snapshot/downtime per host
+    filename = options.report[0]
+
     try:
         for host in REPORT:
             LOGGER.debug("Verifying host '%s'...", host)
@@ -356,16 +359,13 @@ def verify(options, args):
 
                 try:
                     if virt_client.has_snapshot(vm_name, snapshot_name):
-                        #set flag
-                        set_verification_value(options, host, "virt_snapshot", True)
+                        set_verification_value(filename, host, "virt_snapshot", True)
                         LOGGER.info("Snapshot for host '%s' found.", host)
                     else:
-                        #set flag
-                        set_verification_value(options, host, "virt_cleanup", True)
+                        set_verification_value(filename, host, "virt_cleanup", True)
                         LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
                 except EmptySetException:
-                    #set flag
-                    set_verification_value(options, host, "virt_cleanup", True)
+                    set_verification_value(filename, host, "virt_cleanup", True)
                     LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
 
             #check downtime
@@ -375,11 +375,11 @@ def verify(options, args):
 
                 #check scheduled downtime
                 if monitoring_client.has_downtime(host):
-                    set_verification_value(options, host, "mon_downtime", True)
+                    set_verification_value(filename, host, "mon_downtime", True)
                     LOGGER.info("Downtime for host '%s' found.", host)
                 else:
                     #set flag
-                    set_verification_value(options, host, "mon_cleanup", True)
+                    set_verification_value(filename, host, "mon_cleanup", True)
                     LOGGER.info("No downtime for host '%s' found, probably cleaned-up.", host)
 
                 #check critical services
@@ -398,11 +398,11 @@ def verify(options, args):
                             services, list(service.keys())[0], list(service.values())[0]
                         )
                     #add status to verfication values
-                    set_verification_value(options, host, "mon_status", "Warning/Critical")
-                    set_verification_value(options, host, "mon_status_detail", services)
+                    set_verification_value(filename, host, "mon_status", "Warning/Critical")
+                    set_verification_value(filename, host, "mon_status_detail", services)
                 else:
-                    set_verification_value(options, host, "mon_status", "Ok")
-                    set_verification_value(options, host, "mon_status_detail", "All services OK")
+                    set_verification_value(filename, host, "mon_status", "Ok")
+                    set_verification_value(filename, host, "mon_status_detail", "All services OK")
 
     except KeyError:
         #host with either no virt/mon
