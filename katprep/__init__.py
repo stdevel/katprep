@@ -133,22 +133,6 @@ def which(command):
     return None
 
 
-
-def get_json(filename):
-    """
-    Reads a JSON file and returns the whole content as one-liner.
-
-    :param filename: the JSON filename
-    :type filename: str
-    """
-    try:
-        with open(filename, "r") as json_file:
-            json_data = json_file.read().replace("\n", "")
-        return json_data
-    except IOError as err:
-        LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
-
-
 def validate_filters(options, api_client):
     """
     Ensures using IDs for the Foreman API rather than human-readable names.

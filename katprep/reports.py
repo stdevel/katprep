@@ -3,7 +3,6 @@ import os
 import os.path
 from argparse import ArgumentTypeError
 
-from . import get_json
 from .host import Host
 
 
@@ -20,6 +19,21 @@ def load_report(filename):
     """
     hosts = json.loads(get_json(filename))
     return {key: Host.from_dict(host) for key, host in hosts.items()}
+
+
+def get_json(filename):
+    """
+    Reads a JSON file and returns the whole content as one-liner.
+
+    :param filename: the JSON filename
+    :type filename: str
+    """
+    try:
+        with open(filename, "r") as json_file:
+            json_data = json_file.read().replace("\n", "")
+        return json_data
+    except IOError as err:
+        LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
 
 
 def write_report(filename, report):
