@@ -693,35 +693,35 @@ def set_filter(options, report):
     :param report: report data
     :type report: JSON data
     """
+    filter_org = options.filter_organization
+    filter_location = options.filter_location
+    filter_env = options.filter_environment
+    filter_exclude = options.filter_exclude
+    filter_include = options.filter_include
+
     remove = []
-    for host in report:
-        #removing filtered/blacklisted hosts
-        params = report[host]["params"]
-        if options.filter_organization != "" and \
-            params["organization_name"] != options.filter_organization:
-            LOGGER.debug("Removing '%s'", host)
-            remove.append(host)
-        elif options.filter_location != "" and \
-            params["location_name"] != options.filter_location:
-            LOGGER.debug("Removing '%s'", host)
-            remove.append(host)
-        elif options.filter_environment != "" and \
-            params["environment_name"] != options.filter_environment:
-            LOGGER.debug("Removing '%s'", host)
-            remove.append(host)
-        elif is_blacklisted(host, options.filter_exclude):
-            LOGGER.debug("Removing '%s'", host)
-            remove.append(host)
-        elif len(options.filter_include) > 0 and \
-            not is_blacklisted(host, options.filter_include):
-            LOGGER.debug("Removing '%s'", host)
-            remove.append(host)
+    for hostname, host in report.items():
+        if filter_org and host.organisation != filter_org:
+            LOGGER.debug("Removing '%s'", hostname)
+            remove.append(hostname)
+        elif filter_location and host.location != filter_location
+            LOGGER.debug("Removing '%s'", hostname)
+            remove.append(hostname)
+        elif filter_env and host.get_param("environment_name") != filter_env:
+            LOGGER.debug("Removing '%s'", hostname)
+            remove.append(hostname)
+        elif is_blacklisted(host, filter_exclude):
+            LOGGER.debug("Removing '%s'", hostname)
+            remove.append(hostname)
+        elif len(filter_include) > 0 and not is_blacklisted(host, filter_include):
+            LOGGER.debug("Removing '%s'", hostname)
+            remove.append(hostname)
 
     #remove entries
     for entry in remove:
         del report[entry]
-    return report
 
+    return report
 
 
 def main(options, args):
