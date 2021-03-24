@@ -14,7 +14,7 @@ def example_katello_report_path():
     return os.path.join(test_dir, filename)
 
 
-def test_loading_example_report(example_katello_report_path):
+def test_loading_katello_report(example_katello_report_path):
     report = load_report(example_katello_report_path)
 
     assert report
