@@ -87,7 +87,7 @@ def test_creating_host_from_dict():
     host_dict = {
         "hostname": "some.hostname",
         "params": {},
-        "organisation": "Wayland Yutani",
+        "organization": "Wayland Yutani",
     }
     expected_host = Host("some.hostname", {}, "Wayland Yutani")
 
@@ -107,7 +107,7 @@ def test_creating_host_from_dict_requires_hostname(hostkey):
     host_dict = {
         hostkey: "some.hostname",
         "params": {},
-        "organisation": "Wayland Yutani",
+        "organization": "Wayland Yutani",
     }
     expected_host = Host("some.hostname", {}, "Wayland Yutani")
 
@@ -120,7 +120,7 @@ def test_converting_host_to_dict():
     assert host.to_dict() == {
         "hostname": "my.hostname",
         "params": {"some_param"},
-        "organisation": "my orga",
+        "organization": "my orga",
         "type": "host",
         "verifications": {},
     }
@@ -130,7 +130,7 @@ def test_host_json_conversion():
     original_dict = {
         "hostname": "hans.hubert",
         "params": {"sesame": "street"},
-        "organisation": "Funky town",
+        "organization": "Funky town",
         "location": "Digges B",
         "type": "host",
     }
@@ -146,7 +146,7 @@ def test_host_json_conversion_with_verifications():
     original_dict = {
         "hostname": "hans.hubert",
         "params": {"sesame": "street"},
-        "organisation": "Funky town",
+        "organization": "Funky town",
         "location": "Digges B",
         "type": "host",
         "verifications": {},

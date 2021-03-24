@@ -4,7 +4,7 @@ import pytest
 
 
 def test_deserialise_host_from_dict():
-    host = from_dict({"type": "host", "hostname": "a", "params": {}, "organisation": None})
+    host = from_dict({"type": "host", "hostname": "a", "params": {}, "organization": None})
     assert host.hostname == "a"
     assert isinstance(host, Host)
 

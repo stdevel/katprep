@@ -700,7 +700,7 @@ def set_filter(options, report):
 
     remove = []
     for hostname, host in report.items():
-        if filter_org and host.organisation != filter_org:
+        if filter_org and host.organization != filter_org:
             LOGGER.debug("Removing '%s' because of org", hostname)
             remove.append(hostname)
         elif filter_location and host.location != filter_location

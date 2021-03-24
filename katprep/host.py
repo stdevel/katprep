@@ -27,10 +27,10 @@ class Host:
 
     _OBJECT_TYPE = "host"
 
-    def __init__(self, hostname, host_parameters, organisation, location=None, verifications=None):
+    def __init__(self, hostname, host_parameters, organization, location=None, verifications=None):
         self._hostname = hostname
         self.params = host_parameters
-        self._organisation = organisation
+        self._organization = organization
         self._location = location
         self._verifications = verifications or {}
 
@@ -43,13 +43,13 @@ class Host:
         return self._hostname
 
     @property
-    def organisation(self):
-        return self._organisation
+    def organization(self):
+        return self._organization
 
     @property
     def location(self):
         if self._location is None:
-            return self.organisation
+            return self.organization
 
         return self._location
 
@@ -109,7 +109,7 @@ class Host:
         host_dict = {
             "hostname": self._hostname,
             "params": self.params,
-            "organisation": self._organisation,
+            "organization": self._organization,
             "type": self.type,
             "verifications": self._verifications,
         }
@@ -134,7 +134,7 @@ class Host:
             # getting org from katello
             org = host_dict["params"]["organization_name"]
         except KeyError:
-            org = host_dict["organisation"]
+            org = host_dict["organization"]
 
         return Host(
             hostname,
@@ -146,7 +146,7 @@ class Host:
 
     def __repr__(self):
         return "Host({!r}, {!r}, {!r})".format(
-            self._hostname, self.params, self._organisation
+            self._hostname, self.params, self._organization
         )
 
     def __str__(self):
@@ -159,7 +159,7 @@ class Host:
         if self.params != other.params:
             return False
 
-        if self.organisation != other.organisation:
+        if self.organization != other.organization:
             return False
 
         if self.location != other.location:
