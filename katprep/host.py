@@ -145,8 +145,8 @@ class Host:
         )
 
     def __repr__(self):
-        return "Host({!r}, {!r}, {!r})".format(
-            self._hostname, self.params, self._organization
+        return "Host({!r}, {!r}, {!r}, {!r}, {!r})".format(
+            self._hostname, self.params, self._organization, self._location, self._verifications
         )
 
     def __str__(self):

@@ -162,6 +162,22 @@ def test_host_str_contains_hostname():
     assert hostname in str(Host(hostname, {}, None))
 
 
+def test_host_representation():
+    hostname = "some.hostname"
+    params = {"my.param": "value"}
+    org = "Wayland Yutani"
+    loc = "Japan"
+    verifications = {"snapshot": "1"}
+
+    host = Host(hostname, params, org, loc, verifications)
+    representation = repr(host)
+    assert hostname in representation
+    assert repr(params) in representation
+    assert org in representation
+    assert loc in representation
+    assert repr(verifications) in representation
+
+
 def test_host_type_identifier():
     host = Host("bla", {}, None)
     assert host.type == "host"
