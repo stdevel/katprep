@@ -764,39 +764,39 @@ def main(options, args):
 
     #get virtualization host credentials
     if not options.virt_skip_snapshot:
-        required_virt = get_required_hosts_by_report(REPORT, "katprep_virt")
-        for host in required_virt:
+        required_virt = {
+            (host.get_param("katprep_virt_type"), host.get_param("katprep_virt"))
+            for host in REPORT.values()
+            if host.get_param("katprep_virt_type") and host.get_param("katprep_virt")
+        }
+
+        for virt_type, virt_address in required_virt:
+            virt_prefix = "Virtualization {}".format(virt_address)
             (virt_user, virt_pass) = get_credentials(
-                "Virtualization {}".format(host),
-                host, options.generic_auth_container, options.auth_password
+                virt_prefix,
+                virt_address,
+                options.generic_auth_container,
+                options.auth_password
             )
 
-            try:
-                virt_type = host_params["katprep_virt_type"] or "libvirt"
-            except KeyError:
-                # no virtualization configured
-                continue
-
-            VIRT_CLIENTS[host] = get_virtualization_client(virt_type, LOG_LEVEL, host, virt_user, virt_pass)
+            VIRT_CLIENTS[virt_address] = get_virtualization_client(
+                virt_type, LOG_LEVEL, virt_address, virt_user, virt_pass)
 
     #get monitoring host credentials
     if not options.mon_skip_downtime:
-        required_mon = get_required_hosts_by_report(REPORT, "katprep_mon")
-        for host in required_mon:
+        required_mon = {
+            (host.get_param("katprep_mon_type"), host.get_param("katprep_mon"))
+            for host in REPORT.values()
+            if host.get_param("katprep_mon_type") and host.get_param("katprep_mon")
+        }
+
+        for monitoring_type, monitoring_address in required_mon:
             (mon_user, mon_pass) = get_credentials(
-                "Monitoring {}".format(host),
-                host, options.generic_auth_container, options.auth_password
+                "Monitoring {}".format(monitoring_address),
+                monitoring_address, options.generic_auth_container, options.auth_password
             )
 
-            host_params = get_host_params_by_report(REPORT, host)
-
-            try:
-                monitoring_type = host_params["katprep_mon_type"]
-            except KeyError:
-                # No monitoring type configured
-                continue
-
-            MON_CLIENTS[host] = get_monitoring_client(monitoring_type, LOG_LEVEL, host, mon_user, mon_pass, verify_ssl=options.ssl_verify)
+            MON_CLIENTS[monitoring_address] = get_monitoring_client(monitoring_type, LOG_LEVEL, monitoring_address, mon_user, mon_pass, verify_ssl=options.ssl_verify)
 
     #start action
     options.func(options, options.func)
