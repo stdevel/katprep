@@ -121,10 +121,25 @@ class Host:
 
     @classmethod
     def from_dict(cls, host_dict):
+        try:
+            # getting hostname from katello
+            hostname = host_dict["params"]['name']
+        except KeyError:
+            try:
+                hostname = host_dict["hostname"]
+            except KeyError:
+                raise ValueError(f"Unable to detect hostname of {host_dict!r}")
+
+        try:
+            # getting org from katello
+            org = host_dict["params"]["organization_name"]
+        except KeyError:
+            org = host_dict["organisation"]
+
         return Host(
-            host_dict["hostname"],
+            hostname,
             host_dict["params"],
-            host_dict["organisation"],
+            org,
             host_dict.get("location"),
             host_dict.get("verification"),
         )
