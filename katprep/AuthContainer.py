@@ -105,6 +105,8 @@ class AuthContainer:
             return json_data
         except FileNotFoundError as err:
             self.LOGGER.debug("File {!r} is missing: {}".format(filename, err))
+            # Load empty config
+            return '{}'
         except IOError as err:
             self.LOGGER.error(
                 "Unable to read file {!r}: {}".format(filename, err)
