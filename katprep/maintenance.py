@@ -24,6 +24,7 @@ from .management import get_virtualization_client
 from .management.foreman import ForemanAPIClient
 from .monitoring import get_monitoring_client
 from .network import validate_hostname
+from .reports import load_report, write_report
 
 """
 ForemanAPIClient: Foreman API client handle
@@ -733,15 +734,14 @@ def main(options, args):
     if options.generic_dry_run:
         LOGGER.info("This is just a SIMULATION - no changes will be made.")
 
-    #load report
-    REPORT = json.loads(get_json(options.report[0]))
+    filename = options.report[0]
     REPORT_PREFIX = time.strftime(
         "%Y%m%d", time.gmtime(
-            os.path.getmtime(options.report[0])
+            os.path.getmtime(filename)
         )
     )
 
-    #set filter
+    REPORT = load_report(filename)
     REPORT = set_filter(options, REPORT)
 
     #warn if user tends to do something stupid
