@@ -76,6 +76,16 @@ def test_host_with_custom_location():
             Host("a", {}, "org a", "loc 2"),
             marks=pytest.mark.xfail(reason="Different location"),
         ),
+        pytest.param(
+            Host("a", {}, "org a", verifications={"a": True}),
+            Host("b", {}, "org a", verifications={}),
+            marks=pytest.mark.xfail(reason="Different verifications"),
+        ),
+        pytest.param(
+            Host("a", {}, "org a", patches=["patch-1", "patch-2"]),
+            Host("b", {}, "org a", patches=["patch-3"]),
+            marks=pytest.mark.xfail(reason="Different verifications"),
+        ),
     ],
 )
 def test_host_comparison(first, second):
@@ -123,6 +133,7 @@ def test_converting_host_to_dict():
         "organization": "my orga",
         "type": "host",
         "verifications": {},
+        "patches": [],
     }
 
 
@@ -138,6 +149,24 @@ def test_host_json_conversion():
     new_dict = host.to_dict()
 
     del new_dict["verifications"]
+    del new_dict["patches"]
+
+    assert original_dict == new_dict
+
+
+def test_host_json_conversion_with_verifications():
+    original_dict = {
+        "hostname": "hans.hubert",
+        "params": {"sesame": "street"},
+        "organization": "Funky town",
+        "location": "Digges B",
+        "type": "host",
+        "verifications": {"my_key": True},
+    }
+    host = Host.from_dict(original_dict)
+    new_dict = host.to_dict()
+
+    del new_dict["patches"]
 
     assert original_dict == new_dict
 
@@ -150,6 +179,7 @@ def test_host_json_conversion_with_verifications():
         "location": "Digges B",
         "type": "host",
         "verifications": {},
+        "patches": ["patch-1", "patch-2"],
     }
     host = Host.from_dict(original_dict)
     new_dict = host.to_dict()
@@ -168,14 +198,16 @@ def test_host_representation():
     org = "Wayland Yutani"
     loc = "Japan"
     verifications = {"snapshot": "1"}
+    patches = ["patch-1"]
 
-    host = Host(hostname, params, org, loc, verifications)
+    host = Host(hostname, params, org, loc, verifications, patches)
     representation = repr(host)
     assert hostname in representation
     assert repr(params) in representation
     assert org in representation
     assert loc in representation
     assert repr(verifications) in representation
+    assert repr(patches) in representation
 
 
 def test_host_type_identifier():
@@ -226,3 +258,19 @@ def test_setting_verification(key, value):
     host = Host("bla", {}, None)
     host.set_verification(key, value)
     assert host.get_verification(key) == value
+
+
+def test_getting_patches():
+    orig_patches = ["patch-1", "patch-2"]
+    host = Host("bla", {}, None, patches=orig_patches)
+
+    patches = host.patches
+    assert len(patches) == 2
+    assert patches == orig_patches
+
+
+def test_patches_are_empty_by_default():
+    host = Host("bla", {}, None)
+
+    assert not host.patches
+    assert len(host.patches) == 0

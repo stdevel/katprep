@@ -40,6 +40,10 @@ def test_loading_katello_report(example_katello_report_path):
         assert host.get_verification("virt_snapshot") == True
         assert host.get_verification("virt_cleanup") == True
 
+        patches = host.patches
+        assert len(patches) == 1
+        # TODO: Test the patch contents
+
 
 @pytest.fixture
 def temp_report_path(tmp_path):

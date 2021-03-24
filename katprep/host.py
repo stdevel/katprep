@@ -27,12 +27,13 @@ class Host:
 
     _OBJECT_TYPE = "host"
 
-    def __init__(self, hostname, host_parameters, organization, location=None, verifications=None):
+    def __init__(self, hostname, host_parameters, organization, location=None, verifications=None, patches=None):
         self._hostname = hostname
         self.params = host_parameters
         self._organization = organization
         self._location = location
         self._verifications = verifications or {}
+        self._patches = patches or []
 
     @property
     def type(self):
@@ -105,6 +106,10 @@ class Host:
         "Set a verification with a given value"
         self._verifications[name] = value
 
+    @property
+    def patches(self):
+        return self._patches
+
     def to_dict(self):
         host_dict = {
             "hostname": self._hostname,
@@ -112,6 +117,7 @@ class Host:
             "organization": self._organization,
             "type": self.type,
             "verifications": self._verifications,
+            "patches": self._patches,
         }
 
         if self._location:
@@ -142,17 +148,24 @@ class Host:
         except KeyError:
             location = host_dict.get("location")
 
+        try:
+            # getting patches from katello
+            patches = host_dict["errata"]
+        except KeyError:
+            patches = host_dict.get("patches")
+
         return Host(
             hostname,
             host_dict["params"],
             org,
             location,
             host_dict.get("verification"),
+            patches,
         )
 
     def __repr__(self):
-        return "Host({!r}, {!r}, {!r}, {!r}, {!r})".format(
-            self._hostname, self.params, self._organization, self._location, self._verifications
+        return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
+            self._hostname, self.params, self._organization, self._location, self._verifications, self._patches
         )
 
     def __str__(self):
