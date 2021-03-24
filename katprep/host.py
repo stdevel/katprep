@@ -136,11 +136,17 @@ class Host:
         except KeyError:
             org = host_dict["organization"]
 
+        try:
+            # getting org from katello
+            location = host_dict["params"]["location_name"]
+        except KeyError:
+            location = host_dict.get("location")
+
         return Host(
             hostname,
             host_dict["params"],
             org,
-            host_dict.get("location"),
+            location,
             host_dict.get("verification"),
         )
 

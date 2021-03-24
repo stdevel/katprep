@@ -28,6 +28,7 @@ def test_loading_example_report(example_katello_report_path):
         assert host.hostname == "client.labwi.sva.de"
 
         assert host.organization == "SVA GmbH"
+        assert host.location == "Wiesbaden"
 
         assert host.get_param("katprep_virt") == "vc6.labwi.sva.de"
         assert host.get_param("katprep_virt_type") == "pyvmomi"
