@@ -50,7 +50,6 @@ def get_credentials(prefix, hostname=None, auth_container=None, auth_pass=None):
         try:
             container = AuthContainer(
                 logging.ERROR, auth_container, auth_pass)
-            s_creds = None
             s_creds = container.get_credential(hostname)
             if not s_creds:
                 raise TypeError("Empty response")
