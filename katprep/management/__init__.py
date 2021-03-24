@@ -59,7 +59,7 @@ def get_management_client(
 
 
 def get_virtualization_client(
-    virt_type, log_level, username, password, hostname, *args, **kwargs
+    virt_type, log_level, address, username, password, *args, **kwargs
 ):
     """
     Factory for getting an appropriate management client.
@@ -69,10 +69,10 @@ def get_virtualization_client(
     if virt_type == "pyvmomi":
         from .vmware import PyvmomiClient
 
-        return PyvmomiClient(log_level, host, username, password, *args, **kwargs)
+        return PyvmomiClient(log_level, address, username, password, *args, **kwargs)
     elif virt_type == "libvirt":
         from .libvirt import LibvirtClient
 
-        return LibvirtClient(log_level, host, username, password, *args, **kwargs)
+        return LibvirtClient(log_level, address, username, password, *args, **kwargs)
     else:
         raise ValueError(f"Unknown virtualisation type {virt_type!r}")
