@@ -105,8 +105,8 @@ def manage_host_preparation(options, host, cleanup=False):
                     host, snapshot_name, vm_name
                 )
         else:
-            virt_type = host.get_param("katprep_virt")
-            virt_client = VIRT_CLIENTS[virt_type]
+            virt_address = host.get_param("katprep_virt")
+            virt_client = VIRT_CLIENTS[virt_address]
 
             try:
                 if cleanup:
@@ -139,10 +139,10 @@ def manage_host_preparation(options, host, cleanup=False):
     if options.mon_skip_downtime:
         return
 
-    monitoring_type = host.get_param("katprep_mon")
-    unwanted_monitoring_types = [None, "", "fixmepls"]
+    monitoring_address = host.get_param("katprep_mon")
+    unwanted_monitoring_addresss = [None, "", "fixmepls"]
 
-    if monitoring_type not in unwanted_monitoring_types or \
+    if monitoring_address not in unwanted_monitoring_addresss or \
         (options.mon_suggested and True in errata_reboot):
 
         LOGGER.debug(
@@ -155,7 +155,7 @@ def manage_host_preparation(options, host, cleanup=False):
             else:
                 LOGGER.info("Host '%s' --> schedule downtime", host)
         else:
-            monitoring_client = MON_CLIENTS[monitoring_type]
+            monitoring_client = MON_CLIENTS[monitoring_address]
             try:
                 if cleanup:
                     monitoring_client.remove_downtime(host)
@@ -326,8 +326,8 @@ def revert(options, args):
                     host, snapshot_name, vm_name
                 )
             else:
-                virt_type = host.get_param("katprep_virt")
-                virt_client = VIRT_CLIENTS[virt_type]
+                virt_address = host.get_param("katprep_virt")
+                virt_client = VIRT_CLIENTS[virt_address]
                 virt_client.revert_snapshot(vm_name, snapshot_name)
         except ValueError as err:
             LOGGER.error("Error reverting maintenance: '%s'", err)
@@ -352,8 +352,8 @@ def verify(options, args):
                 vm_name = host.virtualisation_id
                 snapshot_name = "katprep_{}".format(REPORT_PREFIX)
 
-                virt_type = host.get_param("katprep_virt")
-                virt_client = VIRT_CLIENTS[virt_type]
+                virt_address = host.get_param("katprep_virt")
+                virt_client = VIRT_CLIENTS[virt_address]
 
                 try:
                     if virt_client.has_snapshot(vm_name, snapshot_name):
@@ -371,8 +371,8 @@ def verify(options, args):
 
             #check downtime
             if not options.mon_skip_downtime:
-                monitoring_type = host.get_param("katprep_mon")
-                monitoring_client = MON_CLIENTS[monitoring_type]
+                monitoring_address = host.get_param("katprep_mon")
+                monitoring_client = MON_CLIENTS[monitoring_address]
 
                 #check scheduled downtime
                 if monitoring_client.has_downtime(host):
