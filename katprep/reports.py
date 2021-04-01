@@ -33,7 +33,7 @@ def get_json(filename):
             json_data = json_file.read().replace("\n", "")
         return json_data
     except IOError as err:
-        LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
+        LOGGER.error("Unable to read file %r: %s", filename, err)
 
 
 def write_report(filename, report):
