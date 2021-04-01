@@ -25,12 +25,12 @@ def test_loading_katello_report(example_katello_report_path):
         assert isinstance(host, Host)
 
         assert host.hostname == key
-        assert host.hostname == "client.labwi.sva.de"
+        assert host.hostname == "client.lab.giertz.com"
 
-        assert host.organization == "SVA GmbH"
-        assert host.location == "Wiesbaden"
+        assert host.organization == "Shitty Robots Corp"
+        assert host.location == "Los Angeles"
 
-        assert host.get_param("katprep_virt") == "vc6.labwi.sva.de"
+        assert host.get_param("katprep_virt") == "vc6.lab.giertz.com"
         assert host.get_param("katprep_virt_type") == "pyvmomi"
         assert host.virtualisation_id == "Katello-Client"
 
