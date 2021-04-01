@@ -156,7 +156,7 @@ def scan_systems(options):
                 continue
             LOGGER.info(
                 "Checking system '%s' (#%s)...", system["name"], system["id"])
-            errata_counter = system["content_facet_attributes"]["errata_counts"]
+            errata_counter = system["content_facet_attributes"].get("errata_counts")
             if not errata_counter:
                 #unable to read errata
                 LOGGER.info(
@@ -215,8 +215,12 @@ def scan_systems(options):
                 LOGGER.debug("No owner for system '%s' defined", system["name"])
 
             #set HW flag
-            if not params_obj["facts"]["is_virtual"].lower() == "true":
-                SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
+            try:
+                if not params_obj["facts"]["is_virtual"].lower() == "true":
+                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
+            except KeyError:
+                if not params_obj["facts"]["virt::is_guest"].lower() == "true":
+                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True                
 
             #add errata information if applicable
             if int(errata_counter["total"]) > 0:
@@ -233,7 +237,8 @@ def scan_systems(options):
             LOGGER.error(
                 "Unable to get system information for '%s', " \
                 "dropping system!", system["name"])
-            pass
+            # pass
+            raise err
         except ValueError as err:
             LOGGER.info("Unable to get data: '%s'", err)
 

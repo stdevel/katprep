@@ -102,7 +102,7 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
 
 
 
-    def __manage_snapshot(
+    def _manage_snapshot(
             self, vm_name, snapshot_title, snapshot_text, action="create"
         ):
         """
