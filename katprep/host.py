@@ -200,7 +200,7 @@ class Host:
         if self._verifications != other._verifications:
             return False
 
-        if self._patches != self._patches:
+        if self._patches != other._patches:
             return False
 
         return True
