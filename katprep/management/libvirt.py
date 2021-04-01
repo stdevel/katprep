@@ -245,26 +245,22 @@ class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
                 raise SessionException("Unable to restart VM: '{}'".format(err))
 
 
-    def powerstate_vm(self, vm_name):
+    def powerstate_vm(self, host):
         """
         Returns the power state of a particular virtual machine.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-
+        :param host: Host to manage
+        :type host: Host
         """
         raise NotImplementedError("powerstate_vm hasn't been implemented yet")
 
-    def _manage_power(
-            self, vm_name, action="poweroff"
-        ):
+    def _manage_power(self, host, action="poweroff"):
         """
         Powers a particual virtual machine on/off forcefully.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param action: action (poweroff, poweron)
         :type action: str
-
         """
         raise NotImplementedError("_manage_power hasn't been implemented yet")

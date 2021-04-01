@@ -100,52 +100,52 @@ class SnapshotManager(metaclass=ABCMeta):
 
 class PowerManager(metaclass=ABCMeta):
     @abstractmethod
-    def _manage_power(self, vm_name, action="poweroff"):
+    def _manage_power(self, host, action="poweroff"):
         """
         Powers a particual virtual machine on/off forcefully.
 
-        :param vm_name: Name of the virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param action: action (poweroff, poweron)
         :type action: str
         """
 
     @abstractmethod
-    def powerstate_vm(self, vm_name):
+    def powerstate_vm(self, host):
         """
         Returns the power state of a particular virtual machine.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         """
         # TODO: powerstate enum
 
     @abstractmethod
-    def restart_vm(self, vm_name, force=False):
+    def restart_vm(self, host, force=False):
         """
         Restarts a particular VM (default: soft reboot using guest tools).
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param force: Flag whether a hard reboot is requested
         :type force: bool
         """
 
     # Aliases
-    def poweroff_vm(self, vm_name):
+    def poweroff_vm(self, host):
         """
         Turns off a particual virtual machine forcefully.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         """
-        return self._manage_power(vm_name, "poweroff")
+        return self._manage_power(host, "poweroff")
 
     def poweron_vm(self, vm_name):
         """
         Turns on a particual virtual machine forcefully.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         """
-        return self._manage_power(vm_name, action="poweron")
+        return self._manage_power(host, action="poweron")

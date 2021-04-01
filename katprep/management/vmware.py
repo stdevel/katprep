@@ -320,19 +320,19 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
             self.LOGGER.error("Unable to get VM hypervisor information: '%s'", err)
             raise SessionException(err)
 
-    def restart_vm(self, vm_name, force=False):
+    def restart_vm(self, host, force=False):
         """
         Restarts a particular VM (default: soft reboot using guest tools).
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param force: Flag whether a hard reboot is requested
         :type force: bool
         """
         try:
             #get VM
             content = self._session.RetrieveContent()
-            vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
+            vm = self.__get_obj(content, [vim.VirtualMachine], host.virtualisation_id)
 
             if force:
                 #kill it with fire
@@ -346,16 +346,17 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
             ))
 
     def _manage_power(
-            self, vm_name, action="poweroff"
+            self, host, action="poweroff"
         ):
         """
         Powers a particual virtual machine on/off forcefully.
 
-        :param vm_name: Name of the virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param action: action (poweroff, poweron)
         :type action: str
         """
+        vm_name = host.virtualisation_id
         try:
             content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
@@ -375,13 +376,14 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
             )
 
 
-    def powerstate_vm(self, vm_name):
+    def powerstate_vm(self, host):
         """
         Returns the power state of a particular virtual machine.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         """
+        vm_name = host.virtualisation_id
         try:
             content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
