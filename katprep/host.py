@@ -27,7 +27,15 @@ class Host:
 
     _OBJECT_TYPE = "host"
 
-    def __init__(self, hostname, host_parameters, organization, location=None, verifications=None, patches=None):
+    def __init__(
+        self,
+        hostname,
+        host_parameters,
+        organization,
+        location=None,
+        verifications=None,
+        patches=None,
+    ):
         self._hostname = hostname
         self._params = host_parameters
         self._organization = organization
@@ -129,7 +137,7 @@ class Host:
     def from_dict(cls, host_dict):
         try:
             # getting hostname from katello
-            hostname = host_dict["params"]['name']
+            hostname = host_dict["params"]["name"]
         except KeyError:
             try:
                 hostname = host_dict["hostname"]
@@ -165,7 +173,12 @@ class Host:
 
     def __repr__(self):
         return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
-            self._hostname, self._params, self._organization, self._location, self._verifications, self._patches
+            self._hostname,
+            self._params,
+            self._organization,
+            self._location,
+            self._verifications,
+            self._patches,
         )
 
     def __str__(self):
