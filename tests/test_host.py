@@ -76,15 +76,28 @@ def test_host_with_custom_location():
             Host("a", {}, "org a", "loc 2"),
             marks=pytest.mark.xfail(reason="Different location"),
         ),
-        pytest.param(
-            Host("a", {}, "org a", verifications={"a": True}),
-            Host("b", {}, "org a", verifications={}),
-            marks=pytest.mark.xfail(reason="Different verifications"),
+        (
+            Host("a", {}, "org", verifications={"a": True}),
+            Host("a", {}, "org", verifications={"a": True})
         ),
         pytest.param(
-            Host("a", {}, "org a", patches=["patch-1", "patch-2"]),
-            Host("b", {}, "org a", patches=["patch-3"]),
+            Host("a", {}, "org", verifications={"a": True}),
+            Host("a", {}, "org", verifications={}),
             marks=pytest.mark.xfail(reason="Different verifications"),
+        ),
+        (
+            Host("a", {}, "org", patches=["patch-123"]),
+            Host("a", {}, "org", patches=["patch-123"]),
+        ),
+        pytest.param(
+            Host("a", {}, "org", patches=["patch-1", "patch-2"]),
+            Host("a", {}, "org", patches=["patch-3"]),
+            marks=pytest.mark.xfail(reason="Different patches"),
+        ),
+        pytest.param(
+            Host("a", {}, "org a", verifications=["patch-1", "patch-2"]),
+            Host("b", {}, "org a", patches=["patch-3"]),
+            marks=pytest.mark.xfail(reason="Some have params some patches"),
         ),
     ],
 )

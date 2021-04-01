@@ -184,6 +184,12 @@ class Host:
         if self.location != other.location:
             return False
 
+        if self._verifications != other._verifications:
+            return False
+
+        if self._patches != self._patches:
+            return False
+
         return True
 
 
