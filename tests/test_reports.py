@@ -42,6 +42,7 @@ def test_loading_katello_report(example_katello_report_path):
 
         patches = host.patches
         assert len(patches) == 1
+        assert isinstance(patches[0], dict)
         # TODO: Test the patch contents
 
 
