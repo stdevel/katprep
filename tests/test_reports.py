@@ -3,7 +3,7 @@ import os.path
 import pytest
 
 from katprep.host import Host
-from katprep.reports import load_report, write_report
+from katprep.reports import load_report, write_report, is_valid_report
 
 
 @pytest.fixture
@@ -64,3 +64,17 @@ def test_writing_reports_converts_hosts(temp_report_path):
     write_report(temp_report_path, report)
 
     assert os.path.exists(temp_report_path)
+
+
+def test_katello_report_validation(example_katello_report_path):
+    assert is_valid_report(example_katello_report_path)
+
+
+def test_writing_valid_reports(temp_report_path):
+    report = {"myhost": Host("myhost", {}, None)}
+
+    write_report(temp_report_path, report)
+    assert is_valid_report(temp_report_path)
+
+    loaded_report = load_report(temp_report_path)
+    assert report == loaded_report
