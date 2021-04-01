@@ -64,10 +64,10 @@ def is_valid_report(filename):
     :type filename: str
     """
     if not os.path.exists(filename):
-        raise ArgumentTypeError("File '{filename!r}' is non-existent")
+        raise ArgumentTypeError(f"File {filename!r} is non-existent")
 
     if not os.access(filename, os.R_OK):
-        raise ArgumentTypeError("File '{filename!r}' is not readable")
+        raise ArgumentTypeError(f"File {filename!r} is not readable")
 
     try:
         # check whether valid json
