@@ -57,7 +57,7 @@ class Host:
     @property
     def virtualisation_id(self):
         try:
-            virt_id = self.params["katprep_virt_name"]
+            virt_id = self._params["katprep_virt_name"]
         except KeyError:
             return self._hostname
 
@@ -66,7 +66,7 @@ class Host:
     @property
     def monitoring_id(self):
         try:
-            monitoring_id = self.params["katprep_mon_name"]
+            monitoring_id = self._params["katprep_mon_name"]
         except KeyError:
             return self._hostname
 
@@ -82,7 +82,7 @@ class Host:
         :type key: str
         """
         try:
-            value = self.params[key]
+            value = self._params[key]
             if value != "":
                 return value
         except KeyError:
@@ -113,7 +113,7 @@ class Host:
     def to_dict(self):
         host_dict = {
             "hostname": self._hostname,
-            "params": self.params,
+            "params": self._params,
             "organization": self._organization,
             "type": self.type,
             "verifications": self._verifications,
@@ -165,7 +165,7 @@ class Host:
 
     def __repr__(self):
         return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
-            self._hostname, self.params, self._organization, self._location, self._verifications, self._patches
+            self._hostname, self._params, self._organization, self._location, self._verifications, self._patches
         )
 
     def __str__(self):
@@ -175,7 +175,7 @@ class Host:
         if self.hostname != other.hostname:
             return False
 
-        if self.params != other.params:
+        if self._params != other._params:
             return False
 
         if self.organization != other.organization:
