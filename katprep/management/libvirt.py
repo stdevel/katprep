@@ -124,8 +124,8 @@ class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
         This requires specifying a VM, comment title and text.
         There are also two alias functions.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         :param snapshot_text: Descriptive text for the snapshot
@@ -134,7 +134,7 @@ class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
         :type action: str
         """
         try:
-            target_vm = self._session.lookupByName(vm_name)
+            target_vm = self._session.lookupByName(host.virtualisation_id)
             if action.lower() == "remove":
                 #remove snapshot
                 target_snap = target_vm.snapshotLookupByName(snapshot_title, 0)
@@ -155,19 +155,19 @@ class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
                 action.lower(), err)
             )
 
-    def has_snapshot(self, vm_name, snapshot_title):
+    def has_snapshot(self, host, snapshot_title):
         """
         Returns whether a particular virtual machine is currently protected
         by a snapshot. This requires specifying a VM name.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
         try:
             #find VM and get all snapshots
-            target_vm = self._session.lookupByName(vm_name)
+            target_vm = self._session.lookupByName(host.virtualisation_id)
             target_snapshots = target_vm.snapshotListNames(0)
             if snapshot_title in target_snapshots:
                 return True
@@ -218,17 +218,17 @@ class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
         """
         raise NotImplementedError("get_vm_hosts hasn't been implemented yet")
 
-    def restart_vm(self, vm_name, force=False):
+    def restart_vm(self, host, force=False):
         """
         Restarts a particular VM (default: soft reboot using guest tools).
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param force: Flag whether a hard reboot is requested
         :type force: bool
         """
         try:
-            target_vm = self._session.lookupByName(vm_name)
+            target_vm = self._session.lookupByName(host.virtualisation_id)
             if force:
                 #kill it with fire
                 target_vm.reboot(1)

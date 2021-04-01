@@ -100,18 +100,16 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
                 break
         return obj
 
-
-
     def _manage_snapshot(
-            self, vm_name, snapshot_title, snapshot_text, action="create"
+            self, host, snapshot_title, snapshot_text, action="create"
         ):
         """
         Creates/removes a snapshot for a particular virtual machine.
         This requires specifying a VM, comment title and text.
         There are also two alias functions.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         :param snapshot_text: Snapshot text
@@ -124,6 +122,7 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
         #TODO: maybe we should supply an option for this?
         dump_memory = False
         quiesce = True
+        vm_name = host.virtualisation_id
         try:
             content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
@@ -202,18 +201,18 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
         except AttributeError:
             raise EmptySetException("No snapshots found")
 
-    def has_snapshot(self, vm_name, snapshot_title):
+    def has_snapshot(self, host, snapshot_title):
         """
         Returns whether a particular virtual machine is currently protected
         by a snapshot. This requires specifying a VM name.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        :param host: Host to manage
+        :type host: Host
         :param snapshot_title: Snapshot title
         :type snapshot_title: str
         """
         #get _all_ the snapshots
-        snapshots = self.__get_snapshots(vm_name)
+        snapshots = self.__get_snapshots(host.virtualisation_id)
         try:
             for snapshot in snapshots:
                 childs = snapshot.childSnapshotList
