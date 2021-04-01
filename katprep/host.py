@@ -29,7 +29,7 @@ class Host:
 
     def __init__(self, hostname, host_parameters, organization, location=None, verifications=None, patches=None):
         self._hostname = hostname
-        self.params = host_parameters
+        self._params = host_parameters
         self._organization = organization
         self._location = location
         self._verifications = verifications or {}
