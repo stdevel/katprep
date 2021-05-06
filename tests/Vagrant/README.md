@@ -54,7 +54,7 @@ $ vagrant destroy
 After having `uyuni` prepared you can start `uyuniclient`:
 
 ```shell
-$ vagrant up uyuniclient`
+$ vagrant up uyuniclient
 ```
 
 Once the playbook succeeded, you will need to enable the client's Salt key from within the Uyuni web interface.
@@ -64,6 +64,12 @@ After this, you can run a post-playbook on `uyuni` in order to assign custominfo
 ```shell
 $ vagrant ssh uyuni
 $ sudo ansible-playbook /vagrant/playbook_uyuni_host.yml
+```
+
+You might also want to snapshot `uyuniclient` during development in order to test appliying patches. Otherwise you might run out of patches at some point:
+
+```shell
+$ vagrant snapshot save uyuniclient "pre-patch"
 ```
 
 ## Running tests in VMs
