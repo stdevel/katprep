@@ -12,8 +12,8 @@ from .utilities import load_config
     '12.34.56.78',
     pytest.param('no', marks=pytest.mark.xfail),
     pytest.param('1.2.3', marks=pytest.mark.xfail),
+    '1.2.3.4',
     pytest.param('1.2.3.4.5', marks=pytest.mark.xfail),
-    pytest.param('1.2.3.4', marks=pytest.mark.xfail),
 ])
 def test_ipv4_check(address):
     "Making sure we are able to identify an IPv4 address"

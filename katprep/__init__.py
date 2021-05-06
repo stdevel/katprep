@@ -50,7 +50,6 @@ def get_credentials(prefix, hostname=None, auth_container=None, auth_pass=None):
         try:
             container = AuthContainer(
                 logging.ERROR, auth_container, auth_pass)
-            s_creds = None
             s_creds = container.get_credential(hostname)
             if not s_creds:
                 raise TypeError("Empty response")
@@ -134,57 +133,6 @@ def which(command):
     return None
 
 
-
-def get_json(filename):
-    """
-    Reads a JSON file and returns the whole content as one-liner.
-
-    :param filename: the JSON filename
-    :type filename: str
-    """
-    try:
-        with open(filename, "r") as json_file:
-            json_data = json_file.read().replace("\n", "")
-        return json_data
-    except IOError as err:
-        LOGGER.error("Unable to read file '{}': '{}'".format(filename, err))
-
-
-
-def is_valid_report(filename):
-    """
-    Checks whether a JSON file contains a valid snapshot report.
-
-    :param filename: the JSON filename
-    :type filename: str
-    """
-    if not os.path.exists(filename) or not os.access(filename, os.R_OK):
-        raise argparse.ArgumentTypeError("File '{}' non-existent or not" \
-            " readable".format(filename))
-    #check whether valid json
-    try:
-        json_obj = json.loads(get_json(filename))
-
-        for obj in json_obj.values():
-            if "params" in obj:
-                break
-        else:
-            raise argparse.ArgumentTypeError("File '{}' is not a valid JSON"
-                " snapshot report.".format(filename))
-        #check whether at least one host with a params dict is found
-        #if "params" not in iter(json_obj.values()).next().keys():
-            #raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
-            #    " snapshot report.".format(filename))
-    except StopIteration as err:
-        raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
-            " snapshot report.".format(filename))
-    except ValueError as err:
-        raise argparse.ArgumentTypeError("File '{}' is not a valid JSON" \
-            " document: '{}'".format(filename, err))
-    return filename
-
-
-
 def validate_filters(options, api_client):
     """
     Ensures using IDs for the Foreman API rather than human-readable names.
@@ -233,44 +181,3 @@ def get_filter(options, api_object):
         return "/environments/{}/{}s".format(options.environment, api_object)
     else:
         return "/{}s".format(api_object)
-
-
-
-def get_required_hosts_by_report(report, key):
-    """
-    Retrieves all required external hosts (such as monitoring systems
-    or hypervisor connections) for maintaining hosts mentioned in a
-    report.
-
-    :param report: report dictionary
-    :type report: dict
-    :param key: key that contains hostname (e.g. katprep_virt)
-    :type key: str
-    """
-    hosts=[]
-    try:
-        for host in report:
-            if report[host]["params"][key] != "" and report[host]["params"][key] not in hosts:
-                hosts.append(report[host]["params"][key])
-    except KeyError:
-            LOGGER.info("Key '{}' not found for host '{}'".format(key, host))
-            pass
-    return hosts
-
-
-
-def get_host_params_by_report(report, host):
-    """
-    Retrieves all parameters for a particular host from a report.
-
-    :param report: report dictionary
-    :type report: dict
-    :param host: hostname
-    :type host: str
-    """
-    try:
-        for entry in report:
-            return report[entry]["params"]
-    except KeyError:
-            LOGGER.info("Parameters not found for host '{}'".format(host))
-            pass

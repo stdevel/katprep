@@ -14,33 +14,28 @@ import json
 import getpass
 from . import __version__, get_credentials
 from .management.foreman import ForemanAPIClient
-from .management.libvirt import LibvirtClient
-from .management.vmware import PyvmomiClient
-from .monitoring.icinga2 import Icinga2APIClient
-from .monitoring.nagios import NagiosCGIClient
+from .management import get_virtualization_client
+from .monitoring import get_monitoring_client
 
-"""
-ForemanAPIClient: Foreman API client handle
-"""
 LOGGER = logging.getLogger('katprep_populate')
 """
-logging: Logger instance
+LOGGER: Logger instance
 """
 LOG_LEVEL = None
 """
-logging: Logger level
+LOG_LEVEL: Logger level
 """
 SAT_CLIENT = None
 """
-ForemanAPIClient: Foreman API client handle
+SAT_CLIENT: Foreman API client handle
 """
 VIRT_CLIENT = None
 """
-LibvirtClient: libvirt API client handle
+VIRT_CLIENT: Virtualization client
 """
 MON_CLIENT = None
 """
-NagiosCGIClient: Nagios CGI client handle
+MON_CLIENT: Monitoring client
 """
 
 
@@ -81,6 +76,7 @@ def populate(options):
             ip_filter = "ip6"
         else:
             ip_filter = "ip"
+
         for host in hosts["results"]:
             LOGGER.debug(
                 "SATELLITE: Found host '%s' with IP '%s'",
@@ -163,10 +159,8 @@ def populate(options):
                             ),
                             json.dumps(payload)
                         )
-
     except ValueError as err:
         LOGGER.error("Unable to populate virtualization data: '%s'", err)
-
 
 
 def parse_options(args=None):
@@ -299,14 +293,11 @@ def main(options, args):
             "Virtualization", options.virt_uri, options.generic_auth_container,
             options.auth_password
         )
-        if options.virt_type == "pyvmomi":
-            #vSphere Python API
-            VIRT_CLIENT = PyvmomiClient(
-                LOG_LEVEL, options.virt_uri, virt_user, virt_pass)
-        else:
-            #libvirt
-            VIRT_CLIENT = LibvirtClient(
-                LOG_LEVEL, options.virt_uri, virt_user, virt_pass)
+
+        VIRT_CLIENT = get_virtualization_client(
+            options.virt_type, LOG_LEVEL,
+            options.virt_uri, virt_user, virt_pass
+        )
 
     #get monitoring host credentials
     if not options.mon_skip:
@@ -314,18 +305,12 @@ def main(options, args):
             "Monitoring", options.mon_url, options.generic_auth_container,
             options.auth_password
         )
-        if options.mon_type == "nagios":
-            #Yet another legacy installation
-            MON_CLIENT = NagiosCGIClient(
-                LOG_LEVEL, options.mon_url, mon_user, mon_pass, \
-                verify_ssl=options.ssl_verify
-            )
-        else:
-            #Icinga 2, yay!
-            MON_CLIENT = Icinga2APIClient(
-                LOG_LEVEL, options.mon_url, mon_user, mon_pass,
-                verify_ssl=options.ssl_verify
-            )
+
+        MON_CLIENT = get_monitoring_client(
+            options.mon_type, LOG_LEVEL,
+            options.mon_url, mon_user, mon_pass,
+            verify_ssl=options.ssl_verify
+        )
 
     #populate _all_ the things
     populate(options)

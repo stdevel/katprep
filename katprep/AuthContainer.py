@@ -7,6 +7,7 @@ import os
 import stat
 import json
 import base64
+import sys
 from collections import namedtuple
 from urllib.parse import urlparse
 
@@ -82,8 +83,12 @@ class AuthContainer:
     def _import(self):
         """This function imports definitions from the file."""
 
-        if not stat.S_IMODE(os.lstat(self._filename).st_mode) == 0o0600:
-            raise OSError("File mode of {!r} not 0600!".format(self._filename))
+        if os.path.exists(self._filename):
+            if sys.platform != 'win32':
+                # Windows might not allow for setting 600
+
+                if stat.S_IMODE(os.lstat(self._filename).st_mode) != 0o0600:
+                    raise OSError("File mode of {!r} not 0600!".format(self._filename))
 
         try:
             self.__credentials = json.loads(self._get_json())
@@ -105,6 +110,8 @@ class AuthContainer:
             return json_data
         except FileNotFoundError as err:
             self.LOGGER.debug("File {!r} is missing: {}".format(filename, err))
+            # Load empty config
+            return '{}'
         except IOError as err:
             self.LOGGER.error(
                 "Unable to read file {!r}: {}".format(filename, err)

@@ -15,7 +15,8 @@ import datetime
 import os
 #import pypandoc
 import yaml
-from . import __version__, is_writable, which, is_valid_report, get_json
+from . import __version__, is_writable, which
+from .reports import is_valid_report, load_report
 
 """
 str: Program version
@@ -171,19 +172,15 @@ def analyze_reports(options):
     """
     global REPORT_OLD, REPORT_NEW
 
-    #load reports
-    REPORT_OLD = json.loads(get_json(
-        get_older_file(options.reports[0], options.reports[1])
-    ))
-    REPORT_NEW = json.loads(get_json(
-        get_newer_file(options.reports[0], options.reports[1])
-    ))
-    LOGGER.debug(
-        "Old report ist '%s', new report is '%s'",
-        get_older_file(options.reports[0], options.reports[1]),
-        get_newer_file(options.reports[0], options.reports[1])
-    )
+    old_file = get_older_file(options.reports[0], options.reports[1])
+    new_file = get_newer_file(options.reports[0], options.reports[1])
 
+    REPORT_OLD = load_report(old_file)
+    REPORT_NEW = load_report(new_file)
+
+    LOGGER.debug(
+        "Old report ist '%s', new report is '%s'", old_file, new_file
+    )
 
 
 def get_errata_by_host(report, hostname):
