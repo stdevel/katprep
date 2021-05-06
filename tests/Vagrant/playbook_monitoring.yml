@@ -18,3 +18,4 @@
           thruk_cookie_auth: false
           remove_nagios_protection: false
           admin_password: drageekeksi
+          enable_icinga2_api: true
