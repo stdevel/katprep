@@ -16,6 +16,7 @@ import getpass
 from . import (
     __version__, get_credentials, is_writable, validate_filters, get_filter)
 from .exceptions import SessionException
+from .management import get_management_client
 from .management.foreman import ForemanAPIClient
 from .network import validate_hostname
 
@@ -30,13 +31,9 @@ LOG_LEVEL = None
 """
 logging: Logger level
 """
-SAT_CLIENT = None
+MGMT_CLIENT = None
 """
-ForemanAPIClient: Foreman API client handle
-"""
-SYSTEM_ERRATA = {}
-"""
-dict: Errata and parameter information per system
+MGMT_CLIENT: Management client
 """
 OUTPUT_FILE = ""
 """
@@ -65,7 +62,7 @@ http://github.com/stdevel/katprep'''
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
-    fman_opts = parser.add_argument_group("Foreman arguments")
+    mgmt_opts = parser.add_argument_group("management arguments")
     filter_opts = parser.add_argument_group("filter arguments")
     filter_opts_excl = filter_opts.add_mutually_exclusive_group()
 
@@ -91,13 +88,20 @@ http://github.com/stdevel/katprep'''
     help="defines the authentication container password in case you don't " \
     "want to enter it manually (useful for scripted automation)")
 
-    #SERVER ARGUMENTS
+    # MANAGEMENT ARGUMENTS
+    # --mgmt-type
+    mgmt_opts.add_argument(
+        "--mgmt-type", dest="mgmt_type",
+        metavar="foreman|uyuni", default="foreman", type=str,
+        help="defines the library used to operate with management host: " \
+        "foreman or uyuni (default: foreman)"
+    )
     #-s / --server
-    fman_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
+    mgmt_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
     default="localhost", help="defines the server to use (default: localhost)")
     #--insecure
-    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
-    action="store_false", help="Disables SSL verification (default: no)")
+    mgmt_opts.add_argument("--insecure", dest="skip_ssl", default=False, \
+    action="store_true", help="Disables SSL verification (default: no)")
 
     #SNAPSHOT FILTER ARGUMENTS
     #-l / --location
@@ -117,7 +121,7 @@ http://github.com/stdevel/katprep'''
     default="", dest="environment", metavar="NAME|ID", help="filters by an" \
     " particular environment (default: no)")
     #-E / --exclude
-    fman_opts.add_argument("-E", "--exclude", action="append", default=[], \
+    filter_opts.add_argument("-E", "--exclude", action="append", default=[], \
     type=str, dest="filter_exclude", metavar="NAME", \
     help="excludes particular hosts (default: no)")
 
@@ -137,129 +141,71 @@ http://github.com/stdevel/katprep'''
 
 
 def scan_systems(options):
-    """Scans all systems that were selected for errata counters."""
+    """
+    Scans all systems that were selected for errata counters
+    """
+    system_info = []
 
-    #get all the hosts depending on the filter
-    filter_url = get_filter(options, "host")
-    LOGGER.debug("Filter URL will be '%s'", filter_url)
-    result_obj = json.loads(
-        SAT_CLIENT.api_get("{}".format(filter_url))
-    )
+    # get information per system
+    for system in MGMT_CLIENT.get_hosts():
 
-    #get errata per system
-    for system in result_obj["results"]:
+        # TODO: exclude if blacklisted or filtered
+
+        # get system information
+        details = MGMT_CLIENT.get_host_details(system)
+        network = MGMT_CLIENT.get_host_network(system)
+        organization = MGMT_CLIENT.get_organization()
+        location = MGMT_CLIENT.get_location()
+        owner = MGMT_CLIENT.get_host_owner(system)
+        patches = MGMT_CLIENT.get_host_patches(system)
+        upgrades = MGMT_CLIENT.get_host_upgrades(system)
+        params = MGMT_CLIENT.get_host_params(system)
+
+        # set system information
+        _system = {
+            'id': details['id'],
+            'name': details['profile_name'],
+            'hostname': details['hostname'],
+            'description': details['description'],
+            'virtualization': details['virtualization'],
+            'organization': organization,
+            'location': location,
+            'params': params,
+            'errata': patches,
+            'upgrades': upgrades,
+            'ip': network['ip'],
+            'ipv6': network['ip6'],
+            'owner': owner,
+            'reboot_suggested': 'TODO'
+        }
+
+        system_info.append(_system)
+    return system_info
+
+
+
+def create_report(system_info):
+    """
+    Creates a JSON report including errata information of all hosts
+    """
+    if system_info:
         try:
-            if system["name"] in options.filter_exclude:
-                #ignore blacklisted system
-                LOGGER.info(
-                    "Ignoring exlucded system '%s'", system["name"])
-                continue
-            LOGGER.info(
-                "Checking system '%s' (#%s)...", system["name"], system["id"])
-            errata_counter = system["content_facet_attributes"].get("errata_counts")
-            if not errata_counter:
-                #unable to read errata
-                LOGGER.info(
-                    "Unable to read errata counters for system '%s' - check " \
-                    "system! (Hint: unregistered content host?)", system["name"]
-                )
-                errata_counter = {}
-                errata_counter["security"] = 0
-                errata_counter["bugfix"] = 0
-                errata_counter["enhancement"] = 0
-                errata_counter["total"] = 0
-            LOGGER.debug(
-                "System errata counter: security=%s, bugfix=%s," \
-                " enhancement=%s, total=%s",
-                errata_counter["security"],
-                errata_counter["bugfix"],
-                errata_counter["enhancement"],
-                errata_counter["total"]
-            )
-            #add columns
-            SYSTEM_ERRATA[system["name"]] = {
-                "errata": {},
-                "params": {},
-                "verification": {},
-            }
-
-            #add _all_ the katprep_* params
-            params_obj = json.loads(
-                SAT_CLIENT.api_get("/hosts/{}".format(system["id"]))
-            )
-            for entry in params_obj["parameters"]:
-                if "katprep_" in entry["name"]:
-                    #add key/value
-                    SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = {}
-                    SYSTEM_ERRATA[system["name"]]["params"][entry["name"]] = entry["value"]
-
-            #add some additional information required for katprep_report
-            params = {
-                "name", "ip", "ip6", "organization_name", "location_name",
-                "environment_name", "operatingsystem_name"
-            }
-            for param in params:
-                try:
-                    SYSTEM_ERRATA[system["name"]]["params"][param] = params_obj[param]
-                except KeyError as err:
-                    LOGGER.debug("Missing key: %s", err)
-                    pass
-
-            #get owner
-            try:
-                SYSTEM_ERRATA[system["name"]]["params"]["owner"] =  \
-                    SAT_CLIENT.get_name_by_id(params_obj["owner_id"], "user")
-            except SessionException:
-                #no user
-                SYSTEM_ERRATA[system["name"]]["params"]["owner"] = ""
-                LOGGER.debug("No owner for system '%s' defined", system["name"])
-
-            #set HW flag
-            try:
-                if not params_obj["facts"]["is_virtual"].lower() == "true":
-                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True
-            except KeyError:
-                if not params_obj["facts"]["virt::is_guest"].lower() == "true":
-                    SYSTEM_ERRATA[system["name"]]["params"]["system_physical"] = True                
-
-            #add errata information if applicable
-            if int(errata_counter["total"]) > 0:
-                result_obj = json.loads(
-                    SAT_CLIENT.api_get("/hosts/{}/errata".format(system["id"]))
-                )
-                SYSTEM_ERRATA[system["name"]]["errata"] = result_obj["results"]
-                #remove _all_ the reboot suggested flags as Pandoc is too dump
-                #to check the value
-                for errata in SYSTEM_ERRATA[system["name"]]["errata"]:
-                    if not errata["reboot_suggested"]:
-                        del errata["reboot_suggested"]
-        except KeyError as err:
-            LOGGER.error(
-                "Unable to get system information for '%s', " \
-                "dropping system!", system["name"])
-            # pass
-            raise err
-        except ValueError as err:
-            LOGGER.info("Unable to get data: '%s'", err)
-
-
-
-def create_report():
-    """Creates a JSON report including errata information of all hosts."""
-
-    try:
-        with open(OUTPUT_FILE, 'w') as target:
-            target.write(json.dumps(SYSTEM_ERRATA))
-    except IOError as err:
-        LOGGER.error("Unable to store report: '%s'", err)
+            with open(OUTPUT_FILE, 'w') as target:
+                target.write(json.dumps(system_info))
+        except IOError as err:
+            LOGGER.error("Unable to store report: '%s'", err)
+        else:
+            LOGGER.info("Report '%s' created.", OUTPUT_FILE)
     else:
-        LOGGER.info("Report '%s' created.", OUTPUT_FILE)
+        LOGGER.info("Empty report - please check.")
 
 
 
 def main(options, args):
-    """Main function, starts the logic based on parameters."""
-    global SAT_CLIENT, OUTPUT_FILE
+    """
+    Main function, starts the logic based on parameters
+    """
+    global MGMT_CLIENT, OUTPUT_FILE
 
     LOGGER.debug("Options: %s", options)
     LOGGER.debug("Arguments: %s", args)
@@ -281,21 +227,22 @@ def main(options, args):
     #check if we can read and write before digging
     if is_writable(OUTPUT_FILE):
         #initalize Foreman connection and scan systems
-        (sat_user, sat_pass) = get_credentials(
-            "Foreman", options.server, options.auth_container,
+        (mgmt_user, mgmt_pass) = get_credentials(
+            "Management", options.server, options.auth_container,
             options.auth_password
         )
-        SAT_CLIENT = ForemanAPIClient(
-            LOG_LEVEL, options.server, sat_user,
-            sat_pass, options.ssl_verify
+        MGMT_CLIENT = get_management_client(
+            options.mgmt_type, LOG_LEVEL,
+            mgmt_user, mgmt_pass,
+            options.server, skip_ssl=options.skip_ssl
         )
 
-        #validate filters
-        validate_filters(options, SAT_CLIENT)
+        # TODO: validate filters
+        # validate_filters(options, MGMT_CLIENT)
 
-        #scan systems and create report
-        scan_systems(options)
-        create_report()
+        # scan systems and create report
+        _info = scan_systems(options)
+        create_report(_info)
     else:
         LOGGER.error("Directory '%s' is not writable!", OUTPUT_FILE)
 
