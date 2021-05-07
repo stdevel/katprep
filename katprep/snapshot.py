@@ -13,17 +13,14 @@ import logging
 import json
 import time
 import getpass
-from . import (
-    __version__, get_credentials, is_writable, validate_filters, get_filter)
+from . import (__version__, get_credentials, is_writable,
+               validate_filters, get_filter)
 from .exceptions import SessionException
 from .management import get_management_client
 from .management.foreman import ForemanAPIClient
 from .network import validate_hostname
 
-"""
-str: Program version
-"""
-LOGGER = logging.getLogger('katprep_snapshot')
+LOGGER = logging.getLogger("katprep_snapshot")
 """
 logging: Logger instance
 """
@@ -44,7 +41,7 @@ str: Output file
 def parse_options(args=None):
     """Parses options and arguments."""
 
-    desc = '''%(prog)s is used for creating snapshot reports of
+    desc = """%(prog)s is used for creating snapshot reports of
     errata available to your systems managed with Foreman/Katello or Red
     Hat Satellite 6. You can use two snapshot reports to create delta
     reports using katprep_report.
@@ -54,90 +51,162 @@ def parse_options(args=None):
     When using an auth container, ensure that the file permissions are 0600 -
     otherwise the script will abort. Maintain the auth container credentials
     with the katprep_authconfig utility.
-    '''
-    epilog = '''Check-out the website for more details:
-http://github.com/stdevel/katprep'''
+    """
+    epilog = """Check-out the website for more details:
+http://github.com/stdevel/katprep"""
     parser = argparse.ArgumentParser(description=desc, epilog=epilog)
-    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument("--version", action="version", version=__version__)
 
-    #define option groups
+    # define option groups
     gen_opts = parser.add_argument_group("generic arguments")
     mgmt_opts = parser.add_argument_group("management arguments")
     filter_opts = parser.add_argument_group("filter arguments")
     filter_opts_excl = filter_opts.add_mutually_exclusive_group()
 
-    #GENERIC ARGUMENTS
-    #-q / --quiet
-    gen_opts.add_argument("-q", "--quiet", action="store_true", \
-    dest="generic_quiet", default=False, help="don't print status messages " \
-    "to stdout (default: no)")
-    #-d / --debug
-    gen_opts.add_argument("-d", "--debug", dest="generic_debug", default=False, \
-    action="store_true", help="enable debugging outputs (default: no)")
-    #-p / --output-path
-    gen_opts.add_argument("-p", "--output-path", dest="output_path", \
-    metavar="PATH", default="", action="store", help="defines the output path" \
-    " for reports (default: current directory)")
-    #-C / --auth-container
-    gen_opts.add_argument("-C", "--auth-container", default="", \
-    dest="auth_container", action="store", metavar="FILE", \
-    help="defines an authentication container file (default: no)")
-    #-P / --auth-password
-    gen_opts.add_argument("-P", "--auth-password", default="empty", \
-    dest="auth_password", action="store", metavar="PASSWORD", \
-    help="defines the authentication container password in case you don't " \
-    "want to enter it manually (useful for scripted automation)")
+    # GENERIC ARGUMENTS
+    # -q / --quiet
+    gen_opts.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        dest="generic_quiet",
+        default=False,
+        help="don't print status messages " "to stdout (default: no)",
+    )
+    # -d / --debug
+    gen_opts.add_argument(
+        "-d",
+        "--debug",
+        dest="generic_debug",
+        default=False,
+        action="store_true",
+        help="enable debugging outputs (default: no)",
+    )
+    # -p / --output-path
+    gen_opts.add_argument(
+        "-p",
+        "--output-path",
+        dest="output_path",
+        metavar="PATH",
+        default="",
+        action="store",
+        help="defines the output path"
+        " for reports (default: current directory)",
+    )
+    # -C / --auth-container
+    gen_opts.add_argument(
+        "-C",
+        "--auth-container",
+        default="",
+        dest="auth_container",
+        action="store",
+        metavar="FILE",
+        help="defines an authentication container file (default: no)",
+    )
+    # -P / --auth-password
+    gen_opts.add_argument(
+        "-P",
+        "--auth-password",
+        default="empty",
+        dest="auth_password",
+        action="store",
+        metavar="PASSWORD",
+        help="defines the authentication container password in case you don't "
+        "want to enter it manually (useful for scripted automation)",
+    )
 
     # MANAGEMENT ARGUMENTS
     # --mgmt-type
     mgmt_opts.add_argument(
-        "--mgmt-type", dest="mgmt_type",
-        metavar="foreman|uyuni", default="foreman", type=str,
-        help="defines the library used to operate with management host: " \
-        "foreman or uyuni (default: foreman)"
+        "--mgmt-type",
+        dest="mgmt_type",
+        metavar="foreman|uyuni",
+        default="foreman",
+        type=str,
+        help="defines the library used to operate with management host: "
+        "foreman or uyuni (default: foreman)",
     )
-    #-s / --server
-    mgmt_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
-    default="localhost", help="defines the server to use (default: localhost)")
-    #--insecure
-    mgmt_opts.add_argument("--insecure", dest="skip_ssl", default=False, \
-    action="store_true", help="Disables SSL verification (default: no)")
+    # -s / --server
+    mgmt_opts.add_argument(
+        "-s",
+        "--server",
+        dest="server",
+        metavar="SERVER",
+        default="localhost",
+        help="defines the server to use (default: localhost)",
+    )
+    # --insecure
+    mgmt_opts.add_argument(
+        "--insecure",
+        dest="skip_ssl",
+        default=False,
+        action="store_true",
+        help="Disables SSL verification (default: no)",
+    )
 
-    #SNAPSHOT FILTER ARGUMENTS
-    #-l / --location
-    filter_opts_excl.add_argument("-l", "--location", action="store", \
-    default="", dest="location", metavar="NAME|ID", help="filters by a" \
-    " particular location (default: no)")
-    #-o / --organization
-    filter_opts_excl.add_argument("-o", "--organization", action="store", \
-    default="", dest="organization", metavar="NAME|ID", help="filters by an" \
-    " particular organization (default: no)")
-    #-g / --hostgroup
-    filter_opts_excl.add_argument("-g", "--hostgroup", action="store", \
-    default="", dest="hostgroup", metavar="NAME|ID", help="filters by a" \
-    " particular hostgroup (default: no)")
-    #-e / --environment
-    filter_opts_excl.add_argument("-e", "--environment", action="store", \
-    default="", dest="environment", metavar="NAME|ID", help="filters by an" \
-    " particular environment (default: no)")
-    #-E / --exclude
-    filter_opts.add_argument("-E", "--exclude", action="append", default=[], \
-    type=str, dest="filter_exclude", metavar="NAME", \
-    help="excludes particular hosts (default: no)")
+    # SNAPSHOT FILTER ARGUMENTS
+    # -l / --location
+    filter_opts_excl.add_argument(
+        "-l",
+        "--location",
+        action="store",
+        default="",
+        dest="location",
+        metavar="NAME|ID",
+        help="filters by a" " particular location (default: no)",
+    )
+    # -o / --organization
+    filter_opts_excl.add_argument(
+        "-o",
+        "--organization",
+        action="store",
+        default="",
+        dest="organization",
+        metavar="NAME|ID",
+        help="filters by an" " particular organization (default: no)",
+    )
+    # -g / --hostgroup
+    filter_opts_excl.add_argument(
+        "-g",
+        "--hostgroup",
+        action="store",
+        default="",
+        dest="hostgroup",
+        metavar="NAME|ID",
+        help="filters by a" " particular hostgroup (default: no)",
+    )
+    # -e / --environment
+    filter_opts_excl.add_argument(
+        "-e",
+        "--environment",
+        action="store",
+        default="",
+        dest="environment",
+        metavar="NAME|ID",
+        help="filters by an" " particular environment (default: no)",
+    )
+    # -E / --exclude
+    filter_opts.add_argument(
+        "-E",
+        "--exclude",
+        action="append",
+        default=[],
+        type=str,
+        dest="filter_exclude",
+        metavar="NAME",
+        help="excludes particular hosts (default: no)",
+    )
 
-
-
-    #parse options and arguments
+    # parse options and arguments
     options = parser.parse_args()
-    #validate hostname
+    # validate hostname
     options.server = validate_hostname(options.server)
-    #set password
+    # set password
     while options.auth_password == "empty" or len(options.auth_password) > 32:
         options.auth_password = getpass.getpass(
             "Authentication container password: "
         )
     return (options, args)
-
 
 
 def scan_systems(options):
@@ -163,25 +232,24 @@ def scan_systems(options):
 
         # set system information
         _system = {
-            'id': details['id'],
-            'name': details['profile_name'],
-            'hostname': details['hostname'],
-            'description': details['description'],
-            'virtualization': details['virtualization'],
-            'organization': organization,
-            'location': location,
-            'params': params,
-            'errata': patches,
-            'upgrades': upgrades,
-            'ip': network['ip'],
-            'ipv6': network['ip6'],
-            'owner': owner,
-            'reboot_suggested': 'TODO'
+            "id": details["id"],
+            "name": details["profile_name"],
+            "hostname": details["hostname"],
+            "description": details["description"],
+            "virtualization": details["virtualization"],
+            "organization": organization,
+            "location": location,
+            "params": params,
+            "errata": patches,
+            "upgrades": upgrades,
+            "ip": network["ip"],
+            "ipv6": network["ip6"],
+            "owner": owner,
+            "reboot_suggested": "TODO",
         }
 
         system_info.append(_system)
     return system_info
-
 
 
 def create_report(system_info):
@@ -190,7 +258,7 @@ def create_report(system_info):
     """
     if system_info:
         try:
-            with open(OUTPUT_FILE, 'w') as target:
+            with open(OUTPUT_FILE, "w") as target:
                 target.write(json.dumps(system_info))
         except IOError as err:
             LOGGER.error("Unable to store report: '%s'", err)
@@ -198,7 +266,6 @@ def create_report(system_info):
             LOGGER.info("Report '%s' created.", OUTPUT_FILE)
     else:
         LOGGER.info("Empty report - please check.")
-
 
 
 def main(options, args):
@@ -210,31 +277,38 @@ def main(options, args):
     LOGGER.debug("Options: %s", options)
     LOGGER.debug("Arguments: %s", args)
 
-    #set output file
+    # set output file
     if options.output_path == "":
         options.output_path = "./"
-    elif options.output_path != "" and \
-    options.output_path[len(options.output_path)-1:] != "/":
-        #add trailing slash
+    elif (
+            options.output_path != ""
+            and options.output_path[len(options.output_path) - 1:] != "/"
+    ):
+        # add trailing slash
         options.output_path = "{}/".format(options.output_path)
     OUTPUT_FILE = "{}errata-snapshot-report-{}-{}.json".format(
         options.output_path,
-        options.server.split('.')[0],
+        options.server.split(".")[0],
         time.strftime("%Y%m%d-%H%M")
     )
     LOGGER.debug("Output file will be: '%s'", OUTPUT_FILE)
 
-    #check if we can read and write before digging
+    # check if we can read and write before digging
     if is_writable(OUTPUT_FILE):
-        #initalize Foreman connection and scan systems
+        # initalize Foreman connection and scan systems
         (mgmt_user, mgmt_pass) = get_credentials(
-            "Management", options.server, options.auth_container,
+            "Management",
+            options.server,
+            options.auth_container,
             options.auth_password
         )
         MGMT_CLIENT = get_management_client(
-            options.mgmt_type, LOG_LEVEL,
-            mgmt_user, mgmt_pass,
-            options.server, skip_ssl=options.skip_ssl
+            options.mgmt_type,
+            LOG_LEVEL,
+            mgmt_user,
+            mgmt_pass,
+            options.server,
+            skip_ssl=options.skip_ssl,
         )
 
         # TODO: validate filters
@@ -254,7 +328,7 @@ def cli():
     global LOG_LEVEL
     (options, args) = parse_options()
 
-    #set logging level
+    # set logging level
     logging.basicConfig()
     if options.generic_debug:
         LOG_LEVEL = logging.DEBUG
@@ -265,7 +339,6 @@ def cli():
     LOGGER.setLevel(LOG_LEVEL)
 
     main(options, args)
-
 
 
 if __name__ == "__main__":
