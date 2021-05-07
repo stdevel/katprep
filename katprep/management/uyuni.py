@@ -201,6 +201,18 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
+    def get_host_owner(self, system_id):
+        """
+        Returns the host owner
+        """
+        host_params = self.get_host_params(system_id)
+        try:
+            return host_params['katprep_owner']
+        except KeyError:
+            raise SessionException(
+                f"Owner not found: {system_id!r}"
+            )
+
     def get_host_patches(self, system_id):
         """
         Returns available patches for a particular system
@@ -520,3 +532,17 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
             )
+
+    def get_organization(self):
+        """
+        Retrieves current organization
+        """
+        return self.get_user(self._username)['org_name']
+
+    def get_location(self):
+        """
+        Retrieves current location
+        """
+        # simply return the organization as Uyuni
+        # does not support any kind of locations
+        return self.get_organization()

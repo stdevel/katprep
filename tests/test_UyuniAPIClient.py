@@ -61,6 +61,14 @@ def user_name(config):
     return config["valid_objects"]["user"]["name"]
 
 
+@pytest.fixture
+def host_owner(config):
+    """
+    Return system owner from configuration
+    """
+    return config["valid_objects"]["hostparams"]["katprep_owner"]
+
+
 def task_completed(task):
     """
     Returns whether a task is completed
@@ -551,7 +559,23 @@ def test_get_user(client, user_name):
 
 def test_get_user_nonexistent(client):
     """
-    Ensure that user information for invalid ussers cannot be gathered
+    Ensure that user information for invalid users cannot be gathered
     """
     with pytest.raises(SessionException):
         client.get_user("hidethepain %s" % random.randint(800, 1500))
+
+
+def test_get_host_owner(client, host_id, host_owner):
+    """
+    Ensure that host owner information can be found
+    """
+    _owner = client.get_host_owner(host_id)
+    assert _owner == host_owner
+
+
+def test_get_host_owner_nonexistent(client):
+    """
+    Ensure that host owner information for invalid machines cannot be gathered
+    """
+    with pytest.raises(SessionException):
+        client.get_host_owner(random.randint(800, 1500))
