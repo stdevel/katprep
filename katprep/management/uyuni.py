@@ -497,3 +497,26 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
             )
+
+    def get_user(self, user_name):
+        """
+        Retrieves information about a particular user
+        """
+        if not isinstance(user_name, str):
+            raise EmptySetException(
+                "No user found - use user name"
+            )
+        try:
+            # return user information
+            user_info = self._session.user.getDetails(
+                self._api_key, user_name
+            )
+            return user_info
+        except Fault as err:
+            if "could not find user" in err.faultString.lower():
+                raise EmptySetException(
+                    f"User not found: {user_name!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )

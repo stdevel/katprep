@@ -53,6 +53,14 @@ def host_id(config):
     return config["valid_objects"]["host"]["id"]
 
 
+@pytest.fixture
+def user_name(config):
+    """
+    Return username from configuration
+    """
+    return config["valid_objects"]["user"]["name"]
+
+
 def task_completed(task):
     """
     Returns whether a task is completed
@@ -520,3 +528,30 @@ def test_get_host_action_nonexistent(client, host_id):
         client.get_host_action(
             host_id, random.randint(1337, 6667)
         )
+
+
+def test_get_user(client, user_name):
+    """
+    Ensure that user information can be found
+    """
+    user_info = client.get_user(
+        user_name
+    )
+    # check some keys
+    keys = [
+        "first_name",
+        "last_name",
+        "email",
+        "org_id",
+        "org_name"
+    ]
+    for key in keys:
+        assert key in user_info.keys()
+
+
+def test_get_user_nonexistent(client):
+    """
+    Ensure that user information for invalid ussers cannot be gathered
+    """
+    with pytest.raises(SessionException):
+        client.get_user("hidethepain %s" % random.randint(800, 1500))

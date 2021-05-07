@@ -6,6 +6,9 @@
         "api_pass": "admin"
     },
     "valid_objects": {
+        "user": {
+            "name": "admin"
+        },
         "host": {
             "name": "uyuniclient.example.com",
             "id": 1000010000,
