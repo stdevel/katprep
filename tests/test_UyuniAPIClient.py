@@ -278,6 +278,31 @@ def test_get_host_details_nonexistent(client):
         client.get_host_details(random.randint(800, 1500))
 
 
+def test_get_host_network(client, host_id):
+    """
+    Ensure that host network information can be found
+    """
+    host_network = client.get_host_network(
+        host_id
+    )
+    # check some keys
+    keys = [
+        "ip",
+        "ip6",
+        "hostname"
+    ]
+    for key in keys:
+        assert key in host_network.keys()
+
+
+def test_get_host_network_nonexistent(client):
+    """
+    Ensure that network information for invalid hosts cannot be gathered
+    """
+    with pytest.raises(SessionException):
+        client.get_host_network(random.randint(800, 1500))
+
+
 def test_get_host_actions(client, host_id):
     """
     Ensure that host actions can be found
