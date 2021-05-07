@@ -16,7 +16,8 @@
         },
         "hostparams": {
             "katprep_mon_name": "uyuniclient",
-            "katprep_mon_type": "icinga"
+            "katprep_mon_type": "icinga",
+            "katprep_owner": "admin"
         }
     }
 }
