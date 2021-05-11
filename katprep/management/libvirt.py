@@ -117,7 +117,7 @@ class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
         return 0
 
     def _manage_snapshot(
-            self, vm_name, snapshot_title, snapshot_text, action="create"
+            self, host, snapshot_title, snapshot_text, action="create"
         ):
         """
         Creates/removes a snapshot for a particular virtual machine.
