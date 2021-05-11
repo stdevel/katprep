@@ -49,11 +49,13 @@ def get_management_client(
     if management_type == "foreman":
         from .foreman import ForemanAPIClient
 
-        return ForemanAPIClient(log_level, host, username, password, *args, **kwargs)
+        return ForemanAPIClient(
+            log_level, hostname, username, password, *args, **kwargs
+        )
     elif management_type == "uyuni":
         from .uyuni import UyuniAPIClient
 
-        return UyuniAPIClient(log_level, username, password, host, *args, **kwargs)
+        return UyuniAPIClient(log_level, username, password, hostname, *args, **kwargs)
     else:
         raise ValueError(f"Unknown virtualisation type {management_type!r}")
 
