@@ -114,7 +114,7 @@ class UyuniAPIClient(BaseConnector):
         super().__init__(username, password)
         self.validate_api_support()
 
-    def __del__(self, exc_type, exc_value, traceback):
+    def __del__(self):
         """
         Destructor
         """
