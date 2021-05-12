@@ -54,3 +54,7 @@ Now you can run `pytest` against the APIs running in VMs - e.g.:
 ```shell
 $ pytest test_UyuniAPICLient.py
 ```
+
+## See also
+
+- [Testing older Uyuni releases](Uyuni.md)
