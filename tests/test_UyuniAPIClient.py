@@ -214,6 +214,8 @@ def test_get_host_upgrades(client, host_id):
     host_upgrades = client.get_host_upgrades(
         host_id
     )
+    if not host_upgrades:
+        raise EmptySetException("No upgrades available - reset uyuniclient VM")
     assert host_upgrades
 
 
