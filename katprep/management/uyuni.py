@@ -1,22 +1,20 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Uyuni XMLRPC API client
 """
 
 import logging
 import ssl
-
-from xmlrpc.client import ServerProxy, Fault, DateTime
 from datetime import datetime
+from xmlrpc.client import DateTime, Fault, ServerProxy
+
 from . import splitFilename
 from .base import BaseConnector
 from ..exceptions import (
-    SessionException,
-    InvalidCredentialsException,
     APILevelNotSupportedException,
-    SSLCertVerificationError,
     EmptySetException,
+    InvalidCredentialsException,
+    SessionException,
+    SSLCertVerificationError,
 )
 
 
@@ -495,9 +493,7 @@ class UyuniAPIClient(BaseConnector):
             actions = self.get_host_actions(system_id)
             action = [x for x in actions if x['id'] == task_id]
             if not action:
-                raise EmptySetException(
-                    f"Action not found"
-                )
+                raise EmptySetException("Action not found")
             return action
         except Fault as err:
             if "action not found" in err.faultString.lower():
