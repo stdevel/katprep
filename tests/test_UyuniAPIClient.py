@@ -348,21 +348,21 @@ def test_host_patch_do_install(client, host_id):
     patches = client.get_host_patches(
         host_id
     )
-    if patches:
-        # install random patch
-        _patches = [x["id"] for x in patches]
-        action_id = client.install_patches(
-            host_id,
-            [random.choice(_patches)]
-        )
-        # wait until task finished before continuing
-        action_id = action_id[0]
-        task = client.get_host_action(host_id, action_id)[0]
-        while not task_completed(task):
-            time.sleep(10)
-            task = client.get_host_action(host_id, action_id)[0]
-    else:
+    if not patches:
         raise EmptySetException("No patches available - reset uyuniclient VM")
+
+    # install random patch
+    _patches = [x["id"] for x in patches]
+    action_id = client.install_patches(
+        host_id,
+        [random.choice(_patches)]
+    )
+    # wait until task finished before continuing
+    action_id = action_id[0]
+    task = client.get_host_action(host_id, action_id)[0]
+    while not task_completed(task):
+        time.sleep(10)
+        task = client.get_host_action(host_id, action_id)[0]
 
 
 def test_host_patch_invalid_format(client, host_id):
@@ -399,19 +399,20 @@ def test_host_patch_already_installed(client, host_id):
     _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # pylint: disable=line-too-long # noqa: E501
     pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
     errata = [re.search(pattern, x)[0] for x in _actions]
-    if errata:
-        # find errata ID by patch CVE
-        _errata = [client.get_patch_by_name(x)["id"] for x in errata]
 
-        # try to install patch
-        with pytest.raises(EmptySetException):
-            client.install_patches(
-                host_id,
-                _errata
-            )
-    else:
+    if not errata:
         raise EmptySetException(
             "No patches installed - install patch and rerun test"
+        )
+
+    # find errata ID by patch CVE
+    _errata = [client.get_patch_by_name(x)["id"] for x in errata]
+
+    # try to install patch
+    with pytest.raises(EmptySetException):
+        client.install_patches(
+            host_id,
+            _errata
         )
 
 
@@ -423,23 +424,23 @@ def test_host_upgrade_do_install(client, host_id):
     upgrades = client.get_host_upgrades(
         host_id
     )
-    if upgrades:
-        # install random upgrade
-        _upgrades = [x["to_package_id"] for x in upgrades]
-        # install upgrade
-        action_id = client.install_upgrades(
-            host_id,
-            [random.choice(_upgrades)]
-        )
-        assert isinstance(action_id[0], int)
-        # wait until task finished before continuing
-        while not task_completed(
-                client.get_host_action(host_id, action_id[0])[0]
-        ):
-            # task not finished
-            time.sleep(10)
-    else:
+    if not upgrades:
         raise EmptySetException("No upgrades available - reset uyuniclient VM")
+
+    # install random upgrade
+    _upgrades = [x["to_package_id"] for x in upgrades]
+    # install upgrade
+    action_id = client.install_upgrades(
+        host_id,
+        [random.choice(_upgrades)]
+    )
+    assert isinstance(action_id[0], int)
+    # wait until task finished before continuing
+    action_id = action_id[0]
+    task = client.get_host_action(host_id, action_id)[0]
+    while not task_completed(task):
+        time.sleep(10)
+        task = client.get_host_action(host_id, action_id)[0]
 
 
 def test_host_upgrade_invalid_format(client, host_id):
