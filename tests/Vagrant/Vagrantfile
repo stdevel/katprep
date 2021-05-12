@@ -11,8 +11,7 @@ Vagrant.configure("2") do |config|
     monitoring.vm.network "forwarded_port", guest: 5665, host: 8665
     # add private network
     monitoring.vm.network "private_network", ip: "192.168.23.10"
-
-    # install Ansible and configure system
+    # configure system
     monitoring.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
     SHELL
@@ -32,8 +31,7 @@ Vagrant.configure("2") do |config|
     zabbix.vm.network "forwarded_port", guest: 443, host: 8444
     # add private network
     zabbix.vm.network "private_network", ip: "192.168.23.20"
-
-    # install Ansible and configure system
+    # configure system
     zabbix.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
     SHELL
@@ -63,7 +61,7 @@ Vagrant.configure("2") do |config|
       libvirt.cpu_feature :name => 'vmx', :policy => 'require'
       libvirt.nested = true
     end
-    # install Ansible and configure system
+    # configure system
     kvm.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
     SHELL
@@ -82,7 +80,6 @@ Vagrant.configure("2") do |config|
     esxi.vm.network "forwarded_port", guest: 443, host: 8445
     # add private network
     esxi.vm.network "private_network", ip: "192.168.23.50"
-
     # configure system
     # TODO: but how though?
   end
@@ -106,8 +103,7 @@ Vagrant.configure("2") do |config|
       libvirt.cpus = "2"
       libvirt.memory = "8192"
     end
-
-    # install Ansible and configure system
+    # configure system
     katello.vm.provision "shell", inline: <<-SHELL
       yum -y install rpm-python epel-release python-xml
     SHELL
@@ -139,7 +135,7 @@ Vagrant.configure("2") do |config|
       libvirt.memory = "4096"
       libvirt.disk_bus = "scsi" # needed to boot (see also https://github.com/lavabit/robox/issues/152#issue-632631234)
     end
-    # install Ansible and configure system
+    # configure system
     uyuni.vm.provision "shell", inline: <<-SHELL
       zypper --non-interactive install python2-rpm python-xml
     SHELL

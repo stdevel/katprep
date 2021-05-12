@@ -37,7 +37,6 @@ $ vagrant up
 To create non-autostart boxes, run one of the following commands:
 
 ```bash
-$ vagrant up uyuni_client
 $ vagrant up zabbix
 $ vagrant up kvm
 $ vagrant up esxi
