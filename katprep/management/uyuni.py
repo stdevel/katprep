@@ -160,10 +160,8 @@ class UyuniAPIClient(BaseConnector):
             api_level = self._session.api.getVersion()
             if float(api_level) < self.API_MIN:
                 raise APILevelNotSupportedException(
-                    "Your API version ({0}) doesn't support required calls."
-                    "You'll need API version ({1}) or higher!".format(
-                        api_level, self.API_MIN
-                    )
+                    f"Your API version ({api_level!r}) doesn't support required calls."
+                    "You'll need API version ({self.API_MIN!r}) or higher!"
                 )
             self.LOGGER.info("Supported API version %s found.", api_level)
         except ValueError as err:
