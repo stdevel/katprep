@@ -10,11 +10,11 @@ from xmlrpc.client import DateTime, Fault, ServerProxy
 from . import splitFilename
 from .base import BaseConnector
 from ..exceptions import (
-    SessionException,
-    InvalidCredentialsException,
     APILevelNotSupportedException,
-    SSLCertVerificationError,
     EmptySetException,
+    InvalidCredentialsException,
+    SessionException,
+    SSLCertVerificationError,
 )
 
 
