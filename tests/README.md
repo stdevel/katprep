@@ -35,7 +35,7 @@ Credentials are assigned using secret variables containing the appropriate JSON 
 
 ## Running tests using Vagrantboxes
 
-This directory contains a [`Vagrantfile`](Vagrantfile) for creating your own testing environment. Simply start it using:
+The `Vagrant` directory contains a [`Vagrantfile`](Vagrant/Vagrantfile) for creating your own testing environment. Simply start it using:
 
 ```shell
 $ vagrant up
