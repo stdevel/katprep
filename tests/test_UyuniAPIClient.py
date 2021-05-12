@@ -273,7 +273,7 @@ def test_get_host_details(client, host_id):
         "virtualization"
     ]
     for key in keys:
-        assert key in host_details.keys()
+        assert key in host_details
 
 
 def test_get_host_details_invalid_format(client):
@@ -306,7 +306,7 @@ def test_get_host_network(client, host_id):
         "hostname"
     ]
     for key in keys:
-        assert key in host_network.keys()
+        assert key in host_network
 
 
 def test_get_host_network_nonexistent(client):
@@ -552,7 +552,7 @@ def test_get_user(client, user_name):
         "org_name"
     ]
     for key in keys:
-        assert key in user_info.keys()
+        assert key in user_info
 
 
 def test_get_user_nonexistent(client):
