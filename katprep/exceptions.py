@@ -76,4 +76,3 @@ class SSLCertVerificationError(Exception):
     Exception for invalid SSL certificates
 .. class:: SSLCertVerificationError
     """
-    pass
