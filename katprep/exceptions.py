@@ -5,7 +5,7 @@ Exceptions used by the management classes
 
 class SessionException(Exception):
     """
-    Dummy class for session errors
+    Exception for session errors
 
     .. class:: SessionException
     """
@@ -13,7 +13,7 @@ class SessionException(Exception):
 
 class InvalidCredentialsException(Exception):
     """
-    Dummy class for invalid credentials
+    Exception for invalid credentials
 
     .. class:: InvalidCredentialsException
     """
@@ -21,7 +21,7 @@ class InvalidCredentialsException(Exception):
 
 class APILevelNotSupportedException(Exception):
     """
-    Dummy class for unsupported API levels
+    Exception for unsupported API levels
 
     .. class:: APILevelNotSupportedException
     """
@@ -29,7 +29,7 @@ class APILevelNotSupportedException(Exception):
 
 class UnsupportedRequestException(Exception):
     """
-    Dummy class for unsupported requests
+    Exception for unsupported requests
 
     .. class:: UnsupportedRequest
     """
@@ -37,7 +37,7 @@ class UnsupportedRequestException(Exception):
 
 class InvalidHostnameFormatException(Exception):
     """
-    Dummy class for invalid hostname formats (non-FQDN)
+    Exception for invalid hostname formats (non-FQDN)
 
     .. class:: InvalidHostnameFormatException
     """
@@ -45,7 +45,7 @@ class InvalidHostnameFormatException(Exception):
 
 class UnsupportedFilterException(Exception):
     """
-    Dummy class for unsupported filters
+    Exception for unsupported filters
 
     .. class:: UnsupportedFilterException
     """
@@ -53,7 +53,7 @@ class UnsupportedFilterException(Exception):
 
 class EmptySetException(Exception):
     """
-    Dummy class for empty result sets
+    Exception for empty result sets
 
     .. class:: EmptySetException
     """
@@ -61,7 +61,7 @@ class EmptySetException(Exception):
 
 class SnapshotExistsException(Exception):
     """
-    Dummy class for existing snapshots
+    Exception for already existing snapshots
 
     .. class:: SnapshotExistsException
     """
@@ -69,10 +69,13 @@ class SnapshotExistsException(Exception):
 class UnauthenticatedError(RuntimeError):
     """
     Exception for showing that a client wasn't able to authenticate itself
+
+    .. class:: UnauthenticatedError
     """
 
 class SSLCertVerificationError(Exception):
     """
     Exception for invalid SSL certificates
-.. class:: SSLCertVerificationError
+
+    .. class:: SSLCertVerificationError
     """
