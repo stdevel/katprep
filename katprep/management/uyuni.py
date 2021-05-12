@@ -36,13 +36,13 @@ def split_rpm_filename(filename):
         filename = filename[:-4]
 
     arch_index = filename.rfind(".")
-    arch = filename[arch_index + 1 :]
+    arch = filename[arch_index + 1:]
 
     rel_index = filename[:arch_index].rfind("-")
-    rel = filename[rel_index + 1 : arch_index]
+    rel = filename[rel_index + 1:arch_index]
 
     ver_index = filename[:rel_index].rfind("-")
-    ver = filename[ver_index + 1 : rel_index]
+    ver = filename[ver_index + 1:rel_index]
 
     epoch_index = filename.find(":")
     if epoch_index == -1:
@@ -50,7 +50,7 @@ def split_rpm_filename(filename):
     else:
         epoch = filename[:epoch_index]
 
-    name = filename[epoch_index + 1 : ver_index]
+    name = filename[epoch_index + 1:ver_index]
     return name, ver, rel, epoch, arch
 
 
@@ -159,8 +159,9 @@ class UyuniAPIClient(BaseConnector):
             api_level = self._session.api.getVersion()
             if float(api_level) < self.API_MIN:
                 raise APILevelNotSupportedException(
-                    f"Your API version ({api_level!r}) doesn't support required calls."
-                    "You'll need API version ({self.API_MIN!r}) or higher!"
+                    f"Your API version ({api_level!r}) doesn't support"
+                    "required calls."
+                    f"You'll need API version ({self.API_MIN!r}) or higher!"
                 )
             self.LOGGER.info("Supported API version %s found.", api_level)
         except ValueError as err:
@@ -219,11 +220,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             params = self._session.system.getCustomValues(
                 self._api_key, system_id
             )
@@ -259,11 +261,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             errata = self._session.system.getRelevantErrata(
                 self._api_key, system_id
             )
@@ -334,11 +337,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             packages = self._session.system.listLatestUpgradablePackages(
                 self._api_key, system_id
             )
@@ -367,11 +371,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             groups = self._session.system.listGroups(
                 self._api_key, system_id
             )
@@ -392,11 +397,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             details = self._session.system.getDetails(
                 self._api_key, system_id
             )
@@ -417,11 +423,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             details = self._session.system.getNetwork(
                 self._api_key, system_id
             )
@@ -461,7 +468,7 @@ class UyuniAPIClient(BaseConnector):
                 raise SessionException(
                     f"System not found: {system_id!r}"
                 )
-            elif "invalid errata" in err.faultString.lower():
+            if "invalid errata" in err.faultString.lower():
                 raise EmptySetException(
                     f"Errata not found: {err.faultString!r}"
                 )
@@ -497,7 +504,7 @@ class UyuniAPIClient(BaseConnector):
                 raise SessionException(
                     f"System not found: {system_id!r}"
                 )
-            elif "cannot find package" in err.faultString.lower():
+            if "cannot find package" in err.faultString.lower():
                 raise EmptySetException(
                     f"Upgrade not found: {err.faultString!r}"
                 )
@@ -512,11 +519,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             action_id = self._session.system.scheduleReboot(
                 self._api_key, system_id,
                 DateTime(datetime.now().timetuple())
@@ -548,6 +556,7 @@ class UyuniAPIClient(BaseConnector):
             raise EmptySetException(
                 "No task found - use task IDs"
             )
+
         try:
             # return particular action
             actions = self.get_host_actions(system_id)
@@ -571,11 +580,12 @@ class UyuniAPIClient(BaseConnector):
         :param system_id: profile ID
         :type system_id: int
         """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
         try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
             actions = self._session.system.listSystemEvents(
                 self._api_key, system_id
             )
@@ -600,6 +610,7 @@ class UyuniAPIClient(BaseConnector):
             raise EmptySetException(
                 "No user found - use user name"
             )
+
         try:
             # return user information
             user_info = self._session.user.getDetails(
