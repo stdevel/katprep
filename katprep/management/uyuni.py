@@ -39,10 +39,6 @@ class UyuniAPIClient(BaseConnector):
     """
     dict: Default headers set for every HTTP request
     """
-    skip_ssl = False
-    """
-    bool: Flag whether to ignore SSL verification
-    """
 
     def __init__(
             self, log_level, username, password,
