@@ -1,5 +1,5 @@
 """
-Exceptions used by the management classes.
+Exceptions used by the management classes
 """
 
 
@@ -68,12 +68,12 @@ class SnapshotExistsException(Exception):
 
 class UnauthenticatedError(RuntimeError):
     """
-    Exception for showing that a client wasn't able to authenticate itself.
+    Exception for showing that a client wasn't able to authenticate itself
     """
 
 class SSLCertVerificationError(Exception):
     """
-    Dummy class for invalid SSL certificates
+    Exception for invalid SSL certificates
 .. class:: SSLCertVerificationError
     """
     pass
