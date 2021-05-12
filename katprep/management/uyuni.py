@@ -105,7 +105,7 @@ class UyuniAPIClient(BaseConnector):
             )
         except ssl.SSLCertVerificationError as err:
             self.LOGGER.error(err)
-            raise SSLCertVerificationError
+            raise SSLCertVerificationError(str(err)) from err
         except Fault as err:
             if err.faultCode == 2950:
                 raise InvalidCredentialsException(
