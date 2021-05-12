@@ -116,6 +116,8 @@ class UyuniAPIClient(BaseConnector):
         Checks whether the API version on the Uyuni server is supported.
         Using older versions than 24 is not recommended. In this case, an
         exception will be thrown.
+
+        :raises: APILevelNotSupportedException
         """
         try:
             # check whether API is supported
