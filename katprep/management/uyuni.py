@@ -453,7 +453,7 @@ class UyuniAPIClient(BaseConnector):
                 raise SessionException(
                     f"System not found: {system_id!r}"
                 )
-            if "invalid errata" in err.faultString.lower():
+            elif "invalid errata" in err.faultString.lower():
                 raise EmptySetException(
                     f"Errata not found: {err.faultString!r}"
                 )
