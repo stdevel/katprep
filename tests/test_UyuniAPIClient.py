@@ -360,11 +360,11 @@ def test_host_patch_do_install(client, host_id):
             [random.choice(_patches)]
         )
         # wait until task finished before continuing
-        while not task_completed(
-                client.get_host_action(host_id, action_id[0])[0]
-        ):
-            # task not finished
+        action_id = action_id[0]
+        task = client.get_host_action(host_id, action_id)[0]
+        while not task_completed(task):
             time.sleep(10)
+            task = client.get_host_action(host_id, action_id)[0]
     else:
         raise EmptySetException("No patches available - reset uyuniclient VM")
 
