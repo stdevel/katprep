@@ -489,7 +489,7 @@ class UyuniAPIClient(BaseConnector):
                 raise SessionException(
                     f"System not found: {system_id!r}"
                 )
-            if "cannot find package" in err.faultString.lower():
+            elif "cannot find package" in err.faultString.lower():
                 raise EmptySetException(
                     f"Upgrade not found: {err.faultString!r}"
                 )
