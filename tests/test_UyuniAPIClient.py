@@ -13,10 +13,10 @@ import time
 import pytest
 from katprep.management.uyuni import UyuniAPIClient
 from katprep.exceptions import (
-    SSLCertVerificationError,
-    SessionException,
     EmptySetException,
-    InvalidCredentialsException
+    InvalidCredentialsException,
+    SessionException,
+    SSLCertVerificationError,
 )
 
 from .utilities import load_config
