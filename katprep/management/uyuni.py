@@ -51,14 +51,16 @@ class UyuniAPIClient(BaseConnector):
 
         :param log_level: log level
         :type log_level: logging
-        :param hostname: Uyuni host
-        :type hostname: str
         :param username: API username
         :type username: str
         :param password: corresponding password
         :type password: str
+        :param hostname: Uyuni host
+        :type hostname: str
         :param port: HTTPS port
         :type port: int
+        :param skip_ssl: Skip SSL verification
+        :type skip_ssl: bool
         """
         # set logging
         logging.basicConfig(level=log_level)
