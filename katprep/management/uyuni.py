@@ -436,31 +436,6 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def get_host_actions(self, system_id):
-        """
-        Returns actions for a given system
-
-        :param system_id: profile ID
-        :type system_id: int
-        """
-        try:
-            if not isinstance(system_id, int):
-                raise EmptySetException(
-                    "No system found - use system profile IDs"
-                )
-            actions = self._session.system.listSystemEvents(
-                self._api_key, system_id
-            )
-            return actions
-        except Fault as err:
-            if "no such system" in err.faultString.lower():
-                raise SessionException(
-                    f"System not found: {system_id!r}"
-                )
-            raise SessionException(
-                f"Generic remote communication error: {err.faultString!r}"
-            )
-
     def install_patches(self, system_id, patches):
         """
         Install patches on a given system
@@ -585,6 +560,31 @@ class UyuniAPIClient(BaseConnector):
             if "action not found" in err.faultString.lower():
                 raise EmptySetException(
                     f"Action not found: {task_id!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def get_host_actions(self, system_id):
+        """
+        Returns actions for a given system
+
+        :param system_id: profile ID
+        :type system_id: int
+        """
+        try:
+            if not isinstance(system_id, int):
+                raise EmptySetException(
+                    "No system found - use system profile IDs"
+                )
+            actions = self._session.system.listSystemEvents(
+                self._api_key, system_id
+            )
+            return actions
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException(
+                    f"System not found: {system_id!r}"
                 )
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
