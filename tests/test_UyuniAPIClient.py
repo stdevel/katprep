@@ -258,7 +258,13 @@ def test_get_host_groups_nonexistent(client):
         client.get_host_groups(random.randint(800, 1500))
 
 
-def test_get_host_details(client, host_id):
+@pytest.mark.parametrize("key", [
+    "id",
+    "profile_name",
+    "hostname",
+    "virtualization"
+])
+def test_get_host_details(client, host_id, key):
     """
     Ensure that host details can be found
     """
@@ -266,14 +272,7 @@ def test_get_host_details(client, host_id):
         host_id
     )
     # check some keys
-    keys = [
-        "id",
-        "profile_name",
-        "hostname",
-        "virtualization"
-    ]
-    for key in keys:
-        assert key in host_details
+    assert key in host_details
 
 
 def test_get_host_details_invalid_format(client):
@@ -292,7 +291,12 @@ def test_get_host_details_nonexistent(client):
         client.get_host_details(random.randint(800, 1500))
 
 
-def test_get_host_network(client, host_id):
+@pytest.mark.parametrize("key", [
+    "ip",
+    "ip6",
+    "hostname"
+])
+def test_get_host_network(client, host_id, key):
     """
     Ensure that host network information can be found
     """
@@ -300,13 +304,7 @@ def test_get_host_network(client, host_id):
         host_id
     )
     # check some keys
-    keys = [
-        "ip",
-        "ip6",
-        "hostname"
-    ]
-    for key in keys:
-        assert key in host_network
+    assert key in host_network
 
 
 def test_get_host_network_nonexistent(client):
@@ -398,7 +396,7 @@ def test_host_patch_already_installed(client, host_id):
     actions = client.get_host_actions(
         host_id
     )
-    _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # noqa: E501
+    _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # pylint: disable=line-too-long # noqa: E501
     pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
     errata = [re.search(pattern, x)[0] for x in _actions]
     if errata:
@@ -536,7 +534,14 @@ def test_get_host_action_nonexistent(client, host_id):
         )
 
 
-def test_get_user(client, user_name):
+@pytest.mark.parametrize("key", [
+    "first_name",
+    "last_name",
+    "email",
+    "org_id",
+    "org_name"
+])
+def test_get_user(client, user_name, key):
     """
     Ensure that user information can be found
     """
@@ -544,15 +549,7 @@ def test_get_user(client, user_name):
         user_name
     )
     # check some keys
-    keys = [
-        "first_name",
-        "last_name",
-        "email",
-        "org_id",
-        "org_name"
-    ]
-    for key in keys:
-        assert key in user_info
+    assert key in user_info
 
 
 def test_get_user_nonexistent(client):
