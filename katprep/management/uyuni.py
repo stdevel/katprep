@@ -114,7 +114,7 @@ class UyuniAPIClient(BaseConnector):
     def validate_api_support(self):
         """
         Checks whether the API version on the Uyuni server is supported.
-        Using older versions than 24 is not recommended. In this case, an
+        Using older versions than API_MIN is not recommended. In this case, an
         exception will be thrown.
 
         :raises: APILevelNotSupportedException
@@ -157,6 +157,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_id(self, hostname):
         """
         Returns the profile ID of a particular system
+
+        :param hostname: System hostname
+        :type hostname: str
         """
         try:
             host_id = self._session.system.getId(
@@ -179,6 +182,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_params(self, system_id):
         """
         Returns the parameters of a particular system
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -201,6 +207,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_owner(self, system_id):
         """
         Returns the host owner
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         host_params = self.get_host_params(system_id)
         try:
@@ -213,6 +222,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_patches(self, system_id):
         """
         Returns available patches for a particular system
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -235,6 +247,9 @@ class UyuniAPIClient(BaseConnector):
     def get_patch_by_name(self, patch_name):
         """
         Returns a patch by name
+
+        :param patch_name: Patch name (e.g. openSUSE-2020-1001)
+        :type patch_name: str
         """
         try:
             patch = self._session.errata.getDetails(
@@ -250,13 +265,16 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def get_package_by_name(self, package_name):
+    def get_package_by_file_name(self, file_name):
         """
-        Returns a package by name
+        Returns a package by file name
+
+        :param file_name: file name (e.g. foo-1.0-1.i386.rpm)
+        :type file_name: str
         """
         try:
             # split file name
-            package_nvrea = splitFilename(package_name)
+            package_nvrea = splitFilename(file_name)
             # return information
             package = self._session.packages.findByNvrea(
                 self._api_key,
@@ -270,7 +288,7 @@ class UyuniAPIClient(BaseConnector):
         except Fault as err:
             if "no such package" in err.faultString.lower():
                 raise EmptySetException(
-                    f"Package not found: {package_name!r}"
+                    f"Package not found: {file_name!r}"
                 )
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
@@ -279,6 +297,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_upgrades(self, system_id):
         """
         Returns available package upgrades
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -309,6 +330,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_groups(self, system_id):
         """
         Returns groups for a given system
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -331,6 +355,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_details(self, system_id):
         """
         Returns details for a given system
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -353,6 +380,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_network(self, system_id):
         """
         Returns network information for a given system
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -375,6 +405,9 @@ class UyuniAPIClient(BaseConnector):
     def get_host_actions(self, system_id):
         """
         Returns actions for a given system
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -397,6 +430,11 @@ class UyuniAPIClient(BaseConnector):
     def install_patches(self, system_id, patches):
         """
         Install patches on a given system
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param patches: patch IDs
+        :type patches: int[]
         """
         try:
             # remove non-integer values
@@ -426,6 +464,11 @@ class UyuniAPIClient(BaseConnector):
     def install_upgrades(self, system_id, upgrades):
         """
         Install package upgrades on a given system
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param upgrades: package IDs
+        :type upgrades: int[]
         """
         try:
             # remove non-integer values
@@ -457,6 +500,9 @@ class UyuniAPIClient(BaseConnector):
     def host_reboot(self, system_id):
         """
         Reboots a system immediately
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         try:
             if not isinstance(system_id, int):
@@ -480,6 +526,11 @@ class UyuniAPIClient(BaseConnector):
     def get_host_action(self, system_id, task_id):
         """
         Retrieves information about a particular host action
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param task_id: task ID
+        :type task_id: int
         """
         if not isinstance(system_id, int):
             raise EmptySetException(
@@ -508,6 +559,9 @@ class UyuniAPIClient(BaseConnector):
     def get_user(self, user_name):
         """
         Retrieves information about a particular user
+
+        :param user_name: Username
+        :type user_name: str
         """
         if not isinstance(user_name, str):
             raise EmptySetException(
