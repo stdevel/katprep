@@ -4,9 +4,9 @@ Uyuni XMLRPC API client
 
 import logging
 import ssl
-
-from xmlrpc.client import ServerProxy, Fault, DateTime
 from datetime import datetime
+from xmlrpc.client import DateTime, Fault, ServerProxy
+
 from . import splitFilename
 from .base import BaseConnector
 from ..exceptions import (
