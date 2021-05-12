@@ -1,10 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Unit tests for Uyuni API integration
 """
-
-from __future__ import absolute_import
 
 import logging
 import random
