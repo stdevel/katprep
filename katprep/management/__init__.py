@@ -3,38 +3,39 @@
 Clients to access various management systems.
 """
 
+
 def splitFilename(filename):
     """
-    Pass in a standard style rpm fullname 
-    
+    Pass in a standard style rpm fullname
+
     Return a name, version, release, epoch, arch, e.g.::
         foo-1.0-1.i386.rpm returns foo, 1.0, 1, i386
         1:bar-9-123a.ia64.rpm returns bar, 9, 123a, 1, ia64
-    
+
     Proudly taken from:
     https://github.com/rpm-software-management/
     yum/blob/master/rpmUtils/miscutils.py
     """
 
-    if filename[-4:] == '.rpm':
+    if filename[-4:] == ".rpm":
         filename = filename[:-4]
-       
-    archIndex = filename.rfind('.')
-    arch = filename[archIndex+1:]
 
-    relIndex = filename[:archIndex].rfind('-')
-    rel = filename[relIndex+1:archIndex]
+    archIndex = filename.rfind(".")
+    arch = filename[archIndex + 1 :]
 
-    verIndex = filename[:relIndex].rfind('-')
-    ver = filename[verIndex+1:relIndex]
+    relIndex = filename[:archIndex].rfind("-")
+    rel = filename[relIndex + 1 : archIndex]
 
-    epochIndex = filename.find(':')
+    verIndex = filename[:relIndex].rfind("-")
+    ver = filename[verIndex + 1 : relIndex]
+
+    epochIndex = filename.find(":")
     if epochIndex == -1:
-        epoch = ''
+        epoch = ""
     else:
         epoch = filename[:epochIndex]
-        
-    name = filename[epochIndex + 1:verIndex]
+
+    name = filename[epochIndex + 1 : verIndex]
     return name, ver, rel, epoch, arch
 
 
@@ -49,11 +50,13 @@ def get_management_client(
     if management_type == "foreman":
         from .foreman import ForemanAPIClient
 
-        return ForemanAPIClient(log_level, host, username, password, *args, **kwargs)
+        return ForemanAPIClient(
+            log_level, hostname, username, password, *args, **kwargs
+        )
     elif management_type == "uyuni":
         from .uyuni import UyuniAPIClient
 
-        return UyuniAPIClient(log_level, username, password, host, *args, **kwargs)
+        return UyuniAPIClient(log_level, username, password, hostname, *args, **kwargs)
     else:
         raise ValueError(f"Unknown virtualisation type {management_type!r}")
 

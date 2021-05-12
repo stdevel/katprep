@@ -59,7 +59,7 @@ def get_credentials(prefix, hostname=None, auth_container=None, auth_pass=None):
             return (s_creds.username, s_creds.password)
         except ContainerException as e:
             LOGGER.error(e)
-            exit(1)
+            sys.exit(1)
         except TypeError:
             LOGGER.warning(
                 "Login information for '{}' not found in container!".format(
