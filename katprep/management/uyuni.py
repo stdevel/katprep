@@ -491,9 +491,7 @@ class UyuniAPIClient(BaseConnector):
             actions = self.get_host_actions(system_id)
             action = [x for x in actions if x['id'] == task_id]
             if not action:
-                raise EmptySetException(
-                    f"Action not found"
-                )
+                raise EmptySetException("Action not found")
             return action
         except Fault as err:
             if "action not found" in err.faultString.lower():
