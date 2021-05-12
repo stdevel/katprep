@@ -97,7 +97,6 @@ class UyuniAPIClient(BaseConnector):
         :type skip_ssl: bool
         """
         # set logging
-        logging.basicConfig(level=log_level)
         self.LOGGER.setLevel(log_level)
         self.LOGGER.debug(
             "About to create Uyuni client '%s'@'%s'",
