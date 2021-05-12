@@ -29,7 +29,7 @@ class UyuniAPIClient(BaseConnector):
     """
     logging: Logger instance
     """
-    API_MIN = 22
+    API_MIN = 24
     """
     int: Minimum supported API version.
     """
