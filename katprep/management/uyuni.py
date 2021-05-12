@@ -145,8 +145,7 @@ class UyuniAPIClient(BaseConnector):
                 self._api_key
             )
             if hosts:
-                _hosts = [x["id"] for x in hosts]
-                return _hosts
+                return [x["id"] for x in hosts]
             raise EmptySetException(
                 "No systems found"
             )
