@@ -3,8 +3,6 @@
 Class for sending requests to libvirt
 """
 
-from __future__ import print_function
-
 import logging
 import socket
 
