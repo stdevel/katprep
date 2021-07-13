@@ -1,9 +1,12 @@
 import json
+import logging
 import os
 import os.path
 from argparse import ArgumentTypeError
 
 from .host import Host
+
+_LOGGER = logging.getLogger('katprep.reports')
 
 
 def load_report(filename):
@@ -33,7 +36,7 @@ def get_json(filename):
             json_data = json_file.read().replace("\n", "")
         return json_data
     except IOError as err:
-        LOGGER.error("Unable to read file %r: %s", filename, err)
+        _LOGGER.error("Unable to read file %r: %s", filename, err)
 
 
 def write_report(filename, report):
