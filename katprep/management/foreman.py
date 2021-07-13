@@ -242,7 +242,7 @@ class ForemanAPIClient(BaseConnector):
                 raise APILevelNotSupportedException(
                     "Your API version (%s) does not support the required calls."
                     "You'll need API version %s - stop using historic"
-                    " software!", result_obj["api_version"], self.API_MIN
+                    " software!" % (result_obj["api_version"], self.API_MIN)
                 )
         except ValueError as err:
             self.LOGGER.error(err)
