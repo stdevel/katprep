@@ -13,8 +13,8 @@ import logging
 import json
 import getpass
 
-from . import __version__, get_credentials, validate_filters, get_filter
-from .management.foreman import ForemanAPIClient
+from .. import __version__, get_credentials, validate_filters, get_filter
+from ..management.foreman import ForemanAPIClient
 
 try:
     raw_input

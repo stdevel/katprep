@@ -15,8 +15,8 @@ import datetime
 import os
 #import pypandoc
 import yaml
-from . import __version__, is_writable, which
-from .reports import is_valid_report, load_report
+from .. import __version__, is_writable, which
+from ..reports import is_valid_report, load_report
 
 """
 str: Program version

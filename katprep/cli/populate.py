@@ -12,10 +12,10 @@ import argparse
 import logging
 import json
 import getpass
-from . import __version__, get_credentials
-from .management.foreman import ForemanAPIClient
-from .monitoring import get_monitoring_client
-from .virtualization import get_virtualization_client
+from .. import __version__, get_credentials
+from ..management.foreman import ForemanAPIClient
+from ..monitoring import get_monitoring_client
+from ..virtualization import get_virtualization_client
 
 LOGGER = logging.getLogger('katprep_populate')
 """
