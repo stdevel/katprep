@@ -125,7 +125,7 @@ class PowerManager(metaclass=ABCMeta):
         """
         return self._manage_power(host, "poweroff")
 
-    def poweron_vm(self, vm_name):
+    def poweron_vm(self, host):
         """
         Turns on a particual virtual machine forcefully.
 
