@@ -10,7 +10,8 @@ import socket
 
 import libvirt
 
-from .base import BaseConnector, PowerManager, SnapshotManager
+from .base import PowerManager, SnapshotManager
+from ..connector import BaseConnector
 from ..exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, UnsupportedRequestException)
 

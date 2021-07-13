@@ -20,11 +20,11 @@ from . import __version__, get_credentials
 from .exceptions import (EmptySetException,
 InvalidCredentialsException, SessionException, SnapshotExistsException,
 UnsupportedRequestException)
-from .management import get_virtualization_client
 from .management.foreman import ForemanAPIClient
 from .monitoring import get_monitoring_client
 from .network import validate_hostname
 from .reports import is_valid_report, load_report, write_report
+from .virtualization import get_virtualization_client
 
 """
 ForemanAPIClient: Foreman API client handle

@@ -9,7 +9,7 @@ import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from .base import BaseConnector
+from ..connector import BaseConnector
 from ..exceptions import (APILevelNotSupportedException,
 InvalidCredentialsException, SessionException)
 

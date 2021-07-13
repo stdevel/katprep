@@ -7,7 +7,7 @@ import ssl
 from datetime import datetime
 from xmlrpc.client import DateTime, Fault, ServerProxy
 
-from .base import BaseConnector
+from ..connector import BaseConnector
 from ..exceptions import (
     APILevelNotSupportedException,
     EmptySetException,

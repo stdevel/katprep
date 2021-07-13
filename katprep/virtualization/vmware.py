@@ -11,7 +11,8 @@ import sys
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
-from .base import BaseConnector, PowerManager, SnapshotManager
+from .base import PowerManager, SnapshotManager
+from ..connector import BaseConnector
 from ..exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException, SnapshotExistsException)
 from ..network import is_ipv4, is_ipv6
