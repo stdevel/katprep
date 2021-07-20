@@ -1,25 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Base for creating management classes.
+Base classes for virtualization managers.
 """
 
 from abc import ABCMeta, abstractmethod
-
-
-class BaseConnector(metaclass=ABCMeta):
-    """
-    Basic management connector that connects on creation.
-    """
-
-    def __init__(self, username, password, **kwargs):
-        self._username = username
-        self._password = password
-        self._session = None
-        self._connect()
-
-    @abstractmethod
-    def _connect(self):
-        pass
 
 
 class SnapshotManager(metaclass=ABCMeta):
@@ -141,7 +125,7 @@ class PowerManager(metaclass=ABCMeta):
         """
         return self._manage_power(host, "poweroff")
 
-    def poweron_vm(self, vm_name):
+    def poweron_vm(self, host):
         """
         Turns on a particual virtual machine forcefully.
 

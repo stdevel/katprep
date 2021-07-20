@@ -12,6 +12,7 @@ import logging
 import os
 import json
 import argparse
+import sys
 from .AuthContainer import AuthContainer, ContainerException
 from .exceptions import SessionException
 

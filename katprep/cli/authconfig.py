@@ -10,8 +10,8 @@ from __future__ import absolute_import, print_function
 import argparse
 import logging
 import getpass
-from . import __version__
-from .AuthContainer import AuthContainer, ContainerException
+from .. import __version__
+from ..AuthContainer import AuthContainer, ContainerException
 
 LOGGER = logging.getLogger("katprep_authconfig")
 """

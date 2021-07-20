@@ -93,12 +93,12 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-           'katprep_authconfig=katprep.authconfig:cli',
-           'katprep_maintenance=katprep.maintenance:cli',
-           'katprep_parameters=katprep.parameters:cli',
-           'katprep_populate=katprep.populate:cli',
-           'katprep_report=katprep.report:cli',
-           'katprep_snapshot=katprep.snapshot:cli',
+           'katprep_authconfig=katprep.cli.authconfig:cli',
+           'katprep_maintenance=katprep.cli.maintenance:cli',
+           'katprep_parameters=katprep.cli.parameters:cli',
+           'katprep_populate=katprep.cli.populate:cli',
+           'katprep_report=katprep.cli.report:cli',
+           'katprep_snapshot=katprep.cli.snapshot:cli',
         ],
     },
 )
