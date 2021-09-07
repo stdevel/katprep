@@ -226,7 +226,11 @@ def scan_systems(options):
         network = MGMT_CLIENT.get_host_network(system)
         organization = MGMT_CLIENT.get_organization()
         location = MGMT_CLIENT.get_location()
-        owner = MGMT_CLIENT.get_host_owner(system)
+        try:
+            owner = MGMT_CLIENT.get_host_owner(system)
+        except SessionException as sexc:
+            LOGGER.debug("Skipping %s: %s", system, sexc)
+            continue  # skip this client
         patches = MGMT_CLIENT.get_host_patches(system)
         upgrades = MGMT_CLIENT.get_host_upgrades(system)
         params = MGMT_CLIENT.get_host_params(system)
