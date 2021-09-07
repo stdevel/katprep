@@ -21,6 +21,6 @@ def get_management_client(
     elif management_type == "uyuni":
         from .uyuni import UyuniAPIClient
 
-        return UyuniAPIClient(log_level, username, password, hostname, *args, **kwargs)
+        return UyuniAPIClient(log_level, hostname, username, password, *args, **kwargs)
     else:
         raise ValueError(f"Unknown virtualisation type {management_type!r}")

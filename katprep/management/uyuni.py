@@ -75,8 +75,8 @@ class UyuniAPIClient(BaseConnector):
     """
 
     def __init__(
-            self, log_level, username, password,
-            hostname, port=443, skip_ssl=False
+            self, log_level, hostname, username, password,
+            port=443, skip_ssl=False
     ):
         """
         Constructor creating the class. It requires specifying a
