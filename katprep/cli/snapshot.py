@@ -121,6 +121,7 @@ http://github.com/stdevel/katprep"""
         "--mgmt-type",
         dest="mgmt_type",
         metavar="foreman|uyuni",
+        choices=['foreman', 'uyuni'],
         default="foreman",
         type=str,
         help="defines the library used to operate with management host: "
@@ -280,10 +281,7 @@ def main(options, args):
     # set output file
     if options.output_path == "":
         options.output_path = "./"
-    elif (
-            options.output_path != ""
-            and options.output_path[len(options.output_path) - 1:] != "/"
-    ):
+    elif not options.output_path.endswith("/"):
         # add trailing slash
         options.output_path = "{}/".format(options.output_path)
     OUTPUT_FILE = "{}errata-snapshot-report-{}-{}.json".format(
@@ -297,7 +295,7 @@ def main(options, args):
     if is_writable(OUTPUT_FILE):
         # initalize Foreman connection and scan systems
         (mgmt_user, mgmt_pass) = get_credentials(
-            "Management",
+            f"Management ({options.mgmt_type})",
             options.server,
             options.auth_container,
             options.auth_password
@@ -315,8 +313,8 @@ def main(options, args):
         # validate_filters(options, MGMT_CLIENT)
 
         # scan systems and create report
-        _info = scan_systems(options)
-        create_report(_info)
+        info = scan_systems(options)
+        create_report(info)
     else:
         LOGGER.error("Directory '%s' is not writable!", OUTPUT_FILE)
 
