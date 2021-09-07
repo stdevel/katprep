@@ -33,11 +33,11 @@ def client(config):
     """
     return UyuniAPIClient(
         logging.ERROR,
+        config["config"]["hostname"],
         config["config"]["api_user"],
         config["config"]["api_pass"],
-        config["config"]["hostname"],
         port=config["config"]["port"],
-        skip_ssl=True
+        verify=False
     )
 
 
@@ -85,11 +85,11 @@ def test_valid_login(config):
     """
     assert UyuniAPIClient(
         logging.ERROR,
+        config["config"]["hostname"],
         config["config"]["api_user"],
         config["config"]["api_pass"],
-        config["config"]["hostname"],
         port=config["config"]["port"],
-        skip_ssl=True
+        verify=False
     )
 
 
@@ -100,11 +100,11 @@ def test_invalid_login(config):
     with pytest.raises(InvalidCredentialsException):
         UyuniAPIClient(
             logging.ERROR,
+            config["config"]["hostname"],
             "giertz",
             "paulapinkepank",
-            config["config"]["hostname"],
             port=config["config"]["port"],
-            skip_ssl=True
+            verify=False
         )
 
 
@@ -115,11 +115,11 @@ def test_invalid_ssl(config):
     with pytest.raises(SSLCertVerificationError):
         UyuniAPIClient(
             logging.ERROR,
+            config["config"]["hostname"],
             config["config"]["api_user"],
             config["config"]["api_pass"],
-            config["config"]["hostname"],
             port=config["config"]["port"],
-            skip_ssl=False
+            verify=True
         )
 
 

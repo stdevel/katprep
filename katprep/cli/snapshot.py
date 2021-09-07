@@ -139,10 +139,10 @@ http://github.com/stdevel/katprep"""
     # --insecure
     mgmt_opts.add_argument(
         "--insecure",
-        dest="skip_ssl",
-        default=False,
-        action="store_true",
-        help="Disables SSL verification (default: no)",
+        dest="verify",
+        default=True,
+        action="store_false",
+        help="Enables SSL verification (default: yes)",
     )
 
     # SNAPSHOT FILTER ARGUMENTS
@@ -306,7 +306,7 @@ def main(options, args):
             mgmt_user,
             mgmt_pass,
             options.server,
-            skip_ssl=options.skip_ssl,
+            verify=options.verify,
         )
 
         # TODO: validate filters

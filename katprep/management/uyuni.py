@@ -76,7 +76,7 @@ class UyuniAPIClient(BaseConnector):
 
     def __init__(
             self, log_level, hostname, username, password,
-            port=443, skip_ssl=False
+            port=443, verify=True
     ):
         """
         Constructor creating the class. It requires specifying a
@@ -93,8 +93,8 @@ class UyuniAPIClient(BaseConnector):
         :type hostname: str
         :param port: HTTPS port
         :type port: int
-        :param skip_ssl: Skip SSL verification
-        :type skip_ssl: bool
+        :param verify: SSL verification
+        :type verify: bool
         """
         # set logging
         self.LOGGER.setLevel(log_level)
@@ -106,7 +106,7 @@ class UyuniAPIClient(BaseConnector):
         # set connection information
         self.LOGGER.debug("Set hostname to '%s'", hostname)
         self.url = "https://{0}:{1}/rpc/api".format(hostname, port)
-        self.skip_ssl = skip_ssl
+        self.verify = verify
 
         # start session and check API version if Uyuni API
         self._api_key = None
@@ -125,7 +125,7 @@ class UyuniAPIClient(BaseConnector):
         """
         # set API session and key
         try:
-            if self.skip_ssl:
+            if not self.verify:
                 context = ssl._create_unverified_context()
             else:
                 context = ssl.create_default_context()
