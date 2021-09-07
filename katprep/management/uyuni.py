@@ -113,12 +113,6 @@ class UyuniAPIClient(BaseConnector):
         super().__init__(username, password)
         self.validate_api_support()
 
-    def __del__(self):
-        """
-        Destructor
-        """
-        self._session.auth.logout(self._api_key)
-
     def _connect(self):
         """
         This function establishes a connection to Uyuni.
