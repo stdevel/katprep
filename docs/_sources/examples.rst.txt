@@ -94,7 +94,7 @@ In order to automate system maintenance we need to utilize the ``katprep_snapsho
   INFO:katprep_snapshot:Checking system 'pinkepank.test.loc' (#2)...
   INFO:katprep_snapshot:Report './errata-snapshot-report-foreman-20170413-0008.json' created.
 
-Afterwards, a JSON file is created. Know, we can prepare maintenance using the ``katprep_maintenance`` command - basically it is a good idea to use the ``--dry-run`` parameter to see what is about to happen::
+Afterwards, a JSON file is created. Now we can prepare maintenance using the ``katprep_maintenance`` command - basically it is a good idea to use the ``--dry-run`` parameter to see what is about to happen::
 
   $ katprep_maintenance -C mycontainer.auth -S foreman.localdomain.loc errata-snapshot-*.json --dry-run prepare
   INFO:katprep_maintenance:This is just a SIMULATION - no changes will be made.
