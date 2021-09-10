@@ -6,13 +6,13 @@ Prepare, execute and control maintenance tasks.
 """
 
 import argparse
-import logging
-import json
-import time
-import os
-import getpass
 import datetime
+import getpass
+import logging
+import os
+import time
 import yaml
+
 from .. import __version__, get_credentials
 from ..exceptions import (EmptySetException, InvalidCredentialsException,
     SessionException, SnapshotExistsException, UnsupportedRequestException)
