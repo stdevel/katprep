@@ -71,7 +71,7 @@ http://github.com/stdevel/katprep"""
         action="store_true",
         dest="generic_quiet",
         default=False,
-        help="don't print status messages " "to stdout (default: no)",
+        help="don't print status messages to stdout (default: no)",
     )
     # -d / --debug
     gen_opts.add_argument(
@@ -90,18 +90,17 @@ http://github.com/stdevel/katprep"""
         metavar="PATH",
         default="",
         action="store",
-        help="defines the output path"
-        " for reports (default: current directory)",
+        help="The directory where reports are stored "
+        "(default: current directory)",
     )
     # -C / --auth-container
     gen_opts.add_argument(
         "-C",
         "--auth-container",
-        default="",
         dest="auth_container",
         action="store",
         metavar="FILE",
-        help="defines an authentication container file (default: no)",
+        help="Which authentication container to use",
     )
     # -P / --auth-password
     gen_opts.add_argument(
@@ -111,8 +110,7 @@ http://github.com/stdevel/katprep"""
         dest="auth_password",
         action="store",
         metavar="PASSWORD",
-        help="defines the authentication container password in case you don't "
-        "want to enter it manually (useful for scripted automation)",
+        help="Set the authentication container password. Useful for scripted automation.",
     )
 
     # MANAGEMENT ARGUMENTS
