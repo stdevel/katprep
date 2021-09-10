@@ -315,32 +315,32 @@ class ForemanAPIClient(ManagementClient):
             return object_type in valid_objects
 
         api_object = api_object.lower()
+        if not is_valid_oject_type(api_object):
+            raise SessionException(
+                "Unable to lookup name by invalid field"
+                " type '{}'".format(api_object)
+            )
 
         filter_object = {
             "hostgroup" : "title", "location": "name", "host" : "name",
             "organization" : "title", "environment" : "name"
         }
         try:
-            if not is_valid_oject_type(api_object):
-                raise ValueError(
-                    "Unable to lookup name by invalid field"
-                    " type '{}'".format(api_object)
-                )
-            else:
-                #get ID by name
-                result_obj = json.loads(
-                    self.api_get("/{}s".format(api_object))
-                )
-                #TODO: nicer way than looping? numpy? Direct URL?
-                for entry in result_obj["results"]:
-                    if entry[filter_object[api_object]].lower() == name.lower():
-                        self.LOGGER.debug(
-                            "%s %s seems to have ID #%s",
-                            api_object, name, entry["id"]
-                        )
-                        return entry["id"]
-                #not found
-                raise SessionException("Object not found")
+            # get ID by name
+            result_obj = json.loads(
+                self.api_get("/{}s".format(api_object))
+            )
+            name_lower = name.lower()
+            #TODO: nicer way than looping? numpy? Direct URL?
+            for entry in result_obj["results"]:
+                if entry[filter_object[api_object]].lower() == name_lower:
+                    self.LOGGER.debug(
+                        "%s %s seems to have ID #%s",
+                        api_object, name, entry["id"]
+                    )
+                    return entry["id"]
+
+            raise SessionException(f"Object {name} not found")
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
