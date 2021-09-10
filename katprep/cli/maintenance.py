@@ -485,12 +485,13 @@ def load_configuration(config_file, options):
     :param options: argparse options dictionary containing the settings
     :type options: argparse options dict
     """
+    raise NotImplementedError("Loading a configuration from a file is currently not implemented.")
+
     #try to apply settings from configuration file
     try:
         with open(config_file, 'r') as yml_file:
             config = yaml.load(yml_file)
         #TODO: load configuration
-        print("TODO: load_configuration")
     except ValueError as err:
         LOGGER.debug("Error: '%s'", err)
     return options
