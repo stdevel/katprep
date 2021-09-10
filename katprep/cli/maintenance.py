@@ -577,7 +577,6 @@ def parse_options(args=None):
 
     #VIRTUALIZATION ARGUMENTS
     #--virt-uri
-    #TODO: validate URI
     virt_opts.add_argument("--virt-uri", dest="virt_uri", \
     metavar="URI", default="", \
     help="defines a libvirt URI to use")
