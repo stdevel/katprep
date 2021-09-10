@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=not-callable
 """
-A script which prepares, executes and controls maintenance tasks on systems
-managed with Foreman/Katello or Red Hat Satellite 6.
+Prepare, execute and control maintenance tasks.
 """
 
 from __future__ import absolute_import, print_function
@@ -19,15 +18,12 @@ import yaml
 from .. import __version__, get_credentials
 from ..exceptions import (EmptySetException, InvalidCredentialsException,
     SessionException, SnapshotExistsException, UnsupportedRequestException)
-from ..management.foreman import ForemanAPIClient
+from ..management import get_management_client
 from ..monitoring import get_monitoring_client
 from ..network import validate_hostname
 from ..reports import is_valid_report, load_report, write_report
 from ..virtualization import get_virtualization_client
 
-"""
-ForemanAPIClient: Foreman API client handle
-"""
 LOGGER = logging.getLogger('katprep_maintenance')
 """
 logging: Logger instance
@@ -38,7 +34,7 @@ logging: Logger level
 """
 SAT_CLIENT = None
 """
-ForemanAPIClient: Foreman API client handle
+SAT_CLIENT: Management client
 """
 VIRT_CLIENTS = {}
 """
@@ -268,8 +264,8 @@ def execute(options, args):
                     errata_reboot = reboot
                     break
 
-            if options.foreman_reboot or \
-                (errata_reboot and not options.foreman_no_reboot):
+            if options.mgmt_reboot or \
+                (errata_reboot and not options.mgmt_no_reboot):
 
                 LOGGER.info("Host '%s' --> reboot host", host)
                 if not options.generic_dry_run:
@@ -506,8 +502,8 @@ def load_configuration(config_file, options):
 def parse_options(args=None):
     """Parses options and arguments."""
     desc = '''%(prog)s is used for preparing, executing and
-    controlling maintenance tasks on systems managed with Foreman/Katello
-    or Red Hat Satellite 6.
+    controlling maintenance tasks.
+
     You can automatically create snapshots and schedule monitoring downtimes
     if you have set all necessary host parameters using katprep_parameters.
     It is also possible to trigger errata installation using the Foreman API.
@@ -521,10 +517,9 @@ def parse_options(args=None):
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
-    fman_opts = parser.add_argument_group("Foreman arguments")
+    mgmt_opts = parser.add_argument_group("Management system arguments")
     virt_opts = parser.add_argument_group("virtualization arguments")
     mon_opts = parser.add_argument_group("monitoring arguments")
-    filter_opts_excl = fman_opts.add_mutually_exclusive_group()
 
     #GENERIC ARGUMENTS
     #-q / --quiet
@@ -559,18 +554,25 @@ def parse_options(args=None):
     gen_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
     action="store_false", help="Disables SSL verification (default: no)")
 
-    #FOREMAN ARGUMENTS
-    #-s / --foreman-server
-    fman_opts.add_argument("-s", "--foreman-server", \
-    dest="foreman_server", metavar="SERVER", default="localhost", \
-    help="defines the Foreman server to use (default: localhost)")
-    #-r / --reboot-systems
-    fman_opts.add_argument("-r", "--reboot-systems", dest="foreman_reboot", \
+    # MANAGEMENT ARGUMENTS
+    mgmt_opts.add_argument(
+        "--mgmt-type",
+        dest="mgmt_type",
+        metavar="foreman|uyuni",
+        choices=["foreman", "uyuni"],
+        default="foreman",
+        type=str,
+        help="defines the library used to operate with management host: "
+        "foreman or uyuni (default: foreman)",
+    )
+    mgmt_opts.add_argument("-s", "--mgmt-server", \
+    dest="mgmt_server", metavar="SERVER", default="localhost", \
+    help="defines the management server to use (default: localhost)")
+    mgmt_opts.add_argument("-r", "--reboot-systems", dest="mgmt_reboot", \
     default=False, action="store_true", \
     help="always reboot systems after successful errata installation " \
     "(default: no, only if reboot_suggested set)")
-    #suppress reboot
-    fman_opts.add_argument("-R", "--no-reboot", dest="foreman_no_reboot", \
+    mgmt_opts.add_argument("-R", "--no-reboot", dest="mgmt_no_reboot", \
     default=True, action="store_false", help="suppresses rebooting the " \
     "system under any circumstances (default: no)")
 
@@ -608,6 +610,7 @@ def parse_options(args=None):
     help="downtime period (default: 8 hours)")
 
     #FILTER ARGUMENTS
+    filter_opts_excl = mgmt_opts.add_mutually_exclusive_group()
     #-l / --location
     filter_opts_excl.add_argument("-l", "--location", action="store", \
     default="", dest="filter_location", metavar="NAME", \
@@ -621,11 +624,11 @@ def parse_options(args=None):
     default="", dest="filter_environment", metavar="NAME", \
     help="filters by an particular environment (default: no)")
     #-E / --exclude
-    fman_opts.add_argument("-E", "--exclude", action="append", default=[], \
+    filter_opts_excl.add_argument("-E", "--exclude", action="append", default=[], \
     type=str, dest="filter_exclude", metavar="NAME", \
     help="excludes particular hosts (default: no)")
     #-I / --include-only
-    fman_opts.add_argument("-I", "--include-only", action="append", default=[], \
+    filter_opts_excl.add_argument("-I", "--include-only", action="append", default=[], \
     type=str, dest="filter_include", metavar="NAME", \
     help="only includes particular hosts (default: no)")
 
@@ -655,8 +658,8 @@ def parse_options(args=None):
     if options.config != "":
         options = load_configuration(options.config, options)
         options = parser.parse_args()
-    #validate hostname
-    options.foreman_server = validate_hostname(options.foreman_server)
+
+    options.mgmt_server = validate_hostname(options.mgmt_server)
     #set password
     while options.auth_password == "empty" or len(options.auth_password) > 32:
         options.auth_password = getpass.getpass(
@@ -735,13 +738,15 @@ def main(options, args):
         LOGGER.warn("You decided to skip scheduling downtimes - happy flodding!")
 
     #initialize APIs
-    (fman_user, fman_pass) = get_credentials(
-        "Foreman", options.foreman_server, options.generic_auth_container,
+    (management_user, management_password) = get_credentials(
+        f"Management ({options.mgmt_type})", options.mgmt_server, options.generic_auth_container,
         options.auth_password
     )
-    SAT_CLIENT = ForemanAPIClient(
-        LOG_LEVEL, options.foreman_server, fman_user,
-        fman_pass, options.ssl_verify
+
+    SAT_CLIENT = get_management_client(
+        options.mgmt_type, LOG_LEVEL,
+        management_user, management_password, options.mgmt_server,
+        verify=options.ssl_verify
     )
 
     #get virtualization host credentials
