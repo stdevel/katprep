@@ -5,8 +5,6 @@
 Prepare, execute and control maintenance tasks.
 """
 
-from __future__ import absolute_import, print_function
-
 import argparse
 import logging
 import json
