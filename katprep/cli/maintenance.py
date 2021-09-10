@@ -653,7 +653,7 @@ def parse_options(args=None):
     #parse options and arguments
     options = parser.parse_args()
     #load configuration file
-    if options.config != "":
+    if options.config:
         options = load_configuration(options.config, options)
         options = parser.parse_args()
 
