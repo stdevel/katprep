@@ -71,7 +71,7 @@ http://github.com/stdevel/katprep"""
         action="store_true",
         dest="generic_quiet",
         default=False,
-        help="don't print status messages " "to stdout (default: no)",
+        help="don't print status messages to stdout (default: no)",
     )
     # -d / --debug
     gen_opts.add_argument(
@@ -90,18 +90,17 @@ http://github.com/stdevel/katprep"""
         metavar="PATH",
         default="",
         action="store",
-        help="defines the output path"
-        " for reports (default: current directory)",
+        help="The directory where reports are stored "
+        "(default: current directory)",
     )
     # -C / --auth-container
     gen_opts.add_argument(
         "-C",
         "--auth-container",
-        default="",
         dest="auth_container",
         action="store",
         metavar="FILE",
-        help="defines an authentication container file (default: no)",
+        help="Which authentication container to use",
     )
     # -P / --auth-password
     gen_opts.add_argument(
@@ -111,8 +110,7 @@ http://github.com/stdevel/katprep"""
         dest="auth_password",
         action="store",
         metavar="PASSWORD",
-        help="defines the authentication container password in case you don't "
-        "want to enter it manually (useful for scripted automation)",
+        help="Set the authentication container password. Useful for scripted automation.",
     )
 
     # MANAGEMENT ARGUMENTS
@@ -214,7 +212,7 @@ def scan_systems(options):
     """
     Scans all systems that were selected for errata counters
     """
-    system_info = []
+    system_info = {}
 
     # get information per system
     for system in MGMT_CLIENT.get_hosts():
@@ -235,9 +233,9 @@ def scan_systems(options):
         upgrades = MGMT_CLIENT.get_host_upgrades(system)
         params = MGMT_CLIENT.get_host_params(system)
 
-        # set system information
-        _system = {
-            "id": details["id"],
+        host_id = details["id"]
+        collected_information = {
+            "id": host_id,
             "name": details["profile_name"],
             "hostname": details["hostname"],
             "description": details["description"],
@@ -253,7 +251,8 @@ def scan_systems(options):
             "reboot_suggested": "TODO",
         }
 
-        system_info.append(_system)
+        system_info[host_id] = collected_information
+
     return system_info
 
 

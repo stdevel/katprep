@@ -245,7 +245,7 @@ class UyuniAPIClient(BaseConnector):
             return host_params['katprep_owner']
         except KeyError:
             raise SessionException(
-                f"Owner not found: {system_id!r}"
+                f"Owner not found for {system_id!r}"
             )
 
     def get_host_patches(self, system_id):
