@@ -79,3 +79,42 @@ def test_writing_valid_reports(temp_report_path):
 
     loaded_report = load_report(temp_report_path)
     assert report == loaded_report
+
+
+@pytest.fixture
+def example_uyuni_report_path():
+    test_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = "errata-snapshot-report-10-20210910-1415.json"
+
+    return os.path.join(test_dir, filename)
+
+
+def test_reading_uyuni_snapshot_report(example_uyuni_report_path):
+    report = load_report(example_uyuni_report_path)
+    assert report
+    assert isinstance(report, dict)
+    assert len(report) == 1
+
+    for key, host in report.items():
+        assert isinstance(host, Host)
+
+        assert host.hostname == "uyuni-client.labor.testdomain"
+
+        assert host.organization == "Demo"
+        assert host.location == "Demo"
+
+        assert host.get_param("katprep_virt") == "vc6.labor.testdomain"
+        assert host.get_param("katprep_virt_type") == "pyvmomi"
+        assert host.virtualisation_id == "Uyuni-Client"
+
+        verifications = host.get_verifications()
+        assert len(verifications) == 0
+
+        patches = host.patches
+        assert len(patches) == 3
+        assert isinstance(patches[0], dict)
+        # TODO: Test the patch contents
+
+
+def test_uyuni_report_validation(example_uyuni_report_path):
+    assert is_valid_report(example_uyuni_report_path)
