@@ -312,8 +312,9 @@ class ForemanAPIClient(ManagementClient):
                 "host"
             }
 
-            return object_type.lower() in valid_objects
+            return object_type in valid_objects
 
+        api_object = api_object.lower()
 
         filter_object = {
             "hostgroup" : "title", "location": "name", "host" : "name",
