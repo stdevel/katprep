@@ -322,9 +322,13 @@ class ForemanAPIClient(ManagementClient):
             )
 
         filter_object = {
-            "hostgroup" : "title", "location": "name", "host" : "name",
-            "organization" : "title", "environment" : "name"
+            "hostgroup": "title",
+            "location": "name",
+            "host": "name",
+            "organization": "title",
+            "environment": "name"
         }
+
         try:
             # get ID by name
             result_obj = json.loads(
@@ -344,8 +348,6 @@ class ForemanAPIClient(ManagementClient):
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
-
-
 
     def get_hostparam_id_by_name(self, host, param_name):
         """
