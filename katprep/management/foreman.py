@@ -9,12 +9,12 @@ import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from ..connector import BaseConnector
+from .base import ManagementClient
 from ..exceptions import (APILevelNotSupportedException,
 InvalidCredentialsException, SessionException)
 
 
-class ForemanAPIClient(BaseConnector):
+class ForemanAPIClient(ManagementClient):
     """
     Class for communicating with the Foreman API
 
@@ -423,3 +423,27 @@ class ForemanAPIClient(BaseConnector):
             self.LOGGER.error(err)
         finally:
             return my_results
+
+    def apply_patches(self, host, errata_ids):
+        self.api_put(
+            "/hosts/{}/errata/apply".format(
+                self.get_id_by_name(host, "host")
+            ),
+            json.dumps({"errata_ids": errata_target})
+        )
+
+    def upgrade_all_packages(self, host):
+        self.api_put(
+            "/hosts/{}/packages/upgrade_all".format(
+                self.get_id_by_name(host, "host")
+            ),
+            json.dumps({})
+        )
+
+    def reboot_host(self, host):
+        self.api_put(
+            "/hosts/{}/power".format(
+                self.get_id_by_name(host, "host")
+            ),
+            json.dumps({"power_action": "soft"})
+        )

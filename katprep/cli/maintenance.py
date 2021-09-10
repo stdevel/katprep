@@ -232,65 +232,50 @@ def execute(options, args):
     :type args: argparse options dict
     """
     try:
-        for host in REPORT:
+        for host, host_obj in REPORT.items():
             LOGGER.debug("Patching host '%s'...", host)
 
-            #installing errata
-            errata_target = [x["errata_id"] for x in REPORT[host]["errata"]]
-            errata_target = [x.encode('utf-8') for x in errata_target]
-            if len(errata_target) > 0:
-                #errata found
-                if options.generic_dry_run:
-                    LOGGER.info(
-                        "Host '%s' --> install: %s", host, ", ".join(errata_target)
-                    )
-                else:
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/errata/apply".format(
-                            SAT_CLIENT.get_id_by_name(host, "host")
-                        ),
-                        json.dumps({"errata_ids": errata_target})
-                    )
+            # installing errata
+            errata_target = [errata["errata_id"] for errata in host_obj.patches]
+            if errata_target:  # erratas found
+                LOGGER.info(
+                    "Host '%s' --> install: %s", host, ", ".join(errata_target)
+                )
+
+                if not options.generic_dry_run:
+                    SAT_CLIENT.apply_patches(host, errata_target)
             else:
                 LOGGER.info("No errata for host %s available", host)
 
-            #install package upgrades
+            # install package upgrades
             if options.upgrade_packages:
-                if options.generic_dry_run:
-                    LOGGER.info(
-                        "Host '%s' --> install package upgrades", host
-                    )
-                else:
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/packages/upgrade_all".format(
-                            SAT_CLIENT.get_id_by_name(host, "host")
-                        ),
-                        json.dumps({})
-                    )
+                LOGGER.info(
+                    "Host '%s' --> install package upgrades", host
+                )
 
-            #get errata reboot flags
-            try:
-                errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
-            except KeyError:
-                #no reboot suggested
-                errata_reboot = []
-                pass
+                if not options.generic_dry_run:
+                    SAT_CLIENT.upgrade_all_packages(host)
+
+            # get errata reboot flags
+            errata_reboot = False
+            for errata in host_obj.patches:
+                try:
+                    reboot = errata["reboot_suggested"]
+                except KeyError:  # field missing
+                    continue
+
+                if reboot:
+                    errata_reboot = reboot
+                    break
 
             if options.foreman_reboot or \
-                (True in errata_reboot and not options.foreman_no_reboot):
-                if options.generic_dry_run:
-                    LOGGER.info("Host '%s' --> reboot host", host)
-                else:
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/power".format(
-                            SAT_CLIENT.get_id_by_name(host, "host")
-                        ),
-                        json.dumps({"power_action": "soft"})
-                    )
+                (errata_reboot and not options.foreman_no_reboot):
 
+                LOGGER.info("Host '%s' --> reboot host", host)
+                if not options.generic_dry_run:
+                    SAT_CLIENT.reboot_host(host)
     except ValueError as err:
         LOGGER.error("Error maintaining host: '%s'", err)
-
 
 
 def revert(options, args):
