@@ -306,17 +306,21 @@ class ForemanAPIClient(ManagementClient):
         :param api_object: Foreman object type (e.g. host, environment)
         :type api_object: str
         """
-        valid_objects = [
-            "hostgroup", "location", "organization", "environment",
-            "host"
-        ]
+        def is_valid_oject_type(object_type):
+            valid_objects = {
+                "hostgroup", "location", "organization", "environment",
+                "host"
+            }
+
+            return object_type.lower() in valid_objects
+
+
         filter_object = {
             "hostgroup" : "title", "location": "name", "host" : "name",
             "organization" : "title", "environment" : "name"
         }
         try:
-            if api_object.lower() not in valid_objects:
-                #invalid type
+            if not is_valid_oject_type(api_object):
                 raise ValueError(
                     "Unable to lookup name by invalid field"
                     " type '{}'".format(api_object)
