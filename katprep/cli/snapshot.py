@@ -212,7 +212,7 @@ def scan_systems(options):
     """
     Scans all systems that were selected for errata counters
     """
-    system_info = []
+    system_info = {}
 
     # get information per system
     for system in MGMT_CLIENT.get_hosts():
@@ -233,9 +233,9 @@ def scan_systems(options):
         upgrades = MGMT_CLIENT.get_host_upgrades(system)
         params = MGMT_CLIENT.get_host_params(system)
 
-        # set system information
-        _system = {
-            "id": details["id"],
+        host_id = details["id"]
+        collected_information = {
+            "id": host_id,
             "name": details["profile_name"],
             "hostname": details["hostname"],
             "description": details["description"],
@@ -251,7 +251,8 @@ def scan_systems(options):
             "reboot_suggested": "TODO",
         }
 
-        system_info.append(_system)
+        system_info[host_id] = collected_information
+
     return system_info
 
 
