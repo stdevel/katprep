@@ -85,39 +85,37 @@ def manage_host_preparation(options, host, cleanup=False):
         vm_name = host.virtualisation_id
         snapshot_name = "katprep_{}".format(REPORT_PREFIX)
 
-        if options.generic_dry_run:
-            if cleanup:
+        virt_address = host.get_param("katprep_virt")
+        virt_client = VIRT_CLIENTS[virt_address]
+
+        try:
+            if cleanup:  # remove snapshot
                 LOGGER.info(
                     "Host '%s' --> remove snapshot (%s@%s)",
-                        host, snapshot_name, vm_name
+                    host, snapshot_name, vm_name
                 )
-            else:
+
+                if not options.generic_dry_run:
+                    virt_client.remove_snapshot(vm_name, snapshot_name)
+            else:  # create snapshot
                 LOGGER.info(
                     "Host '%s' --> create snapshot (%s@%s)",
                     host, snapshot_name, vm_name
                 )
-        else:
-            virt_address = host.get_param("katprep_virt")
-            virt_client = VIRT_CLIENTS[virt_address]
 
-            try:
-                if cleanup:
-                    # remove snapshot
-                    virt_client.remove_snapshot(vm_name, snapshot_name)
-                else:
-                    # create snapshot
+                if not options.generic_dry_run:
                     virt_client.create_snapshot(
                         vm_name, snapshot_name,
                         "Snapshot created automatically by katprep"
                     )
-            except InvalidCredentialsException as err:
-                LOGGER.error("Invalid crendentials supplied")
-            except SnapshotExistsException as err:
-                LOGGER.info("Snapshot for host '%s' already exists: %s", host, err)
-            except EmptySetException as err:
-                LOGGER.info("Snapshot for host '%s' already removed: %s", host, err)
-            except SessionException as err:
-                LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
+        except InvalidCredentialsException as err:
+            LOGGER.error("Invalid crendentials supplied")
+        except SnapshotExistsException as err:
+            LOGGER.info("Snapshot for host '%s' already exists: %s", host, err)
+        except EmptySetException as err:
+            LOGGER.info("Snapshot for host '%s' already removed: %s", host, err)
+        except SessionException as err:
+            LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
 
     #get errata reboot flags
     try:
@@ -141,23 +139,23 @@ def manage_host_preparation(options, host, cleanup=False):
             "Downtime needs to be scheduled for host '%s'", host
         )
 
-        if options.generic_dry_run:
+        monitoring_client = MON_CLIENTS[monitoring_address]
+        try:
             if cleanup:
                 LOGGER.info("Host '%s' --> remove downtime", host)
+
+                if not options.generic_dry_run:
+                    monitoring_client.remove_downtime(host)
             else:
                 LOGGER.info("Host '%s' --> schedule downtime", host)
-        else:
-            monitoring_client = MON_CLIENTS[monitoring_address]
-            try:
-                if cleanup:
-                    monitoring_client.remove_downtime(host)
-                else:
+
+                if not options.generic_dry_run:
                     monitoring_client.schedule_downtime(host,
                                                         hours=options.mon_downtime)
-            except InvalidCredentialsException as err:
-                LOGGER.error("Unable to maintain downtime: '%s'", err)
-            except UnsupportedRequestException as err:
-                LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host, err)
+        except InvalidCredentialsException as err:
+            LOGGER.error("Unable to maintain downtime: '%s'", err)
+        except UnsupportedRequestException as err:
+            LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host, err)
 
 
 def set_verification_value(filename, host, setting, value):
@@ -298,12 +296,12 @@ def revert(options, args):
         snapshot_name = "katprep_{}".format(REPORT_PREFIX)
 
         try:
-            if options.generic_dry_run:
-                LOGGER.info(
-                    "Host '%s' --> revert snapshot (%s@%s)",
-                    host, snapshot_name, vm_name
-                )
-            else:
+            LOGGER.info(
+                "Host '%s' --> revert snapshot (%s@%s)",
+                host, snapshot_name, vm_name
+            )
+
+            if not options.generic_dry_run:
                 virt_address = host.get_param("katprep_virt")
                 virt_client = VIRT_CLIENTS[virt_address]
                 virt_client.revert_snapshot(vm_name, snapshot_name)
