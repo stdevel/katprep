@@ -155,7 +155,7 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
             else:
                 #only create snapshot if not already existing
                 try:
-                    if not self.has_snapshot(vm_name, snapshot_title):
+                    if not self.has_snapshot(host, snapshot_title):
                         task = vm.CreateSnapshot(
                             snapshot_title, snapshot_text, dump_memory, quiesce
                         )
