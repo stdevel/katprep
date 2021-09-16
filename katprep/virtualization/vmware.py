@@ -161,9 +161,7 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
                         )
                     else:
                         raise SnapshotExistsException(
-                            "Snapshot '{}' for VM '{}' already exists!".format(
-                                snapshot_title, vm_name
-                            )
+                            f"Snapshot {snapshot_title!r} for VM {vm_name!r} already exists!"
                         )
                 except EmptySetException as err:
                     task = vm.CreateSnapshot(
