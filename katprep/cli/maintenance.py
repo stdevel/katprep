@@ -83,7 +83,7 @@ def manage_host_preparation(options, host, cleanup=False):
     #create snapshot if applicable
     if not options.virt_skip_snapshot and snapshot not in SNAPSHOTS_TO_SKIP:
         LOGGER.debug(
-            "Host '%s' needs to be protected by a snapshot", host.hostname
+            "Host '%s' needs to be protected by a snapshot", host
         )
 
         vm_name = host.virtualisation_id
@@ -96,7 +96,7 @@ def manage_host_preparation(options, host, cleanup=False):
             if cleanup:  # remove snapshot
                 LOGGER.info(
                     "Host '%s' --> remove snapshot (%s@%s)",
-                    host.hostname, snapshot_name, vm_name
+                    host, snapshot_name, vm_name
                 )
 
                 if not options.generic_dry_run:
@@ -104,7 +104,7 @@ def manage_host_preparation(options, host, cleanup=False):
             else:  # create snapshot
                 LOGGER.info(
                     "Host '%s' --> create snapshot (%s@%s)",
-                    host.hostname, snapshot_name, vm_name
+                    host, snapshot_name, vm_name
                 )
 
                 if not options.generic_dry_run:
