@@ -168,18 +168,9 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
                         snapshot_title, snapshot_text, dump_memory, quiesce
                     )
 
-        except TypeError as err:
+        except (TypeError, ValueError, AttributeError) as err:
             raise SessionException(
                 "Unable to manage snapshot: '{}'".format(err)
-            )
-        except ValueError as err:
-            raise SessionException(
-                "Unable to manage snapshot: '{}'".format(err)
-            )
-        except AttributeError as err:
-            raise SessionException(
-                "Unable to manage snapshot: '{}'".format(err)
-            )
 
     def __get_snapshots(self, vm_name):
         """
