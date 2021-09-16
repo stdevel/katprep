@@ -437,23 +437,18 @@ def status(options, args):
 
 def cleanup(options, args):
     """
-    This function cleans things up after executing maintenance tasks. This
-    might include removing snapshots and scheduled downtimes.
+    This function cleans things up after executing maintenance tasks.
+    This might include removing snapshots and scheduled downtimes.
 
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    #remove snapshot/downtime per host
     try:
-        for host in REPORT:
-            LOGGER.debug("Cleaning-up host '%s'...", host)
-
-            #clean-up host
-            manage_host_preparation(options, host, True)
-
+        for host_id, host in REPORT.items():
+            LOGGER.debug("Cleaning-up host '%s'...", host_id)
+            manage_host_preparation(options, host, cleanup=True)
     except ValueError as err:
         LOGGER.error("Error cleaning-up maintenance: '%s'", err)
-
 
 
 def load_configuration(config_file, options):
