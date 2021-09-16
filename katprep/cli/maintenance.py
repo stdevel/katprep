@@ -271,7 +271,7 @@ def revert(options, args):
 
     snapshots_to_skip = [None, "", "fixmepls"]
 
-    for host in REPORT:
+    for host_id, host in REPORT.items():
         LOGGER.debug("Restoring host '%s'...", host)
 
         # create snapshot if applicable
@@ -308,7 +308,7 @@ def verify(options, args):
     filename = options.report[0]
 
     try:
-        for host in REPORT:
+        for host_id, host in REPORT.items():
             LOGGER.debug("Verifying host '%s'...", host)
 
             #check snapshot
@@ -390,7 +390,7 @@ def status(options, args):
     }
 
     try:
-        for host in REPORT:
+        for host_id, host in REPORT.items():
             LOGGER.debug("Getting '%s' task status...", host)
 
             #check maintenance progress
