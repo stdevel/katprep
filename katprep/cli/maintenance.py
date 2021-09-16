@@ -165,7 +165,7 @@ def set_verification_value(filename, host, setting, value):
 
     :param filename: The file to save the information to
     :type filename: str
-    :param host: hostname
+    :param host: Host to alter
     :type host: Host
     :param setting: setting name
     :type setting: str
