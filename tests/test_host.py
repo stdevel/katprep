@@ -310,6 +310,7 @@ def test_creating_errata_from_uyuni():
     assert errata.updated_at == datetime(year=2021, month=8, day=27)
     assert errata.summary.startswith("moderate: Security update")
     assert errata.summary.endswith(", python-urllib3")
+    assert not errata.reboot_suggested
 
 
 def test_creating_errata_from_foreman():
@@ -356,3 +357,4 @@ def test_creating_errata_from_foreman():
     assert errata.issued_at == datetime(year=2020, month=5, day=10)
     assert errata.updated_at == datetime(year=2021, month=3, day=23)
     assert errata.summary == "python-jmespath-0.9.4-2.el7 bugfix update"
+    assert not errata.reboot_suggested

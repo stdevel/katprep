@@ -210,13 +210,20 @@ class Host:
 
 class Errata:
     def __init__(
-        self, id: int, name: str, summary: str, issued_at: datetime, updated_at=None
+        self,
+        id: int,
+        name: str,
+        summary: str,
+        issued_at: datetime,
+        updated_at=None,
+        reboot_suggested: bool = False,
     ):
         self.id = id
         self.name = name
         self.summary = summary
         self.issued_at = issued_at
         self.updated_at = updated_at or issued_at
+        self.reboot_suggested = reboot_suggested
 
     @classmethod
     def from_uyuni(cls, data: dict):
@@ -249,8 +256,18 @@ class Errata:
         issuing_date = create_datetime(data["issued"])
         update_date = create_datetime(data["updated"])
 
+        try:
+            reboot = data["reboot_suggested"]
+        except KeyError:
+            reboot = False
+
         return cls(
-            data["id"], data["errata_id"], data["summary"], issuing_date, update_date
+            data["id"],
+            data["errata_id"],
+            data["summary"],
+            issuing_date,
+            update_date,
+            reboot,
         )
 
 
