@@ -439,7 +439,7 @@ class ForemanAPIClient(ManagementClient):
             json.dumps({"errata_ids": errata_target})
         )
 
-    def upgrade_all_packages(self, host):
+    def upgrade_all_packages(self, host: str):
         self.api_put(
             "/hosts/{}/packages/upgrade_all".format(
                 self.get_id_by_name(host, "host")
@@ -447,7 +447,7 @@ class ForemanAPIClient(ManagementClient):
             json.dumps({})
         )
 
-    def reboot_host(self, host):
+    def reboot_host(self, host: str):
         self.api_put(
             "/hosts/{}/power".format(
                 self.get_id_by_name(host, "host")
