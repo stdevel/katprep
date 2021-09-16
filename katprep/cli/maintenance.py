@@ -117,12 +117,7 @@ def manage_host_preparation(options, host, cleanup=False):
         except SessionException as err:
             LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
 
-    #get errata reboot flags
-    try:
-        errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
-    except KeyError:
-        #no reboot suggested
-        errata_reboot = []
+    errata_reboot = any(x["reboot_suggested"] for x in host.patches if "reboot_suggested" in x)
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
@@ -133,7 +128,7 @@ def manage_host_preparation(options, host, cleanup=False):
     unwanted_monitoring_addresss = [None, "", "fixmepls"]
 
     if monitoring_address not in unwanted_monitoring_addresss or \
-        (options.mon_suggested and True in errata_reboot):
+        (options.mon_suggested and errata_reboot):
 
         LOGGER.debug(
             "Downtime needs to be scheduled for host '%s'", host
@@ -249,16 +244,7 @@ def execute(options, args):
                     SAT_CLIENT.upgrade_all_packages(host)
 
             # get errata reboot flags
-            errata_reboot = False
-            for errata in host_obj.patches:
-                try:
-                    reboot = errata["reboot_suggested"]
-                except KeyError:  # field missing
-                    continue
-
-                if reboot:
-                    errata_reboot = reboot
-                    break
+            errata_reboot = any(errata["reboot_suggested"] for errata in host_obj.patches if "reboot_suggested" in errata)
 
             if options.mgmt_reboot or \
                 (errata_reboot and not options.mgmt_no_reboot):
