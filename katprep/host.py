@@ -2,6 +2,8 @@
 Host class to make working with hosts easier in the scripts.
 """
 
+from datetime import datetime
+
 
 def from_dict(some_dict):
     """
@@ -204,6 +206,52 @@ class Host:
             return False
 
         return True
+
+
+class Errata:
+    def __init__(
+        self, id: int, name: str, summary: str, issued_at: datetime, updated_at=None
+    ):
+        self.id = id
+        self.name = name
+        self.summary = summary
+        self.issued_at = issued_at
+        self.updated_at = updated_at or issued_at
+
+    @classmethod
+    def from_uyuni(cls, data: dict):
+        def create_datetime(date_str):
+            month, day, year = [int(x) for x in date_str.split("/")]
+
+            if year < 99:
+                # We assume that we retrieved something like 21
+                # which should really be 2021.
+                year += 2000
+
+            return datetime(year=year, month=month, day=day)
+
+        issuing_date = create_datetime(data["date"])
+        update_date = create_datetime(data["date"])
+
+        return cls(
+            data["id"],
+            data["advisory_name"],
+            data["advisory_synopsis"],
+            issuing_date,
+            update_date,
+        )
+
+    @classmethod
+    def from_foreman(cls, data: dict):
+        def create_datetime(date_str):
+            return datetime.strptime(date_str, "%Y-%m-%d")
+
+        issuing_date = create_datetime(data["issued"])
+        update_date = create_datetime(data["updated"])
+
+        return cls(
+            data["id"], data["errata_id"], data["summary"], issuing_date, update_date
+        )
 
 
 class HostGroup:
