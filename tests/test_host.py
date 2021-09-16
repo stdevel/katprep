@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from katprep.host import Host, Errata
+from katprep.host import Host, Erratum
 
 
 def test_getting_custom_virt_name():
@@ -291,8 +291,9 @@ def test_patches_are_empty_by_default():
     assert len(host.patches) == 0
 
 
-def test_creating_errata_from_uyuni():
-    uyuni_data = {
+@pytest.fixture
+def uyuni_erratum():
+    return {
         "id": 2075,
         "date": "8/27/21",
         "update_date": "8/27/21",
@@ -302,18 +303,20 @@ def test_creating_errata_from_uyuni():
         "advisory_name": "openSUSE-2021-1206",
     }
 
-    errata = Errata.from_uyuni(uyuni_data)
 
-    assert errata.id == 2075
-    assert errata.name == "openSUSE-2021-1206"
-    assert errata.issued_at == datetime(year=2021, month=8, day=27)
-    assert errata.updated_at == datetime(year=2021, month=8, day=27)
-    assert errata.summary.startswith("moderate: Security update")
-    assert errata.summary.endswith(", python-urllib3")
-    assert not errata.reboot_suggested
+def test_creating_erratum_from_uyuni(uyuni_erratum):
+    erratum = Erratum.from_uyuni(uyuni_erratum)
+
+    assert erratum.id == 2075
+    assert erratum.name == "openSUSE-2021-1206"
+    assert erratum.issued_at == datetime(year=2021, month=8, day=27)
+    assert erratum.updated_at == datetime(year=2021, month=8, day=27)
+    assert erratum.summary.startswith("moderate: Security update")
+    assert erratum.summary.endswith(", python-urllib3")
+    assert not erratum.reboot_suggested
 
 
-def test_creating_errata_from_foreman():
+def test_creating_erratum_from_foreman():
     foreman_data = {
         "id": 9,
         "pulp_id": "FEDORA-EPEL-2020-68a03cd3b1",
@@ -350,11 +353,27 @@ def test_creating_errata_from_foreman():
         "installable": True
     }
 
-    errata = Errata.from_foreman(foreman_data)
+    erratum = Erratum.from_foreman(foreman_data)
 
-    assert errata.id == 9
-    assert errata.name == "FEDORA-EPEL-2020-68a03cd3b1"
-    assert errata.issued_at == datetime(year=2020, month=5, day=10)
-    assert errata.updated_at == datetime(year=2021, month=3, day=23)
-    assert errata.summary == "python-jmespath-0.9.4-2.el7 bugfix update"
-    assert not errata.reboot_suggested
+    assert erratum.id == 9
+    assert erratum.name == "FEDORA-EPEL-2020-68a03cd3b1"
+    assert erratum.issued_at == datetime(year=2020, month=5, day=10)
+    assert erratum.updated_at == datetime(year=2021, month=3, day=23)
+    assert erratum.summary == "python-jmespath-0.9.4-2.el7 bugfix update"
+    assert not erratum.reboot_suggested
+
+
+def test_erratum_serialisation(uyuni_erratum):
+    erratum = Erratum.from_dict(uyuni_erratum)
+
+    erratum_dict = erratum.to_dict()
+    erratum_from_dict = Erratum.from_dict(erratum_dict)
+    erratum_dict2 = erratum_from_dict.to_dict()
+
+    assert erratum_dict == erratum_dict2
+
+
+def test_erratum_to_json(uyuni_erratum):
+    erratum = Erratum.from_dict(uyuni_erratum)
+
+    json.dumps(erratum.to_dict())

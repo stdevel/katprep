@@ -208,7 +208,10 @@ class Host:
         return True
 
 
-class Errata:
+class Erratum:
+
+    _OBJECT_TYPE = "erratum"
+
     def __init__(
         self,
         id: int,
