@@ -109,7 +109,7 @@ def manage_host_preparation(options, host, cleanup=False):
 
                 if not options.generic_dry_run:
                     virt_client.create_snapshot(
-                        vm_name, snapshot_name,
+                        host, snapshot_name,
                         "Snapshot created automatically by katprep"
                     )
         except InvalidCredentialsException as err:
