@@ -230,7 +230,7 @@ class Errata:
         def create_datetime(date_str):
             month, day, year = [int(x) for x in date_str.split("/")]
 
-            if year < 99:
+            if year <= 99:
                 # We assume that we retrieved something like 21
                 # which should really be 2021.
                 year += 2000
