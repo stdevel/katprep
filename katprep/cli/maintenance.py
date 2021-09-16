@@ -188,7 +188,6 @@ def set_verification_value(filename, host, setting, value):
         )
 
 
-
 def prepare(options, args):
     """
     This function prepares maintenance tasks, which might include creating
@@ -197,21 +196,17 @@ def prepare(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    #create snapshot/downtime per host
     try:
-        for host in REPORT:
-            LOGGER.debug("Preparing host '%s'...", host)
+        for host_id, host in REPORT.items():
+            LOGGER.debug("Preparing host '%s'...", host_id)
 
-            #prepare host
             manage_host_preparation(options, host)
 
-            #verify preparation
-            #if not options.generic_dry_run:
-                #verify(options, args)
-
+            # verify preparation
+            # if not options.generic_dry_run:
+            #   verify(options, args)
     except ValueError as err:
         LOGGER.error("Error preparing maintenance: '%s'", err)
-
 
 
 def execute(options, args):
