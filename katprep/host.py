@@ -283,6 +283,9 @@ class Erratum:
         issuing_date = create_datetime(data["date"])
         update_date = create_datetime(data["date"])
 
+        # TODO: When https://github.com/uyuni-project/uyuni/issues/3733
+        # is implemented make sure that we set if reboots are suggested.
+
         return cls(
             data["id"],
             data["advisory_name"],
