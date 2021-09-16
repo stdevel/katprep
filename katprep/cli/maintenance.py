@@ -100,7 +100,7 @@ def manage_host_preparation(options, host, cleanup=False):
                 )
 
                 if not options.generic_dry_run:
-                    virt_client.remove_snapshot(vm_name, snapshot_name)
+                    virt_client.remove_snapshot(host, snapshot_name)
             else:  # create snapshot
                 LOGGER.info(
                     "Host '%s' --> create snapshot (%s@%s)",
