@@ -198,9 +198,8 @@ def prepare(options, args):
     :type args: argparse options dict
     """
     try:
-        for host_id, host in REPORT.items():
-            LOGGER.debug("Preparing host '%s'...", host_id)
-
+        for host in REPORT.values():
+            LOGGER.debug("Preparing host '%s'...", host)
             manage_host_preparation(options, host)
 
             # verify preparation
