@@ -119,6 +119,7 @@ def manage_host_preparation(options, host, cleanup=False):
         except EmptySetException as err:
             LOGGER.info("Snapshot for host '%s' already removed: %s", host.hostname, err)
         except SessionException as err:
+            LOGGER.exception(err)
             LOGGER.error("Unable to manage snapshot for host '%s': %s", host.hostname, err)
 
     errata_reboot = any(x["reboot_suggested"] for x in host.patches if "reboot_suggested" in x)
