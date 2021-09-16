@@ -222,6 +222,7 @@ def execute(options, args):
             LOGGER.debug("Patching host '%s'...", host)
 
             # installing errata
+            LOGGER.debug("Erratas of the host %s: %s", host, host_obj.patches)
             errata_target = [errata["errata_id"] for errata in host_obj.patches]
             if errata_target:  # erratas found
                 LOGGER.info(
