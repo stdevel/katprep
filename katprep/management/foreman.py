@@ -431,7 +431,7 @@ class ForemanAPIClient(ManagementClient):
         finally:
             return my_results
 
-    def apply_patches(self, host, errata_ids):
+    def apply_erratas(self, host: str, errata_ids):
         self.api_put(
             "/hosts/{}/errata/apply".format(
                 self.get_id_by_name(host, "host")

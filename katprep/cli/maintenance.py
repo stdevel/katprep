@@ -229,7 +229,7 @@ def execute(options, args):
                 )
 
                 if not options.generic_dry_run:
-                    SAT_CLIENT.apply_patches(host, errata_target)
+                    SAT_CLIENT.apply_erratas(host, errata_target)
             else:
                 LOGGER.info("No errata for host %s available", host)
 
