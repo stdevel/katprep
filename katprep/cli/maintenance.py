@@ -371,7 +371,6 @@ def verify(options, args):
         LOGGER.error("Error verifying host: '%s'", err)
 
 
-
 def status(options, args):
     """
     This function shows current Foreman/Katello software maintenance task
@@ -471,7 +470,6 @@ def load_configuration(config_file, options):
     except ValueError as err:
         LOGGER.debug("Error: '%s'", err)
     return options
-
 
 
 def parse_options(args=None):
@@ -640,7 +638,6 @@ def parse_options(args=None):
             "Authentication container password: "
         )
     return (options, args)
-
 
 
 def set_filter(options, report):
