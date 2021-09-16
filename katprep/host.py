@@ -21,6 +21,8 @@ def from_dict(some_dict):
         return Host.from_dict(some_dict)
     elif object_type == "hostgroup":
         return HostGroup.from_dict(some_dict)
+    elif object_type == "erratum":
+        return Erratum.from_dict(some_dict)
     else:
         raise ValueError("Unknown type {!r}".format(object_type))
 
@@ -227,6 +229,44 @@ class Erratum:
         self.issued_at = issued_at
         self.updated_at = updated_at or issued_at
         self.reboot_suggested = reboot_suggested
+
+    def to_dict(self):
+        return {
+            "type": self._OBJECT_TYPE,
+            "id": self.id,
+            "name": self.name,
+            "summary": self.summary,
+            "issued_at": self.issued_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "reboot_suggested": self.reboot_suggested,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if "errata_id" in data:
+            return cls.from_foreman(data)
+        elif "advisory_name" in data:
+            return cls.from_uyuni(data)
+        elif data.get("type") == cls._OBJECT_TYPE:
+            def convert_to_datetime(timedata):
+                if isinstance(timedata, datetime):
+                    return timedata
+
+                return datetime.fromisoformat(timedata)
+
+            issuing_date = convert_to_datetime(data["issued_at"])
+            update_date = convert_to_datetime(data["updated_at"])
+
+            return Erratum(
+                data["id"],
+                data["name"],
+                data["summary"],
+                issuing_date,
+                update_date,
+                data["reboot_suggested"],
+            )
+        else:
+            raise ValueError(f"Unable to detect parser for erratum: {data!r}")
 
     @classmethod
     def from_uyuni(cls, data: dict):
