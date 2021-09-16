@@ -357,15 +357,10 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
             else:
                 #fire it up
                 task = vm.PowerOn()
-        except AttributeError as err:
+        except (AttributeError, ValueError) as err:
             raise SessionException(
-                "Unable to manage power state: '{}'".format(err)
+                f"Unable to manage power state: {err}"
             )
-        except ValueError as err:
-            raise SessionException(
-                "Unable to manage power state: '{}'".format(err)
-            )
-
 
     def powerstate_vm(self, host):
         """
