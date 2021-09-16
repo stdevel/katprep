@@ -50,7 +50,10 @@ REPORT_PREFIX = ""
 """
 str: Date prefix for snapshots and downtimes
 """
-
+SNAPSHOTS_TO_SKIP = {None, "", "fixmepls"}
+"""
+set([str, ]): Snapshot names that will be skipped
+"""
 
 
 def is_blacklisted(host, blacklist):
@@ -73,13 +76,12 @@ def manage_host_preparation(options, host, cleanup=False):
     :param cleanup: Flag whether preparations should be undone (default: no)
     :type cleanup: bool
     """
-    snapshots_to_skip = [None, "", "fixmepls"]
     snapshot = host.get_param("katprep_virt_snapshot")
 
     #create snapshot if applicable
-    if not options.virt_skip_snapshot and snapshot not in snapshots_to_skip:
+    if not options.virt_skip_snapshot and snapshot not in SNAPSHOTS_TO_SKIP:
         LOGGER.debug(
-            "Host '%s' needs to be protected by a snapshot", host
+            "Host '%s' needs to be protected by a snapshot", host.hostname
         )
 
         vm_name = host.virtualisation_id
@@ -92,7 +94,7 @@ def manage_host_preparation(options, host, cleanup=False):
             if cleanup:  # remove snapshot
                 LOGGER.info(
                     "Host '%s' --> remove snapshot (%s@%s)",
-                    host, snapshot_name, vm_name
+                    host.hostname, snapshot_name, vm_name
                 )
 
                 if not options.generic_dry_run:
@@ -100,7 +102,7 @@ def manage_host_preparation(options, host, cleanup=False):
             else:  # create snapshot
                 LOGGER.info(
                     "Host '%s' --> create snapshot (%s@%s)",
-                    host, snapshot_name, vm_name
+                    host.hostname, snapshot_name, vm_name
                 )
 
                 if not options.generic_dry_run:
@@ -111,11 +113,11 @@ def manage_host_preparation(options, host, cleanup=False):
         except InvalidCredentialsException as err:
             LOGGER.error("Invalid crendentials supplied")
         except SnapshotExistsException as err:
-            LOGGER.info("Snapshot for host '%s' already exists: %s", host, err)
+            LOGGER.info("Snapshot for host '%s' already exists: %s", host.hostname, err)
         except EmptySetException as err:
-            LOGGER.info("Snapshot for host '%s' already removed: %s", host, err)
+            LOGGER.info("Snapshot for host '%s' already removed: %s", host.hostname, err)
         except SessionException as err:
-            LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
+            LOGGER.error("Unable to manage snapshot for host '%s': %s", host.hostname, err)
 
     errata_reboot = any(x["reboot_suggested"] for x in host.patches if "reboot_suggested" in x)
 
@@ -137,12 +139,12 @@ def manage_host_preparation(options, host, cleanup=False):
         monitoring_client = MON_CLIENTS[monitoring_address]
         try:
             if cleanup:
-                LOGGER.info("Host '%s' --> remove downtime", host)
+                LOGGER.info("Host '%s' --> remove downtime", host.hostname)
 
                 if not options.generic_dry_run:
                     monitoring_client.remove_downtime(host)
             else:
-                LOGGER.info("Host '%s' --> schedule downtime", host)
+                LOGGER.info("Host '%s' --> schedule downtime", host.hostname)
 
                 if not options.generic_dry_run:
                     monitoring_client.schedule_downtime(host,
@@ -150,7 +152,7 @@ def manage_host_preparation(options, host, cleanup=False):
         except InvalidCredentialsException as err:
             LOGGER.error("Unable to maintain downtime: '%s'", err)
         except UnsupportedRequestException as err:
-            LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host, err)
+            LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host.hostname, err)
 
 
 def set_verification_value(filename, host, setting, value):
@@ -269,13 +271,11 @@ def revert(options, args):
     if options.virt_skip_snapshot:
         return
 
-    snapshots_to_skip = [None, "", "fixmepls"]
-
     for host_id, host in REPORT.items():
         LOGGER.debug("Restoring host '%s'...", host)
 
         # create snapshot if applicable
-        if host.get_param("katprep_virt_snapshot") in snapshots_to_skip:
+        if host.get_param("katprep_virt_snapshot") in SNAPSHOTS_TO_SKIP:
             continue
 
         vm_name = host.virtualisation_id
