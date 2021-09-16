@@ -56,14 +56,16 @@ set([str, ]): Snapshot names that will be skipped
 """
 
 
-def is_blacklisted(host, blacklist):
+def is_blacklisted(host: str, blacklist: list):
     """
-    This function checks whether a host is matched by an exclude pattern
+    This function checks whether a host is matched by an exclude pattern.
+
+    :param host: Hostname
+    :type host: str
+    :param blacklist: List of blacklisted terms
+    :type blacklist: [str, ]
     """
-    for entry in blacklist:
-        if entry.replace("*", "").replace("%", "") in host:
-            return True
-    return False
+    return any(entry in host for entry in blacklist)
 
 
 def manage_host_preparation(options, host, cleanup=False):
@@ -71,8 +73,8 @@ def manage_host_preparation(options, host, cleanup=False):
     This function prepares or cleans up maintenance tasks for a particular
     host. This includes creating/removing snapshots and scheduled downtimes.
 
-    :param host: hostname
-    :type host: str
+    :param host: host object to work with
+    :type host: Host
     :param cleanup: Flag whether preparations should be undone (default: no)
     :type cleanup: bool
     """
@@ -661,11 +663,14 @@ def set_filter(options, report):
     :param report: report data
     :type report: JSON data
     """
+    def prepare_filter_list(blacklist):
+        return [entry.replace("*", "").replace("%", "") for entry in blacklist]
+
     filter_org = options.filter_organization
     filter_location = options.filter_location
     filter_env = options.filter_environment
-    filter_exclude = options.filter_exclude
-    filter_include = options.filter_include
+    filter_exclude = prepare_filter_list(options.filter_exclude)
+    filter_include = prepare_filter_list(options.filter_include)
 
     remove = []
     for hostname, host in report.items():
