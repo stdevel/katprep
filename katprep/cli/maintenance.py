@@ -673,10 +673,10 @@ def set_filter(options, report):
         elif filter_env and host.get_param("environment_name") != filter_env:
             LOGGER.debug("Removing '%s' because of environment_name", hostname)
             remove.append(hostname)
-        elif is_blacklisted(host, filter_exclude):
+        elif is_blacklisted(hostname, filter_exclude):
             LOGGER.debug("Removing '%s' because of exclusion filter", hostname)
             remove.append(hostname)
-        elif len(filter_include) > 0 and not is_blacklisted(host, filter_include):
+        elif len(filter_include) > 0 and not is_blacklisted(hostname, filter_include):
             LOGGER.debug("Removing '%s' because of inclusion filter", hostname)
             remove.append(hostname)
 
