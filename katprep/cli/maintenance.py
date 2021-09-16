@@ -763,6 +763,8 @@ def main(options, args):
             MON_CLIENTS[monitoring_address] = get_monitoring_client(monitoring_type, LOG_LEVEL, monitoring_address, mon_user, mon_pass, verify_ssl=options.ssl_verify)
 
     #start action
+    if not hasattr(options, 'func'):
+        raise ValueError("Please select an action you want to perform!")
     options.func(options, options.func)
 
 
