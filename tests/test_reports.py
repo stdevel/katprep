@@ -1,8 +1,9 @@
 import os.path
+from datetime import datetime
 
 import pytest
 
-from katprep.host import Host
+from katprep.host import Host, Erratum
 from katprep.reports import load_report, write_report, is_valid_report
 
 
@@ -42,8 +43,14 @@ def test_loading_katello_report(example_katello_report_path):
 
         patches = host.patches
         assert len(patches) == 1
-        assert isinstance(patches[0], dict)
-        # TODO: Test the patch contents
+        erratum = patches[0]
+        assert isinstance(erratum, Erratum)
+        assert erratum.id == 9
+        assert erratum.name == "FEDORA-EPEL-2020-68a03cd3b1"
+        assert erratum.summary == "python-jmespath-0.9.4-2.el7 bugfix update"
+        assert not erratum.reboot_suggested
+        assert erratum.issued_at == datetime(year=2020, month=5, day=10)
+        assert erratum.updated_at == datetime(year=2021, month=3, day=23)
 
 
 @pytest.fixture

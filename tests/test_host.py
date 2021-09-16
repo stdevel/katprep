@@ -195,8 +195,12 @@ def test_host_json_conversion_with_verifications():
         "location": "Digges B",
         "type": "host",
         "verifications": {},
-        "patches": ["patch-1", "patch-2"],
+        "patches": [
+            {'type': 'erratum', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
+            {'type': 'erratum', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
+        ],
     }
+
     host = Host.from_dict(original_dict)
     new_dict = host.to_dict()
 

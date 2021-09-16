@@ -129,7 +129,7 @@ class Host:
             "organization": self._organization,
             "type": self.type,
             "verifications": self._verifications,
-            "patches": self._patches,
+            "patches": [patch.to_dict() for patch in self._patches],
         }
 
         if self._location:
@@ -164,7 +164,8 @@ class Host:
             # getting patches from katello
             patches = host_dict["errata"]
         except KeyError:
-            patches = host_dict.get("patches")
+            patches = host_dict.get("patches", [])
+        patches = [Erratum.from_dict(patch) for patch in patches]
 
         return Host(
             hostname,
