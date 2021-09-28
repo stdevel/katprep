@@ -440,11 +440,10 @@ class ForemanAPIClient(ManagementClient):
             json.dumps({"errata_ids": erratas})
         )
 
-    def upgrade_all_packages(self, host: str):
+    def install_upgrades(self, host):
+        host_id = self.get_id_by_name(host.hostname, "host")
         self.api_put(
-            "/hosts/{}/packages/upgrade_all".format(
-                self.get_id_by_name(host, "host")
-            ),
+            f"/hosts/{host_id}/packages/upgrade_all",
             json.dumps({})
         )
 

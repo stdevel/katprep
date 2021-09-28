@@ -433,27 +433,27 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_upgrades(self, system_id, upgrades):
+    def install_upgrades(self, host):
         """
         Install package upgrades on a given system
 
-        :param system_id: profile ID
-        :type system_id: int
-        :param upgrades: package IDs
-        :type upgrades: int[]
+        :param host: The host to upgrade
+        :type host: Host
         """
+        system_id = self.get_host_id(host.hostname)
+        upgrades = self.get_host_upgrades(system_id)
+        if not upgrades:
+            self.LOGGER.debug("No upgrades for %s found", host)
+            return  # Nothing to do
+
+        upgrades = [package["to_package_id"] for package in upgrades]
+        earliest_execution = DateTime(datetime.now().timetuple())
+
         try:
-            # remove non-integer values
-            _upgrades = [x for x in upgrades if isinstance(x, int)]
-            if not _upgrades:
-                raise EmptySetException(
-                    "No upgrades supplied - use package ID"
-                )
-            # install _all_ the upgrades
             action_id = self._session.system.schedulePackageInstall(
-                self._api_key, system_id, _upgrades,
-                DateTime(datetime.now().timetuple())
+                self._api_key, system_id, upgrades, earliest_execution
             )
+
             # returning an array to be consistent with install_patches
             return [action_id]
         except Fault as err:

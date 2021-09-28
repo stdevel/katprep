@@ -257,7 +257,7 @@ def _install_package_upgrades(host, dry_run):
     )
 
     if not dry_run:
-        SAT_CLIENT.upgrade_all_packages(host)
+        SAT_CLIENT.install_upgrades(host)
 
 
 def revert(options, args):

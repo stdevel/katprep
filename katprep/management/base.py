@@ -16,9 +16,11 @@ class ManagementClient(BaseConnector):
         """
 
     @abstractmethod
-    def upgrade_all_packages(self, host: str):
+    def install_upgrades(self, host):
         """
         Upgrade all packages on the given host.
+
+        This does include ugrades that are not part of an errata.
         """
 
     @abstractmethod
