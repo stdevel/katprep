@@ -273,7 +273,7 @@ def revert(options, args):
     if options.virt_skip_snapshot:
         return
 
-    for host_id, host in REPORT.items():
+    for host in REPORT.values():
         LOGGER.debug("Restoring host '%s'...", host)
 
         # create snapshot if applicable
