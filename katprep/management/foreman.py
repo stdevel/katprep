@@ -433,10 +433,10 @@ class ForemanAPIClient(ManagementClient):
 
     def install_patches(self, host):
         erratas = [errata.id for errata in host.patches]
-        hostid = self.get_id_by_name(host.hostname, "host")
+        host_id = self.get_id_by_name(host.hostname, "host")
 
         self.api_put(
-            f"/hosts/{hostid}/errata/apply",
+            f"/hosts/{host_id}/errata/apply",
             json.dumps({"errata_ids": erratas})
         )
 
