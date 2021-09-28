@@ -19,7 +19,8 @@ from ..exceptions import (
 
 NVREA = namedtuple("NVREA", "name version release epoch architecture")
 
-def split_rpm_filename(filename):
+
+def split_rpm_filename(filename: str):
     """
     Splits a standard style RPM file name into NVREA.
     It returns a name, version, release, epoch, arch, e.g.:
