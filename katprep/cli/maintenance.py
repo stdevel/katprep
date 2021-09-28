@@ -390,28 +390,33 @@ def status(options, args):
         "Package": "Actions::Katello::Host::Update"
     }
 
-    try:
-        for host_id, host in REPORT.items():
-            LOGGER.debug("Getting '%s' task status...", host)
+    for host_id, host in REPORT.items():
+        LOGGER.debug("Getting '%s' task status...", host)
 
-            #check maintenance progress
-            today = datetime.datetime.now().strftime("%Y-%m-%d")
+        #check maintenance progress
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
 
-            try:
-                for task, task_filter in tasks.items():
+        try:
+            for task, task_filter in tasks.items():
+                try:
                     results = SAT_CLIENT.get_task_by_filter(
                         host, task_filter, today
                     )
-                    if not results:
-                        if task.lower() == "package":
-                            LOGGER.info("No %s task for '%s' found!", task.lower(), host)
-                        else:
-                            LOGGER.error("No %s task for '%s' found!", task.lower(), host)
+                except ValueError:
+                    LOGGER.error("Error getting '%s' task status...", host)
+                    continue
 
-                        continue
+                if not results:
+                    if task.lower() == "package":
+                        log_method = LOGGER.info
+                    else:
+                        log_method = LOGGER.error
 
-                    for result in results:
-                        #print result
+                    log_method("No %s task for '%s' found!", task.lower(), host)
+                    continue
+
+                for result in results:
+                    try:
                         LOGGER.debug(
                             "Found '%s' task %s from %s (state %s)", result["label"],
                             result["id"], result["started_at"], result["result"]
@@ -432,14 +437,8 @@ def status(options, args):
                                 "%s task for host '%s' has state '%s'",
                                 task, host, result["result"]
                             )
-            except TypeError:
-                pass
-
-    except KeyError:
-        #host with either no virt/mon
-        pass
-    except ValueError:
-        LOGGER.error("Error getting '%s' task status...", host)
+                    except KeyError as kerr:
+                        LOGGER.debug("Failed showing result: %r", kerr)
 
 
 def cleanup(options, args):
