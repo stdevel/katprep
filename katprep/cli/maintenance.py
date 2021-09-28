@@ -221,39 +221,45 @@ def execute(options, args):
         for host, host_obj in REPORT.items():
             LOGGER.debug("Patching host '%s'...", host)
 
-            # installing errata
-            LOGGER.debug("Erratas of the host %s: %s", host, host_obj.patches)
-            errata_target = [errata["errata_id"] for errata in host_obj.patches]
-            if errata_target:  # erratas found
-                LOGGER.info(
-                    "Host '%s' --> install: %s", host, ", ".join(errata_target)
-                )
-
-                if not options.generic_dry_run:
-                    SAT_CLIENT.apply_erratas(host, errata_target)
-            else:
-                LOGGER.info("No errata for host %s available", host)
+            _install_erratas(host_obj, options.generic_dry_run)
 
             # install package upgrades
             if options.upgrade_packages:
-                LOGGER.info(
-                    "Host '%s' --> install package upgrades", host
-                )
+                _install_package_upgrades(host, options.generic_dry_run)
 
-                if not options.generic_dry_run:
-                    SAT_CLIENT.upgrade_all_packages(host)
-
-            # get errata reboot flags
-            errata_reboot = any(errata.reboot_suggested for errata in host_obj.patches)
-
+            # Handle potential reboots
+            reboot_request = any(errata.reboot_suggested for errata in host_obj.patches)
             if options.mgmt_reboot or \
-                (errata_reboot and not options.mgmt_no_reboot):
+                (reboot_request and not options.mgmt_no_reboot):
 
                 LOGGER.info("Host '%s' --> reboot host", host)
                 if not options.generic_dry_run:
                     SAT_CLIENT.reboot_host(host)
     except ValueError as err:
         LOGGER.error("Error maintaining host: '%s'", err)
+
+
+def _install_erratas(host, dry_run):
+    LOGGER.debug("Erratas of the host %s: %s", host, host.patches)
+    if host.patches:
+        patch_ids = [str(errata.id) for errata in host.patches]
+        LOGGER.info(
+            "Host '%s' --> install: %s", host, ", ".join(patch_ids)
+        )
+
+        if not dry_run:
+            SAT_CLIENT.apply_erratas(host)
+    else:
+        LOGGER.info("No errata for host %s available", host)
+
+
+def _install_package_upgrades(host, dry_run):
+    LOGGER.info(
+        "Host '%s' --> install package upgrades", host
+    )
+
+    if not dry_run:
+        SAT_CLIENT.upgrade_all_packages(host)
 
 
 def revert(options, args):
