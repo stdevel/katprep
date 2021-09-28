@@ -417,15 +417,15 @@ class ForemanAPIClient(ManagementClient):
                     '&order="started_at DESC"'.format(task_name)
                 )
             )
-            #print results
-            for result in results["results"]:
-                #validate date and host
-                host_info = result["input"]["host"]
-                if host_info["name"] == host and \
-                    task_date in result["started_at"]:
-                    my_results.append(result)
-        except KeyError:
-            pass
+
+            try:
+                for result in results["results"]:
+                    # validate date and host
+                    host_name = result["input"]["host"]["name"]
+                    if host_name == host and task_date in result["started_at"]:
+                        my_results.append(result)
+            except KeyError:
+                pass
         except ValueError as err:
             self.LOGGER.error(err)
         finally:
