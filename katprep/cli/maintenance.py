@@ -244,7 +244,7 @@ def _install_erratas(host, dry_run):
     if host.patches:
         patch_ids = [str(errata.id) for errata in host.patches]
         LOGGER.info(
-            "Host '%s' --> install: %s", host, ", ".join(patch_ids)
+            "Host '%s' --> installing %i patches: %s", host, len(host.patches), ", ".join(patch_ids)
         )
 
         if not dry_run:
