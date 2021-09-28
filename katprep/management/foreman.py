@@ -408,9 +408,9 @@ class ForemanAPIClient(ManagementClient):
         :param task_date: Task date wildcard
         :type task_date: str
         """
+        my_results = []
+
         try:
-            my_results = []
-            #get _all_ the results
             results = json.loads(
                 self.api_get(
                     '/../../foreman_tasks/api/tasks?search="{}"' \
