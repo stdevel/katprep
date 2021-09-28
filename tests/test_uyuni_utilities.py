@@ -2,7 +2,7 @@
 Testing splitting the RPM filename
 """
 
-from katprep.management.uyuni import split_rpm_filename
+from katprep.management.utilities import split_rpm_filename
 
 import pytest
 
