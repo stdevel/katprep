@@ -248,7 +248,7 @@ def _install_erratas(host, dry_run):
         )
 
         if not dry_run:
-            SAT_CLIENT.apply_erratas(host)
+            SAT_CLIENT.install_patches(host)
     else:
         LOGGER.info("No errata for host %s available", host)
 

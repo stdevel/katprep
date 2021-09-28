@@ -10,7 +10,7 @@ from ..connector import BaseConnector
 
 class ManagementClient(BaseConnector):
     @abstractmethod
-    def apply_patches(self, host: str, errata_ids: List):
+    def install_patches(self, host):
         """
         Apply the patches with the given errata_ids on the given host.
         """

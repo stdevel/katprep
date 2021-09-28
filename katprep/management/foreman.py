@@ -431,12 +431,13 @@ class ForemanAPIClient(ManagementClient):
         finally:
             return my_results
 
-    def apply_erratas(self, host: str, errata_ids):
+    def install_patches(self, host):
+        erratas = [errata.id for errata in host.patches]
+        hostid = self.get_id_by_name(host.hostname, "host")
+
         self.api_put(
-            "/hosts/{}/errata/apply".format(
-                self.get_id_by_name(host, "host")
-            ),
-            json.dumps({"errata_ids": errata_target})
+            f"/hosts/{hostid}/errata/apply",
+            json.dumps({"errata_ids": erratas})
         )
 
     def upgrade_all_packages(self, host: str):

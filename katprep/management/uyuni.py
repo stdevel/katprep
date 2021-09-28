@@ -399,25 +399,25 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_patches(self, system_id, patches):
+    def install_patches(self, host):
         """
         Install patches on a given system
 
-        :param system_id: profile ID
-        :type system_id: int
-        :param patches: patch IDs
-        :type patches: int[]
+        :param host: The host on which to install updates
+        :type host: Host
         """
+        patches = host.patches
+        if not patches:
+            raise EmptySetException(
+                "No patches supplied - use patch ID"
+            )
+        patches = [errata.id for errata in patches]
+
+        system_id = self.get_host_id(host.hostname)
+
         try:
-            # remove non-integer values
-            _patches = [x for x in patches if isinstance(x, int)]
-            if not _patches:
-                raise EmptySetException(
-                    "No patches supplied - use patch ID"
-                )
-            # install _all_ the patches
             action_id = self._session.system.scheduleApplyErrata(
-                self._api_key, system_id, _patches
+                self._api_key, system_id, patches
             )
             return action_id
         except Fault as err:
