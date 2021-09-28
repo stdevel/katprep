@@ -317,6 +317,17 @@ class Erratum:
             reboot,
         )
 
+    def __repr__(self):
+        return "{}({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
+            self.__class__.__name__,
+            self.id,
+            self.name,
+            self.summary,
+            self.issued_at,
+            self.updated_at,
+            self.reboot_suggested,
+        )
+
 
 class HostGroup:
 
