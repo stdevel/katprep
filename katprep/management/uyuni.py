@@ -302,10 +302,9 @@ class UyuniAPIClient(BaseConnector):
         :param file_name: file name (e.g. foo-1.0-1.i386.rpm)
         :type file_name: str
         """
+        package_nvrea = split_rpm_filename(file_name)
+
         try:
-            # split file name
-            package_nvrea = split_rpm_filename(file_name)
-            # return information
             package = self._session.packages.findByNvrea(
                 self._api_key,
                 package_nvrea[0],
