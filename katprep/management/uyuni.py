@@ -4,6 +4,7 @@ Uyuni XMLRPC API client
 
 import logging
 import ssl
+from collections import namedtuple
 from datetime import datetime
 from xmlrpc.client import DateTime, Fault, ServerProxy
 
@@ -16,6 +17,7 @@ from ..exceptions import (
     SSLCertVerificationError,
 )
 
+NVREA = namedtuple("NVREA", "name version release epoch architecture")
 
 def split_rpm_filename(filename):
     """
@@ -30,6 +32,7 @@ def split_rpm_filename(filename):
 
     :param filename: RPM file name
     :type filename: str
+    :rtype: NVREA
     """
 
     if filename[-4:] == ".rpm":
@@ -51,7 +54,7 @@ def split_rpm_filename(filename):
         epoch = filename[:epoch_index]
 
     name = filename[epoch_index + 1:ver_index]
-    return name, ver, rel, epoch, arch
+    return NVREA(name, ver, rel, epoch, arch)
 
 
 class UyuniAPIClient(BaseConnector):
@@ -307,11 +310,11 @@ class UyuniAPIClient(BaseConnector):
         try:
             package = self._session.packages.findByNvrea(
                 self._api_key,
-                package_nvrea[0],
-                package_nvrea[1],
-                package_nvrea[2],
-                package_nvrea[3],
-                package_nvrea[4]
+                package_nvrea.name,
+                package_nvrea.version,
+                package_nvrea.release,
+                package_nvrea.epoch,
+                package_nvrea.architecture
             )
             return package
         except Fault as err:
