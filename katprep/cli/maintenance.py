@@ -218,22 +218,21 @@ def execute(options, args):
     :type args: argparse options dict
     """
     try:
-        for host, host_obj in REPORT.items():
-            LOGGER.debug("Patching host '%s'...", host)
+        for host_obj in REPORT.values():
+            LOGGER.debug("Patching host '%s'...", host_obj)
 
             _install_erratas(host_obj, options.generic_dry_run)
 
-            # install package upgrades
             if options.upgrade_packages:
-                _install_package_upgrades(host, options.generic_dry_run)
+                _install_package_upgrades(host_obj, options.generic_dry_run)
 
             reboot_wanted = any(errata.reboot_suggested for errata in host_obj.patches)
             if options.mgmt_reboot or \
                 (reboot_wanted and not options.mgmt_no_reboot):
 
-                LOGGER.info("Host '%s' --> reboot host", host)
+                LOGGER.info("Host '%s' --> reboot host", host_obj)
                 if not options.generic_dry_run:
-                    SAT_CLIENT.reboot_host(host)
+                    SAT_CLIENT.reboot_host(host_obj)
     except ValueError as err:
         LOGGER.error("Error maintaining host: '%s'", err)
 
