@@ -227,10 +227,9 @@ def execute(options, args):
             if options.upgrade_packages:
                 _install_package_upgrades(host, options.generic_dry_run)
 
-            # Handle potential reboots
-            reboot_request = any(errata.reboot_suggested for errata in host_obj.patches)
+            reboot_wanted = any(errata.reboot_suggested for errata in host_obj.patches)
             if options.mgmt_reboot or \
-                (reboot_request and not options.mgmt_no_reboot):
+                (reboot_wanted and not options.mgmt_no_reboot):
 
                 LOGGER.info("Host '%s' --> reboot host", host)
                 if not options.generic_dry_run:
