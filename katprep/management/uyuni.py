@@ -469,22 +469,23 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def host_reboot(self, system_id):
+    def reboot_host(self, host):
         """
         Reboots a system immediately
 
-        :param system_id: profile ID
-        :type system_id: int
+        :param host: Host to reboot
+        :type host: Host
         """
+        system_id = self.get_host_id(host.hostname)
         if not isinstance(system_id, int):
             raise EmptySetException(
                 "No system found - use system profile IDs"
             )
 
+        earliest_occurance = DateTime(datetime.now().timetuple())
         try:
             action_id = self._session.system.scheduleReboot(
-                self._api_key, system_id,
-                DateTime(datetime.now().timetuple())
+                self._api_key, system_id, earliest_occurance
             )
             return action_id
         except Fault as err:

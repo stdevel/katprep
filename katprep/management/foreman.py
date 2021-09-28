@@ -447,10 +447,10 @@ class ForemanAPIClient(ManagementClient):
             json.dumps({})
         )
 
-    def reboot_host(self, host: str):
+    def reboot_host(self, host):
+        host_id = self.get_id_by_name(host.hostname, "host")
+
         self.api_put(
-            "/hosts/{}/power".format(
-                self.get_id_by_name(host, "host")
-            ),
+            f"/hosts/{host_id}/power",
             json.dumps({"power_action": "soft"})
         )

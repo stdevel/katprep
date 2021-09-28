@@ -24,7 +24,7 @@ class ManagementClient(BaseConnector):
         """
 
     @abstractmethod
-    def reboot_host(self, host: str):
+    def reboot_host(self, host):
         """
         Soft reboot of the given host.
         """
