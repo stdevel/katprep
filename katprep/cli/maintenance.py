@@ -402,33 +402,36 @@ def status(options, args):
                     results = SAT_CLIENT.get_task_by_filter(
                         host, task_filter, today
                     )
-                    if results:
-                        for result in results:
-                            #print result
-                            LOGGER.debug(
-                                "Found '%s' task %s from %s (state %s)", result["label"],
-                                result["id"], result["started_at"], result["result"]
-                            )
-                            if result["result"].lower() == "success":
-                                LOGGER.info(
-                                    "%s task for host '%s' succeeded",
-                                    task, host
-                                )
-                            elif result["result"].lower() == "error":
-                                LOGGER.info(
-                                    "%s task for host '%s' FAILED!",
-                                    task, host
-                                )
-                            else:
-                                LOGGER.info(
-                                    "%s task for host '%s' has state '%s'",
-                                    task, host, result["result"]
-                                )
-                    else:
+                    if not results:
                         if task.lower() == "package":
                             LOGGER.info("No %s task for '%s' found!", task.lower(), host)
                         else:
                             LOGGER.error("No %s task for '%s' found!", task.lower(), host)
+
+                        continue
+
+                    for result in results:
+                        #print result
+                        LOGGER.debug(
+                            "Found '%s' task %s from %s (state %s)", result["label"],
+                            result["id"], result["started_at"], result["result"]
+                        )
+
+                        if result["result"].lower() == "success":
+                            LOGGER.info(
+                                "%s task for host '%s' succeeded",
+                                task, host
+                            )
+                        elif result["result"].lower() == "error":
+                            LOGGER.info(
+                                "%s task for host '%s' FAILED!",
+                                task, host
+                            )
+                        else:
+                            LOGGER.info(
+                                "%s task for host '%s' has state '%s'",
+                                task, host, result["result"]
+                            )
             except TypeError:
                 pass
 
