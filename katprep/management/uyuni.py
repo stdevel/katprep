@@ -311,6 +311,8 @@ class UyuniAPIClient(BaseConnector):
                 )
                 if not erratum:
                     _packages.append(pkg)
+
+            self.LOGGER.debug("Found %i upgrades for %s: %s", len(_packages), system_id, _packages)
             return _packages
         except Fault as err:
             if "no such system" in err.faultString.lower():
