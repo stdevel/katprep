@@ -320,6 +320,17 @@ class Erratum:
             reboot,
         )
 
+    def __eq__(self, other):
+        if self.id != other.id:
+            return False
+
+        # An erratum might get updated.
+        # For this case it should have been looked at again.
+        if self.updated_at != other.updated_at:
+            return False
+
+        return True
+
     def __repr__(self):
         return "{}({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
             self.__class__.__name__,
