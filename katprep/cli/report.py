@@ -192,13 +192,10 @@ def get_errata_by_host(report, hostname):
     :param host: hostname
     :type host: str
     """
-    #TODO: find a nicer way to do this -> list comprehension?
-    errata = []
-    for host in report:
-        if host == hostname:
-            for erratum in report[host]["errata"]:
-                errata.append(erratum["errata_id"])
-    LOGGER.debug("Errata for host '%s': '%s'", hostname, errata)
+    try:
+        errata = report[hostname].patches
+    except KeyError:
+        errata = []
     return errata
 
 
