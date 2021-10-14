@@ -208,7 +208,7 @@ def test_host_json_conversion_with_verifications():
     assert original_dict == new_dict
 
 
-def test_host_json_conversion_with_verifications():
+def test_host_json_conversion_with_verifications_and_patches():
     original_dict = {
         "hostname": "hans.hubert",
         "params": {"sesame": "street"},
