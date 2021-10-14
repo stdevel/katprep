@@ -212,6 +212,9 @@ def create_delta(options):
     newer_file = get_newer_file(options.reports[0], options.reports[1])
     file_mod_time = os.path.getmtime(newer_file)
     timestamp = datetime.datetime.fromtimestamp(file_mod_time).strftime('%Y%m%d')
+    now = datetime.datetime.now()
+    date = now.strftime("%Y-%m-%d")
+    time = now.strftime("%H:%M")
 
     for host_id in all_hosts:
         try:
@@ -232,7 +235,10 @@ def create_delta(options):
 
         # store delta report
         filename = "{}errata-diff-{}-{}.yml".format(options.output_path, old_host, timestamp)
-        host_json = json.dumps(old_host.to_dict())
+        host_dict = old_host.to_dict()
+        host_dict['date'] = date
+        host_dict['time'] = time
+        host_json = json.dumps(host_dict)
 
         with open(filename, "w") as json_file:
             yaml.dump(
@@ -250,12 +256,12 @@ def create_reports(options):
     Creates patch reports per system. This is done by translating the
     YAML reports created previously into the desired format using ``pandoc``.
     """
-    for host in REPORT_OLD:
+    for host in REPORT_OLD.values():
         timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
             get_newer_file(options.reports[0], options.reports[1])
         )).strftime('%Y%m%d')
         filename = "{}errata-diff-{}-{}".format(
-            options.output_path, host, timestamp
+            options.output_path, host.hostname, timestamp
         )
         if os.path.isfile("{}.yml".format(filename)):
             LOGGER.debug("Creating report for host '%s'", host)
