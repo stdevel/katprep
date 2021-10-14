@@ -17,7 +17,6 @@ from .. import (__version__, get_credentials, is_writable,
                 validate_filters, get_filter)
 from ..exceptions import SessionException
 from ..management import get_management_client
-from ..management.foreman import ForemanAPIClient
 from ..network import validate_hostname
 
 LOGGER = logging.getLogger("katprep_snapshot")

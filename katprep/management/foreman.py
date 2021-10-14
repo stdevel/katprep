@@ -9,12 +9,12 @@ import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from ..connector import BaseConnector
+from .base import ManagementClient
 from ..exceptions import (APILevelNotSupportedException,
 InvalidCredentialsException, SessionException)
 
 
-class ForemanAPIClient(BaseConnector):
+class ForemanAPIClient(ManagementClient):
     """
     Class for communicating with the Foreman API
 
@@ -306,41 +306,48 @@ class ForemanAPIClient(BaseConnector):
         :param api_object: Foreman object type (e.g. host, environment)
         :type api_object: str
         """
-        valid_objects = [
-            "hostgroup", "location", "organization", "environment",
-            "host"
-        ]
+        def is_valid_oject_type(object_type):
+            valid_objects = {
+                "hostgroup", "location", "organization", "environment",
+                "host"
+            }
+
+            return object_type in valid_objects
+
+        api_object = api_object.lower()
+        if not is_valid_oject_type(api_object):
+            raise SessionException(
+                "Unable to lookup name by invalid field"
+                " type '{}'".format(api_object)
+            )
+
         filter_object = {
-            "hostgroup" : "title", "location": "name", "host" : "name",
-            "organization" : "title", "environment" : "name"
+            "hostgroup": "title",
+            "location": "name",
+            "host": "name",
+            "organization": "title",
+            "environment": "name"
         }
+
         try:
-            if api_object.lower() not in valid_objects:
-                #invalid type
-                raise ValueError(
-                    "Unable to lookup name by invalid field"
-                    " type '{}'".format(api_object)
-                )
-            else:
-                #get ID by name
-                result_obj = json.loads(
-                    self.api_get("/{}s".format(api_object))
-                )
-                #TODO: nicer way than looping? numpy? Direct URL?
-                for entry in result_obj["results"]:
-                    if entry[filter_object[api_object]].lower() == name.lower():
-                        self.LOGGER.debug(
-                            "%s %s seems to have ID #%s",
-                            api_object, name, entry["id"]
-                        )
-                        return entry["id"]
-                #not found
-                raise SessionException("Object not found")
+            # get ID by name
+            result_obj = json.loads(
+                self.api_get("/{}s".format(api_object))
+            )
+            name_lower = name.lower()
+            #TODO: nicer way than looping? numpy? Direct URL?
+            for entry in result_obj["results"]:
+                if entry[filter_object[api_object]].lower() == name_lower:
+                    self.LOGGER.debug(
+                        "%s %s seems to have ID #%s",
+                        api_object, name, entry["id"]
+                    )
+                    return entry["id"]
+
+            raise SessionException(f"Object {name} not found")
         except ValueError as err:
             self.LOGGER.error(err)
             raise SessionException(err)
-
-
 
     def get_hostparam_id_by_name(self, host, param_name):
         """
@@ -401,25 +408,49 @@ class ForemanAPIClient(BaseConnector):
         :param task_date: Task date wildcard
         :type task_date: str
         """
+        my_results = []
+
         try:
-            my_results = []
-            #get _all_ the results
             results = json.loads(
                 self.api_get(
                     '/../../foreman_tasks/api/tasks?search="{}"' \
                     '&order="started_at DESC"'.format(task_name)
                 )
             )
-            #print results
-            for result in results["results"]:
-                #validate date and host
-                host_info = result["input"]["host"]
-                if host_info["name"] == host and \
-                    task_date in result["started_at"]:
-                    my_results.append(result)
-        except KeyError:
-            pass
+
+            try:
+                for result in results["results"]:
+                    # validate date and host
+                    host_name = result["input"]["host"]["name"]
+                    if host_name == host and task_date in result["started_at"]:
+                        my_results.append(result)
+            except KeyError:
+                pass
         except ValueError as err:
             self.LOGGER.error(err)
         finally:
             return my_results
+
+    def install_patches(self, host):
+        erratas = [errata.id for errata in host.patches]
+        host_id = self.get_id_by_name(host.hostname, "host")
+
+        self.api_put(
+            f"/hosts/{host_id}/errata/apply",
+            json.dumps({"errata_ids": erratas})
+        )
+
+    def install_upgrades(self, host):
+        host_id = self.get_id_by_name(host.hostname, "host")
+        self.api_put(
+            f"/hosts/{host_id}/packages/upgrade_all",
+            json.dumps({})
+        )
+
+    def reboot_host(self, host):
+        host_id = self.get_id_by_name(host.hostname, "host")
+
+        self.api_put(
+            f"/hosts/{host_id}/power",
+            json.dumps({"power_action": "soft"})
+        )

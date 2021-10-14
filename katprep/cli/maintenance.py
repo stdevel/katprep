@@ -2,32 +2,26 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=not-callable
 """
-A script which prepares, executes and controls maintenance tasks on systems
-managed with Foreman/Katello or Red Hat Satellite 6.
+Prepare, execute and control maintenance tasks.
 """
 
-from __future__ import absolute_import, print_function
-
 import argparse
-import logging
-import json
-import time
-import os
-import getpass
 import datetime
+import getpass
+import logging
+import os
+import time
 import yaml
+
 from .. import __version__, get_credentials
 from ..exceptions import (EmptySetException, InvalidCredentialsException,
     SessionException, SnapshotExistsException, UnsupportedRequestException)
-from ..management.foreman import ForemanAPIClient
+from ..management import get_management_client
 from ..monitoring import get_monitoring_client
 from ..network import validate_hostname
 from ..reports import is_valid_report, load_report, write_report
 from ..virtualization import get_virtualization_client
 
-"""
-ForemanAPIClient: Foreman API client handle
-"""
 LOGGER = logging.getLogger('katprep_maintenance')
 """
 logging: Logger instance
@@ -38,7 +32,7 @@ logging: Logger level
 """
 SAT_CLIENT = None
 """
-ForemanAPIClient: Foreman API client handle
+SAT_CLIENT: Management client
 """
 VIRT_CLIENTS = {}
 """
@@ -56,17 +50,22 @@ REPORT_PREFIX = ""
 """
 str: Date prefix for snapshots and downtimes
 """
+SNAPSHOTS_TO_SKIP = {None, "", "fixmepls"}
+"""
+set([str, ]): Snapshot names that will be skipped
+"""
 
 
-
-def is_blacklisted(host, blacklist):
+def is_blacklisted(host: str, blacklist: list):
     """
-    This function checks whether a host is matched by an exclude pattern
+    This function checks whether a host is matched by an exclude pattern.
+
+    :param host: Hostname
+    :type host: str
+    :param blacklist: List of blacklisted terms
+    :type blacklist: [str, ]
     """
-    for entry in blacklist:
-        if entry.replace("*", "").replace("%", "") in host:
-            return True
-    return False
+    return any(entry in host for entry in blacklist)
 
 
 def manage_host_preparation(options, host, cleanup=False):
@@ -74,16 +73,15 @@ def manage_host_preparation(options, host, cleanup=False):
     This function prepares or cleans up maintenance tasks for a particular
     host. This includes creating/removing snapshots and scheduled downtimes.
 
-    :param host: hostname
-    :type host: str
+    :param host: host object to work with
+    :type host: Host
     :param cleanup: Flag whether preparations should be undone (default: no)
     :type cleanup: bool
     """
-    snapshots_to_skip = [None, "", "fixmepls"]
     snapshot = host.get_param("katprep_virt_snapshot")
 
     #create snapshot if applicable
-    if not options.virt_skip_snapshot and snapshot not in snapshots_to_skip:
+    if not options.virt_skip_snapshot and snapshot not in SNAPSHOTS_TO_SKIP:
         LOGGER.debug(
             "Host '%s' needs to be protected by a snapshot", host
         )
@@ -91,46 +89,40 @@ def manage_host_preparation(options, host, cleanup=False):
         vm_name = host.virtualisation_id
         snapshot_name = "katprep_{}".format(REPORT_PREFIX)
 
-        if options.generic_dry_run:
-            if cleanup:
+        virt_address = host.get_param("katprep_virt")
+        virt_client = VIRT_CLIENTS[virt_address]
+
+        try:
+            if cleanup:  # remove snapshot
                 LOGGER.info(
                     "Host '%s' --> remove snapshot (%s@%s)",
-                        host, snapshot_name, vm_name
+                    host, snapshot_name, vm_name
                 )
-            else:
+
+                if not options.generic_dry_run:
+                    virt_client.remove_snapshot(host, snapshot_name)
+            else:  # create snapshot
                 LOGGER.info(
                     "Host '%s' --> create snapshot (%s@%s)",
                     host, snapshot_name, vm_name
                 )
-        else:
-            virt_address = host.get_param("katprep_virt")
-            virt_client = VIRT_CLIENTS[virt_address]
 
-            try:
-                if cleanup:
-                    # remove snapshot
-                    virt_client.remove_snapshot(vm_name, snapshot_name)
-                else:
-                    # create snapshot
+                if not options.generic_dry_run:
                     virt_client.create_snapshot(
-                        vm_name, snapshot_name,
+                        host, snapshot_name,
                         "Snapshot created automatically by katprep"
                     )
-            except InvalidCredentialsException as err:
-                LOGGER.error("Invalid crendentials supplied")
-            except SnapshotExistsException as err:
-                LOGGER.info("Snapshot for host '%s' already exists: %s", host, err)
-            except EmptySetException as err:
-                LOGGER.info("Snapshot for host '%s' already removed: %s", host, err)
-            except SessionException as err:
-                LOGGER.error("Unable to manage snapshot for host '%s': %s", host, err)
+        except InvalidCredentialsException as err:
+            LOGGER.error("Invalid crendentials supplied")
+        except SnapshotExistsException as err:
+            LOGGER.info("Snapshot for host '%s' already exists: %s", host.hostname, err)
+        except EmptySetException as err:
+            LOGGER.info("Snapshot for host '%s' already removed: %s", host.hostname, err)
+        except SessionException as err:
+            LOGGER.exception(err)
+            LOGGER.error("Unable to manage snapshot for host '%s': %s", host.hostname, err)
 
-    #get errata reboot flags
-    try:
-        errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
-    except KeyError:
-        #no reboot suggested
-        errata_reboot = []
+    errata_reboot = any(errata.reboot_suggested for errata in host.patches)
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
@@ -141,29 +133,29 @@ def manage_host_preparation(options, host, cleanup=False):
     unwanted_monitoring_addresss = [None, "", "fixmepls"]
 
     if monitoring_address not in unwanted_monitoring_addresss or \
-        (options.mon_suggested and True in errata_reboot):
+        (options.mon_suggested and errata_reboot):
 
         LOGGER.debug(
             "Downtime needs to be scheduled for host '%s'", host
         )
 
-        if options.generic_dry_run:
+        monitoring_client = MON_CLIENTS[monitoring_address]
+        try:
             if cleanup:
-                LOGGER.info("Host '%s' --> remove downtime", host)
-            else:
-                LOGGER.info("Host '%s' --> schedule downtime", host)
-        else:
-            monitoring_client = MON_CLIENTS[monitoring_address]
-            try:
-                if cleanup:
+                LOGGER.info("Host '%s' --> remove downtime", host.hostname)
+
+                if not options.generic_dry_run:
                     monitoring_client.remove_downtime(host)
-                else:
+            else:
+                LOGGER.info("Host '%s' --> schedule downtime", host.hostname)
+
+                if not options.generic_dry_run:
                     monitoring_client.schedule_downtime(host,
                                                         hours=options.mon_downtime)
-            except InvalidCredentialsException as err:
-                LOGGER.error("Unable to maintain downtime: '%s'", err)
-            except UnsupportedRequestException as err:
-                LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host, err)
+        except InvalidCredentialsException as err:
+            LOGGER.error("Unable to maintain downtime: '%s'", err)
+        except UnsupportedRequestException as err:
+            LOGGER.info("Unable to maintain downtime for host '%s': '%s'", host.hostname, err)
 
 
 def set_verification_value(filename, host, setting, value):
@@ -174,7 +166,7 @@ def set_verification_value(filename, host, setting, value):
 
     :param filename: The file to save the information to
     :type filename: str
-    :param host: hostname
+    :param host: Host to alter
     :type host: Host
     :param setting: setting name
     :type setting: str
@@ -197,7 +189,6 @@ def set_verification_value(filename, host, setting, value):
         )
 
 
-
 def prepare(options, args):
     """
     This function prepares maintenance tasks, which might include creating
@@ -206,21 +197,16 @@ def prepare(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    #create snapshot/downtime per host
     try:
-        for host in REPORT:
+        for host in REPORT.values():
             LOGGER.debug("Preparing host '%s'...", host)
-
-            #prepare host
             manage_host_preparation(options, host)
 
-            #verify preparation
-            #if not options.generic_dry_run:
-                #verify(options, args)
-
+            # verify preparation
+            # if not options.generic_dry_run:
+            #   verify(options, args)
     except ValueError as err:
         LOGGER.error("Error preparing maintenance: '%s'", err)
-
 
 
 def execute(options, args):
@@ -232,65 +218,46 @@ def execute(options, args):
     :type args: argparse options dict
     """
     try:
-        for host in REPORT:
-            LOGGER.debug("Patching host '%s'...", host)
+        for host_obj in REPORT.values():
+            LOGGER.debug("Patching host '%s'...", host_obj)
 
-            #installing errata
-            errata_target = [x["errata_id"] for x in REPORT[host]["errata"]]
-            errata_target = [x.encode('utf-8') for x in errata_target]
-            if len(errata_target) > 0:
-                #errata found
-                if options.generic_dry_run:
-                    LOGGER.info(
-                        "Host '%s' --> install: %s", host, ", ".join(errata_target)
-                    )
-                else:
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/errata/apply".format(
-                            SAT_CLIENT.get_id_by_name(host, "host")
-                        ),
-                        json.dumps({"errata_ids": errata_target})
-                    )
-            else:
-                LOGGER.info("No errata for host %s available", host)
+            _install_erratas(host_obj, options.generic_dry_run)
 
-            #install package upgrades
             if options.upgrade_packages:
-                if options.generic_dry_run:
-                    LOGGER.info(
-                        "Host '%s' --> install package upgrades", host
-                    )
-                else:
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/packages/upgrade_all".format(
-                            SAT_CLIENT.get_id_by_name(host, "host")
-                        ),
-                        json.dumps({})
-                    )
+                _install_package_upgrades(host_obj, options.generic_dry_run)
 
-            #get errata reboot flags
-            try:
-                errata_reboot = [x["reboot_suggested"] for x in REPORT[host]["errata"]]
-            except KeyError:
-                #no reboot suggested
-                errata_reboot = []
-                pass
+            reboot_wanted = any(errata.reboot_suggested for errata in host_obj.patches)
+            if options.mgmt_reboot or \
+                (reboot_wanted and not options.mgmt_no_reboot):
 
-            if options.foreman_reboot or \
-                (True in errata_reboot and not options.foreman_no_reboot):
-                if options.generic_dry_run:
-                    LOGGER.info("Host '%s' --> reboot host", host)
-                else:
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/power".format(
-                            SAT_CLIENT.get_id_by_name(host, "host")
-                        ),
-                        json.dumps({"power_action": "soft"})
-                    )
-
+                LOGGER.info("Host '%s' --> reboot host", host_obj)
+                if not options.generic_dry_run:
+                    SAT_CLIENT.reboot_host(host_obj)
     except ValueError as err:
         LOGGER.error("Error maintaining host: '%s'", err)
 
+
+def _install_erratas(host, dry_run):
+    LOGGER.debug("Erratas of the host %s: %s", host, host.patches)
+    if host.patches:
+        patch_ids = [str(errata.id) for errata in host.patches]
+        LOGGER.info(
+            "Host '%s' --> installing %i patches: %s", host, len(host.patches), ", ".join(patch_ids)
+        )
+
+        if not dry_run:
+            SAT_CLIENT.install_patches(host)
+    else:
+        LOGGER.info("No errata for host %s available", host)
+
+
+def _install_package_upgrades(host, dry_run):
+    LOGGER.info(
+        "Host '%s' --> install package upgrades", host
+    )
+
+    if not dry_run:
+        SAT_CLIENT.install_upgrades(host)
 
 
 def revert(options, args):
@@ -306,25 +273,23 @@ def revert(options, args):
     if options.virt_skip_snapshot:
         return
 
-    snapshots_to_skip = [None, "", "fixmepls"]
-
-    for host in REPORT:
+    for host in REPORT.values():
         LOGGER.debug("Restoring host '%s'...", host)
 
         # create snapshot if applicable
-        if host.get_param("katprep_virt_snapshot") in snapshots_to_skip:
+        if host.get_param("katprep_virt_snapshot") in SNAPSHOTS_TO_SKIP:
             continue
 
         vm_name = host.virtualisation_id
         snapshot_name = "katprep_{}".format(REPORT_PREFIX)
 
         try:
-            if options.generic_dry_run:
-                LOGGER.info(
-                    "Host '%s' --> revert snapshot (%s@%s)",
-                    host, snapshot_name, vm_name
-                )
-            else:
+            LOGGER.info(
+                "Host '%s' --> revert snapshot (%s@%s)",
+                host, snapshot_name, vm_name
+            )
+
+            if not options.generic_dry_run:
                 virt_address = host.get_param("katprep_virt")
                 virt_client = VIRT_CLIENTS[virt_address]
                 virt_client.revert_snapshot(vm_name, snapshot_name)
@@ -345,7 +310,7 @@ def verify(options, args):
     filename = options.report[0]
 
     try:
-        for host in REPORT:
+        for host_id, host in REPORT.items():
             LOGGER.debug("Verifying host '%s'...", host)
 
             #check snapshot
@@ -411,7 +376,6 @@ def verify(options, args):
         LOGGER.error("Error verifying host: '%s'", err)
 
 
-
 def status(options, args):
     """
     This function shows current Foreman/Katello software maintenance task
@@ -426,74 +390,71 @@ def status(options, args):
         "Package": "Actions::Katello::Host::Update"
     }
 
-    try:
-        for host in REPORT:
-            LOGGER.debug("Getting '%s' task status...", host)
+    for host_id, host in REPORT.items():
+        LOGGER.debug("Getting '%s' task status...", host)
 
-            #check maintenance progress
-            today = datetime.datetime.now().strftime("%Y-%m-%d")
+        #check maintenance progress
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
 
-            try:
-                for task, task_filter in tasks.items():
+        try:
+            for task, task_filter in tasks.items():
+                try:
                     results = SAT_CLIENT.get_task_by_filter(
                         host, task_filter, today
                     )
-                    if results:
-                        for result in results:
-                            #print result
-                            LOGGER.debug(
-                                "Found '%s' task %s from %s (state %s)", result["label"],
-                                result["id"], result["started_at"], result["result"]
-                            )
-                            if result["result"].lower() == "success":
-                                LOGGER.info(
-                                    "%s task for host '%s' succeeded",
-                                    task, host
-                                )
-                            elif result["result"].lower() == "error":
-                                LOGGER.info(
-                                    "%s task for host '%s' FAILED!",
-                                    task, host
-                                )
-                            else:
-                                LOGGER.info(
-                                    "%s task for host '%s' has state '%s'",
-                                    task, host, result["result"]
-                                )
-                    else:
-                        if task.lower() == "package":
-                            LOGGER.info("No %s task for '%s' found!", task.lower(), host)
-                        else:
-                            LOGGER.error("No %s task for '%s' found!", task.lower(), host)
-            except TypeError:
-                pass
+                except ValueError:
+                    LOGGER.error("Error getting '%s' task status...", host)
+                    continue
 
-    except KeyError:
-        #host with either no virt/mon
-        pass
-    except ValueError:
-        LOGGER.error("Error getting '%s' task status...", host)
+                if not results:
+                    if task.lower() == "package":
+                        log_method = LOGGER.info
+                    else:
+                        log_method = LOGGER.error
+
+                    log_method("No %s task for '%s' found!", task.lower(), host)
+                    continue
+
+                for result in results:
+                    try:
+                        LOGGER.debug(
+                            "Found '%s' task %s from %s (state %s)", result["label"],
+                            result["id"], result["started_at"], result["result"]
+                        )
+
+                        if result["result"].lower() == "success":
+                            LOGGER.info(
+                                "%s task for host '%s' succeeded",
+                                task, host
+                            )
+                        elif result["result"].lower() == "error":
+                            LOGGER.info(
+                                "%s task for host '%s' FAILED!",
+                                task, host
+                            )
+                        else:
+                            LOGGER.info(
+                                "%s task for host '%s' has state '%s'",
+                                task, host, result["result"]
+                            )
+                    except KeyError as kerr:
+                        LOGGER.debug("Failed showing result: %r", kerr)
 
 
 def cleanup(options, args):
     """
-    This function cleans things up after executing maintenance tasks. This
-    might include removing snapshots and scheduled downtimes.
+    This function cleans things up after executing maintenance tasks.
+    This might include removing snapshots and scheduled downtimes.
 
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    #remove snapshot/downtime per host
     try:
-        for host in REPORT:
-            LOGGER.debug("Cleaning-up host '%s'...", host)
-
-            #clean-up host
-            manage_host_preparation(options, host, True)
-
+        for host_id, host in REPORT.items():
+            LOGGER.debug("Cleaning-up host '%s'...", host_id)
+            manage_host_preparation(options, host, cleanup=True)
     except ValueError as err:
         LOGGER.error("Error cleaning-up maintenance: '%s'", err)
-
 
 
 def load_configuration(config_file, options):
@@ -506,23 +467,23 @@ def load_configuration(config_file, options):
     :param options: argparse options dictionary containing the settings
     :type options: argparse options dict
     """
+    raise NotImplementedError("Loading a configuration from a file is currently not implemented.")
+
     #try to apply settings from configuration file
     try:
         with open(config_file, 'r') as yml_file:
             config = yaml.load(yml_file)
         #TODO: load configuration
-        print("TODO: load_configuration")
     except ValueError as err:
         LOGGER.debug("Error: '%s'", err)
     return options
 
 
-
 def parse_options(args=None):
     """Parses options and arguments."""
     desc = '''%(prog)s is used for preparing, executing and
-    controlling maintenance tasks on systems managed with Foreman/Katello
-    or Red Hat Satellite 6.
+    controlling maintenance tasks.
+
     You can automatically create snapshots and schedule monitoring downtimes
     if you have set all necessary host parameters using katprep_parameters.
     It is also possible to trigger errata installation using the Foreman API.
@@ -536,10 +497,9 @@ def parse_options(args=None):
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
-    fman_opts = parser.add_argument_group("Foreman arguments")
+    mgmt_opts = parser.add_argument_group("Management system arguments")
     virt_opts = parser.add_argument_group("virtualization arguments")
     mon_opts = parser.add_argument_group("monitoring arguments")
-    filter_opts_excl = fman_opts.add_mutually_exclusive_group()
 
     #GENERIC ARGUMENTS
     #-q / --quiet
@@ -574,24 +534,30 @@ def parse_options(args=None):
     gen_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
     action="store_false", help="Disables SSL verification (default: no)")
 
-    #FOREMAN ARGUMENTS
-    #-s / --foreman-server
-    fman_opts.add_argument("-s", "--foreman-server", \
-    dest="foreman_server", metavar="SERVER", default="localhost", \
-    help="defines the Foreman server to use (default: localhost)")
-    #-r / --reboot-systems
-    fman_opts.add_argument("-r", "--reboot-systems", dest="foreman_reboot", \
+    # MANAGEMENT ARGUMENTS
+    mgmt_opts.add_argument(
+        "--mgmt-type",
+        dest="mgmt_type",
+        metavar="foreman|uyuni",
+        choices=["foreman", "uyuni"],
+        default="foreman",
+        type=str,
+        help="defines the library used to operate with management host: "
+        "foreman or uyuni (default: foreman)",
+    )
+    mgmt_opts.add_argument("-s", "--mgmt-server", \
+    dest="mgmt_server", metavar="SERVER", default="localhost", \
+    help="defines the management server to use (default: localhost)")
+    mgmt_opts.add_argument("-r", "--reboot-systems", dest="mgmt_reboot", \
     default=False, action="store_true", \
     help="always reboot systems after successful errata installation " \
     "(default: no, only if reboot_suggested set)")
-    #suppress reboot
-    fman_opts.add_argument("-R", "--no-reboot", dest="foreman_no_reboot", \
+    mgmt_opts.add_argument("-R", "--no-reboot", dest="mgmt_no_reboot", \
     default=True, action="store_false", help="suppresses rebooting the " \
     "system under any circumstances (default: no)")
 
     #VIRTUALIZATION ARGUMENTS
     #--virt-uri
-    #TODO: validate URI
     virt_opts.add_argument("--virt-uri", dest="virt_uri", \
     metavar="URI", default="", \
     help="defines a libvirt URI to use")
@@ -623,6 +589,7 @@ def parse_options(args=None):
     help="downtime period (default: 8 hours)")
 
     #FILTER ARGUMENTS
+    filter_opts_excl = mgmt_opts.add_mutually_exclusive_group()
     #-l / --location
     filter_opts_excl.add_argument("-l", "--location", action="store", \
     default="", dest="filter_location", metavar="NAME", \
@@ -636,11 +603,11 @@ def parse_options(args=None):
     default="", dest="filter_environment", metavar="NAME", \
     help="filters by an particular environment (default: no)")
     #-E / --exclude
-    fman_opts.add_argument("-E", "--exclude", action="append", default=[], \
+    filter_opts_excl.add_argument("-E", "--exclude", action="append", default=[], \
     type=str, dest="filter_exclude", metavar="NAME", \
     help="excludes particular hosts (default: no)")
     #-I / --include-only
-    fman_opts.add_argument("-I", "--include-only", action="append", default=[], \
+    filter_opts_excl.add_argument("-I", "--include-only", action="append", default=[], \
     type=str, dest="filter_include", metavar="NAME", \
     help="only includes particular hosts (default: no)")
 
@@ -667,18 +634,17 @@ def parse_options(args=None):
     #parse options and arguments
     options = parser.parse_args()
     #load configuration file
-    if options.config != "":
+    if options.config:
         options = load_configuration(options.config, options)
         options = parser.parse_args()
-    #validate hostname
-    options.foreman_server = validate_hostname(options.foreman_server)
+
+    options.mgmt_server = validate_hostname(options.mgmt_server)
     #set password
     while options.auth_password == "empty" or len(options.auth_password) > 32:
         options.auth_password = getpass.getpass(
             "Authentication container password: "
         )
     return (options, args)
-
 
 
 def set_filter(options, report):
@@ -691,11 +657,14 @@ def set_filter(options, report):
     :param report: report data
     :type report: JSON data
     """
+    def prepare_filter_list(blacklist):
+        return [entry.replace("*", "").replace("%", "") for entry in blacklist]
+
     filter_org = options.filter_organization
     filter_location = options.filter_location
     filter_env = options.filter_environment
-    filter_exclude = options.filter_exclude
-    filter_include = options.filter_include
+    filter_exclude = prepare_filter_list(options.filter_exclude)
+    filter_include = prepare_filter_list(options.filter_include)
 
     remove = []
     for hostname, host in report.items():
@@ -708,10 +677,10 @@ def set_filter(options, report):
         elif filter_env and host.get_param("environment_name") != filter_env:
             LOGGER.debug("Removing '%s' because of environment_name", hostname)
             remove.append(hostname)
-        elif is_blacklisted(host, filter_exclude):
+        elif is_blacklisted(hostname, filter_exclude):
             LOGGER.debug("Removing '%s' because of exclusion filter", hostname)
             remove.append(hostname)
-        elif len(filter_include) > 0 and not is_blacklisted(host, filter_include):
+        elif len(filter_include) > 0 and not is_blacklisted(hostname, filter_include):
             LOGGER.debug("Removing '%s' because of inclusion filter", hostname)
             remove.append(hostname)
 
@@ -750,13 +719,15 @@ def main(options, args):
         LOGGER.warn("You decided to skip scheduling downtimes - happy flodding!")
 
     #initialize APIs
-    (fman_user, fman_pass) = get_credentials(
-        "Foreman", options.foreman_server, options.generic_auth_container,
+    (management_user, management_password) = get_credentials(
+        f"Management ({options.mgmt_type})", options.mgmt_server, options.generic_auth_container,
         options.auth_password
     )
-    SAT_CLIENT = ForemanAPIClient(
-        LOG_LEVEL, options.foreman_server, fman_user,
-        fman_pass, options.ssl_verify
+
+    SAT_CLIENT = get_management_client(
+        options.mgmt_type, LOG_LEVEL,
+        management_user, management_password, options.mgmt_server,
+        verify=options.ssl_verify
     )
 
     #get virtualization host credentials
@@ -796,6 +767,8 @@ def main(options, args):
             MON_CLIENTS[monitoring_address] = get_monitoring_client(monitoring_type, LOG_LEVEL, monitoring_address, mon_user, mon_pass, verify_ssl=options.ssl_verify)
 
     #start action
+    if not hasattr(options, 'func'):
+        raise ValueError("Please select an action you want to perform!")
     options.func(options, options.func)
 
 

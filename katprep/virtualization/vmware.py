@@ -155,33 +155,23 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
             else:
                 #only create snapshot if not already existing
                 try:
-                    if not self.has_snapshot(vm_name, snapshot_title):
+                    if not self.has_snapshot(host, snapshot_title):
                         task = vm.CreateSnapshot(
                             snapshot_title, snapshot_text, dump_memory, quiesce
                         )
                     else:
                         raise SnapshotExistsException(
-                            "Snapshot '{}' for VM '{}' already exists!".format(
-                                snapshot_title, vm_name
-                            )
+                            f"Snapshot {snapshot_title!r} for VM {vm_name!r} already exists!"
                         )
                 except EmptySetException as err:
                     task = vm.CreateSnapshot(
                         snapshot_title, snapshot_text, dump_memory, quiesce
                     )
 
-        except TypeError as err:
+        except (TypeError, ValueError, AttributeError) as err:
             raise SessionException(
                 "Unable to manage snapshot: '{}'".format(err)
-            )
-        except ValueError as err:
-            raise SessionException(
-                "Unable to manage snapshot: '{}'".format(err)
-            )
-        except AttributeError as err:
-            raise SessionException(
-                "Unable to manage snapshot: '{}'".format(err)
-            )
+            ) from err
 
     def __get_snapshots(self, vm_name):
         """
@@ -367,15 +357,10 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
             else:
                 #fire it up
                 task = vm.PowerOn()
-        except AttributeError as err:
+        except (AttributeError, ValueError) as err:
             raise SessionException(
-                "Unable to manage power state: '{}'".format(err)
+                f"Unable to manage power state: {err}"
             )
-        except ValueError as err:
-            raise SessionException(
-                "Unable to manage power state: '{}'".format(err)
-            )
-
 
     def powerstate_vm(self, host):
         """

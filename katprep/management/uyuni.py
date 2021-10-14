@@ -7,6 +7,7 @@ import ssl
 from datetime import datetime
 from xmlrpc.client import DateTime, Fault, ServerProxy
 
+from .utilities import split_rpm_filename
 from ..connector import BaseConnector
 from ..exceptions import (
     APILevelNotSupportedException,
@@ -15,43 +16,6 @@ from ..exceptions import (
     SessionException,
     SSLCertVerificationError,
 )
-
-
-def split_rpm_filename(filename):
-    """
-    Splits a standard style RPM file name into NVREA.
-    It returns a name, version, release, epoch, arch, e.g.:
-        foo-1.0-1.i386.rpm returns foo, 1.0, 1, i386
-        1:bar-9-123a.ia64.rpm returns bar, 9, 123a, 1, ia64
-
-    Proudly taken from:
-    https://github.com/rpm-software-management/
-    yum/blob/master/rpmUtils/miscutils.py
-
-    :param filename: RPM file name
-    :type filename: str
-    """
-
-    if filename[-4:] == ".rpm":
-        filename = filename[:-4]
-
-    arch_index = filename.rfind(".")
-    arch = filename[arch_index + 1:]
-
-    rel_index = filename[:arch_index].rfind("-")
-    rel = filename[rel_index + 1:arch_index]
-
-    ver_index = filename[:rel_index].rfind("-")
-    ver = filename[ver_index + 1:rel_index]
-
-    epoch_index = filename.find(":")
-    if epoch_index == -1:
-        epoch = ""
-    else:
-        epoch = filename[:epoch_index]
-
-    name = filename[epoch_index + 1:ver_index]
-    return name, ver, rel, epoch, arch
 
 
 class UyuniAPIClient(BaseConnector):
@@ -302,17 +266,16 @@ class UyuniAPIClient(BaseConnector):
         :param file_name: file name (e.g. foo-1.0-1.i386.rpm)
         :type file_name: str
         """
+        package_nvrea = split_rpm_filename(file_name)
+
         try:
-            # split file name
-            package_nvrea = split_rpm_filename(file_name)
-            # return information
             package = self._session.packages.findByNvrea(
                 self._api_key,
-                package_nvrea[0],
-                package_nvrea[1],
-                package_nvrea[2],
-                package_nvrea[3],
-                package_nvrea[4]
+                package_nvrea.name,
+                package_nvrea.version,
+                package_nvrea.release,
+                package_nvrea.epoch,
+                package_nvrea.architecture
             )
             return package
         except Fault as err:
@@ -348,6 +311,8 @@ class UyuniAPIClient(BaseConnector):
                 )
                 if not erratum:
                     _packages.append(pkg)
+
+            self.LOGGER.debug("Found %i upgrades for %s: %s", len(_packages), system_id, _packages)
             return _packages
         except Fault as err:
             if "no such system" in err.faultString.lower():
@@ -436,25 +401,25 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_patches(self, system_id, patches):
+    def install_patches(self, host):
         """
         Install patches on a given system
 
-        :param system_id: profile ID
-        :type system_id: int
-        :param patches: patch IDs
-        :type patches: int[]
+        :param host: The host on which to install updates
+        :type host: Host
         """
+        patches = host.patches
+        if not patches:
+            raise EmptySetException(
+                "No patches supplied - use patch ID"
+            )
+        patches = [errata.id for errata in patches]
+
+        system_id = self.get_host_id(host.hostname)
+
         try:
-            # remove non-integer values
-            _patches = [x for x in patches if isinstance(x, int)]
-            if not _patches:
-                raise EmptySetException(
-                    "No patches supplied - use patch ID"
-                )
-            # install _all_ the patches
             action_id = self._session.system.scheduleApplyErrata(
-                self._api_key, system_id, _patches
+                self._api_key, system_id, patches
             )
             return action_id
         except Fault as err:
@@ -470,27 +435,27 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_upgrades(self, system_id, upgrades):
+    def install_upgrades(self, host):
         """
         Install package upgrades on a given system
 
-        :param system_id: profile ID
-        :type system_id: int
-        :param upgrades: package IDs
-        :type upgrades: int[]
+        :param host: The host to upgrade
+        :type host: Host
         """
+        system_id = self.get_host_id(host.hostname)
+        upgrades = self.get_host_upgrades(system_id)
+        if not upgrades:
+            self.LOGGER.debug("No upgrades for %s found", host)
+            return  # Nothing to do
+
+        upgrades = [package["to_package_id"] for package in upgrades]
+        earliest_execution = DateTime(datetime.now().timetuple())
+
         try:
-            # remove non-integer values
-            _upgrades = [x for x in upgrades if isinstance(x, int)]
-            if not _upgrades:
-                raise EmptySetException(
-                    "No upgrades supplied - use package ID"
-                )
-            # install _all_ the upgrades
             action_id = self._session.system.schedulePackageInstall(
-                self._api_key, system_id, _upgrades,
-                DateTime(datetime.now().timetuple())
+                self._api_key, system_id, upgrades, earliest_execution
             )
+
             # returning an array to be consistent with install_patches
             return [action_id]
         except Fault as err:
@@ -506,22 +471,23 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def host_reboot(self, system_id):
+    def reboot_host(self, host):
         """
         Reboots a system immediately
 
-        :param system_id: profile ID
-        :type system_id: int
+        :param host: Host to reboot
+        :type host: Host
         """
+        system_id = self.get_host_id(host.hostname)
         if not isinstance(system_id, int):
             raise EmptySetException(
                 "No system found - use system profile IDs"
             )
 
+        earliest_occurance = DateTime(datetime.now().timetuple())
         try:
             action_id = self._session.system.scheduleReboot(
-                self._api_key, system_id,
-                DateTime(datetime.now().timetuple())
+                self._api_key, system_id, earliest_occurance
             )
             return action_id
         except Fault as err:

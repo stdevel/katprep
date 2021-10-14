@@ -1,6 +1,9 @@
+import json
+from datetime import datetime
+
 import pytest
 
-from katprep.host import Host
+from katprep.host import Host, Erratum
 
 
 def test_getting_custom_virt_name():
@@ -192,8 +195,12 @@ def test_host_json_conversion_with_verifications():
         "location": "Digges B",
         "type": "host",
         "verifications": {},
-        "patches": ["patch-1", "patch-2"],
+        "patches": [
+            {'type': 'erratum', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
+            {'type': 'erratum', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
+        ],
     }
+
     host = Host.from_dict(original_dict)
     new_dict = host.to_dict()
 
@@ -287,3 +294,91 @@ def test_patches_are_empty_by_default():
 
     assert not host.patches
     assert len(host.patches) == 0
+
+
+@pytest.fixture
+def uyuni_erratum():
+    return {
+        "id": 2075,
+        "date": "8/27/21",
+        "update_date": "8/27/21",
+        "advisory_synopsis": "moderate: Security update for aws-cli, python-boto3, python-botocore, python-service_identity, python-trustme, python-urllib3",
+        "advisory_type": "Security Advisory",
+        "advisory_status": "stable",
+        "advisory_name": "openSUSE-2021-1206",
+    }
+
+
+def test_creating_erratum_from_uyuni(uyuni_erratum):
+    erratum = Erratum.from_uyuni(uyuni_erratum)
+
+    assert erratum.id == 2075
+    assert erratum.name == "openSUSE-2021-1206"
+    assert erratum.issued_at == datetime(year=2021, month=8, day=27)
+    assert erratum.updated_at == datetime(year=2021, month=8, day=27)
+    assert erratum.summary.startswith("moderate: Security update")
+    assert erratum.summary.endswith(", python-urllib3")
+    assert not erratum.reboot_suggested
+
+
+def test_creating_erratum_from_foreman():
+    foreman_data = {
+        "id": 9,
+        "pulp_id": "FEDORA-EPEL-2020-68a03cd3b1",
+        "title": "python-jmespath-0.9.4-2.el7",
+        "errata_id": "FEDORA-EPEL-2020-68a03cd3b1",
+        "issued": "2020-05-10",
+        "updated": "2021-03-23",
+        "severity": "None",
+        "description": "Make jp.py use python2 again.",
+        "solution": "",
+        "summary": "python-jmespath-0.9.4-2.el7 bugfix update",
+        "uuid": "FEDORA-EPEL-2020-68a03cd3b1",
+        "name": "python-jmespath-0.9.4-2.el7",
+        "type": "bugfix",
+        "cves":
+        [],
+        "bugs":
+        [
+            {
+                "bug_id": "1826380",
+                "href": "https://bugzilla.redhat.com/show_bug.cgi?id=1826380"
+            }
+        ],
+        "hosts_available_count": 1,
+        "hosts_applicable_count": 1,
+        "packages":
+        [
+            "python2-jmespath-0.9.4-2.el7.noarch",
+            "python36-jmespath-0.9.4-2.el7.noarch",
+            "python-jmespath-0.9.4-2.el7.src"
+        ],
+        "module_streams":
+        [],
+        "installable": True
+    }
+
+    erratum = Erratum.from_foreman(foreman_data)
+
+    assert erratum.id == 9
+    assert erratum.name == "FEDORA-EPEL-2020-68a03cd3b1"
+    assert erratum.issued_at == datetime(year=2020, month=5, day=10)
+    assert erratum.updated_at == datetime(year=2021, month=3, day=23)
+    assert erratum.summary == "python-jmespath-0.9.4-2.el7 bugfix update"
+    assert not erratum.reboot_suggested
+
+
+def test_erratum_serialisation(uyuni_erratum):
+    erratum = Erratum.from_dict(uyuni_erratum)
+
+    erratum_dict = erratum.to_dict()
+    erratum_from_dict = Erratum.from_dict(erratum_dict)
+    erratum_dict2 = erratum_from_dict.to_dict()
+
+    assert erratum_dict == erratum_dict2
+
+
+def test_erratum_to_json(uyuni_erratum):
+    erratum = Erratum.from_dict(uyuni_erratum)
+
+    json.dumps(erratum.to_dict())
