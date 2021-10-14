@@ -40,7 +40,9 @@ PARAMETERS = {
     "katprep_mon" : "URL of the monitoring system",
     "katprep_virt" : "Virtualization URL of the system",
     "katprep_virt_snapshot" : "Boolean whether system needs to be"\
-    " protected by a snapshot before maintenance"}
+    " protected by a snapshot before maintenance",
+    "katprep_owner" : "System owner"
+}
 """
 dict: Built-in default host parameters mandatory for katprep
 """
