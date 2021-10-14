@@ -234,7 +234,7 @@ def create_delta(options):
             continue
 
         # store delta report
-        filename = "{}errata-diff-{}-{}.yml".format(options.output_path, host, timestamp)
+        filename = "{}errata-diff-{}-{}.yml".format(options.output_path, old_host, timestamp)
         host_json = json.dumps(old_host.to_dict())
 
         with open(filename, "w") as json_file:
