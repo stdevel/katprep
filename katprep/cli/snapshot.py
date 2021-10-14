@@ -247,7 +247,7 @@ def scan_systems(options):
             "ip": network["ip"],
             "ipv6": network["ip6"],
             "owner": owner,
-            "reboot_suggested": "TODO",
+            "reboot_suggested": "TODO",     # TODO: find out how to get this data
         }
 
         system_info[host_id] = collected_information

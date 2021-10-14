@@ -384,8 +384,8 @@ def status(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    #verify snapshot/downtime per host
-    tasks = {
+    # I'M A PIECE OF SHIT AND NEED TO BE REPLACED
+"""     tasks = {
         "Erratum": "Actions::Katello::Host::Erratum::Install",
         "Package": "Actions::Katello::Host::Update"
     }
@@ -438,7 +438,7 @@ def status(options, args):
                                 task, host, result["result"]
                             )
                     except KeyError as kerr:
-                        LOGGER.debug("Failed showing result: %r", kerr)
+                        LOGGER.debug("Failed showing result: %r", kerr) """
 
 
 def cleanup(options, args):
