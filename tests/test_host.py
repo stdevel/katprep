@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -107,6 +107,27 @@ def test_host_with_custom_location():
 def test_host_comparison(first, second):
     assert first == second
     assert second == first
+
+
+def test_host_comparison_with_different_patches(uyuni_erratum):
+    erratas = []
+    erratas2 = []
+    for increment in range(5):
+        e = Erratum.from_dict(uyuni_erratum)
+        e.id = e.id + increment
+        erratas.append(e)
+
+        e = Erratum.from_dict(uyuni_erratum)
+        e.id = e.id + increment
+        if not increment:
+            # Change the date on the first erratum
+            e.updated_at += timedelta(minutes=10)
+        erratas2.append(e)
+
+    host1 = Host("a", {}, "org", patches=erratas)
+    host2 = Host("a", {}, "org", patches=erratas2)
+
+    assert host1 != host2
 
 
 def test_creating_host_from_dict():
@@ -382,3 +403,27 @@ def test_erratum_to_json(uyuni_erratum):
     erratum = Erratum.from_dict(uyuni_erratum)
 
     json.dumps(erratum.to_dict())
+
+
+def test_erratum_comparison(uyuni_erratum):
+    erratum1 = Erratum.from_dict(uyuni_erratum)
+    erratum2 = Erratum.from_dict(uyuni_erratum)
+
+    assert erratum1 == erratum2
+
+
+def test_erratum_comparison_update_date(uyuni_erratum):
+    erratum1 = Erratum.from_dict(uyuni_erratum)
+    erratum2 = Erratum.from_dict(uyuni_erratum)
+    assert erratum2.updated_at is not None
+    erratum2.updated_at += timedelta(minutes=10)
+
+    assert erratum1 != erratum2
+
+
+def test_erratum_comparison_by_id(uyuni_erratum):
+    erratum1 = Erratum.from_dict(uyuni_erratum)
+    erratum2 = Erratum.from_dict(uyuni_erratum)
+    erratum2.id = erratum1.id + 1
+
+    assert erratum1 != erratum2

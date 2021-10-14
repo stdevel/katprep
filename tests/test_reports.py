@@ -119,7 +119,8 @@ def test_reading_uyuni_snapshot_report(example_uyuni_report_path):
 
         patches = host.patches
         assert len(patches) == 3
-        assert isinstance(patches[0], dict)
+        for patch in patches:
+            assert isinstance(patch, Erratum)
         # TODO: Test the patch contents
 
 

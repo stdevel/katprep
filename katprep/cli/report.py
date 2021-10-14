@@ -205,44 +205,44 @@ def create_delta(options):
     Creats delta YAML reports per system. This is done by comparing the two
     snapshot reports passed as arguments.
     """
-    global REPORT_OLD
-    now = datetime.datetime.now()
-    #open old report and remove entries from newer report
-    for host in REPORT_OLD:
-        LOGGER.debug("Analyzing changes for host '%s'", host)
+    all_hosts = set(REPORT_OLD.keys()).union(set(REPORT_NEW.keys()))
+    if not all_hosts:
+        raise RuntimeError("No hosts to compare.")
+
+    newer_file = get_newer_file(options.reports[0], options.reports[1])
+    file_mod_time = os.path.getmtime(newer_file)
+    timestamp = datetime.datetime.fromtimestamp(file_mod_time).strftime('%Y%m%d')
+
+    for host_id in all_hosts:
         try:
-            for i, erratum in enumerate(REPORT_OLD[host]["errata"]):
-                if erratum["errata_id"] in get_errata_by_host(REPORT_NEW, host):
-                    LOGGER.debug(
-                        "Dropping erratum '%s' (#%s}) as it seems not to" \
-                        " be installed",
-                        erratum["summary"], erratum["errata_id"]
-                    )
-                    del REPORT_OLD[host]["errata"][i]
-            #add date and time
-            #TODO: date format based on locale?
-            REPORT_OLD[host]["params"]["date"] = now.strftime("%Y-%m-%d")
-            REPORT_OLD[host]["params"]["time"] = now.strftime("%H:%M")
-
-            #store delta report
-            timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(
-                get_newer_file(options.reports[0], options.reports[1])
-            )).strftime('%Y%m%d')
-
-            #store YAML files if at least 1 erratum installed
-            if len(REPORT_OLD[host]["errata"]) > len(REPORT_NEW[host]["errata"]):
-                with open("{}errata-diff-{}-{}.yml".format(options.output_path, \
-                    host, timestamp), "w") as json_file:
-                    yaml.dump(yaml.load(json.dumps(REPORT_OLD[host])), json_file, \
-                    default_flow_style=False, explicit_start=True, \
-                    explicit_end=True, default_style="'")
-            else:
-                LOGGER.debug(
-                    "Host '%s' has not been patched #ohman", host
-                )
+            old_host = REPORT_OLD[host_id]
         except KeyError:
-            LOGGER.debug("Unable to find changes for host '%s'", host)
+            LOGGER.warn(f"Host {host_id} missing in old report")
+            continue
 
+        try:
+            new_host = REPORT_NEW[host_id]
+        except KeyError:
+            LOGGER.warn(f"Host {host_id} missing in new report")
+            continue
+
+        if old_host.patches == new_host.patches:
+            LOGGER.debug(f"Host {host_id!r} has not been patched #ohman")
+            continue
+
+        # store delta report
+        filename = "{}errata-diff-{}-{}.yml".format(options.output_path, old_host, timestamp)
+        host_json = json.dumps(old_host.to_dict())
+
+        with open(filename, "w") as json_file:
+            yaml.dump(
+                yaml.load(host_json),
+                json_file,
+                default_flow_style=False,
+                explicit_start=True,
+                explicit_end=True,
+                default_style="'"
+            )
 
 
 def create_reports(options):
