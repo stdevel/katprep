@@ -466,32 +466,32 @@ def test_host_upgrade_nonexistent(client, host_id):
         )
 
 
-def test_host_reboot(client, host_id):
+def test_reboot_host(client, host_id):
     """
     Ensures that hosts can be rebooted
     """
-    action_id = client.host_reboot(
+    action_id = client.reboot_host(
         host_id
     )
     assert isinstance(action_id, int)
 
 
-def test_host_reboot_invalid_format(client):
+def test_reboot_host_invalid_format(client):
     """
     Ensure that hosts with invalid format can't be rebooted
     """
     with pytest.raises(EmptySetException):
-        client.host_reboot(
+        client.reboot_host(
             "pinkepank.giertz.loc"
         )
 
 
-def test_host_reboot_nonexistent(client):
+def test_reboot_host_nonexistent(client):
     """
     Ensure that non-existing hosts can't be rebooted
     """
     with pytest.raises(EmptySetException):
-        client.host_reboot(
+        client.reboot_host(
             random.randint(64000, 128000)
         )
 
