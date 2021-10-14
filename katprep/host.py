@@ -167,12 +167,17 @@ class Host:
             patches = host_dict.get("patches", [])
         patches = [Erratum.from_dict(patch) for patch in patches]
 
+        try:
+            verifications = host_dict["verification"]  # katello
+        except KeyError:
+            verifications = host_dict.get("verifications", {})
+
         return Host(
             hostname,
             host_dict["params"],
             org,
             location,
-            host_dict.get("verification"),
+            verifications,
             patches,
         )
 
