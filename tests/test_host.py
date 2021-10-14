@@ -168,7 +168,7 @@ def test_converting_host_to_dict():
         "hostname": "my.hostname",
         "params": {"some_param"},
         "organization": "my orga",
-        "type": "host",
+        "cls": "host",
         "verifications": {},
         "patches": [],
     }
@@ -180,7 +180,7 @@ def test_host_json_conversion():
         "params": {"sesame": "street"},
         "organization": "Funky town",
         "location": "Digges B",
-        "type": "host",
+        "cls": "host",
     }
     host = Host.from_dict(original_dict)
     new_dict = host.to_dict()
@@ -197,7 +197,7 @@ def test_host_json_conversion_with_verifications():
         "params": {"sesame": "street"},
         "organization": "Funky town",
         "location": "Digges B",
-        "type": "host",
+        "cls": "host",
         "verifications": {"my_key": True},
     }
     host = Host.from_dict(original_dict)
@@ -214,11 +214,11 @@ def test_host_json_conversion_with_verifications_and_patches():
         "params": {"sesame": "street"},
         "organization": "Funky town",
         "location": "Digges B",
-        "type": "host",
+        "cls": "host",
         "verifications": {},
         "patches": [
-            {'type': 'erratum', 'erratum_type': 'testing', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
-            {'type': 'erratum', 'erratum_type': 'testing', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
+            {'cls': 'erratum', 'type': 'testing', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
+            {'cls': 'erratum', 'type': 'testing', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
         ],
     }
 

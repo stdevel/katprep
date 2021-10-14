@@ -13,7 +13,7 @@ def from_dict(some_dict):
     :type some_dict: dict
     """
     try:
-        object_type = some_dict["type"]
+        object_type = some_dict["cls"]
     except KeyError:
         raise ValueError("Unable to get type of object from {!r}".format(some_dict))
 
@@ -127,7 +127,7 @@ class Host:
             "hostname": self._hostname,
             "params": self._params,
             "organization": self._organization,
-            "type": self.type,
+            "cls": self.type,
             "verifications": self._verifications,
             "patches": [patch.to_dict() for patch in self._patches],
         }
@@ -240,9 +240,9 @@ class Erratum:
 
     def to_dict(self):
         return {
-            "type": self._OBJECT_TYPE,
+            "cls": self._OBJECT_TYPE,
             "id": self.id,
-            "erratum_type": self.type,
+            "type": self.type,
             "name": self.name,
             "summary": self.summary,
             "issued_at": self.issued_at.isoformat(),
@@ -256,7 +256,7 @@ class Erratum:
             return cls.from_foreman(data)
         elif "advisory_name" in data:
             return cls.from_uyuni(data)
-        elif data.get("type") == cls._OBJECT_TYPE:
+        elif data.get("cls") == cls._OBJECT_TYPE:
             def convert_to_datetime(timedata):
                 if isinstance(timedata, datetime):
                     return timedata
@@ -268,7 +268,7 @@ class Erratum:
 
             return Erratum(
                 data["id"],
-                data["erratum_type"],
+                data["type"],
                 data["name"],
                 data["summary"],
                 issuing_date,

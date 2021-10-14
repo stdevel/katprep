@@ -4,13 +4,13 @@ import pytest
 
 
 def test_deserialise_host_from_dict():
-    host = from_dict({"type": "host", "hostname": "a", "params": {}, "organization": None})
+    host = from_dict({"cls": "host", "hostname": "a", "params": {}, "organization": None})
     assert host.hostname == "a"
     assert isinstance(host, Host)
 
 
 def test_deserialise_hostgroup_from_dict():
-    group = from_dict({"type": "hostgroup", "groupname": "b"})
+    group = from_dict({"cls": "hostgroup", "groupname": "b"})
     assert group.name == "b"
     assert isinstance(group, HostGroup)
 
@@ -28,4 +28,4 @@ def test_converting_expects_type_key():
 
 def test_converting_unexpected_type():
     with pytest.raises(ValueError):
-        from_dict({"type": "dontexist"})
+        from_dict({"cls": "dontexist"})
