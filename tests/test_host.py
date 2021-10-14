@@ -217,8 +217,8 @@ def test_host_json_conversion_with_verifications_and_patches():
         "type": "host",
         "verifications": {},
         "patches": [
-            {'type': 'erratum', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
-            {'type': 'erratum', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
+            {'type': 'erratum', 'erratum_type': 'testing', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
+            {'type': 'erratum', 'erratum_type': 'testing', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
         ],
     }
 
@@ -334,6 +334,7 @@ def test_creating_erratum_from_uyuni(uyuni_erratum):
     erratum = Erratum.from_uyuni(uyuni_erratum)
 
     assert erratum.id == 2075
+    assert erratum.type == "Security Advisory"
     assert erratum.name == "openSUSE-2021-1206"
     assert erratum.issued_at == datetime(year=2021, month=8, day=27)
     assert erratum.updated_at == datetime(year=2021, month=8, day=27)
@@ -386,6 +387,7 @@ def test_creating_erratum_from_foreman():
     assert erratum.issued_at == datetime(year=2020, month=5, day=10)
     assert erratum.updated_at == datetime(year=2021, month=3, day=23)
     assert erratum.summary == "python-jmespath-0.9.4-2.el7 bugfix update"
+    assert erratum.type == "bugfix"
     assert not erratum.reboot_suggested
 
 

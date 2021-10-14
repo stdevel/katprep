@@ -223,6 +223,7 @@ class Erratum:
     def __init__(
         self,
         id: int,
+        type: str,
         name: str,
         summary: str,
         issued_at: datetime,
@@ -230,6 +231,7 @@ class Erratum:
         reboot_suggested: bool = False,
     ):
         self.id = id
+        self.type = type
         self.name = name
         self.summary = summary
         self.issued_at = issued_at
@@ -240,6 +242,7 @@ class Erratum:
         return {
             "type": self._OBJECT_TYPE,
             "id": self.id,
+            "erratum_type": self.type,
             "name": self.name,
             "summary": self.summary,
             "issued_at": self.issued_at.isoformat(),
@@ -265,6 +268,7 @@ class Erratum:
 
             return Erratum(
                 data["id"],
+                data["erratum_type"],
                 data["name"],
                 data["summary"],
                 issuing_date,
@@ -297,6 +301,7 @@ class Erratum:
 
         return cls(
             data["id"],
+            data["advisory_type"],
             data["advisory_name"],
             data["advisory_synopsis"],
             issuing_date,
@@ -318,6 +323,7 @@ class Erratum:
 
         return cls(
             data["id"],
+            data["type"],
             data["errata_id"],
             data["summary"],
             issuing_date,
