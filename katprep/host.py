@@ -272,7 +272,10 @@ class Erratum:
     @classmethod
     def from_uyuni(cls, data: dict):
         def create_datetime(date_str):
-            month, day, year = [int(x) for x in date_str.split("/")]
+            try:
+                month, day, year = [int(x) for x in date_str.split("/")]
+            except ValueError:
+                year, month, day = [int(x) for x in date_str.split("-")]
 
             if year <= 99:
                 # We assume that we retrieved something like 21
