@@ -28,3 +28,10 @@ class ManagementClient(BaseConnector):
         """
         Soft reboot of the given host.
         """
+
+    @abstractmethod
+    def is_reboot_required(self, host) -> bool:
+        """
+        Checks if the client requires a reboot.
+        """
+

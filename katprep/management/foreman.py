@@ -454,3 +454,6 @@ class ForemanAPIClient(ManagementClient):
             f"/hosts/{host_id}/power",
             json.dumps({"power_action": "soft"})
         )
+
+    def is_reboot_required(self, host):
+        return any(errata.reboot_suggested for errata in host.patches)

@@ -599,3 +599,15 @@ class UyuniAPIClient(BaseConnector):
         # simply return the organization as Uyuni
         # does not support any kind of locations
         return self.get_organization()
+
+    def is_reboot_required(self, host):
+        try:
+            systems = self._session.system.listSuggestedReboot(
+                self._api_key, host.id
+            )
+
+            return any(system["id"] == host.management_id for system in systems)
+        except Fault as err:
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
