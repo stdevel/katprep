@@ -35,3 +35,14 @@ class ManagementClient(BaseConnector):
         Checks if the client requires a reboot.
         """
 
+    @abstractmethod
+    def get_errata_task_status(self, host):
+        """
+        Get the status of errata installations for the given host.
+        """
+
+    @abstractmethod
+    def get_upgrade_task_status(self, host):
+        """
+        Get the status of package upgrades for the given host.
+        """

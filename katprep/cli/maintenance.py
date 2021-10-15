@@ -384,8 +384,14 @@ def status(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    # I'M A PIECE OF SHIT AND NEED TO BE REPLACED
-"""     tasks = {
+    raise NotImplementedError("This functions needs a generic implementation")
+    # TODO: we have to find a way to handle this
+    # TODO: how to handle the call to the SAT_CLIENT?
+    # TODO: what it be good if SAT_CLIENT was a dict like for monitoring and virt?
+    # TODO: make the results generic
+
+    #verify snapshot/downtime per host
+    tasks = {
         "Erratum": "Actions::Katello::Host::Erratum::Install",
         "Package": "Actions::Katello::Host::Update"
     }
@@ -438,7 +444,7 @@ def status(options, args):
                                 task, host, result["result"]
                             )
                     except KeyError as kerr:
-                        LOGGER.debug("Failed showing result: %r", kerr) """
+                        LOGGER.debug("Failed showing result: %r", kerr)
 
 
 def cleanup(options, args):
