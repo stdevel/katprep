@@ -24,13 +24,13 @@ table tr:nth-child(odd) {
 <h2>Meta information</h2>
 <table>
 <tr>
-<th>IP</th>
+<th>Hostname</th>
 <th>Date</th>
 <th>Time</th>
 <th>Owner</th>
 </tr>
 <tr>
-<td>$if(params.ip)$$params.ip$$endif$</td>
+<td>$if(hostname)$$hostname$$endif$</td>
 <td>$if(date)$$date$$endif$</td>
 <td>$if(time)$$time$$endif$</td>
 <td>$if(params.katprep_owner)$$params.katprep_owner$$endif$</td>
