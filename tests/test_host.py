@@ -34,6 +34,20 @@ def test_getting_monitoring_id():
     assert host.monitoring_id == "my.hostname"
 
 
+def test_getting_management_id():
+    host = Host("my.hostname", {}, None, management_id="Year of the Knife")
+
+    assert host.hostname == "my.hostname"
+    assert host.management_id == "Year of the Knife"
+
+
+def test_getting_management_id_if_unset():
+    host = Host("my.hostname", {}, None)
+
+    assert host.hostname == "my.hostname"
+    assert host.management_id == "my.hostname"
+
+
 def test_host_with_custom_location():
     host = Host("a", {}, "org", "my loc")
 
@@ -101,6 +115,15 @@ def test_host_with_custom_location():
             Host("a", {}, "org a", verifications=["patch-1", "patch-2"]),
             Host("b", {}, "org a", patches=["patch-3"]),
             marks=pytest.mark.xfail(reason="Some have params some patches"),
+        ),
+        pytest.param(
+            Host("a", {}, "org a", management_id="abc123"),
+            Host("a", {}, "org a", management_id="def123"),
+            marks=pytest.mark.xfail(reason="Different management IDs"),
+        ),
+        (
+            Host("a", {}, "org a", management_id="abc123"),
+            Host("a", {}, "org a", management_id="abc123")
         ),
     ],
 )
