@@ -603,7 +603,7 @@ class UyuniAPIClient(BaseConnector):
     def is_reboot_required(self, host):
         try:
             systems = self._session.system.listSuggestedReboot(
-                self._api_key, host.id
+                self._api_key
             )
 
             return any(system["id"] == host.management_id for system in systems)
