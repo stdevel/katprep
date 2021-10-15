@@ -130,10 +130,10 @@ class UyuniAPIClient(BaseConnector):
 
     def get_hosts(self):
         """
-        Returns all active system IDs
+        Returns all system IDs
         """
         try:
-            hosts = self._session.system.listActiveSystems(
+            hosts = self._session.system.listSystems(
                 self._api_key
             )
             if hosts:
