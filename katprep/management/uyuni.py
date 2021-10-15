@@ -415,7 +415,7 @@ class UyuniAPIClient(BaseConnector):
             )
         patches = [errata.id for errata in patches]
 
-        system_id = self.get_host_id(host.hostname)
+        system_id = host.management_id
 
         try:
             action_id = self._session.system.scheduleApplyErrata(
@@ -442,7 +442,7 @@ class UyuniAPIClient(BaseConnector):
         :param host: The host to upgrade
         :type host: Host
         """
-        system_id = self.get_host_id(host.hostname)
+        system_id = host.management_id
         upgrades = self.get_host_upgrades(system_id)
         if not upgrades:
             self.LOGGER.debug("No upgrades for %s found", host)
@@ -478,7 +478,7 @@ class UyuniAPIClient(BaseConnector):
         :param host: Host to reboot
         :type host: Host
         """
-        system_id = self.get_host_id(host.hostname)
+        system_id = host.management_id
         if not isinstance(system_id, int):
             raise EmptySetException(
                 "No system found - use system profile IDs"
@@ -599,3 +599,15 @@ class UyuniAPIClient(BaseConnector):
         # simply return the organization as Uyuni
         # does not support any kind of locations
         return self.get_organization()
+
+    def is_reboot_required(self, host):
+        try:
+            systems = self._session.system.listSuggestedReboot(
+                self._api_key
+            )
+
+            return any(system["id"] == host.management_id for system in systems)
+        except Fault as err:
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )

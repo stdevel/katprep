@@ -39,8 +39,10 @@ class Host:
         location=None,
         verifications=None,
         patches=None,
+        management_id=None,
     ):
         self._hostname = hostname
+        self._management_id = management_id
         self._params = host_parameters
         self._organization = organization
         self._location = location
@@ -83,6 +85,10 @@ class Host:
             return self._hostname
 
         return monitoring_id or self._hostname
+
+    @property
+    def management_id(self):
+        return self._management_id or self._hostname
 
     def get_param(self, key):
         """
@@ -135,6 +141,9 @@ class Host:
         if self._location:
             host_dict["location"] = self._location
 
+        if self._management_id:
+            host_dict["management_id"] = self._management_id
+
         return host_dict
 
     @classmethod
@@ -172,6 +181,11 @@ class Host:
         except KeyError:
             verifications = host_dict.get("verifications", {})
 
+        try:
+            management_id = host_dict["id"]
+        except KeyError:
+            management_id = host_dict.get("management_id")
+
         return Host(
             hostname,
             host_dict["params"],
@@ -179,16 +193,18 @@ class Host:
             location,
             verifications,
             patches,
+            management_id,
         )
 
     def __repr__(self):
-        return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
+        return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
             self._hostname,
             self._params,
             self._organization,
             self._location,
             self._verifications,
             self._patches,
+            self._management_id
         )
 
     def __str__(self):
@@ -211,6 +227,9 @@ class Host:
             return False
 
         if self._patches != other._patches:
+            return False
+
+        if self.management_id != other.management_id:
             return False
 
         return True

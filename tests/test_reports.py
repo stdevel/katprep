@@ -27,6 +27,8 @@ def test_loading_katello_report(example_katello_report_path):
 
         assert host.hostname == key
         assert host.hostname == "client.lab.giertz.com"
+        assert host.management_id == key
+        assert host.management_id == "client.lab.giertz.com"
 
         assert host.organization == "Shitty Robots Corp"
         assert host.location == "Los Angeles"
@@ -106,6 +108,9 @@ def test_reading_uyuni_snapshot_report(example_uyuni_report_path):
         assert isinstance(host, Host)
 
         assert host.hostname == "uyuni-client.labor.testdomain"
+        assert isinstance(host.management_id, int)  # Uyuni expects int
+        assert host.management_id == 1000010000
+        assert key == str(host.management_id)
 
         assert host.organization == "Demo"
         assert host.location == "Demo"
