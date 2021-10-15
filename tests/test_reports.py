@@ -108,8 +108,9 @@ def test_reading_uyuni_snapshot_report(example_uyuni_report_path):
         assert isinstance(host, Host)
 
         assert host.hostname == "uyuni-client.labor.testdomain"
-        assert host.management_id == '1000010000'
-        assert host.management_id == key
+        assert isinstance(host.management_id, int)  # Uyuni expects int
+        assert host.management_id == 1000010000
+        assert key == str(host.management_id)
 
         assert host.organization == "Demo"
         assert host.location == "Demo"
