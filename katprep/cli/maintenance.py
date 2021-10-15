@@ -122,7 +122,7 @@ def manage_host_preparation(options, host, cleanup=False):
             LOGGER.exception(err)
             LOGGER.error("Unable to manage snapshot for host '%s': %s", host.hostname, err)
 
-    errata_reboot = any(errata.reboot_suggested for errata in host.patches)
+    errata_reboot = SAT_CLIENT.is_reboot_required(host)
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
@@ -226,7 +226,7 @@ def execute(options, args):
             if options.upgrade_packages:
                 _install_package_upgrades(host_obj, options.generic_dry_run)
 
-            reboot_wanted = any(errata.reboot_suggested for errata in host_obj.patches)
+            reboot_wanted = SAT_CLIENT.is_reboot_required(host_obj)
             if options.mgmt_reboot or \
                 (reboot_wanted and not options.mgmt_no_reboot):
 

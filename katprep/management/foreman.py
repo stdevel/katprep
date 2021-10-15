@@ -433,6 +433,7 @@ class ForemanAPIClient(ManagementClient):
 
     def install_patches(self, host):
         erratas = [errata.id for errata in host.patches]
+        # TODO: can we use host.management_id for this?
         host_id = self.get_id_by_name(host.hostname, "host")
 
         self.api_put(
@@ -441,6 +442,7 @@ class ForemanAPIClient(ManagementClient):
         )
 
     def install_upgrades(self, host):
+        # TODO: can we use host.management_id for this?
         host_id = self.get_id_by_name(host.hostname, "host")
         self.api_put(
             f"/hosts/{host_id}/packages/upgrade_all",
@@ -448,9 +450,13 @@ class ForemanAPIClient(ManagementClient):
         )
 
     def reboot_host(self, host):
+        # TODO: can we use host.management_id for this?
         host_id = self.get_id_by_name(host.hostname, "host")
 
         self.api_put(
             f"/hosts/{host_id}/power",
             json.dumps({"power_action": "soft"})
         )
+
+    def is_reboot_required(self, host):
+        return any(errata.reboot_suggested for errata in host.patches)
