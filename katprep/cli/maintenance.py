@@ -122,7 +122,7 @@ def manage_host_preparation(options, host, cleanup=False):
             LOGGER.exception(err)
             LOGGER.error("Unable to manage snapshot for host '%s': %s", host.hostname, err)
 
-    errata_reboot = SAT_CLIENT.is_reboot_required(host_obj)
+    errata_reboot = SAT_CLIENT.is_reboot_required(host)
 
     #schedule downtime if applicable
     #TODO: only schedule downtime if a patch suggests it?
