@@ -113,7 +113,7 @@ def test_host_with_custom_location():
         ),
         pytest.param(
             Host("a", {}, "org a", verifications=["patch-1", "patch-2"]),
-            Host("b", {}, "org a", patches=["patch-3"]),
+            Host("a", {}, "org a", patches=["patch-3"]),
             marks=pytest.mark.xfail(reason="Some have params some patches"),
         ),
         pytest.param(
