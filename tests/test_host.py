@@ -238,7 +238,7 @@ def test_host_json_conversion_with_verifications_and_patches():
         "organization": "Funky town",
         "location": "Digges B",
         "cls": "host",
-        "verifications": {},
+        "verifications": {"virt_snapshot": True},
         "patches": [
             {'cls': 'erratum', 'type': 'testing', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
             {'cls': 'erratum', 'type': 'testing', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
