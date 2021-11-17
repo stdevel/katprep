@@ -576,9 +576,9 @@ def parse_options(args=None):
     metavar="URL", default="", help="defines a monitoring URL to use")
     #--mon-type
     mon_opts.add_argument("--mon-type", dest="mon_type", \
-    metavar="TYPE", type=str, choices="nagios|icinga", default="icinga", \
-    help="defines the monitoring system type: nagios (Nagios/Icinga 1.x) or" \
-    " icinga (Icinga 2.x). (default: icinga)")
+    metavar="TYPE", type=str, choices="nagios|icinga|icinga2", default="icinga2", \
+    help="defines the monitoring system type: nagios, icinga (Icinga 1.x) or" \
+    " icinga2 (Icinga 2.x). (default: icinga2)")
     #-K / --skip-downtime
     mon_opts.add_argument("-K", "--skip-downtime", dest="mon_skip_downtime", \
     action="store_true", default=False, \
@@ -756,6 +756,7 @@ def main(options, args):
 
     #get monitoring host credentials
     if not options.mon_skip_downtime:
+        # TODO: use icinga2 by default if not defined?
         required_mon = {
             (host.get_param("katprep_mon_type"), host.get_param("katprep_mon"))
             for host in REPORT.values()
