@@ -28,24 +28,24 @@
       uyuni_org_login: "{{ username }}"
       uyuni_org_passowrd: "{{ password }}"
       uyuni_channels:
-        - name: opensuse_leap15_2
+        - name: opensuse_leap15_3
           arch: x86_64
-        - name: opensuse_leap15_2-updates
+        - name: opensuse_leap15_3-updates
           arch: x86_64
-        - name: opensuse_leap15_2-uyuni-client
+        - name: opensuse_leap15_3-uyuni-client
           arch: x86_64
   post_tasks:
     - name: Create activation key
       block:
         - name: Create key
-          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_create -n ak-opensuse-15_2-default -d 'openSUSE Leap 15.2 default' -b opensuse_leap15_2-x86_64"
+          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_create -n ak-opensuse-15_3-default -d 'openSUSE Leap 15.3 default' -b opensuse_leap15_3-x86_64"
         - name: Add child channels
-          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_addchildchannels 1-ak-opensuse-15_2-default opensuse_leap15_2-x86_64-updates opensuse_leap15_2-uyuni-client-x86_64"
+          command: spacecmd -u "{{ username }}" -p "{{ password }}" "activationkey_addchildchannels 1-ak-opensuse-15_3-default opensuse_leap15_3-x86_64-updates opensuse_leap15_3-uyuni-client-x86_64"
       ignore_errors: true
     - name: Create filters
       block:
         - name: Create openSUSE filters
-          command: spacecmd repo_addfilters -- 'External - openSUSE Leap 15.2 (x86_64)' '{{ item }}'
+          command: spacecmd repo_addfilters -- 'External - openSUSE Leap 15.3 (x86_64)' '{{ item }}'
           loop:
             - +cowsay
             - +openscap-utils
@@ -57,7 +57,7 @@
             - +salt*
             - +python3*
         - name: Create openSUSE Update filters
-          command: spacecmd repo_addfilters -- 'External - openSUSE Leap 15.2 Updates (x86_64)' '{{ item }}'
+          command: spacecmd repo_addfilters -- 'External - openSUSE Leap 15.3 Updates (x86_64)' '{{ item }}'
           loop:
             - +salt*
             - +python3*
@@ -65,9 +65,9 @@
     - name: Sync channels
       command: spacewalk-repo-sync -c "{{ item }}"
       loop:
-        - opensuse_leap15_2-x86_64
-        - opensuse_leap15_2-x86_64-updates
-        - opensuse_leap15_2-uyuni-client-x86_64
+        - opensuse_leap15_3-x86_64
+        - opensuse_leap15_3-x86_64-updates
+        - opensuse_leap15_3-uyuni-client-x86_64
     - name: Create bootstrap script
       block:
         - name: Create script
@@ -78,14 +78,14 @@
           lineinfile:
             path: /srv/www/htdocs/pub/bootstrap/bootstrap.sh
             regexp: '^ACTIVATION_KEYS='
-            line: 'ACTIVATION_KEYS=1-ak-opensuse-15_2-default'
+            line: 'ACTIVATION_KEYS=1-ak-opensuse-15_3-default'
     - name: Create custominfo keys
       command: spacecmd -u "{{ username }}" -p "{{ password }}" "custominfo_createkey -- {{ item.name }} {{ item.description }}"
       loop:
         - name: 'katprep_mon'
           description: 'URL of the monitoring system'
         - name: 'katprep_mon_type'
-          description: 'Monitoring system type: nagios/(icinga)'
+          description: 'Monitoring system type: nagios/icinga/icinga2'
         - name: 'katprep_mon_name'
           description: 'Object name within monitoring if not FQDN'
         - name: 'katprep_virt'
