@@ -175,9 +175,11 @@ def set_verification_value(filename, host, setting, value):
     """
     global REPORT
 
-    host = REPORT[host.hostname]
+    # explicit conversion to str as JSON requires keys to be strings ¯\_(ツ)_/¯
+    management_id = str(host.management_id)
+    host = REPORT[management_id]
     host.set_verification(setting, value)
-    REPORT[host.hostname] = host
+    REPORT[management_id] = host
 
     try:
         write_report(filename, REPORT)
@@ -292,7 +294,7 @@ def revert(options, args):
             if not options.generic_dry_run:
                 virt_address = host.get_param("katprep_virt")
                 virt_client = VIRT_CLIENTS[virt_address]
-                virt_client.revert_snapshot(vm_name, snapshot_name)
+                virt_client.revert_snapshot(host, snapshot_name)
         except ValueError as err:
             LOGGER.error("Error reverting maintenance: '%s'", err)
 
@@ -319,22 +321,28 @@ def verify(options, args):
                 snapshot_name = "katprep_{}".format(REPORT_PREFIX)
 
                 virt_address = host.get_param("katprep_virt")
-                virt_client = VIRT_CLIENTS[virt_address]
-
-                try:
-                    if virt_client.has_snapshot(vm_name, snapshot_name):
-                        set_verification_value(filename, host, "virt_snapshot", True)
-                        LOGGER.info("Snapshot for host '%s' found.", host)
-                    else:
-                        set_verification_value(filename, host, "virt_cleanup", True)
+                if virt_address:
+                    virt_client = VIRT_CLIENTS[virt_address]
+                    try:
+                        if virt_client.has_snapshot(host, snapshot_name):
+                            LOGGER.info("Snapshot for host '%s' found.", host)
+                            set_verification_value(filename, host, "virt_snapshot", True)
+                        else:
+                            LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
+                            set_verification_value(filename, host, "virt_cleanup", True)
+                    except EmptySetException:
                         LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
-                except EmptySetException:
-                    set_verification_value(filename, host, "virt_cleanup", True)
-                    LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
+                        set_verification_value(filename, host, "virt_cleanup", True)
+                else:
+                    LOGGER.info("Host '%s' is not a VM", host)
 
             #check downtime
             if not options.mon_skip_downtime:
                 monitoring_address = host.get_param("katprep_mon")
+                if monitoring_address is None:
+                    LOGGER.info("Monitoring for host '%s' not configured", host)
+                    continue
+
                 monitoring_client = MON_CLIENTS[monitoring_address]
 
                 #check scheduled downtime
@@ -368,10 +376,6 @@ def verify(options, args):
                     set_verification_value(filename, host, "mon_status", "Ok")
                     set_verification_value(filename, host, "mon_status_detail", "All services OK")
 
-    except KeyError:
-        #host with either no virt/mon
-        pass
-        #TODO: seems not to work...
     except ValueError as err:
         LOGGER.error("Error verifying host: '%s'", err)
 
@@ -384,7 +388,7 @@ def status(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    # I'M A PIECE OF SHIT AND NEED TO BE REPLACED
+    # TODO: I'M A PIECE OF SHIT AND NEED TO BE REPLACED
 """     tasks = {
         "Erratum": "Actions::Katello::Host::Erratum::Install",
         "Package": "Actions::Katello::Host::Update"

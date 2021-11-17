@@ -127,10 +127,7 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
         try:
             content = self._session.RetrieveContent()
             vm = self.__get_obj(content, [vim.VirtualMachine], vm_name)
-            if action.lower() == "revert":
-                #TODO: implement revert
-                raise NotImplementedError("Reverting snapshots not supported")
-            elif action.lower() == "remove":
+            if action.lower() == "remove" or action.lower() == "revert":
                 #get _all_ the snapshots
                 snapshots = self.__get_snapshots(vm_name)
                 for snapshot in snapshots:
