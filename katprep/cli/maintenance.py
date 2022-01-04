@@ -14,8 +14,10 @@ import time
 import yaml
 
 from .. import __version__, get_credentials
-from ..exceptions import (EmptySetException, InvalidCredentialsException,
-    SessionException, SnapshotExistsException, UnsupportedRequestException)
+from ..exceptions import (
+    EmptySetException, InvalidCredentialsException,
+    SessionException, SnapshotExistsException, UnsupportedRequestException
+    )
 from ..management import get_management_client
 from ..monitoring import get_monitoring_client
 from ..network import validate_hostname
@@ -328,7 +330,9 @@ def verify(options, args):
                             LOGGER.info("Snapshot for host '%s' found.", host)
                             set_verification_value(filename, host, "virt_snapshot", True)
                         else:
-                            LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
+                            LOGGER.info(
+                                "No snapshot for host '%s' found, probably cleaned-up.", host
+                            )
                             set_verification_value(filename, host, "virt_cleanup", True)
                     except EmptySetException:
                         LOGGER.info("No snapshot for host '%s' found, probably cleaned-up.", host)
@@ -691,9 +695,9 @@ def main(options, args):
 
     #warn if user tends to do something stupid
     if options.virt_skip_snapshot:
-        LOGGER.warn("You decided to skip creating snapshots - I've warned you!")
+        LOGGER.warning("You decided to skip creating snapshots - I've warned you!")
     if options.mon_skip_downtime:
-        LOGGER.warn("You decided to skip scheduling downtimes - happy flodding!")
+        LOGGER.warning("You decided to skip scheduling downtimes - happy flodding!")
 
     #initialize APIs
     (management_user, management_password) = get_credentials(
@@ -742,7 +746,13 @@ def main(options, args):
                 monitoring_address, options.generic_auth_container, options.auth_password
             )
 
-            MON_CLIENTS[monitoring_address] = get_monitoring_client(monitoring_type, LOG_LEVEL, monitoring_address, mon_user, mon_pass, verify_ssl=options.ssl_verify)
+            MON_CLIENTS[monitoring_address] = get_monitoring_client(
+                monitoring_type,
+                LOG_LEVEL,
+                monitoring_address,
+                mon_user, mon_pass,
+                verify_ssl=options.ssl_verify
+            )
 
     #start action
     if not hasattr(options, 'func'):
