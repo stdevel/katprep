@@ -575,3 +575,53 @@ def test_get_host_owner_nonexistent(client):
     """
     with pytest.raises(SessionException):
         client.get_host_owner(random.randint(800, 1500))
+
+
+def test_errata_task_status(client, host_id):
+    """
+    Ensure that errata installation task status can be gathered
+    """
+    # TODO: ensure that at least one errata was installed previously
+    # pick random errata task
+    actions = client.get_errata_task_status(host_id)
+    action = random.choice(actions)
+    # get action details
+    details = client.get_host_action(
+        host_id, action['id']
+    )
+    assert details
+
+
+def test_errata_task_status_nonexistent(client):
+    """
+    Ensure that host errata information for invalid machines cannot be gathered
+    """
+    with pytest.raises(SessionException):
+        client.get_errata_task_status(
+            random.randint(800, 1500)
+        )
+
+
+def test_upgrade_task_status(client, host_id):
+    """
+    Ensure that package upgrade task status can be gathered
+    """
+    # TODO: ensure that at least one update was installed previously
+    # pick random errata task
+    actions = client.get_upgrade_task_status(host_id)
+    action = random.choice(actions)
+    # get action details
+    details = client.get_host_action(
+        host_id, action['id']
+    )
+    assert details
+
+
+def test_upgrade_task_status_nonexistent(client):
+    """
+    Ensure that host upgrade information for invalid machines cannot be gathered
+    """
+    with pytest.raises(SessionException):
+        client.get_upgrade_task_status(
+            random.randint(800, 1500)
+        )

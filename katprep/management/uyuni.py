@@ -79,7 +79,7 @@ class UyuniAPIClient(BaseConnector):
 
     def _connect(self):
         """
-        This function establishes a connection to Uyuni.
+        This function establishes a connection to Uyuni
         """
         # set API session and key
         try:
@@ -601,6 +601,9 @@ class UyuniAPIClient(BaseConnector):
         return self.get_organization()
 
     def is_reboot_required(self, host):
+        """
+        Checks whether a particular host requires a reboot
+        """
         try:
             systems = self._session.system.listSuggestedReboot(
                 self._api_key
@@ -611,3 +614,46 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
             )
+
+    def get_action_by_type(self, system_id, action_type):
+        """
+        Gets host action by specific type
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param action_type: action type
+        :type action_type: str
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        try:
+            actions = self._session.system.listSystemEvents(
+                self._api_key, system_id, action_type
+            )
+            return actions
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException(
+                    f"System not found: {system_id!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def get_errata_task_status(self, system_id):
+        """
+        Get the status of errata installations for the given host
+
+        :param system_id: profile ID
+        :type system_id: int
+        """
+        return self.get_action_by_type(system_id, 'Patch Update')
+
+    def get_upgrade_task_status(self, system_id):
+        """
+        Get the status of package upgrades for the given host.
+        """
+        return self.get_action_by_type(system_id, 'Package Install')
