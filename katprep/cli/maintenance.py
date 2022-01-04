@@ -388,61 +388,34 @@ def status(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
-    # TODO: I'M A PIECE OF SHIT AND NEED TO BE REPLACED
-"""     tasks = {
-        "Erratum": "Actions::Katello::Host::Erratum::Install",
-        "Package": "Actions::Katello::Host::Update"
-    }
-
     for host_id, host in REPORT.items():
         LOGGER.debug("Getting '%s' task status...", host)
-
-        #check maintenance progress
         today = datetime.datetime.now().strftime("%Y-%m-%d")
 
-        try:
-            for task, task_filter in tasks.items():
-                try:
-                    results = SAT_CLIENT.get_task_by_filter(
-                        host, task_filter, today
-                    )
-                except ValueError:
-                    LOGGER.error("Error getting '%s' task status...", host)
-                    continue
+        # filter for errata/upgrade tasks from today
+        errata_tasks = SAT_CLIENT.get_errata_task_status(int(host_id))
+        errata_tasks = [x for x in errata_tasks if today in x['created']]
+        upgrade_tasks = SAT_CLIENT.get_upgrade_task_status(int(host_id))
+        upgrade_tasks = [x for x in upgrade_tasks if today in x['created']]
+        LOGGER.debug("Erratas for host '%s': %s", int(host_id), len(errata_tasks))
+        LOGGER.debug("Upgrades for host '%s': %s", int(host_id), len(upgrade_tasks))
 
-                if not results:
-                    if task.lower() == "package":
-                        log_method = LOGGER.info
-                    else:
-                        log_method = LOGGER.error
+        # check all the tasks
+        _tasks = errata_tasks + upgrade_tasks
+        for _task in _tasks:
 
-                    log_method("No %s task for '%s' found!", task.lower(), host)
-                    continue
-
-                for result in results:
-                    try:
-                        LOGGER.debug(
-                            "Found '%s' task %s from %s (state %s)", result["label"],
-                            result["id"], result["started_at"], result["result"]
-                        )
-
-                        if result["result"].lower() == "success":
-                            LOGGER.info(
-                                "%s task for host '%s' succeeded",
-                                task, host
-                            )
-                        elif result["result"].lower() == "error":
-                            LOGGER.info(
-                                "%s task for host '%s' FAILED!",
-                                task, host
-                            )
-                        else:
-                            LOGGER.info(
-                                "%s task for host '%s' has state '%s'",
-                                task, host, result["result"]
-                            )
-                    except KeyError as kerr:
-                        LOGGER.debug("Failed showing result: %r", kerr) """
+            # TODO: We might need to change keys/adopt format
+            # when re-implementing Foreman support
+            if _task["successful_count"] != 0:
+                LOGGER.info(
+                    "%s task for host '%s' succeeded",
+                    _task['name'], host
+                )
+            elif _task["failed_count"] != 0:
+                LOGGER.info(
+                    "%s task for host '%s' FAILED!",
+                    _task['name'], host
+                )
 
 
 def cleanup(options, args):
