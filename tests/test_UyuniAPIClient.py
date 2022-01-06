@@ -48,6 +48,13 @@ def host_id(config):
     """
     return config["valid_objects"]["host"]["id"]
 
+@pytest.fixture
+def hostparams(config):
+    """
+    Return host parameters
+    """
+    return config["valid_objects"]["hostparams"]
+
 
 @pytest.fixture
 def user_name(config):
@@ -575,6 +582,24 @@ def test_get_host_owner_nonexistent(client):
     """
     with pytest.raises(SessionException):
         client.get_host_owner(random.randint(800, 1500))
+
+
+def test_get_host_custom_variables(client, host_id, hostparams):
+    """
+    Ensure that host custom values can be found
+    """
+    _variables = client.get_host_custom_variables(host_id)
+    for _param in hostparams:
+        assert _param in _variables.keys()
+        assert hostparams[_param] == _variables[_param]
+
+
+def test_get_host_custom_variables_nonexistent(client):
+    """
+    Ensure that host custom values for invalid machines cannot be gathered
+    """
+    with pytest.raises(SessionException):
+        client.get_host_custom_variables(random.randint(800, 1500))
 
 
 def test_errata_task_status(client, host_id):

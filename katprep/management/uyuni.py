@@ -212,6 +212,32 @@ class UyuniAPIClient(BaseConnector):
                 f"Owner not found for {system_id!r}"
             )
 
+    def get_host_custom_variables(self, system_id):
+        """
+        Returns host custom variables (custom info key values)
+
+        :param system_id: profile ID
+        :type system_id: int
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        try:
+            values = self._session.system.getCustomValues(
+                self._api_key, system_id
+            )
+            return values
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise SessionException(
+                    f"System not found: {system_id!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
     def get_host_patches(self, system_id):
         """
         Returns available patches for a particular system
