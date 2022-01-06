@@ -17,7 +17,7 @@ katprep is a toolkit for automating system maintenance tasks such as:
 -  Checking monitoring and snapshot status
 -  Reverting VM snapshots
 -  Removing downtimes and snapshots
--  Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
+-  Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
    IT certifications)
 
 For VM management, the **libvirt** and **pyVmomi** (VMware vSphere
@@ -43,11 +43,11 @@ When using **libvirt** specify a valid connection URI, such as:
 | qemu+ssh://root@pinkepank.giertz.loc/system
 | xen:///system
 | esx:///system
-| vpx://vc01/cluster02/locaiton03/esxi04/?no\_verify=1
+| vpx://vc01/cluster02/locaiton03/esxi04/?no_verify=1
 | vbox:///system
 
 See the libvirt documentation
-(https://libvirt.org/guide/html/Application\_Development\_Guide-Connections-URI\_Formats.html)
+(https://libvirt.org/guide/html/Application_Development_Guide-Connections-URI_Formats.html)
 for more examples.
 
 When using **pyvmomi**, specify a valid ESXi host or vCenter Server
@@ -68,23 +68,23 @@ Icinga 1.x URL - make sure **not** to include **/cgi-bin**. Examples:
 When using **icinga** (*IcingaAPIClient*), specify the full API URL
 including the port - such as:
 
-https://bigbrother.giertz.loc:5665
+| https://bigbrother.giertz.loc:5665
 
 Utilities
 ---------
 
 The following utilities are part of the katprep framework:
 
--  **katprep\_authconfig(1)** - Manages credentials for third-party
+-  **katprep_authconfig(1)** - Manages credentials for third-party
    systems triggered by katprep
--  **katprep\_maintenance(1)** - Prepares, executes and verifies system
+-  **katprep_maintenance(1)** - Prepares, executes and verifies system
    maintenance tasks
--  **katprep\_parameters(1)** - Bulk edits Puppet host parameters for
+-  **katprep_parameters(1)** - Bulk edits Puppet host parameters for
    managed hosts
--  **katprep\_populate(1)** - Auto-discovers and updates monitoring and
+-  **katprep_populate(1)** - Auto-discovers and updates monitoring and
    hypervisor information for managed systems
--  **katprep\_report(1)** - Creates reports after system maintenance
--  **katprep\_snapshot(1)** - Creates infrastructure status overview
+-  **katprep_report(1)** - Creates reports after system maintenance
+-  **katprep_snapshot(1)** - Creates infrastructure status overview
    snapshots
 
 Usage
@@ -95,29 +95,29 @@ system landscape in katprep as the toolkit needs to know *which* hosts
 are *VMs* running on *which* hypervisor monitored by *which* monitoring
 system (managing physical hosts is also possible). From a Foreman
 perspective, these information are stored as Puppet host parameter - see
-also **katprep\_parameters(1)**. To omit the need of entering these
+also **katprep_parameters(1)**. To omit the need of entering these
 information manually, two tools can assist - see
-**katprep\_parameters(1)** and **katprep\_populate(1)**.
+**katprep_parameters(1)** and **katprep_populate(1)**.
 
 After your infrastructure is known to katprep, it can create
-infrastructure status reports using **katprep\_snapshot(5)**. This
+infrastructure status reports using **katprep_snapshot(5)**. This
 snapshot includes information about hosts and outstanding patches.
 Before and after managing hosts, a report needs to be created in order
 to be able to calculate the delta. System maintenance is triggered via
-**katprep\_maintenance(1)**. This utilities automates preparing,
+**katprep_maintenance(1)**. This utilities automates preparing,
 executing, verifying and cleaning-up maintenance tasks.
 
 After finishing maintenance, it is possible to create maintenance
-reports by leveraging **katprep\_report(1)**.
+reports by leveraging **katprep_report(1)**.
 
 So, in summary - to automate patching your system landscape, execute the
 following tools:
 
-1. **katprep\_snapshot(1)** to create an infrastructure snapshot
-2. **katprep\_maintenance(1)** to prepare, execute and clean-up
+1. **katprep_snapshot(1)** to create an infrastructure snapshot
+2. **katprep_maintenance(1)** to prepare, execute and clean-up
    maintenance
-3. **katprep\_snapshot(1)** to create another infrastructure snapshot
-4. **katprep\_report(1)** to create maintenance reports (optional)
+3. **katprep_snapshot(1)** to create another infrastructure snapshot
+4. **katprep_report(1)** to create maintenance reports (optional)
 
 BUGS
 ====
@@ -132,6 +132,6 @@ Christian Stankowic info@cstan.io
 SEE ALSO
 ========
 
-**katprep\_authconfig(1)**, **katprep\_maintenance(1)**,
-**katprep\_parameters(1)**, **katprep\_populate(1)**,
-**katprep\_report(1)**, **katprep\_snapshot(1)**
+**katprep_authconfig(1)**, **katprep_maintenance(1)**,
+**katprep_parameters(1)**, **katprep_populate(1)**,
+**katprep_report(1)**, **katprep_snapshot(1)**
