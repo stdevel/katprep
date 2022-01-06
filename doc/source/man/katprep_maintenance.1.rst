@@ -135,7 +135,7 @@ This utility supports the following commands
 Foreman 1.15.x or Red Hat Satellite 6.3 is required.
 
 FILES
-=====
+-----
 
 *~/.katpreprc*
    Per-user katprep configuration file.

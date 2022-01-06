@@ -1,12 +1,10 @@
 % katprep(1) Version 0.5.0 | katprep documentation
 
-NAME
-====
+# NAME
 
 **katprep** — Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Red Hat Satellite 6.x
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 katprep is a toolkit for automating system maintenance tasks such as:
 
@@ -19,6 +17,7 @@ katprep is a toolkit for automating system maintenance tasks such as:
 - Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005 IT certifications)
 
 For VM management, the **libvirt** and **pyVmomi** (VMware vSphere Python API bindings) libraries are used, therefore at least the following hypervisors are supported:
+
 - VMware vSphere, Workstation, Player
 - VirtualBox
 - QEMU
@@ -29,13 +28,14 @@ For VM management, the **libvirt** and **pyVmomi** (VMware vSphere Python API bi
 Check-out the libvirt website (https://libvirt.org/drivers.html) for additional drivers.
 
 For managing monitoring, the following products are supported:
+
 - Nagios/Icinga 1.x
 - Icinga2
 
 When creating reports, the document converter Pandoc is used. This enables exporting reports in various formats; this utility offers pre-defined Markdown and HTML templates.
 
-Virtualization URIs
--------------------
+## Virtualization URIs
+
 When using **libvirt** specify a valid connection URI, such as:
 
 | qemu+ssh://root@pinkepank.giertz.loc/system
@@ -51,8 +51,8 @@ When using **pyvmomi**, specify a valid ESXi host or vCenter Server hostname, su
 | vcenter.localdomain.loc
 | esxi.giertz.loc
 
-Monitoring URLs:
-----------------
+## Monitoring URLs:
+
 When using **nagios** (_NagiosCGIClient_), specify the full Nagios or Icinga 1.x URL - make sure **not** to include **/cgi-bin**. Examples:
 
 | https://nagios.giertz.loc/nagios
@@ -62,8 +62,7 @@ When using **icinga** (_IcingaAPIClient_), specify the full API URL including th
 
 | https://bigbrother.giertz.loc:5665
 
-Utilities
----------
+## Utilities
 
 The following utilities are part of the katprep framework:
 
@@ -74,8 +73,7 @@ The following utilities are part of the katprep framework:
 - **katprep_report(1)** - Creates reports after system maintenance
 - **katprep_snapshot(1)** - Creates infrastructure status overview snapshots
 
-Usage
------
+## Usage
 
 In order to automate system maintenance, you will need to represent your system landscape in katprep as the toolkit needs to know _which_ hosts are _VMs_ running on _which_ hypervisor monitored by _which_ monitoring system (managing physical hosts is also possible). From a Foreman perspective, these information are stored as Puppet host parameter - see also **katprep_parameters(1)**.
 To omit the need of entering these information manually, two tools can assist - see **katprep_parameters(1)** and **katprep_populate(1)**.
@@ -92,17 +90,14 @@ So, in summary - to automate patching your system landscape, execute the followi
 3. **katprep_snapshot(1)** to create another infrastructure snapshot
 4. **katprep_report(1)** to create maintenance reports (optional)
 
-BUGS
-====
+# BUGS
 
 See GitHub issues: <https://github.com/stdevel/katprep/issues>
 
-AUTHOR
-======
+# AUTHOR
 
 Christian Stankowic <info@cstan.io>
 
-SEE ALSO
-========
+# SEE ALSO
 
 **katprep_authconfig(1)**, **katprep_maintenance(1)**, **katprep_parameters(1)**, **katprep_populate(1)**, **katprep_report(1)**, **katprep_snapshot(1)**

@@ -27,7 +27,7 @@ To only update particular host parameters, utilize the
 **katprep_parameters(1)** utility.
 
 Host parameters
----------------
+===============
 
 The following Puppet host parameters are created/updated:
 

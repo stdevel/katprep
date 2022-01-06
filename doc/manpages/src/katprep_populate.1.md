@@ -1,25 +1,20 @@
 % katprep_populate(1) Version 0.5.0 | katprep documentation
 
-NAME
-====
+# NAME
 
 **katprep_populate** — Auto-discovers and updates monitoring and hypervisor information for managed systems
 
-SYNOPSIS
-========
+# SYNOPSIS
 
 | **katprep_populate** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--ipv6-only**] \[**--insecure**] \[**-s** _server_] \[**-u**] \[**--virt-uri** _uri_] \[**--virt-type** _libvirt_|_pyvmomi_] \[**--skip-virt**] \[**--mon-url** _url_] \[**--mon-type** _nagios_|_icinga_] \[**--skip-mon**]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Auto-discovers monitoring host definitions and virtual machines and links those objects to Foreman hosts. This is done by comparing IP addresses and hostnames. Differing hostnames between Foreman, monitoring and hypervisor are detected and configured as host parameters (see also **Host parameters**).
 
 To only update particular host parameters, utilize the **katprep_parameters(1)** utility.
 
-
-Host parameters
----------------
+# Host parameters
 
 The following Puppet host parameters are created/updated:
 
@@ -53,8 +48,7 @@ katprep_virt_type
 
 For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
-Options
--------
+## Options
 
 -h, --help
 
@@ -124,8 +118,7 @@ Options
 
 :   Skips gathering data from monitoring system (default: no)
 
-EXAMPLES
-========
+# EXAMPLES
 
 It is a good idea to start-over by specifying your monitoring and hypervisor systems and enabling **dry-run** mode:
 
@@ -137,8 +130,7 @@ It is a good idea to start-over by specifying your monitoring and hypervisor sys
 
 Check the values that would be set - run the command again with omitting the **dry-run** parameter if they are correct.
 
-FILES
-=====
+# FILES
 
 *~/.katpreprc*
 
@@ -148,17 +140,14 @@ FILES
 
 :   Individual katprep authentication container file.
 
-BUGS
-====
+# BUGS
 
 See GitHub issues: <https://github.com/stdevel/katprep/issues>
 
-AUTHOR
-======
+# AUTHOR
 
 Christian Stankowic <info@cstan.io>
 
-SEE ALSO
-========
+# SEE ALSO
 
 **katprep(1)**, **katprep_parameters(1)**

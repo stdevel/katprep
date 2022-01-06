@@ -22,14 +22,22 @@ katprep is a toolkit for automating system maintenance tasks such as:
 
 For VM management, the **libvirt** and **pyVmomi** (VMware vSphere
 Python API bindings) libraries are used, therefore at least the
-following hypervisors are supported: - VMware vSphere, Workstation,
-Player - VirtualBox - QEMU - KVM - XEN - Microsoft Hyper-V
+following hypervisors are supported:
+
+-  VMware vSphere, Workstation, Player
+-  VirtualBox
+-  QEMU
+-  KVM
+-  XEN
+-  Microsoft Hyper-V
 
 Check-out the libvirt website (https://libvirt.org/drivers.html) for
 additional drivers.
 
-For managing monitoring, the following products are supported: -
-Nagios/Icinga 1.x - Icinga2
+For managing monitoring, the following products are supported:
+
+-  Nagios/Icinga 1.x
+-  Icinga2
 
 When creating reports, the document converter Pandoc is used. This
 enables exporting reports in various formats; this utility offers

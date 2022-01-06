@@ -22,7 +22,7 @@ debugging purposes or writing your own templates it might be necessary
 to check the content. To preserve YAML files execute
 **katprep_report(1)** like this:
 
-| $ katprep_report errata*json -t *template* -x
+| $ katprep_report errata*.json -t *template* -x
 
 A valid variable file is written in YAML and contains the following
 dictionaries:
