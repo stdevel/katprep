@@ -50,7 +50,9 @@ OPT_PARAMETERS = {
     "katprep_mon_name" : "Object name within monitoring if not FQDN",
     "katprep_mon_type" : "Monitoring system type: nagios/(icinga)",
     "katprep_virt_name": "Object name within hypervisor if not FQDN",
-    "katprep_virt_type": "Virtualization host type: (libvirt)/pyvmomi"
+    "katprep_virt_type": "Virtualization host type: (libvirt)/pyvmomi",
+    "katprep_pre-script": "Script to run before maintenance",
+    "katprep_post-script": "Script to run after maintenance"
 }
 """
 dict: Built-in optional host parameters
@@ -69,7 +71,9 @@ def list_params():
     """Lists all pre-defined parameters and values."""
     #global parameters
 
-    for key, value in PARAMETERS.items():
+    params = PARAMETERS.copy()
+    params.update(OPT_PARAMETERS)
+    for key, value in params.items():
         LOGGER.info(
             "Setting '%s' will define '%s'", key, value
         )

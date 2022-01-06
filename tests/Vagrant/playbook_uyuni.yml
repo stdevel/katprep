@@ -96,6 +96,10 @@
           description: 'Object name within hypervisor if not FQDN'
         - name: 'katprep_virt_snapshot'
           description: 'Boolean whether system needs to be procted with a snapshot'
+        - name: 'katprep_pre-script'
+          description: 'Script to run before maintenance'
+        - name: 'katprep_post-script'
+          description: 'Script to run after maintenance'
       ignore_errors: true
     - name: Create host groups
       command: spacecmd -u "{{ username }}" -p "{{ password }}" "group_create -- {{ item.name }} {{ item.description }}"
