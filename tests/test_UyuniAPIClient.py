@@ -13,6 +13,7 @@ from katprep.exceptions import (
     InvalidCredentialsException,
     SessionException,
     SSLCertVerificationError,
+    CustomVariableExistsException
 )
 
 from .utilities import load_config
@@ -54,6 +55,13 @@ def hostparams(config):
     Return host parameters
     """
     return config["valid_objects"]["hostparams"]
+
+@pytest.fixture
+def customvars(config):
+    """
+    Return custom info keys
+    """
+    return config["valid_objects"]["customvars"]
 
 
 @pytest.fixture
@@ -648,5 +656,68 @@ def test_upgrade_task_status_nonexistent(client):
     """
     with pytest.raises(SessionException):
         client.get_upgrade_task_status(
+            random.randint(800, 1500)
+        )
+
+
+def test_get_custom_variables(client, customvars):
+    """
+    Ensure that custom variables can be found
+    """
+    _variables = client.get_custom_variables()
+    for _param in customvars:
+        assert _param in _variables.keys()
+        assert customvars[_param] == _variables[_param]
+
+
+def test_create_update_delete_custom_variable(client):
+    """
+    Ensure that custom variables can be added, updated and deleted
+    """
+    _variables = {
+        "katprep_maintainer": "Defines the maintainerz",
+        "katprep_update_channel": "Defines the update chanel"
+    }
+    _changed_variables = {
+        "katprep_maintainer": "Defines the maintainer",
+        "katprep_update_channel": "Defines the update channel"
+    }
+
+    # create variables
+    for _var in _variables:
+        client.create_custom_variable(_var, _variables[_var])
+    # update variables
+    for _var in _changed_variables:
+        client.update_custom_variable(_var, _changed_variables[_var])
+    # delete variables
+    for _var in _variables:
+        client.delete_custom_variable(_var)
+
+
+def test_create_custom_variable_already_existing(client, customvars):
+    """
+    Ensure that already existing custom variables can't be re-created
+    """
+    with pytest.raises(CustomVariableExistsException):
+        for _var in customvars:
+            client.create_custom_variable(_var, customvars[_var])
+
+
+def test_update_custom_variable_nonexisting(client):
+    """
+    Ensure that updating a non-existing custom variable isn't possible
+    """
+    with pytest.raises(EmptySetException):
+        client.update_custom_variable(
+            random.randint(800, 1500), random.randint(800, 1500)
+        )
+
+
+def test_delete_custom_variable_nonexisting(client):
+    """
+    Ensure that removing a non-existing custom variable isn't possible
+    """
+    with pytest.raises(EmptySetException):
+        client.delete_custom_variable(
             random.randint(800, 1500)
         )

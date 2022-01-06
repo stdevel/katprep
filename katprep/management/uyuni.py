@@ -15,6 +15,7 @@ from ..exceptions import (
     InvalidCredentialsException,
     SessionException,
     SSLCertVerificationError,
+    CustomVariableExistsException
 )
 
 
@@ -681,5 +682,74 @@ class UyuniAPIClient(BaseConnector):
     def get_upgrade_task_status(self, system_id):
         """
         Get the status of package upgrades for the given host.
+
+        :param system_id: profile ID
+        :type system_id: int
         """
         return self.get_action_by_type(system_id, 'Package Install')
+
+    def get_custom_variables(self):
+        """
+        Returns all defines custom variables (custom info keys)
+        """
+        try:
+            _variables = self._session.system.custominfo.listAllKeys(
+                self._api_key
+            )
+            variables = {x['label']: x['description'] for x in _variables}
+            return variables
+        except Fault as err:
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def create_custom_variable(self, label, description):
+        """
+        Creates a custom variable (custom info keys)
+        """
+        try:
+            self._session.system.custominfo.createKey(
+                self._api_key, label, description
+            )
+        except Fault as err:
+            if "already exists" in err.faultString.lower():
+                raise CustomVariableExistsException(
+                    f"Key already exists: {label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def update_custom_variable(self, label, description):
+        """
+        Updates a custom variable's description (custom info keys)
+        """
+        try:
+            self._session.system.custominfo.updateKey(
+                self._api_key, label, description
+            )
+        except Fault as err:
+            if "does not exist" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Key does not exist: {label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def delete_custom_variable(self, label):
+        """
+        Deletes a custom variable (custom info keys)
+        """
+        try:
+            self._session.system.custominfo.deleteKey(
+                self._api_key, label
+            )
+        except Fault as err:
+            if "does not exist" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Key does not exist: {label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )

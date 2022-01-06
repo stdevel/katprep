@@ -59,6 +59,15 @@ class EmptySetException(Exception):
     """
 
 
+class CustomVariableExistsException(Exception):
+    """
+    Exception for already existing custom variables
+
+    .. class:: CustomVariableExistsException
+    """
+
+
+
 class SnapshotExistsException(Exception):
     """
     Exception for already existing snapshots
