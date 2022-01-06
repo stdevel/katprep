@@ -61,10 +61,10 @@ approaches fail, logon credentials are prompted.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – prefix for the external system (used in variables/prompts)</li>
-<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – external system hostname</li>
-<li><strong>auth_container</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – authentication container file name</li>
-<li><strong>auth_pass</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – authentication container password</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – prefix for the external system (used in variables/prompts)</li>
+<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – external system hostname</li>
+<li><strong>auth_container</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – authentication container file name</li>
+<li><strong>auth_pass</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – authentication container password</li>
 </ul>
 </td>
 </tr>
@@ -81,60 +81,8 @@ approaches fail, logon credentials are prompted.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – argparse options dict</li>
-<li><strong>api_object</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Foreman object type (e.g. host, environment)</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.get_host_params_by_report">
-<code class="descclassname">katprep.</code><code class="descname">get_host_params_by_report</code><span class="sig-paren">(</span><em>report</em>, <em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#get_host_params_by_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.get_host_params_by_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves all parameters for a particular host from a report.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – report dictionary</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.get_json">
-<code class="descclassname">katprep.</code><code class="descname">get_json</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#get_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.get_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads a JSON file and returns the whole content as one-liner.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the JSON filename</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.get_required_hosts_by_report">
-<code class="descclassname">katprep.</code><code class="descname">get_required_hosts_by_report</code><span class="sig-paren">(</span><em>report</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#get_required_hosts_by_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.get_required_hosts_by_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves all required external hosts (such as monitoring systems
-or hypervisor connections) for maintaining hosts mentioned in a
-report.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – report dictionary</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – key that contains hostname (e.g. katprep_virt)</li>
+<li><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – argparse options dict</li>
+<li><strong>api_object</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Foreman object type (e.g. host, environment)</li>
 </ul>
 </td>
 </tr>
@@ -150,21 +98,7 @@ report.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – path to the file</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.is_valid_report">
-<code class="descclassname">katprep.</code><code class="descname">is_valid_report</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#is_valid_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.is_valid_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks whether a JSON file contains a valid snapshot report.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the JSON filename</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – path to the file</td>
 </tr>
 </tbody>
 </table>
@@ -178,7 +112,7 @@ report.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – path to check for write access</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – path to check for write access</td>
 </tr>
 </tbody>
 </table>
@@ -194,8 +128,8 @@ This is done by detecting strings and translating them into IDs.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – argparse options dict</li>
-<li><strong>api_client</strong> (<a class="reference internal" href="katprep.clients.html#clients.ForemanAPIClient.ForemanAPIClient" title="clients.ForemanAPIClient.ForemanAPIClient"><em>ForemanAPIClient</em></a>) – ForemanAPIClient object</li>
+<li><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – argparse options dict</li>
+<li><strong>api_client</strong> (<em>ForemanAPIClient</em>) – ForemanAPIClient object</li>
 </ul>
 </td>
 </tr>
@@ -211,7 +145,7 @@ This is done by detecting strings and translating them into IDs.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – command name to check</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – command name to check</td>
 </tr>
 </tbody>
 </table>
@@ -224,35 +158,11 @@ This is done by detecting strings and translating them into IDs.</p>
 <dl class="class">
 <dt id="AuthContainer.AuthContainer">
 <em class="property">class </em><code class="descclassname">AuthContainer.</code><code class="descname">AuthContainer</code><span class="sig-paren">(</span><em>log_level</em>, <em>filename</em>, <em>key=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="class">
 <dt id="AuthContainer.AuthContainer.AuthContainer">
 <em class="property">class </em><code class="descname">AuthContainer</code><a class="headerlink" href="#AuthContainer.AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="attribute">
-<dt id="AuthContainer.AuthContainer.CREDENTIALS">
-<code class="descname">CREDENTIALS</code><em class="property"> = {}</em><a class="headerlink" href="#AuthContainer.AuthContainer.CREDENTIALS" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: authentication credentials</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="AuthContainer.AuthContainer.FILENAME">
-<code class="descname">FILENAME</code><em class="property"> = ''</em><a class="headerlink" href="#AuthContainer.AuthContainer.FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd><p>str: correspending file</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="AuthContainer.AuthContainer.KEY">
-<code class="descname">KEY</code><em class="property"> = ''</em><a class="headerlink" href="#AuthContainer.AuthContainer.KEY" title="Permalink to this definition">¶</a></dt>
-<dd><p>str: encryption key</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="AuthContainer.AuthContainer.LOGGER">
-<code class="descname">LOGGER</code><em class="property"> = &lt;Logger AuthContainer (WARNING)&gt;</em><a class="headerlink" href="#AuthContainer.AuthContainer.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
-</dd></dl>
 
 <dl class="method">
 <dt id="AuthContainer.AuthContainer.add_credentials">
@@ -263,9 +173,9 @@ This is done by detecting strings and translating them into IDs.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</li>
-<li><strong>username</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – username</li>
-<li><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – corresponding password</li>
+<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</li>
+<li><strong>username</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – username</li>
+<li><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – corresponding password</li>
 </ul>
 </td>
 </tr>
@@ -282,7 +192,7 @@ find/create generic authentication information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>snippet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – connection string, URI/URL,…</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>snippet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – connection string, URI/URL,…</td>
 </tr>
 </tbody>
 </table>
@@ -296,7 +206,7 @@ find/create generic authentication information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</td>
 </tr>
 </tbody>
 </table>
@@ -306,20 +216,6 @@ find/create generic authentication information.</p>
 <dt id="AuthContainer.AuthContainer.get_hostnames">
 <code class="descname">get_hostnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_hostnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_hostnames" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns hostnames</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.get_json">
-<code class="descname">get_json</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads a JSON file and returns the whole content as one-liner.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the JSON filename</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -337,7 +233,7 @@ encrypted.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</td>
 </tr>
 </tbody>
 </table>
@@ -357,7 +253,7 @@ encrypted.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – key</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – key</td>
 </tr>
 </tbody>
 </table>
@@ -368,7 +264,7 @@ encrypted.</p>
 <dl class="exception">
 <dt id="AuthContainer.ContainerException">
 <em class="property">exception </em><code class="descclassname">AuthContainer.</code><code class="descname">ContainerException</code><a class="reference internal" href="_modules/AuthContainer.html#ContainerException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.ContainerException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <blockquote>
 <div>Dummy class for authentication container errors</div></blockquote>
 <dl class="class">
@@ -378,731 +274,181 @@ encrypted.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-katprep.authconfig">
-<span id="authconfig-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">authconfig</span></code> Module<a class="headerlink" href="#module-katprep.authconfig" title="Permalink to this headline">¶</a></h2>
-<p>A script which maintains entries in a authentication container.</p>
-<dl class="data">
-<dt id="katprep.authconfig.CONTAINER">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">CONTAINER</code><em class="property"> = None</em><a class="headerlink" href="#katprep.authconfig.CONTAINER" title="Permalink to this definition">¶</a></dt>
-<dd><p>AuthContainer: authentication container file</p>
+<dl class="class">
+<dt id="AuthContainer.Credentials">
+<em class="property">class </em><code class="descclassname">AuthContainer.</code><code class="descname">Credentials</code><span class="sig-paren">(</span><em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="headerlink" href="#AuthContainer.Credentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="attribute">
+<dt id="AuthContainer.Credentials.password">
+<code class="descname">password</code><a class="headerlink" href="#AuthContainer.Credentials.password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.authconfig.LOGGER">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">LOGGER</code><em class="property"> = &lt;Logger katprep_authconfig (WARNING)&gt;</em><a class="headerlink" href="#katprep.authconfig.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
+<dl class="attribute">
+<dt id="AuthContainer.Credentials.username">
+<code class="descname">username</code><a class="headerlink" href="#AuthContainer.Credentials.username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.authconfig.LOG_LEVEL">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">LOG_LEVEL</code><em class="property"> = None</em><a class="headerlink" href="#katprep.authconfig.LOG_LEVEL" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger level</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.authconfig.add">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">add</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/authconfig.html#add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.authconfig.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function adds/modifies an entry to/from the authentication container.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.authconfig.cli">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">cli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/authconfig.html#cli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.authconfig.cli" title="Permalink to this definition">¶</a></dt>
-<dd><p>This functions initializes the CLI interface</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.authconfig.list_entries">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">list_entries</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/authconfig.html#list_entries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.authconfig.list_entries" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function lists entries from the authentication container.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.authconfig.main">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">main</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/authconfig.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.authconfig.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function, starts the logic based on parameters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.authconfig.parse_options">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">parse_options</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/authconfig.html#parse_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.authconfig.parse_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses options and arguments.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.authconfig.remove">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">remove</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/authconfig.html#remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.authconfig.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function removes an entry from the authentication container.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.authconfig.set_password">
-<code class="descclassname">katprep.authconfig.</code><code class="descname">set_password</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/authconfig.html#set_password"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.authconfig.set_password" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function sets/changes/removes the authentication container password.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="exceptions-module">
-<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">exceptions</span></code> Module<a class="headerlink" href="#exceptions-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="authconfig-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">authconfig</span></code> Module<a class="headerlink" href="#authconfig-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-katprep.maintenance">
-<span id="maintenance-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">maintenance</span></code> Module<a class="headerlink" href="#module-katprep.maintenance" title="Permalink to this headline">¶</a></h2>
-<p>A script which prepares, executes and controls maintenance tasks on systems
-managed with Foreman/Katello or Red Hat Satellite 6.</p>
-<dl class="data">
-<dt id="katprep.maintenance.LOGGER">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">LOGGER</code><em class="property"> = &lt;Logger katprep_maintenance (WARNING)&gt;</em><a class="headerlink" href="#katprep.maintenance.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
+<div class="section" id="module-exceptions">
+<span id="exceptions-module"></span><h2><a class="reference internal" href="#module-exceptions" title="exceptions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">exceptions</span></code></a> Module<a class="headerlink" href="#module-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Exceptions used by the management classes</p>
+<dl class="exception">
+<dt id="exceptions.APILevelNotSupportedException">
+<em class="property">exception </em><code class="descname">APILevelNotSupportedException</code><a class="reference internal" href="_modules/exceptions.html#APILevelNotSupportedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for unsupported API levels</p>
+<dl class="class">
+<dt id="exceptions.APILevelNotSupportedException.APILevelNotSupportedException">
+<em class="property">class </em><code class="descname">APILevelNotSupportedException</code><a class="headerlink" href="#exceptions.APILevelNotSupportedException.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.maintenance.LOG_LEVEL">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">LOG_LEVEL</code><em class="property"> = None</em><a class="headerlink" href="#katprep.maintenance.LOG_LEVEL" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger level</p>
+<dl class="exception">
+<dt id="exceptions.EmptySetException">
+<em class="property">exception </em><code class="descname">EmptySetException</code><a class="reference internal" href="_modules/exceptions.html#EmptySetException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.EmptySetException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for empty result sets</p>
+<dl class="class">
+<dt id="exceptions.EmptySetException.EmptySetException">
+<em class="property">class </em><code class="descname">EmptySetException</code><a class="headerlink" href="#exceptions.EmptySetException.EmptySetException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.maintenance.MON_CLIENTS">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">MON_CLIENTS</code><em class="property"> = {}</em><a class="headerlink" href="#katprep.maintenance.MON_CLIENTS" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: Nagios CGI client handles</p>
+<dl class="exception">
+<dt id="exceptions.InvalidCredentialsException">
+<em class="property">exception </em><code class="descname">InvalidCredentialsException</code><a class="reference internal" href="_modules/exceptions.html#InvalidCredentialsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.InvalidCredentialsException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for invalid credentials</p>
+<dl class="class">
+<dt id="exceptions.InvalidCredentialsException.InvalidCredentialsException">
+<em class="property">class </em><code class="descname">InvalidCredentialsException</code><a class="headerlink" href="#exceptions.InvalidCredentialsException.InvalidCredentialsException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.maintenance.REPORT">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">REPORT</code><em class="property"> = None</em><a class="headerlink" href="#katprep.maintenance.REPORT" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: Snapshot report</p>
+<dl class="exception">
+<dt id="exceptions.InvalidHostnameFormatException">
+<em class="property">exception </em><code class="descname">InvalidHostnameFormatException</code><a class="reference internal" href="_modules/exceptions.html#InvalidHostnameFormatException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.InvalidHostnameFormatException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for invalid hostname formats (non-FQDN)</p>
+<dl class="class">
+<dt id="exceptions.InvalidHostnameFormatException.InvalidHostnameFormatException">
+<em class="property">class </em><code class="descname">InvalidHostnameFormatException</code><a class="headerlink" href="#exceptions.InvalidHostnameFormatException.InvalidHostnameFormatException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.maintenance.REPORT_PREFIX">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">REPORT_PREFIX</code><em class="property"> = ''</em><a class="headerlink" href="#katprep.maintenance.REPORT_PREFIX" title="Permalink to this definition">¶</a></dt>
-<dd><p>str: Date prefix for snapshots and downtimes</p>
+<dl class="exception">
+<dt id="exceptions.SSLCertVerificationError">
+<em class="property">exception </em><code class="descname">SSLCertVerificationError</code><a class="reference internal" href="_modules/exceptions.html#SSLCertVerificationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.SSLCertVerificationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for invalid SSL certificates</p>
+<dl class="class">
+<dt id="exceptions.SSLCertVerificationError.SSLCertVerificationError">
+<em class="property">class </em><code class="descname">SSLCertVerificationError</code><a class="headerlink" href="#exceptions.SSLCertVerificationError.SSLCertVerificationError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.maintenance.SAT_CLIENT">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">SAT_CLIENT</code><em class="property"> = None</em><a class="headerlink" href="#katprep.maintenance.SAT_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd><p>ForemanAPIClient: Foreman API client handle</p>
+<dl class="exception">
+<dt id="exceptions.SessionException">
+<em class="property">exception </em><code class="descname">SessionException</code><a class="reference internal" href="_modules/exceptions.html#SessionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.SessionException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for session errors</p>
+<dl class="class">
+<dt id="exceptions.SessionException.SessionException">
+<em class="property">class </em><code class="descname">SessionException</code><a class="headerlink" href="#exceptions.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="data">
-<dt id="katprep.maintenance.VIRT_CLIENTS">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">VIRT_CLIENTS</code><em class="property"> = {}</em><a class="headerlink" href="#katprep.maintenance.VIRT_CLIENTS" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: libvirt API client handles</p>
+<dl class="exception">
+<dt id="exceptions.SnapshotExistsException">
+<em class="property">exception </em><code class="descname">SnapshotExistsException</code><a class="reference internal" href="_modules/exceptions.html#SnapshotExistsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.SnapshotExistsException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for already existing snapshots</p>
+<dl class="class">
+<dt id="exceptions.SnapshotExistsException.SnapshotExistsException">
+<em class="property">class </em><code class="descname">SnapshotExistsException</code><a class="headerlink" href="#exceptions.SnapshotExistsException.SnapshotExistsException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="function">
-<dt id="katprep.maintenance.cleanup">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">cleanup</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function cleans things up after executing maintenance tasks. This
-might include removing snapshots and scheduled downtimes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse options dict</em>) – argparse options dictionary containing parameters</td>
-</tr>
-</tbody>
-</table>
+<dl class="exception">
+<dt id="exceptions.UnauthenticatedError">
+<em class="property">exception </em><code class="descname">UnauthenticatedError</code><a class="reference internal" href="_modules/exceptions.html#UnauthenticatedError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.UnauthenticatedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></a></p>
+<p>Exception for showing that a client wasn’t able to authenticate itself</p>
+<dl class="class">
+<dt id="exceptions.UnauthenticatedError.UnauthenticatedError">
+<em class="property">class </em><code class="descname">UnauthenticatedError</code><a class="headerlink" href="#exceptions.UnauthenticatedError.UnauthenticatedError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="function">
-<dt id="katprep.maintenance.cli">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">cli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#cli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.cli" title="Permalink to this definition">¶</a></dt>
-<dd><p>This functions initializes the CLI interface</p>
+<dl class="exception">
+<dt id="exceptions.UnsupportedFilterException">
+<em class="property">exception </em><code class="descname">UnsupportedFilterException</code><a class="reference internal" href="_modules/exceptions.html#UnsupportedFilterException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.UnsupportedFilterException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for unsupported filters</p>
+<dl class="class">
+<dt id="exceptions.UnsupportedFilterException.UnsupportedFilterException">
+<em class="property">class </em><code class="descname">UnsupportedFilterException</code><a class="headerlink" href="#exceptions.UnsupportedFilterException.UnsupportedFilterException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="function">
-<dt id="katprep.maintenance.execute">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">execute</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function executes maintenance tasks, which might include applying
-errata.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse options dict</em>) – argparse options dictionary containing parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<dl class="exception">
+<dt id="exceptions.UnsupportedRequestException">
+<em class="property">exception </em><code class="descname">UnsupportedRequestException</code><a class="reference internal" href="_modules/exceptions.html#UnsupportedRequestException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.UnsupportedRequestException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception for unsupported requests</p>
+<dl class="class">
+<dt id="exceptions.UnsupportedRequestException.UnsupportedRequest">
+<em class="property">class </em><code class="descname">UnsupportedRequest</code><a class="headerlink" href="#exceptions.UnsupportedRequestException.UnsupportedRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="function">
-<dt id="katprep.maintenance.get_host_param_from_report">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">get_host_param_from_report</code><span class="sig-paren">(</span><em>report</em>, <em>host</em>, <em>param</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#get_host_param_from_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.get_host_param_from_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function retrieves a host parameter value from a report.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – snapshot report data</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</li>
-<li><strong>param</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – parameter name</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.is_blacklisted">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">is_blacklisted</code><span class="sig-paren">(</span><em>host</em>, <em>blacklist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#is_blacklisted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.is_blacklisted" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function checks whether a host is matched by an exclude pattern</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.load_configuration">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">load_configuration</code><span class="sig-paren">(</span><em>config_file</em>, <em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#load_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.load_configuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function imports parameters and values from a YAML configuration
-file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>config_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to configuration file</li>
-<li><strong>options</strong> (<em>argparse options dict</em>) – argparse options dictionary containing the settings</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.main">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">main</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function, starts the logic based on parameters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.manage_host_preparation">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">manage_host_preparation</code><span class="sig-paren">(</span><em>options</em>, <em>host</em>, <em>cleanup=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#manage_host_preparation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.manage_host_preparation" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function prepares or cleans up maintenance tasks for a particular
-host. This includes creating/removing snapshots and scheduled downtimes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</li>
-<li><strong>cleanup</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Flag whether preparations should be undone (default: no)</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.parse_options">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">parse_options</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#parse_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.parse_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses options and arguments.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.prepare">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">prepare</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.prepare" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function prepares maintenance tasks, which might include creating
-snapshots and scheduling downtime.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse options dict</em>) – argparse options dictionary containing parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.revert">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">revert</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#revert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.revert" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function reverts maintenance tasks.
-As the Foreman APIs lacks possibilities, only VM snapshots are restored
-currently.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse options dict</em>) – argparse options dictionary containing parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.set_filter">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">set_filter</code><span class="sig-paren">(</span><em>options</em>, <em>report</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#set_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.set_filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function filters a report’s hosts by organization, location
-or environment. Also, it evaluates exclude filters.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>options</strong> (<em>argparse options dict</em>) – argparse options dictionary containing parameters</li>
-<li><strong>report</strong> (<em>JSON data</em>) – report data</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.set_verification_value">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">set_verification_value</code><span class="sig-paren">(</span><em>options</em>, <em>host</em>, <em>setting</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#set_verification_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.set_verification_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function stores verification data in a snapshot report. This is done
-by altering the host information dictionary and storing the changes in the
-JSON catalog.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</li>
-<li><strong>setting</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – setting name</li>
-<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – setting value</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.status">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">status</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.status" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function shows current Foreman/Katello software maintenance task
-status.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse options dict</em>) – argparse options dictionary containing parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.maintenance.verify">
-<code class="descclassname">katprep.maintenance.</code><code class="descname">verify</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/maintenance.html#verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.maintenance.verify" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function verifies maintenance tasks (such as creating snapshots and
-installing errata) and stores status information in a verification log.
-These information are included into host reports by katprep_report.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse options dict</em>) – argparse options dictionary containing parameters</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </div>
-<div class="section" id="module-katprep.parameters">
-<span id="parameters-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">parameters</span></code> Module<a class="headerlink" href="#module-katprep.parameters" title="Permalink to this headline">¶</a></h2>
-<p>A script for managing Puppet host parameters for systems managed with
-Foreman/Katello or Red Hat Satellite 6.</p>
-<dl class="data">
-<dt id="katprep.parameters.LOGGER">
-<code class="descclassname">katprep.parameters.</code><code class="descname">LOGGER</code><em class="property"> = &lt;Logger katprep_parameters (WARNING)&gt;</em><a class="headerlink" href="#katprep.parameters.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.parameters.LOG_LEVEL">
-<code class="descclassname">katprep.parameters.</code><code class="descname">LOG_LEVEL</code><em class="property"> = None</em><a class="headerlink" href="#katprep.parameters.LOG_LEVEL" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger level</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.parameters.OPT_PARAMETERS">
-<code class="descclassname">katprep.parameters.</code><code class="descname">OPT_PARAMETERS</code><em class="property"> = {'katprep_mon_name': 'Object name within monitoring if not FQDN', 'katprep_mon_type': 'Monitoring system type: nagios/(icinga)', 'katprep_virt_name': 'Object name within hypervisor if not FQDN', 'katprep_virt_type': 'Virtualization host type: (libvirt)/pyvmomi'}</em><a class="headerlink" href="#katprep.parameters.OPT_PARAMETERS" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: Built-in optional host parameters</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.parameters.PARAMETERS">
-<code class="descclassname">katprep.parameters.</code><code class="descname">PARAMETERS</code><em class="property"> = {'katprep_mon': 'URL of the monitoring system', 'katprep_virt': 'Virtualization URL of the system', 'katprep_virt_snapshot': 'Boolean whether system needs to be protected by a snapshot before maintenance'}</em><a class="headerlink" href="#katprep.parameters.PARAMETERS" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: Built-in default host parameters mandatory for katprep</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.parameters.SAT_CLIENT">
-<code class="descclassname">katprep.parameters.</code><code class="descname">SAT_CLIENT</code><em class="property"> = None</em><a class="headerlink" href="#katprep.parameters.SAT_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd><p>ForemanAPIClient: Foreman API client handle</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.parameters.VALUES">
-<code class="descclassname">katprep.parameters.</code><code class="descname">VALUES</code><em class="property"> = {'katprep_mon': 'fixmepls', 'katprep_mon_name': 'fixmepls', 'katprep_virt': 'fixmepls', 'katprep_virt_name': 'fixmepls', 'katprep_virt_snapshot': '0'}</em><a class="headerlink" href="#katprep.parameters.VALUES" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: Default values for built-in host parameters</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.parameters.change_param">
-<code class="descclassname">katprep.parameters.</code><code class="descname">change_param</code><span class="sig-paren">(</span><em>options</em>, <em>host</em>, <em>mode='add'</em>, <em>dry_run=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/parameters.html#change_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.parameters.change_param" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds/updates/removes parameters for a particular host. For this, a
-host result object and a mode need to be specified.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Foreman API result dictionary</li>
-<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Mode (add, delete, update)</li>
-<li><strong>dry_run</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Only simulates what woule be done</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.parameters.cli">
-<code class="descclassname">katprep.parameters.</code><code class="descname">cli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/parameters.html#cli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.parameters.cli" title="Permalink to this definition">¶</a></dt>
-<dd><p>This functions initializes the CLI interface</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.parameters.list_params">
-<code class="descclassname">katprep.parameters.</code><code class="descname">list_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/parameters.html#list_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.parameters.list_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Lists all pre-defined parameters and values.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.parameters.main">
-<code class="descclassname">katprep.parameters.</code><code class="descname">main</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/parameters.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.parameters.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function, starts the logic based on parameters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.parameters.manage_params">
-<code class="descclassname">katprep.parameters.</code><code class="descname">manage_params</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/parameters.html#manage_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.parameters.manage_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds/removes/displays/updates parameter definitions.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.parameters.parse_options">
-<code class="descclassname">katprep.parameters.</code><code class="descname">parse_options</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/parameters.html#parse_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.parameters.parse_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses options and arguments.</p>
-</dd></dl>
-
+<div class="section" id="maintenance-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">maintenance</span></code> Module<a class="headerlink" href="#maintenance-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-katprep.populate">
-<span id="populate-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">populate</span></code> Module<a class="headerlink" href="#module-katprep.populate" title="Permalink to this headline">¶</a></h2>
-<p>A script which populates the Foreman/Katello or Red Hat Satellite 6 host
-parameters with information from Nagios/Icinga or a virtualization host</p>
-<dl class="data">
-<dt id="katprep.populate.LOGGER">
-<code class="descclassname">katprep.populate.</code><code class="descname">LOGGER</code><em class="property"> = &lt;Logger katprep_populate (WARNING)&gt;</em><a class="headerlink" href="#katprep.populate.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.populate.LOG_LEVEL">
-<code class="descclassname">katprep.populate.</code><code class="descname">LOG_LEVEL</code><em class="property"> = None</em><a class="headerlink" href="#katprep.populate.LOG_LEVEL" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger level</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.populate.MON_CLIENT">
-<code class="descclassname">katprep.populate.</code><code class="descname">MON_CLIENT</code><em class="property"> = None</em><a class="headerlink" href="#katprep.populate.MON_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd><p>NagiosCGIClient: Nagios CGI client handle</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.populate.SAT_CLIENT">
-<code class="descclassname">katprep.populate.</code><code class="descname">SAT_CLIENT</code><em class="property"> = None</em><a class="headerlink" href="#katprep.populate.SAT_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd><p>ForemanAPIClient: Foreman API client handle</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.populate.VIRT_CLIENT">
-<code class="descclassname">katprep.populate.</code><code class="descname">VIRT_CLIENT</code><em class="property"> = None</em><a class="headerlink" href="#katprep.populate.VIRT_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd><p>LibvirtClient: libvirt API client handle</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.populate.cli">
-<code class="descclassname">katprep.populate.</code><code class="descname">cli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/populate.html#cli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.populate.cli" title="Permalink to this definition">¶</a></dt>
-<dd><p>This functions initializes the CLI interface</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.populate.main">
-<code class="descclassname">katprep.populate.</code><code class="descname">main</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/populate.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.populate.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function, starts the logic based on parameters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.populate.parse_options">
-<code class="descclassname">katprep.populate.</code><code class="descname">parse_options</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/populate.html#parse_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.populate.parse_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses options and arguments.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.populate.populate">
-<code class="descclassname">katprep.populate.</code><code class="descname">populate</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/populate.html#populate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.populate.populate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves information from a virtualization system and tries to merge
-data with Foreman/Katello.</p>
-</dd></dl>
-
+<div class="section" id="parameters-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">parameters</span></code> Module<a class="headerlink" href="#parameters-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-katprep.report">
-<span id="report-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">report</span></code> Module<a class="headerlink" href="#module-katprep.report" title="Permalink to this headline">¶</a></h2>
-<p>A script for creating maintenance reports including installed errata per system
-managed with Foreman/Katello or Red Hat Satellite 6.</p>
-<dl class="data">
-<dt id="katprep.report.LOGGER">
-<code class="descclassname">katprep.report.</code><code class="descname">LOGGER</code><em class="property"> = &lt;Logger katprep_report (WARNING)&gt;</em><a class="headerlink" href="#katprep.report.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.report.LOG_LEVEL">
-<code class="descclassname">katprep.report.</code><code class="descname">LOG_LEVEL</code><em class="property"> = None</em><a class="headerlink" href="#katprep.report.LOG_LEVEL" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger level</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.report.REPORT_NEW">
-<code class="descclassname">katprep.report.</code><code class="descname">REPORT_NEW</code><em class="property"> = {}</em><a class="headerlink" href="#katprep.report.REPORT_NEW" title="Permalink to this definition">¶</a></dt>
-<dd><p>dic: New snapshot report</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.report.REPORT_OLD">
-<code class="descclassname">katprep.report.</code><code class="descname">REPORT_OLD</code><em class="property"> = {}</em><a class="headerlink" href="#katprep.report.REPORT_OLD" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: Old snapshot report</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.analyze_reports">
-<code class="descclassname">katprep.report.</code><code class="descname">analyze_reports</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#analyze_reports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.analyze_reports" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finds and loads report data. This function compares the two report files
-passed as arguments and assigns them to dedicated dictionaries (<em>older and
-*newer report</em>).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.check_pandoc">
-<code class="descclassname">katprep.report.</code><code class="descname">check_pandoc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#check_pandoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.check_pandoc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks the Pandoc installation by ensuring that the <code class="docutils literal notranslate"><span class="pre">pandoc</span></code> binary is
-available from the command line.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.cli">
-<code class="descclassname">katprep.report.</code><code class="descname">cli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#cli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.cli" title="Permalink to this definition">¶</a></dt>
-<dd><p>This functions initializes the CLI interface</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.create_delta">
-<code class="descclassname">katprep.report.</code><code class="descname">create_delta</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#create_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.create_delta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creats delta YAML reports per system. This is done by comparing the two
-snapshot reports passed as arguments.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.create_reports">
-<code class="descclassname">katprep.report.</code><code class="descname">create_reports</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#create_reports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.create_reports" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates patch reports per system. This is done by translating the
-YAML reports created previously into the desired format using <code class="docutils literal notranslate"><span class="pre">pandoc</span></code>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.get_errata_by_host">
-<code class="descclassname">katprep.report.</code><code class="descname">get_errata_by_host</code><span class="sig-paren">(</span><em>report</em>, <em>hostname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#get_errata_by_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.get_errata_by_host" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns all errata by a particular host in a report.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – JSON report content</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – hostname</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.get_file_by_age">
-<code class="descclassname">katprep.report.</code><code class="descname">get_file_by_age</code><span class="sig-paren">(</span><em>file_a</em>, <em>file_b</em>, <em>return_older=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#get_file_by_age"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.get_file_by_age" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Returns the newer/older file of two files. The creation time of the
-files is used as inidicator.
-There are also two alias functions available:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">param file_a:</th><td class="field-body">a file</td>
-</tr>
-<tr class="field-even field"><th class="field-name">type file_a:</th><td class="field-body">str</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">param file_b:</th><td class="field-body">another file</td>
-</tr>
-<tr class="field-even field"><th class="field-name">type file_b:</th><td class="field-body">str</td>
-</tr>
-<tr class="field-odd field"><th class="field-name" colspan="2">param return_older:</th></tr>
-<tr class="field-odd field"><td>&#160;</td><td class="field-body">returns the older file if set to True</td>
-</tr>
-<tr class="field-even field"><th class="field-name" colspan="2">type return_older:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</div></blockquote>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last">get_newer_file()</p>
+<div class="section" id="populate-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">populate</span></code> Module<a class="headerlink" href="#populate-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last">get_older_file()</p>
+<div class="section" id="report-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">report</span></code> Module<a class="headerlink" href="#report-module" title="Permalink to this headline">¶</a></h2>
 </div>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.get_newer_file">
-<code class="descclassname">katprep.report.</code><code class="descname">get_newer_file</code><span class="sig-paren">(</span><em>file_a</em>, <em>file_b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#get_newer_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.get_newer_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the newer of two files. The creation file of the files is used
-as indicator.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>file_a</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – a file</li>
-<li><strong>file_b</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – another file</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.get_older_file">
-<code class="descclassname">katprep.report.</code><code class="descname">get_older_file</code><span class="sig-paren">(</span><em>file_a</em>, <em>file_b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#get_older_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.get_older_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the older of two files. The creation time of the files is used
-as indicator.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>file_a</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – a file</li>
-<li><strong>file_b</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – another file</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.main">
-<code class="descclassname">katprep.report.</code><code class="descname">main</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function, starts the logic based on parameters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.report.parse_options">
-<code class="descclassname">katprep.report.</code><code class="descname">parse_options</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/report.html#parse_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.report.parse_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses options and arguments.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-katprep.snapshot">
-<span id="snapshot-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">snapshot</span></code> Module<a class="headerlink" href="#module-katprep.snapshot" title="Permalink to this headline">¶</a></h2>
-<p>A script for creating a snapshot report of available errata and updates for
-systems managed with Foreman/Katello or Red Hat Satellite 6.</p>
-<dl class="data">
-<dt id="katprep.snapshot.LOGGER">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">LOGGER</code><em class="property"> = &lt;Logger katprep_snapshot (WARNING)&gt;</em><a class="headerlink" href="#katprep.snapshot.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.snapshot.LOG_LEVEL">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">LOG_LEVEL</code><em class="property"> = None</em><a class="headerlink" href="#katprep.snapshot.LOG_LEVEL" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger level</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.snapshot.OUTPUT_FILE">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">OUTPUT_FILE</code><em class="property"> = ''</em><a class="headerlink" href="#katprep.snapshot.OUTPUT_FILE" title="Permalink to this definition">¶</a></dt>
-<dd><p>str: Output file</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.snapshot.SAT_CLIENT">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">SAT_CLIENT</code><em class="property"> = None</em><a class="headerlink" href="#katprep.snapshot.SAT_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd><p>ForemanAPIClient: Foreman API client handle</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="katprep.snapshot.SYSTEM_ERRATA">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">SYSTEM_ERRATA</code><em class="property"> = {}</em><a class="headerlink" href="#katprep.snapshot.SYSTEM_ERRATA" title="Permalink to this definition">¶</a></dt>
-<dd><p>dict: Errata and parameter information per system</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.snapshot.cli">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">cli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/snapshot.html#cli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.snapshot.cli" title="Permalink to this definition">¶</a></dt>
-<dd><p>This functions initializes the CLI interface</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.snapshot.create_report">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">create_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/snapshot.html#create_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.snapshot.create_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a JSON report including errata information of all hosts.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.snapshot.main">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">main</code><span class="sig-paren">(</span><em>options</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/snapshot.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.snapshot.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function, starts the logic based on parameters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.snapshot.parse_options">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">parse_options</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/snapshot.html#parse_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.snapshot.parse_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses options and arguments.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.snapshot.scan_systems">
-<code class="descclassname">katprep.snapshot.</code><code class="descname">scan_systems</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep/snapshot.html#scan_systems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.snapshot.scan_systems" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scans all systems that were selected for errata counters.</p>
-</dd></dl>
-
+<div class="section" id="snapshot-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">snapshot</span></code> Module<a class="headerlink" href="#snapshot-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="katprep.clients.html">clients Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#module-clients.ForemanAPIClient"><code class="docutils literal notranslate"><span class="pre">ForemanAPIClient</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#spacewalnapiclient-module"><code class="docutils literal notranslate"><span class="pre">SpacewalnAPIClient</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#module-clients.Icinga2APIClient"><code class="docutils literal notranslate"><span class="pre">Icinga2APIClient</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#module-clients.LibvirtClient"><code class="docutils literal notranslate"><span class="pre">LibvirtClient</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#module-clients.NagiosCGIClient"><code class="docutils literal notranslate"><span class="pre">NagiosCGIClient</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.clients.html#module-clients.PyvmomiClient"><code class="docutils literal notranslate"><span class="pre">PyvmomiClient</span></code> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="katprep.management.html">management Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#foreman-module"><code class="docutils literal notranslate"><span class="pre">foreman</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#spacewalk-module"><code class="docutils literal notranslate"><span class="pre">spacewalk</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#libvirt-module"><code class="docutils literal notranslate"><span class="pre">libvirt</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#vmware-module"><code class="docutils literal notranslate"><span class="pre">vmware</span></code> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="katprep.monitoring.html">monitoring Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="katprep.monitoring.html#monitoring-icinga2-module"><code class="docutils literal notranslate"><span class="pre">monitoring.icinga2</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.monitoring.html#monitoring-nagios-module"><code class="docutils literal notranslate"><span class="pre">monitoring.nagios</span></code> Module</a></li>
 </ul>
 </li>
 </ul>
@@ -1121,13 +467,13 @@ systems managed with Foreman/Katello or Red Hat Satellite 6.</p>
 <li><a class="reference internal" href="#">Package</a><ul>
 <li><a class="reference internal" href="#module-katprep">:mod:` Package</a></li>
 <li><a class="reference internal" href="#module-AuthContainer"><code class="docutils literal notranslate"><span class="pre">AuthContainer</span></code> Module</a></li>
-<li><a class="reference internal" href="#module-katprep.authconfig"><code class="docutils literal notranslate"><span class="pre">authconfig</span></code> Module</a></li>
-<li><a class="reference internal" href="#exceptions-module"><code class="docutils literal notranslate"><span class="pre">exceptions</span></code> Module</a></li>
-<li><a class="reference internal" href="#module-katprep.maintenance"><code class="docutils literal notranslate"><span class="pre">maintenance</span></code> Module</a></li>
-<li><a class="reference internal" href="#module-katprep.parameters"><code class="docutils literal notranslate"><span class="pre">parameters</span></code> Module</a></li>
-<li><a class="reference internal" href="#module-katprep.populate"><code class="docutils literal notranslate"><span class="pre">populate</span></code> Module</a></li>
-<li><a class="reference internal" href="#module-katprep.report"><code class="docutils literal notranslate"><span class="pre">report</span></code> Module</a></li>
-<li><a class="reference internal" href="#module-katprep.snapshot"><code class="docutils literal notranslate"><span class="pre">snapshot</span></code> Module</a></li>
+<li><a class="reference internal" href="#authconfig-module"><code class="docutils literal notranslate"><span class="pre">authconfig</span></code> Module</a></li>
+<li><a class="reference internal" href="#module-exceptions"><code class="docutils literal notranslate"><span class="pre">exceptions</span></code> Module</a></li>
+<li><a class="reference internal" href="#maintenance-module"><code class="docutils literal notranslate"><span class="pre">maintenance</span></code> Module</a></li>
+<li><a class="reference internal" href="#parameters-module"><code class="docutils literal notranslate"><span class="pre">parameters</span></code> Module</a></li>
+<li><a class="reference internal" href="#populate-module"><code class="docutils literal notranslate"><span class="pre">populate</span></code> Module</a></li>
+<li><a class="reference internal" href="#report-module"><code class="docutils literal notranslate"><span class="pre">report</span></code> Module</a></li>
+<li><a class="reference internal" href="#snapshot-module"><code class="docutils literal notranslate"><span class="pre">snapshot</span></code> Module</a></li>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 </ul>
 </li>

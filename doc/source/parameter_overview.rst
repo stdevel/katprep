@@ -21,3 +21,7 @@ katprep uses multiple Puppet host parameters to control maintenance preparation 
 +-----------------------+----------------------+---------------------------------------------------------------------------------------+
 | katprep_virt_snapshot | 1                    | Boolean (*1/0*) whether system needs to be protected by a snapshot before maintenance |
 +-----------------------+----------------------+---------------------------------------------------------------------------------------+
+| katprep_pre-script    | /opt/stop_node.sh    | Script to run before maintenance                                                      |
++-----------------------+----------------------+---------------------------------------------------------------------------------------+
+| katprep_post-script   | /opt/start_node.sh   | Script to run after maintenance                                                       |
++-----------------------+----------------------+---------------------------------------------------------------------------------------+

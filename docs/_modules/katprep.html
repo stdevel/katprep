@@ -53,8 +53,9 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">.AuthContainer</span> <span class="kn">import</span> <span class="n">AuthContainer</span><span class="p">,</span> <span class="n">ContainerException</span>
-<span class="kn">from</span> <span class="nn">.clients</span> <span class="kn">import</span> <span class="n">SessionException</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">SessionException</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">raw_input</span>
@@ -91,15 +92,16 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">container</span> <span class="o">=</span> <span class="n">AuthContainer</span><span class="p">(</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">auth_container</span><span class="p">,</span> <span class="n">auth_pass</span><span class="p">)</span>
-            <span class="n">s_creds</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">s_creds</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">get_credential</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_creds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">(</span><span class="n">s_creds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s_creds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">s_creds</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Empty response&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="mi">2</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_creds</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid response&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">(</span><span class="n">s_creds</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">s_creds</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">ContainerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;Login information for &#39;</span><span class="si">{}</span><span class="s2">&#39; not found in container!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -173,50 +175,6 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
-
-<div class="viewcode-block" id="get_json"><a class="viewcode-back" href="../katprep.html#katprep.get_json">[docs]</a><span class="k">def</span> <span class="nf">get_json</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Reads a JSON file and returns the whole content as one-liner.</span>
-
-<span class="sd">    :param filename: the JSON filename</span>
-<span class="sd">    :type filename: str</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
-            <span class="n">json_data</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">json_data</span>
-    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to read file &#39;</span><span class="si">{}</span><span class="s2">&#39;: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span></div>
-
-
-
-<div class="viewcode-block" id="is_valid_report"><a class="viewcode-back" href="../katprep.html#katprep.is_valid_report">[docs]</a><span class="k">def</span> <span class="nf">is_valid_report</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks whether a JSON file contains a valid snapshot report.</span>
-
-<span class="sd">    :param filename: the JSON filename</span>
-<span class="sd">    :type filename: str</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">{}</span><span class="s2">&#39; non-existent or not&quot;</span> \
-            <span class="s2">&quot; readable&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="c1">#check whether valid json</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">json_obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">get_json</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-        <span class="c1">#check whether at least one host with a params dict is found</span>
-        <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">json_obj</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">next</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">{}</span><span class="s2">&#39; is not a valid JSON&quot;</span> \
-                <span class="s2">&quot; snapshot report.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">StopIteration</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">{}</span><span class="s2">&#39; is not a valid JSON&quot;</span> \
-            <span class="s2">&quot; snapshot report.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">{}</span><span class="s2">&#39; is not a valid JSON&quot;</span> \
-            <span class="s2">&quot; document: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">filename</span></div>
-
-
-
 <div class="viewcode-block" id="validate_filters"><a class="viewcode-back" href="../katprep.html#katprep.validate_filters">[docs]</a><span class="k">def</span> <span class="nf">validate_filters</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">api_client</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Ensures using IDs for the Foreman API rather than human-readable names.</span>
@@ -240,11 +198,10 @@
         <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">environment</span> <span class="ow">and</span> <span class="n">options</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">options</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">api_client</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span>
                 <span class="n">options</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span> <span class="s2">&quot;environment&quot;</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">SessionException</span><span class="p">:</span>
-        <span class="k">pass</span></div>
-
+        <span class="k">pass</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_filter"><a class="viewcode-back" href="../katprep.html#katprep.get_filter">[docs]</a><span class="k">def</span> <span class="nf">get_filter</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">api_object</span><span class="p">):</span>
@@ -266,47 +223,6 @@
         <span class="k">return</span> <span class="s2">&quot;/environments/</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">s&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span> <span class="n">api_object</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;/</span><span class="si">{}</span><span class="s2">s&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">api_object</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="get_required_hosts_by_report"><a class="viewcode-back" href="../katprep.html#katprep.get_required_hosts_by_report">[docs]</a><span class="k">def</span> <span class="nf">get_required_hosts_by_report</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Retrieves all required external hosts (such as monitoring systems</span>
-<span class="sd">    or hypervisor connections) for maintaining hosts mentioned in a</span>
-<span class="sd">    report.</span>
-
-<span class="sd">    :param report: report dictionary</span>
-<span class="sd">    :type report: dict</span>
-<span class="sd">    :param key: key that contains hostname (e.g. katprep_virt)</span>
-<span class="sd">    :type key: str</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">hosts</span><span class="o">=</span><span class="p">[]</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">report</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">report</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">report</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hosts</span><span class="p">:</span>
-                <span class="n">hosts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="n">host</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">])</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Key &#39;</span><span class="si">{}</span><span class="s2">&#39; not found for host &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">host</span><span class="p">))</span>
-            <span class="k">pass</span>
-    <span class="k">return</span> <span class="n">hosts</span></div>
-
-
-
-<div class="viewcode-block" id="get_host_params_by_report"><a class="viewcode-back" href="../katprep.html#katprep.get_host_params_by_report">[docs]</a><span class="k">def</span> <span class="nf">get_host_params_by_report</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Retrieves all parameters for a particular host from a report.</span>
-
-<span class="sd">    :param report: report dictionary</span>
-<span class="sd">    :type report: dict</span>
-<span class="sd">    :param host: hostname</span>
-<span class="sd">    :type host: str</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">report</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">report</span><span class="p">[</span><span class="n">entry</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parameters not found for host &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">host</span><span class="p">))</span>
-            <span class="k">pass</span></div>
 </pre></div>
 
           </div>

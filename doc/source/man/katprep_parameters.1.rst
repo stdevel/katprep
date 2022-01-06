@@ -52,6 +52,12 @@ katprep\_virt\_type
     Virtualization host type, [*libvirt*\ \|\ *pyvmovmi*] (default:
     libvirt)
 
+katprep\_pre-script
+    Script to run before maintenance
+
+katprep\_post-script
+    Script to run after maintenance
+
 For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
 Options

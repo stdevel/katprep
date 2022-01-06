@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Parameter overview &#8212; katprep 0.5.0 documentation</title>
+    <title>monitoring Package &#8212; katprep 0.5.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -17,9 +17,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="examples.html" />
-    <link rel="prev" title="Customizing" href="reports.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -30,12 +28,6 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="examples.html" title="Examples"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="reports.html" title="Customizing"
-             accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -45,60 +37,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="parameter-overview">
-<h1>Parameter overview<a class="headerlink" href="#parameter-overview" title="Permalink to this headline">¶</a></h1>
-<p>katprep uses multiple Puppet host parameters to control maintenance preparation and executing per system. Some parameters are created automatically using <code class="docutils literal notranslate"><span class="pre">katprep_parameters</span></code>, some need to be created manually. The following table gives an overview:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="17%" />
-<col width="17%" />
-<col width="66%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Parameter</th>
-<th class="head">Example</th>
-<th class="head">Explanation</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>katprep_mon</td>
-<td><a class="reference external" href="http://host/icinga">http://host/icinga</a></td>
-<td>URL of the monitoring system</td>
-</tr>
-<tr class="row-odd"><td>katprep_mon_name</td>
-<td>giertz.stankowic.loc</td>
-<td>Object name within monitoring if not FQDN</td>
-</tr>
-<tr class="row-even"><td>katprep_mon_type</td>
-<td>nagios</td>
-<td>Monitoring host type: Nagios/Icinga 1.x (<em>nagios</em>) or Icinga2 (<em>icinga, default</em>)</td>
-</tr>
-<tr class="row-odd"><td>katprep_virt</td>
-<td>vpx://esx.test.loc</td>
-<td>Virtualization URL of the system (<em>libvirt or pyvmomi hostname</em>)</td>
-</tr>
-<tr class="row-even"><td>katprep_virt_name</td>
-<td>MYVM001</td>
-<td>VM name within hypervisor if not FQDN</td>
-</tr>
-<tr class="row-odd"><td>katprep_virt_type</td>
-<td>pyvmomi</td>
-<td>Virtualization host type: pyvmomi (<em>VMware</em>) or libvirt (<em>default</em>)</td>
-</tr>
-<tr class="row-even"><td>katprep_virt_snapshot</td>
-<td>1</td>
-<td>Boolean (<em>1/0</em>) whether system needs to be protected by a snapshot before maintenance</td>
-</tr>
-<tr class="row-odd"><td>katprep_pre-script</td>
-<td>/opt/stop_node.sh</td>
-<td>Script to run before maintenance</td>
-</tr>
-<tr class="row-even"><td>katprep_post-script</td>
-<td>/opt/start_node.sh</td>
-<td>Script to run after maintenance</td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="monitoring-package">
+<h1>monitoring Package<a class="headerlink" href="#monitoring-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="monitoring-icinga2-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">monitoring.icinga2</span></code> Module<a class="headerlink" href="#monitoring-icinga2-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monitoring-nagios-module">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">monitoring.nagios</span></code> Module<a class="headerlink" href="#monitoring-nagios-module" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -107,16 +53,19 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="reports.html"
-                        title="previous chapter">Customizing</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="examples.html"
-                        title="next chapter">Examples</a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">monitoring Package</a><ul>
+<li><a class="reference internal" href="#monitoring-icinga2-module"><code class="docutils literal notranslate"><span class="pre">monitoring.icinga2</span></code> Module</a></li>
+<li><a class="reference internal" href="#monitoring-nagios-module"><code class="docutils literal notranslate"><span class="pre">monitoring.nagios</span></code> Module</a></li>
+</ul>
+</li>
+</ul>
+
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/parameter_overview.rst.txt"
+      <li><a href="_sources/katprep.monitoring.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -145,12 +94,6 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="examples.html" title="Examples"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="reports.html" title="Customizing"
-             >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
