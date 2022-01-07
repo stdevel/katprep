@@ -151,7 +151,7 @@ class UyuniAPIClient(BaseConnector):
         """
         Returns the profile ID of a particular system
 
-        :param hostname: System hostname
+        :param hostname: system hostname
         :type hostname: str
         """
         try:
@@ -432,8 +432,8 @@ class UyuniAPIClient(BaseConnector):
         """
         Install patches on a given system
 
-        :param host: The host on which to install updates
-        :type host: Host
+        :param host: host on which to install updates
+        :type host: host object
         """
         patches = host.patches
         if not patches:
@@ -466,8 +466,8 @@ class UyuniAPIClient(BaseConnector):
         """
         Install package upgrades on a given system
 
-        :param host: The host to upgrade
-        :type host: Host
+        :param host: host to upgrade
+        :type host: host object
         """
         system_id = host.management_id
         upgrades = self.get_host_upgrades(system_id)
@@ -502,8 +502,8 @@ class UyuniAPIClient(BaseConnector):
         """
         Reboots a system immediately
 
-        :param host: Host to reboot
-        :type host: Host
+        :param host: host to reboot
+        :type host: host object
         """
         system_id = host.management_id
         if not isinstance(system_id, int):
@@ -590,7 +590,7 @@ class UyuniAPIClient(BaseConnector):
         """
         Retrieves information about a particular user
 
-        :param user_name: Username
+        :param user_name: username
         :type user_name: str
         """
         if not isinstance(user_name, str):
@@ -630,6 +630,9 @@ class UyuniAPIClient(BaseConnector):
     def is_reboot_required(self, host):
         """
         Checks whether a particular host requires a reboot
+
+        :param host: host
+        :type host: host object
         """
         try:
             systems = self._session.system.listSuggestedReboot(
@@ -706,6 +709,11 @@ class UyuniAPIClient(BaseConnector):
     def create_custom_variable(self, label, description):
         """
         Creates a custom variable (custom info keys)
+
+        :param label: variable label
+        :type label: str
+        :param description: variable description
+        :type label: str
         """
         try:
             self._session.system.custominfo.createKey(
@@ -723,6 +731,11 @@ class UyuniAPIClient(BaseConnector):
     def update_custom_variable(self, label, description):
         """
         Updates a custom variable's description (custom info keys)
+
+        :param label: variable label
+        :type label: str
+        :param description: variable description
+        :type label: str
         """
         try:
             self._session.system.custominfo.updateKey(
@@ -740,6 +753,9 @@ class UyuniAPIClient(BaseConnector):
     def delete_custom_variable(self, label):
         """
         Deletes a custom variable (custom info keys)
+
+        :param label: variable label
+        :type label: str
         """
         try:
             self._session.system.custominfo.deleteKey(
