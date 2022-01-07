@@ -761,3 +761,26 @@ def test_delete_host_custom_variables_nonexisting(client, host_id):
         client.host_add_custom_variable(
             host_id, "katprep_motd", "HurraHurraWirSchiffeUebernMaa"
         )
+
+def test_run_host_command(client, host_id):
+    """
+    Ensure that commands can be run on hosts
+    """
+    _cmds = [
+        """#!/bin/sh
+uptime""",
+        "uptime"
+    ]
+    for _cmd in _cmds:
+        result = client.host_run_command(host_id, _cmd)
+        assert isinstance(result, int)
+
+def test_run_host_command_nonexistent(client):
+    """
+    Ensure that commands can't be executed on non-existing hosts
+    """
+    with pytest.raises(EmptySetException):
+        client.host_run_command(
+            random.randint(800, 1500),
+            "uptime"
+        )

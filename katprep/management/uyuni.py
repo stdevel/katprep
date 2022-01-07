@@ -840,3 +840,41 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
             )
+
+    def host_run_command(self, system_id, command, user="root", group="root"):
+        """
+        Runs a particular command on a host
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param command: command
+        :type command: str
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        earliest_execution = DateTime(datetime.now().timetuple())
+        # add shebang if not found
+        if not command.startswith("#!/"):
+            command = f'#!/bin/sh\n{command}'
+
+        try:
+            return self._session.system.scheduleScriptRun(
+                self._api_key,
+                system_id,
+                user,
+                group,
+                600,
+                command,
+                earliest_execution
+            )
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise EmptySetException(
+                    f"System not found: {system_id!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
