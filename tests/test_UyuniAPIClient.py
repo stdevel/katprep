@@ -721,3 +721,43 @@ def test_delete_custom_variable_nonexisting(client):
         client.delete_custom_variable(
             random.randint(800, 1500)
         )
+
+def test_set_update_delete_host_custom_variables(client, host_id):
+    """
+    Ensure that host custom values can be set and updated
+    """
+    _variables = {
+        "katprep_pre-script": "sleep 60",
+        "katprep_post-script": "sleep 30"
+    }
+    for _var in _variables:
+        # set custom variable
+        client.host_add_custom_variable(
+            host_id, _var, _variables[_var]
+        )
+        # update custom variable
+        client.host_update_custom_variable(
+            host_id, _var, "DietmarDiamantUltras"
+        )
+        # delete custom variable
+        client.host_delete_custom_variable(
+            host_id, _var
+        )
+
+def test_set_host_custom_variables_nonexisting(client, host_id):
+    """
+    Ensure that non-existing custom values can't be set for a host
+    """
+    with pytest.raises(EmptySetException):
+        client.host_add_custom_variable(
+            host_id, "katprep_motd", "Heer mir uff"
+        )
+
+def test_delete_host_custom_variables_nonexisting(client, host_id):
+    """
+    Ensure that non-existing custom values can't be deleted from a host
+    """
+    with pytest.raises(EmptySetException):
+        client.host_add_custom_variable(
+            host_id, "katprep_motd", "HurraHurraWirSchiffeUebernMaa"
+        )

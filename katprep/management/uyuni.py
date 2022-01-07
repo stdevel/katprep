@@ -769,3 +769,74 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
             )
+
+    def host_add_custom_variable(self, system_id, label, value):
+        """
+        Adds a custom variable to a host
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param label: variable label
+        :type label: str
+        :param value: variable value
+        :type value: str
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        try:
+            self._session.system.setCustomValues(
+                self._api_key, system_id,
+                {label: value}
+            )
+        except Fault as err:
+            if "was not defined" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Custom Variable does not exist: {label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def host_update_custom_variable(self, system_id, label, value):
+        """
+        Updates a custom variable for a host
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param label: variable label
+        :type label: str
+        :param value: variable value
+        :type value: str
+        """
+        self.host_add_custom_variable(system_id, label, value)
+
+    def host_delete_custom_variable(self, system_id, label):
+        """
+        Deletes a custom variable from a host
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param label: variable label
+        :type label: str
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        try:
+            self._session.system.deleteCustomValues(
+                self._api_key, system_id,
+                [label]
+            )
+        except Fault as err:
+            if "was not defined" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Custom Variable does not exist: {label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
