@@ -50,6 +50,20 @@ class Host:
         self._patches = patches or []
 
     @property
+    def pre_script(self):
+        try:
+            return self.host_parameters['katprep_pre-script']
+        except KeyError:
+            return None
+
+    @property
+    def post_script(self):
+        try:
+            return self.host_parameters['katprep_post-script']
+        except KeyError:
+            return None
+
+    @property
     def type(self):
         return self._OBJECT_TYPE
 
