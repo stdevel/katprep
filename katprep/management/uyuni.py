@@ -1097,20 +1097,30 @@ class UyuniAPIClient(BaseConnector):
         :type patches: int array
         """
         system_id = host.management_id
+        action_ids = []
         if host.pre_script:
             # create required action chain
             chain_label = f"{system_id}_patch"
             self.add_actionchain(chain_label)
-            self.install_pre_script(host, chain_label)
-            self.actionchain_add_patches(chain_label, system_id, patches)
+            # add pre-script
+            action_ids.append(
+                self.install_pre_script(host, chain_label)
+            )
+            # add patches
+            action_ids.append(
+                self.actionchain_add_patches(chain_label, system_id, patches)
+            )
         if host.post_script:
-            # add post script to action chain
-            self.install_post_script(host, chain_label)
+            # add post script
+            action_ids.append(
+                self.install_post_script(host, chain_label)
+            )
             # schedule execution
             self.run_actionchain(chain_label)
         else:
             # simply install patches
-            self.install_plain_patches(host)
+            return self.install_plain_patches(host)
+        return action_ids
 
     def install_upgrades(self, host, upgrades):
         """
@@ -1122,20 +1132,30 @@ class UyuniAPIClient(BaseConnector):
         :type upgrade: int array
         """
         system_id = host.management_id
+        action_ids = []
         if host.pre_script:
             # create required action chain
             chain_label = f"{system_id}_upgrade"
             self.add_actionchain(chain_label)
-            self.install_pre_script(host, chain_label)
-            self.actionchain_add_upgrades(chain_label, system_id, upgrades)
+            # add pre-script
+            action_ids.append(
+                self.install_pre_script(host, chain_label)
+            )
+            # add upgrades
+            action_ids.append(
+                self.actionchain_add_upgrades(chain_label, system_id, upgrades)
+            )
         if host.post_script:
-            # add post script to action chain
-            self.install_post_script(host, chain_label)
+            # add post script
+            action_ids.append(
+                self.install_post_script(host, chain_label)
+            )
             # schedule execution
             self.run_actionchain(chain_label)
         else:
             # simply install patches
-            self.install_plain_upgrades(host, upgrades)
+            return self.install_plain_upgrades(host, upgrades)
+        return action_ids
 
     def install_pre_script(self, host, chain_label):
         """
@@ -1146,7 +1166,7 @@ class UyuniAPIClient(BaseConnector):
         :param chain_label: chain label
         :type chain_label: str
         """
-        self.actionchain_add_command(
+        return self.actionchain_add_command(
             chain_label,
             host.management_id,
             host.pre_script,
@@ -1163,7 +1183,7 @@ class UyuniAPIClient(BaseConnector):
         :param chain_label: chain label
         :type chain_label: str
         """
-        self.actionchain_add_command(
+        return self.actionchain_add_command(
             chain_label,
             host.management_id,
             host.post_script,
