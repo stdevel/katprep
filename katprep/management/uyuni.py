@@ -4,6 +4,7 @@ Uyuni XMLRPC API client
 
 import logging
 import ssl
+import base64
 from datetime import datetime
 from xmlrpc.client import DateTime, Fault, ServerProxy
 
@@ -874,6 +875,213 @@ class UyuniAPIClient(BaseConnector):
             if "no such system" in err.faultString.lower():
                 raise EmptySetException(
                     f"System not found: {system_id!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def get_actionchains(self):
+        """
+        Returns all defined action chains
+        """
+        try:
+            return self._session.actionchain.listChains(
+                self._api_key
+            )
+        except Fault as err:
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def get_actionchain_actions(self, chain_label):
+        """
+        Returns actions of a particular action chain
+
+        :param chain_label: chain label
+        :type chain_label: str
+        """
+        try:
+            actions = self._session.actionchain.listChainActions(
+                self._api_key, chain_label
+            )
+            if len(actions) == 0:
+                raise EmptySetException("Action chain is empty")
+            return actions
+        except Fault as err:
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def add_actionchain(self, label):
+        """
+        Creates a new action chain
+
+        :param label: action chain label
+        :type label: str
+        """
+        try:
+            chain_id = self._session.actionchain.createChain(
+                self._api_key, label
+            )
+            return chain_id
+        except Fault as err:
+            if "is missing" in err.faultString.lower():
+                raise EmptySetException(
+                    "Label missing"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def run_actionchain(self, chain_label):
+        """
+        Runs a particular action chain
+
+        :param chain_label: chain label
+        :type chain_label: str
+        """
+        try:
+            earliest_execution = DateTime(datetime.now().timetuple())
+            chain_id = self._session.actionchain.scheduleChain(
+                self._api_key, chain_label, earliest_execution
+            )
+            return chain_id
+        except Fault as err:
+            if "no such action chain" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Action chain not found: {chain_label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def delete_actionchain(self, chain_label):
+        """
+        Removes a particular action chain
+
+        :param chain_label: chain label
+        :type chain_label: str
+        """
+        try:
+            self._session.actionchain.deleteChain(
+                self._api_key, chain_label
+            )
+        except Fault as err:
+            if "no such action chain" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Action chain not found: {chain_label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def actionchain_add_patches(self, chain_label, system_id, patches):
+        """
+        Adds patch installation to an action chain
+
+        :param chain_label: chain label
+        :type chain_label: str
+        :param system_id: profile ID
+        :type system_id: int
+        :param patches: patch IDs
+        :type patches: int array
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        try:
+            action_id = self._session.actionchain.addErrataUpdate(
+                self._api_key, system_id, patches, chain_label
+            )
+            return action_id
+        except Fault as err:
+            if "no such action chain" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Action chain not found: {chain_label!r}"
+                )
+            if "could not find errata" in err.faultString.lower():
+                raise EmptySetException(
+                    f"At least one patch not found: {patches!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def actionchain_add_upgrades(self, chain_label, system_id, upgrades):
+        """
+        Adds package upgrad to an action chain
+
+        :param chain_label: chain label
+        :type chain_label: str
+        :param system_id: profile ID
+        :type system_id: int
+        :param upgrades: upgrade IDs
+        :type upgrades: int array
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        try:
+            action_id = self._session.actionchain.addPackageUpgrade(
+                self._api_key, system_id, upgrades, chain_label
+            )
+            return action_id
+        except Fault as err:
+            if "no such action chain" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Action chain not found: {chain_label!r}"
+                )
+            if "invalid package" in err.faultString.lower():
+                raise EmptySetException(
+                    f"At least one package upgrade not found: {upgrades!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
+    def actionchain_add_command(self, chain_label, system_id, command, user="root", group="root"):
+        """
+        :param chain_label: chain label
+        :type chain_label: str
+        :param system_id: profile ID
+        :type system_id: int
+        :param command: command
+        :type command: str
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+        if len(command) == 0:
+            raise EmptySetException(
+                "Command is empty"
+            )
+        # add shebang if not found
+        if not command.startswith("#!/"):
+            command = f'#!/bin/sh\n{command}'
+
+        try:
+            action_id = self._session.actionchain.addScriptRun(
+                self._api_key,
+                system_id,
+                chain_label,
+                user,
+                group,
+                600,
+                str(
+                    base64.b64encode(command.encode("utf-8")),
+                    "utf-8"
+                )
+            )
+            return action_id
+        except Fault as err:
+            if "no such action chain" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Action chain not found: {chain_label!r}"
                 )
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"

@@ -784,3 +784,159 @@ def test_run_host_command_nonexistent(client):
             random.randint(800, 1500),
             "uptime"
         )
+
+def test_get_actionchains(client):
+    """
+    Ensure that action chains can be retrieved
+    """
+    two_chainz = client.get_actionchains()
+    assert isinstance(two_chainz, list)
+
+def test_create_add_list_run_actionchains(client, host_id):
+    """
+    Ensure that action chains can be managed
+    """
+    # get host patches and package upgrades
+    patches = client.get_host_patches(host_id)
+    _patches = [x["id"] for x in patches]
+    upgrades = client.get_host_upgrades(host_id)
+    _upgrades = [x["to_package_id"] for x in upgrades]
+
+    if not upgrades:
+        raise EmptySetException("No upgrades available - reset uyuniclient VM")
+    if not patches:
+        raise EmptySetException("No patches available - reset uyuniclient VM")
+
+    # create action chain
+    chain_label = f"{host_id}_{random.randint(800, 1500)}"
+    chain_id = client.add_actionchain(chain_label)
+
+    # add patch update
+    client.actionchain_add_patches(
+        chain_label,
+        host_id,
+        [random.choice(_patches)]
+    )
+
+    # add package upgrade
+    client.actionchain_add_upgrades(
+        chain_label,
+        host_id,
+        [random.choice(_upgrades)]
+    )
+
+    # add remote command
+    client.actionchain_add_command(
+        chain_label,
+        host_id,
+        "sleep 10"
+    )
+
+    # list actions
+    actions = client.get_actionchain_actions(chain_label)
+    # ensure that 3 actions are defined
+    assert len(actions) == 3
+
+    # run action chain
+    action_id = client.run_actionchain(chain_label)
+    # ensure that an action ID is retrieved
+    assert isinstance(action_id, int)
+
+def test_create_actionchain_incorrect(client):
+    """
+    Ensure that action chains without labels can't be created
+    """
+    with pytest.raises(EmptySetException):
+        client.add_actionchain("")
+
+def test_run_actionchain_nonexisting(client):
+    """
+    Ensure that non-existing action chains can be scheduled
+    """
+    with pytest.raises(EmptySetException):
+        client.run_actionchain(random.randint(800, 1500))
+
+def test_delete_actionchain_nonexisting(client):
+    """
+    Ensure that non-existing action chains can't be deleted
+    """
+    with pytest.raises(EmptySetException):
+        client.delete_actionchain(random.randint(800, 1500))
+
+def test_nonexisting_actionchain_add_patches(client, host_id):
+    """
+    Ensure that patches can't be added to non-existing action chains
+    """
+    with pytest.raises(EmptySetException):
+        client.actionchain_add_patches(
+            random.randint(800, 1500),
+            host_id,
+            [random.randint(800, 1500)]
+        )
+
+def test_actionchain_add_patches_nonexisting(client, host_id):
+    """
+    Ensure that non-existing patches can't be used
+    """
+    # try adding non-existing patches action chain
+    chain_label = f"{host_id}_{random.randint(800, 1500)}"
+    client.add_actionchain(chain_label)
+    with pytest.raises(EmptySetException):
+        client.actionchain_add_patches(
+            chain_label, host_id, [random.randint(8000, 15000)]
+        )
+
+    # cleanup
+    client.delete_actionchain(chain_label)
+
+def test_nonexisting_actionchain_add_upgrades(client, host_id):
+    """
+    Ensure that upgrades can't be added to non-existing action chains
+    """
+    with pytest.raises(EmptySetException):
+        client.actionchain_add_upgrades(
+            random.randint(800, 1500),
+            host_id,
+            [random.randint(800, 1500)]
+        )
+
+def test_actionchain_add_upgrades_nonexisting(client, host_id):
+    """
+    Ensure that non-existing upgrades can't be used
+    """
+    # try adding non-existing upgrades action chain
+    chain_label = f"{host_id}_{random.randint(800, 1500)}"
+    client.add_actionchain(chain_label)
+    with pytest.raises(EmptySetException):
+        client.actionchain_add_upgrades(
+            chain_label, host_id, [random.randint(80000, 150000)]
+        )
+
+    # cleanup
+    client.delete_actionchain(chain_label)
+
+def test_nonexisting_actionchain_add_command(client, host_id):
+    """
+    Ensure that commands can't be added to non-existing action chains
+    """
+    with pytest.raises(EmptySetException):
+        client.actionchain_add_command(
+            random.randint(800, 1500),
+            host_id,
+            "sleep 10"
+        )
+
+def test_actionchain_add_nonexisting_command(client, host_id):
+    """
+    Ensure that empty commands can't be added to action chains
+    """
+    # try adding non-existing upgrades action chain
+    chain_label = f"{host_id}_{random.randint(800, 1500)}"
+    client.add_actionchain(chain_label)
+    with pytest.raises(EmptySetException):
+        client.actionchain_add_command(
+            chain_label, host_id, ""
+        )
+
+    # cleanup
+    client.delete_actionchain(chain_label)
