@@ -1101,14 +1101,14 @@ class UyuniAPIClient(BaseConnector):
             # create required action chain
             chain_label = f"{system_id}_patch"
             self.add_actionchain(chain_label)
-            self.install_pre_script(system_id, chain_label)
+            self.install_pre_script(host, chain_label)
             self.actionchain_add_patches(chain_label, system_id, patches)
         if host.post_script:
             # add post script to action chain
-            self.install_post_script(system_id, chain_label)
+            self.install_post_script(host, chain_label)
         else:
             # simply install patches
-            self.install_plain_patches(system_id)
+            self.install_plain_patches(host)
 
     def install_upgrades(self, host, upgrades):
         """
@@ -1124,14 +1124,14 @@ class UyuniAPIClient(BaseConnector):
             # create required action chain
             chain_label = f"{system_id}_upgrade"
             self.add_actionchain(chain_label)
-            self.install_pre_script(system_id, chain_label)
+            self.install_pre_script(host, chain_label)
             self.actionchain_add_upgrades(chain_label, system_id, upgrades)
         if host.post_script:
             # add post script to action chain
-            self.install_post_script(system_id, chain_label)
+            self.install_post_script(host, chain_label)
         else:
             # simply install patches
-            self.install_upgrades(system_id, upgrades)
+            self.install_plain_upgrades(host, upgrades)
 
     def install_pre_script(self, host, chain_label):
         """
