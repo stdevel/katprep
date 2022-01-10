@@ -54,6 +54,12 @@ def test_host_with_custom_location():
     assert host.location == "my loc"
 
 
+def test_host_with_upgrades():
+    host = Host("my.hostname", {}, "org", upgrades=["hot", "espresso"])
+
+    assert host.upgrades == ["hot", "espresso"]
+
+
 @pytest.mark.parametrize(
     "first, second",
     [
@@ -120,6 +126,11 @@ def test_host_with_custom_location():
             Host("a", {}, "org a", management_id="abc123"),
             Host("a", {}, "org a", management_id="def123"),
             marks=pytest.mark.xfail(reason="Different management IDs"),
+        ),
+        pytest.param(
+            Host("a", {}, "org a", upgrades=["123"]),
+            Host("a", {}, "org a", upgrades=["456"]),
+            marks=pytest.mark.xfail(reason="Different upgrades"),
         ),
         (
             Host("a", {}, "org a", management_id="abc123"),
@@ -194,6 +205,7 @@ def test_converting_host_to_dict():
         "cls": "host",
         "verifications": {},
         "patches": [],
+        "upgrades": []
     }
 
 
@@ -210,6 +222,7 @@ def test_host_json_conversion():
 
     del new_dict["verifications"]
     del new_dict["patches"]
+    del new_dict["upgrades"]
 
     assert original_dict == new_dict
 
@@ -227,6 +240,7 @@ def test_host_json_conversion_with_verifications():
     new_dict = host.to_dict()
 
     del new_dict["patches"]
+    del new_dict["upgrades"]
 
     assert original_dict == new_dict
 
@@ -243,6 +257,7 @@ def test_host_json_conversion_with_verifications_and_patches():
             {'cls': 'erratum', 'type': 'testing', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
             {'cls': 'erratum', 'type': 'testing', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
         ],
+        "upgrades": []
     }
 
     host = Host.from_dict(original_dict)
@@ -263,8 +278,10 @@ def test_host_representation():
     loc = "Japan"
     verifications = {"snapshot": "1"}
     patches = ["patch-1"]
+    management_id = "managed-987"
+    upgrades = ["upgrade-2"]
 
-    host = Host(hostname, params, org, loc, verifications, patches)
+    host = Host(hostname, params, org, loc, verifications, patches, management_id, upgrades)
     representation = repr(host)
     assert hostname in representation
     assert repr(params) in representation
@@ -272,6 +289,8 @@ def test_host_representation():
     assert loc in representation
     assert repr(verifications) in representation
     assert repr(patches) in representation
+    assert repr(management_id) in representation
+    assert repr(upgrades) in representation
 
 
 def test_host_type_identifier():

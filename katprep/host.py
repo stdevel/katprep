@@ -40,6 +40,7 @@ class Host:
         verifications=None,
         patches=None,
         management_id=None,
+        upgrades=None
     ):
         self._hostname = hostname
         self._management_id = management_id
@@ -48,6 +49,7 @@ class Host:
         self._location = location
         self._verifications = verifications or {}
         self._patches = patches or []
+        self._upgrades = upgrades or []
 
     @property
     def type(self):
@@ -89,6 +91,10 @@ class Host:
     @property
     def management_id(self):
         return self._management_id or self._hostname
+
+    @property
+    def upgrades(self):
+        return self._upgrades
 
     def get_param(self, key):
         """
@@ -136,6 +142,7 @@ class Host:
             "cls": self.type,
             "verifications": self._verifications,
             "patches": [patch.to_dict() for patch in self._patches],
+            "upgrades": self._upgrades,
         }
 
         if self._location:
@@ -186,6 +193,8 @@ class Host:
         except KeyError:
             management_id = host_dict.get("management_id")
 
+        upgrades = host_dict.get("upgrades", [])
+
         return Host(
             hostname,
             host_dict["params"],
@@ -194,17 +203,19 @@ class Host:
             verifications,
             patches,
             management_id,
+            upgrades,
         )
 
     def __repr__(self):
-        return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
+        return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
             self._hostname,
             self._params,
             self._organization,
             self._location,
             self._verifications,
             self._patches,
-            self._management_id
+            self._management_id,
+            self._upgrades
         )
 
     def __str__(self):
@@ -230,6 +241,9 @@ class Host:
             return False
 
         if self.management_id != other.management_id:
+            return False
+
+        if self.upgrades != other.upgrades:
             return False
 
         return True
