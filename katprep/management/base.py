@@ -3,14 +3,14 @@ Basic management client
 """
 
 from abc import abstractmethod
-from typing import List
+from typing import List, Optional
 
 from ..connector import BaseConnector
 
 
 class ManagementClient(BaseConnector):
     @abstractmethod
-    def install_patches(self, host, patches=None):
+    def install_patches(self, host, patches=Optional[List]):
         """
         Apply the patches with the given errata_ids on the given host.
 
