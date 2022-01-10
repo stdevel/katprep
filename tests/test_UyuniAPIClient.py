@@ -63,14 +63,12 @@ def customvars(config):
     """
     return config["valid_objects"]["customvars"]
 
-
 @pytest.fixture
 def user_name(config):
     """
     Return username from configuration
     """
     return config["valid_objects"]["user"]["name"]
-
 
 @pytest.fixture
 def host_owner(config):
@@ -140,7 +138,7 @@ def test_invalid_ssl(config):
 
 def test_get_hosts(client):
     """
-    Ensure that all hosts can be listed
+    Ensure that all host IDs can be listed
     """
     for host in client.get_hosts():
         # we only deal with integers
@@ -722,6 +720,7 @@ def test_delete_custom_variable_nonexisting(client):
             random.randint(800, 1500)
         )
 
+
 def test_set_update_delete_host_custom_variables(client, host_id):
     """
     Ensure that host custom values can be set and updated
@@ -744,6 +743,7 @@ def test_set_update_delete_host_custom_variables(client, host_id):
             host_id, _var
         )
 
+
 def test_set_host_custom_variables_nonexisting(client, host_id):
     """
     Ensure that non-existing custom values can't be set for a host
@@ -752,6 +752,7 @@ def test_set_host_custom_variables_nonexisting(client, host_id):
         client.host_add_custom_variable(
             host_id, "katprep_motd", "Heer mir uff"
         )
+
 
 def test_delete_host_custom_variables_nonexisting(client, host_id):
     """
@@ -775,6 +776,7 @@ uptime""",
         result = client.host_run_command(host_id, _cmd)
         assert isinstance(result, int)
 
+
 def test_run_host_command_nonexistent(client):
     """
     Ensure that commands can't be executed on non-existing hosts
@@ -785,12 +787,14 @@ def test_run_host_command_nonexistent(client):
             "uptime"
         )
 
+
 def test_get_actionchains(client):
     """
     Ensure that action chains can be retrieved
     """
     two_chainz = client.get_actionchains()
     assert isinstance(two_chainz, list)
+
 
 def test_create_add_list_run_actionchains(client, host_id):
     """
@@ -842,12 +846,14 @@ def test_create_add_list_run_actionchains(client, host_id):
     # ensure that an action ID is retrieved
     assert isinstance(action_id, int)
 
+
 def test_create_actionchain_incorrect(client):
     """
     Ensure that action chains without labels can't be created
     """
     with pytest.raises(EmptySetException):
         client.add_actionchain("")
+
 
 def test_run_actionchain_nonexisting(client):
     """
@@ -856,12 +862,14 @@ def test_run_actionchain_nonexisting(client):
     with pytest.raises(EmptySetException):
         client.run_actionchain(random.randint(800, 1500))
 
+
 def test_delete_actionchain_nonexisting(client):
     """
     Ensure that non-existing action chains can't be deleted
     """
     with pytest.raises(EmptySetException):
         client.delete_actionchain(random.randint(800, 1500))
+
 
 def test_nonexisting_actionchain_add_patches(client, host_id):
     """
@@ -873,6 +881,7 @@ def test_nonexisting_actionchain_add_patches(client, host_id):
             host_id,
             [random.randint(800, 1500)]
         )
+
 
 def test_actionchain_add_patches_nonexisting(client, host_id):
     """
@@ -889,6 +898,7 @@ def test_actionchain_add_patches_nonexisting(client, host_id):
     # cleanup
     client.delete_actionchain(chain_label)
 
+
 def test_nonexisting_actionchain_add_upgrades(client, host_id):
     """
     Ensure that upgrades can't be added to non-existing action chains
@@ -899,6 +909,7 @@ def test_nonexisting_actionchain_add_upgrades(client, host_id):
             host_id,
             [random.randint(800, 1500)]
         )
+
 
 def test_actionchain_add_upgrades_nonexisting(client, host_id):
     """
@@ -915,6 +926,7 @@ def test_actionchain_add_upgrades_nonexisting(client, host_id):
     # cleanup
     client.delete_actionchain(chain_label)
 
+
 def test_nonexisting_actionchain_add_command(client, host_id):
     """
     Ensure that commands can't be added to non-existing action chains
@@ -925,6 +937,7 @@ def test_nonexisting_actionchain_add_command(client, host_id):
             host_id,
             "sleep 10"
         )
+
 
 def test_actionchain_add_nonexisting_command(client, host_id):
     """
