@@ -512,10 +512,10 @@ class UyuniAPIClient(BaseConnector):
                 "No system found - use system profile IDs"
             )
 
-        earliest_occurrence = DateTime(datetime.now().timetuple())
+        earliest_execution = DateTime(datetime.now().timetuple())
         try:
             action_id = self._session.system.scheduleReboot(
-                self._api_key, system_id, earliest_occurrence
+                self._api_key, system_id, earliest_execution
             )
             return action_id
         except Fault as err:
