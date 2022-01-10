@@ -429,7 +429,7 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_patches(self, host):
+    def install_plain_patches(self, host):
         """
         Install patches on a given system
 
@@ -463,7 +463,7 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_upgrades(self, host):
+    def install_plain_upgrades(self, host):
         """
         Install package upgrades on a given system
 
@@ -1086,3 +1086,83 @@ class UyuniAPIClient(BaseConnector):
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
             )
+
+    def install_patches(self, host, patches):
+        """
+        Installs patches
+
+        :param host: host on which to install updates
+        :type host: host object
+        :param patches: patch IDs
+        :type patches: int array
+        """
+        system_id = host.management_id
+        if host.pre_script:
+            # create required action chain
+            chain_label = f"{system_id}_patch"
+            self.add_actionchain(chain_label)
+            self.install_pre_script(system_id, chain_label)
+            self.actionchain_add_patches(chain_label, system_id, patches)
+        if host.post_script:
+            # add post script to action chain
+            self.install_post_script(system_id, chain_label)
+        else:
+            # simply install patches
+            self.install_plain_patches(system_id)
+
+    def install_upgrades(self, host, upgrades):
+        """
+        Installs upgrades
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param upgrades: package IDs
+        :type upgrade: int array
+        """
+        system_id = host.management_id
+        if host.pre_script:
+            # create required action chain
+            chain_label = f"{system_id}_upgrade"
+            self.add_actionchain(chain_label)
+            self.install_pre_script(system_id, chain_label)
+            self.actionchain_add_upgrades(chain_label, system_id, upgrades)
+        if host.post_script:
+            # add post script to action chain
+            self.install_post_script(system_id, chain_label)
+        else:
+            # simply install patches
+            self.install_upgrades(system_id, upgrades)
+
+    def install_pre_script(self, host, chain_label):
+        """
+        Runs the install pre-script
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param chain_label: chain label
+        :type chain_label: str
+        """
+        self.actionchain_add_command(
+            chain_label,
+            host.management_id,
+            host.pre_script,
+            user="root",
+            group="root"
+        )
+
+    def install_post_script(self, host, chain_label):
+        """
+        Runs the install post-script
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param chain_label: chain label
+        :type chain_label: str
+        """
+        self.actionchain_add_command(
+            chain_label,
+            host.management_id,
+            host.post_script,
+            user="root",
+            group="root"
+        )
