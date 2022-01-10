@@ -245,14 +245,14 @@ def execute(options, args):
             )
 
             if options.upgrade_packages:
-                _install_package_upgrades(host_obj, options.generic_dry_run)
+                _install_package_upgrades(host_obj, dry_run)
 
             reboot_wanted = SAT_CLIENT.is_reboot_required(host_obj)
             if options.mgmt_reboot or \
                 (reboot_wanted and not options.mgmt_no_reboot):
 
                 LOGGER.info("Host '%s' --> reboot host", host_obj)
-                if not options.generic_dry_run:
+                if not dry_run:
                     SAT_CLIENT.reboot_host(host_obj)
     except ValueError as err:
         LOGGER.error("Error maintaining host: '%s'", err)
