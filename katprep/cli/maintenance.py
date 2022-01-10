@@ -279,7 +279,7 @@ def _install_erratas(host, dry_run, included_patches, excluded_patches):
 
 def _filter_host_patches(host, patches_to_include, patches_to_exclude) -> list:
     """
-    Filtering patches of a host based on a whitelist and blacklist.
+    Filtering patches of a host based on a allowlist and denylist.
     """
     patches = host.patches
 
