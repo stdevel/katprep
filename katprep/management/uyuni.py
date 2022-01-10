@@ -417,7 +417,11 @@ class UyuniAPIClient(BaseConnector):
             raise EmptySetException(
                 "No patches supplied - use patch ID"
             )
-        patches = [errata.id for errata in patches]
+
+        try:
+            patches = [errata.id for errata in patches]
+        except AttributeError as atterr:
+            raise EmptySetException("Unable to get patch IDs") from atterr
 
         system_id = host.management_id
 
@@ -482,7 +486,13 @@ class UyuniAPIClient(BaseConnector):
         :param host: Host to reboot
         :type host: Host
         """
-        system_id = host.management_id
+        try:
+            system_id = host.management_id
+        except AttributeError as attrerr:
+            raise EmptySetException(
+                f"Unable to get management id from {host}"
+            ) from attrerr
+
         if not isinstance(system_id, int):
             raise EmptySetException(
                 "No system found - use system profile IDs"
