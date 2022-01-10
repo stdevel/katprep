@@ -476,7 +476,7 @@ def test_host_upgrade_invalid_format(client, host):
     """
     with pytest.raises(EmptySetException):
         client.install_upgrades(
-            host_id,
+            host,
             ["csgo-0.8-15", "doge-12.3-4"]
         )
 
