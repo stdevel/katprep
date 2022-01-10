@@ -221,11 +221,28 @@ def execute(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
+    included_patches = set(options.include_patches)
+    LOGGER.debug(
+        "Including only the following patches: %s",
+        ", ".join(patches_to_include)
+    )
+    excluded_patches = set(options.exclude_patches)
+    LOGGER.debug(
+        "Excluding the following patches: %s",
+        ", ".join(patches_to_exclude)
+    )
+    dry_run = options.generic_dry_run
+
     try:
         for host_obj in REPORT.values():
             LOGGER.debug("Patching host '%s'...", host_obj)
 
-            _install_erratas(host_obj, options.generic_dry_run)
+            _install_erratas(
+                host_obj,
+                dry_run,
+                included_patches,
+                excluded_patches
+            )
 
             if options.upgrade_packages:
                 _install_package_upgrades(host_obj, options.generic_dry_run)
@@ -241,18 +258,49 @@ def execute(options, args):
         LOGGER.error("Error maintaining host: '%s'", err)
 
 
-def _install_erratas(host, dry_run):
+def _install_erratas(host, dry_run, included_patches, excluded_patches):
     LOGGER.debug("Erratas of the host %s: %s", host, host.patches)
     if host.patches:
-        patch_ids = [str(errata.id) for errata in host.patches]
+        patches = _filter_host_patches(host, included_patches, excluded_patches)
+
+        patch_ids = [str(errata.id) for errata in patches]
         LOGGER.info(
-            "Host '%s' --> installing %i patches: %s", host, len(host.patches), ", ".join(patch_ids)
+            "Host '%s' --> installing %i patches: %s", host, len(patches), ", ".join(patch_ids)
         )
 
+        if not patches:
+            LOGGER.debug("No patches to install: skipping %s", host)
+
         if not dry_run:
-            SAT_CLIENT.install_patches(host)
+            SAT_CLIENT.install_patches(host, patches)
     else:
         LOGGER.info("No errata for host %s available", host)
+
+
+def _filter_host_patches(host, patches_to_include, patches_to_exclude) -> list:
+    """
+    Filtering patches of a host based on a whitelist and blacklist.
+    """
+    patches = host.patches
+
+    if patches_to_exclude:
+        patches = [
+            patch for patch in patches
+            if patch.id not in patches_to_exclude
+        ]
+
+    if patches_to_include:
+        patches = [
+            patch for patch in patches
+            if patch.id in patches_to_include
+        ]
+
+    LOGGER.debug(
+        "Patches for %s after filtering: %s",
+        host,
+        ", ".join(patch.id for patch in patches)
+    )
+    return patches
 
 
 def _install_package_upgrades(host, dry_run):
@@ -602,6 +650,11 @@ def parse_options(args=None):
     cmd_execute.add_argument("-p", "--include-packages", action="store_true", \
     default=False, dest="upgrade_packages", help="installs available package" \
     " upgrades (default: no)")
+    cmd_execute.add_argument("--include-patches", nargs="+", default=[], dest="include_patches",
+        help="Include the given patches")
+    cmd_execute.add_argument("--exclude-patches", nargs="+", default=[], dest="exclude_patches",
+        help="Exclude the given patches")
+
     cmd_status = subparsers.add_parser("status", help="Display software " \
     "maintenance progress")
     cmd_status.set_defaults(func=status)

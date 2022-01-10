@@ -431,8 +431,11 @@ class ForemanAPIClient(ManagementClient):
         finally:
             return my_results
 
-    def install_patches(self, host):
-        erratas = [errata.id for errata in host.patches]
+    def install_patches(self, host, patches=None):
+        if not patches:
+            patches = host.patches  # install all patches
+
+        erratas = [errata.id for errata in patches]
         # TODO: can we use host.management_id for this?
         host_id = self.get_id_by_name(host.hostname, "host")
 

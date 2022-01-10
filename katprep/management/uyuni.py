@@ -401,14 +401,18 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_patches(self, host):
+    def install_patches(self, host, patches=None):
         """
         Install patches on a given system
 
         :param host: The host on which to install updates
         :type host: Host
+        :param patches: If given only installs the given patches.
+        :type patches: list
         """
-        patches = host.patches
+        if not patches:
+            patches = host.patches  # installing all patches
+
         if not patches:
             raise EmptySetException(
                 "No patches supplied - use patch ID"
