@@ -224,12 +224,12 @@ def execute(options, args):
     included_patches = set(options.include_patches)
     LOGGER.debug(
         "Including only the following patches: %s",
-        ", ".join(patches_to_include)
+        ", ".join(included_patches)
     )
     excluded_patches = set(options.exclude_patches)
     LOGGER.debug(
         "Excluding the following patches: %s",
-        ", ".join(patches_to_exclude)
+        ", ".join(excluded_patches)
     )
     dry_run = options.generic_dry_run
 
