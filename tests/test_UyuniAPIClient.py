@@ -445,7 +445,7 @@ def test_host_upgrade_do_install(client, host):
     """
     Ensure that package upgrades can be installed
     """
-    host_id = host = host.management_id
+    host_id = host.management_id
     # get available upgrades
     upgrades = client.get_host_upgrades(
         host_id
