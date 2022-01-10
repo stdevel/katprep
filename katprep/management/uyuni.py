@@ -1106,6 +1106,8 @@ class UyuniAPIClient(BaseConnector):
         if host.post_script:
             # add post script to action chain
             self.install_post_script(host, chain_label)
+            # schedule execution
+            self.run_actionchain(chain_label)
         else:
             # simply install patches
             self.install_plain_patches(host)
@@ -1129,6 +1131,8 @@ class UyuniAPIClient(BaseConnector):
         if host.post_script:
             # add post script to action chain
             self.install_post_script(host, chain_label)
+            # schedule execution
+            self.run_actionchain(chain_label)
         else:
             # simply install patches
             self.install_plain_upgrades(host, upgrades)
