@@ -223,7 +223,7 @@ def execute(options, args):
     """
     included_patches = set(options.include_patches)
     LOGGER.debug(
-        "Including only the following patches: %s",
+        "Only including only the following patches: %s",
         ", ".join(included_patches)
     )
     excluded_patches = set(options.exclude_patches)
