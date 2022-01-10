@@ -12,7 +12,7 @@ class ManagementClient(BaseConnector):
     @abstractmethod
     def install_patches(self, host, patches=Optional[List]):
         """
-        Apply the patches with the given errata_ids on the given host.
+        Apply patches on the given host.
 
         If no `patches` are given all patches that are available for
         the host will be installed.
