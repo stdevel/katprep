@@ -23,6 +23,8 @@ def from_dict(some_dict):
         return HostGroup.from_dict(some_dict)
     elif object_type == "erratum":
         return Erratum.from_dict(some_dict)
+    elif object_type == "upgrade":
+        return Upgrade.from_dict(some_dict)
     else:
         raise ValueError("Unknown type {!r}".format(object_type))
 
@@ -194,6 +196,7 @@ class Host:
             management_id = host_dict.get("management_id")
 
         upgrades = host_dict.get("upgrades", [])
+        upgrades = [Upgrade.from_dict(upgrade) for upgrade in upgrades]
 
         return Host(
             hostname,
@@ -384,6 +387,42 @@ class Erratum:
             self.issued_at,
             self.updated_at,
             self.reboot_suggested,
+        )
+
+
+
+class Upgrade:
+
+    _OBJECT_TYPE = "upgrade"
+
+    def __init__(self, package_name):
+        self._package_name = package_name
+
+    @property
+    def package_name(self):
+        return self._package_name
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        try:
+            package_name = data["package_name"]
+        except KeyError:
+            package_name = data["name"]  # Uyuni
+
+        return cls(
+            package_name,
+        )
+
+    def to_dict(self):
+        return {
+            "cls": self._OBJECT_TYPE,
+            "package_name": self._package_name
+        }
+
+    def __repr__(self):
+        return "{}({!r})".format(
+            self.__class__.__name__,
+            self.package_name,
         )
 
 

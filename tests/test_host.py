@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from katprep.host import Host, Erratum
+from katprep.host import Host, Erratum, Upgrade
 
 
 def test_getting_custom_virt_name():
@@ -471,3 +471,26 @@ def test_erratum_comparison_by_id(uyuni_erratum):
     erratum2.id = erratum1.id + 1
 
     assert erratum1 != erratum2
+
+
+def test_upgrade():
+    upgrade = Upgrade("tar")
+
+    assert upgrade.package_name == "tar"
+
+
+def test_upgrade_repr_contains_package_name():
+    package_name = "tar"
+    upgrade = Upgrade(package_name)
+
+    representation = repr(upgrade)
+
+    assert representation.startswith("Upgrade(")
+    assert representation.endswith(")")
+    assert repr(package_name) in representation
+
+
+def test_create_upgrade_from_dict():
+    upgrade = Upgrade.from_dict({"package_name": "gzup"})
+
+    assert upgrade.package_name == "gzup"
