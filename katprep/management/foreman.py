@@ -432,7 +432,7 @@ class ForemanAPIClient(ManagementClient):
             return my_results
 
     def install_patches(self, host, patches=None):
-        if not patches:
+        if patches is None:
             patches = host.patches  # install all patches
 
         erratas = [errata.id for errata in patches]

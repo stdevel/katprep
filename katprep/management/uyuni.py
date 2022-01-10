@@ -410,7 +410,7 @@ class UyuniAPIClient(BaseConnector):
         :param patches: If given only installs the given patches.
         :type patches: list
         """
-        if not patches:
+        if patches is None:
             patches = host.patches  # installing all patches
 
         if not patches:
