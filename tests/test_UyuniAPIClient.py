@@ -6,7 +6,9 @@ import logging
 import random
 import re
 import time
+from datetime import datetime
 import pytest
+from katprep.host import Host
 from katprep.management.uyuni import UyuniAPIClient
 from katprep.exceptions import (
     EmptySetException,
@@ -27,7 +29,7 @@ def config():
     return load_config("uyuni_config.json")
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def client(config):
     """
     Instance client
@@ -41,6 +43,40 @@ def client(config):
         verify=False
     )
 
+
+@pytest.fixture
+def host_obj(client, config):
+    """
+    Returns a host object
+    """
+    system_id = config["valid_objects"]["host"]["id"]
+    _host = Host(
+        config["valid_objects"]["host"]["name"],
+        client.get_host_params(system_id),
+        client.get_organization(),
+        location=client.get_location(),
+        verifications=None,
+        patches=client.get_host_patches(system_id),
+        management_id=system_id
+    )
+    return _host
+
+@pytest.fixture
+def incorrect_host_obj():
+    """
+    Returns an incorrect host object
+    """
+    system_id = random.randint(800, 1500)
+    _host = Host(
+        f"duck{random.randint(800, 1500)}",
+        system_id,
+        "Duckburg",
+        "Duckburg",
+        verifications=None,
+        patches={},
+        management_id=system_id
+    )
+    return _host
 
 @pytest.fixture
 def host_id(config):
@@ -353,89 +389,93 @@ def test_get_host_actions_nonexistent(client):
         client.get_host_actions(random.randint(800, 1500))
 
 
-def test_host_patch_do_install(client, host_id):
+def test_host_patch_do_install(client, host_obj):
     """
     Ensure that patches can be installed
     """
     # get available patches
-    patches = client.get_host_patches(
-        host_id
-    )
-    if not patches:
+    if not host_obj.patches:
         raise EmptySetException("No patches available - reset uyuniclient VM")
 
     # install random patch
-    _patches = [x["id"] for x in patches]
+    _patches = [x["id"] for x in host_obj.patches]
     action_id = client.install_patches(
-        host_id,
+        host_obj,
         [random.choice(_patches)]
     )
     # wait until task finished before continuing
     action_id = action_id[0]
-    task = client.get_host_action(host_id, action_id)[0]
+    task = client.get_host_action(host_obj.management_id, action_id)[0]
     while not task_completed(task):
         time.sleep(10)
-        task = client.get_host_action(host_id, action_id)[0]
+        task = client.get_host_action(host_obj.management_id, action_id)[0]
 
 
-def test_host_patch_invalid_format(client, host_id):
+def test_host_patch_invalid_format(client, host_obj):
     """
     Ensure that patches cannot be installed when supplying
     invalid formats (strings instead of integers)
     """
     with pytest.raises(EmptySetException):
         client.install_patches(
-            host_id,
+            host_obj,
             ["BA-libpinkepank", "gcc-13.37"]
         )
 
 
-def test_host_patch_nonexistent(client, host_id):
+def test_host_patch_nonexistent(client, host_obj):
     """
     Ensure that non-existing patches cannot be installed
     """
     with pytest.raises(EmptySetException):
         client.install_patches(
-            host_id,
+            host_obj,
             [random.randint(64000, 128000)]
         )
 
 
-def test_host_patch_already_installed(client, host_id):
+def test_host_patch_already_installed(client, host_obj):
     """
     Ensure that already installed patches cannot be installed
     """
     # find already installed errata by searching actions
     actions = client.get_host_actions(
-        host_id
+        host_obj.management_id
     )
-    _actions = [x["name"] for x in actions if "patch update: opensuse" in x["name"].lower() and x["successful_count"] == 1]     # pylint: disable=line-too-long # noqa: E501
-    pattern = r'openSUSE-[0-9]{1,4}-[0-9]{1,}'
-    errata = [re.search(pattern, x)[0] for x in _actions]
+    today = datetime.now().strftime("%Y-%m-%d")
+    _actions = [x["name"] for x in actions if x['action_type'] == 'Patch Update' and today in x["earliest_action"] and x["successful_count"] == 1]     # pylint: disable=line-too-long # noqa: E501
+    # search for SUSE errata pattern
+    errata = []
+    pattern = r'openSUSE-?(SLE-15.[1-5]{1}-)[0-9]{1,4}-[0-9]{1,}'
+    for _act in _actions:
+        try:
+            errata.append(re.search(pattern, _act)[0])
+        except TypeError:
+            pass
 
+    # abort if no patches found
     if not errata:
         raise EmptySetException(
             "No patches installed - install patch and rerun test"
         )
 
-    # find errata ID by patch CVE
+    # get installed errata IDs
     _errata = [client.get_patch_by_name(x)["id"] for x in errata]
-
-    # try to install patch
+    # try to install random patch
     with pytest.raises(EmptySetException):
         client.install_patches(
-            host_id,
-            _errata
+            host_obj,
+            [random.choice(_errata)]
         )
 
 
-def test_host_upgrade_do_install(client, host_id):
+def test_host_upgrade_do_install(client, host_obj):
     """
     Ensure that package upgrades can be installed
     """
     # get available upgrades
     upgrades = client.get_host_upgrades(
-        host_id
+        host_obj.management_id
     )
     if not upgrades:
         raise EmptySetException("No upgrades available - reset uyuniclient VM")
@@ -444,68 +484,58 @@ def test_host_upgrade_do_install(client, host_id):
     _upgrades = [x["to_package_id"] for x in upgrades]
     # install upgrade
     action_id = client.install_upgrades(
-        host_id,
+        host_obj,
         [random.choice(_upgrades)]
     )
     assert isinstance(action_id[0], int)
     # wait until task finished before continuing
     action_id = action_id[0]
-    task = client.get_host_action(host_id, action_id)[0]
+    task = client.get_host_action(host_obj.management_id, action_id)[0]
     while not task_completed(task):
         time.sleep(10)
-        task = client.get_host_action(host_id, action_id)[0]
+        task = client.get_host_action(host_obj.management_id, action_id)[0]
 
 
-def test_host_upgrade_invalid_format(client, host_id):
+def test_host_upgrade_invalid_format(client, host_obj):
     """
     Ensure that upgrades cannot be installed when supplying
     invalid formats (strings instead of integers)
     """
     with pytest.raises(EmptySetException):
         client.install_upgrades(
-            host_id,
+            host_obj,
             ["csgo-0.8-15", "doge-12.3-4"]
         )
 
 
-def test_host_upgrade_nonexistent(client, host_id):
+def test_host_upgrade_nonexistent(client, host_obj):
     """
     Ensure that non-existing upgrades cannot be installed
     """
     with pytest.raises(EmptySetException):
         client.install_upgrades(
-            host_id,
+            host_obj,
             [random.randint(64000, 128000)]
         )
 
 
-def test_reboot_host(client, host_id):
+def test_reboot_host(client, host_obj):
     """
     Ensures that hosts can be rebooted
     """
     action_id = client.reboot_host(
-        host_id
+        host_obj
     )
     assert isinstance(action_id, int)
 
 
-def test_reboot_host_invalid_format(client):
+def test_reboot_host_invalid(client, incorrect_host_obj):
     """
-    Ensure that hosts with invalid format can't be rebooted
-    """
-    with pytest.raises(EmptySetException):
-        client.reboot_host(
-            "pinkepank.giertz.loc"
-        )
-
-
-def test_reboot_host_nonexistent(client):
-    """
-    Ensure that non-existing hosts can't be rebooted
+    Ensure that invalid hosts can't be rebooted
     """
     with pytest.raises(EmptySetException):
         client.reboot_host(
-            random.randint(64000, 128000)
+            incorrect_host_obj
         )
 
 
