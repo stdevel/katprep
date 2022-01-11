@@ -429,21 +429,22 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_plain_patches(self, host):
+    def install_plain_patches(self, host, patches):
         """
         Install patches on a given system
 
         :param host: host on which to install updates
         :type host: host object
+        :param patches: patches to be installed
+        :type patches: int array
         """
-        patches = host.patches
+        system_id = host.management_id
+        # ensure that only integers are given
+        patches = [x for x in patches if isinstance(x, int)]
         if not patches:
             raise EmptySetException(
-                "No patches supplied - use patch ID"
+                "No patches supplied - use patch IDs"
             )
-        patches = [errata.id for errata in patches]
-
-        system_id = host.management_id
 
         try:
             action_id = self._session.system.scheduleApplyErrata(
@@ -463,20 +464,23 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_plain_upgrades(self, host):
+    def install_plain_upgrades(self, host, upgrades):
         """
         Install package upgrades on a given system
 
         :param host: host to upgrade
         :type host: host object
+        :param patches: patches to be installed
+        :type patches: int array
         """
         system_id = host.management_id
-        upgrades = self.get_host_upgrades(system_id)
+        # ensure that only integers are given
+        upgrades = [x for x in upgrades if isinstance(x, int)]
         if not upgrades:
-            self.LOGGER.debug("No upgrades for %s found", host)
-            return  # Nothing to do
+            raise EmptySetException(
+                "No upgrades supplied - use package IDs"
+            )
 
-        upgrades = [package["to_package_id"] for package in upgrades]
         earliest_execution = DateTime(datetime.now().timetuple())
 
         try:
@@ -1119,7 +1123,7 @@ class UyuniAPIClient(BaseConnector):
             self.run_actionchain(chain_label)
         else:
             # simply install patches
-            return self.install_plain_patches(host)
+            return self.install_plain_patches(host, patches)
         return action_ids
 
     def install_upgrades(self, host, upgrades):
