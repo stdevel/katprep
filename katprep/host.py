@@ -52,14 +52,14 @@ class Host:
     @property
     def pre_script(self):
         try:
-            return self.host_parameters['katprep_pre-script']
+            return self._params['katprep_pre-script']
         except KeyError:
             return None
 
     @property
     def post_script(self):
         try:
-            return self.host_parameters['katprep_post-script']
+            return self._params['katprep_post-script']
         except KeyError:
             return None
 
@@ -178,7 +178,7 @@ class Host:
             org = host_dict["organization"]
 
         try:
-            # getting org from katello
+            # getting location from katello
             location = host_dict["params"]["location_name"]
         except KeyError:
             location = host_dict.get("location")
