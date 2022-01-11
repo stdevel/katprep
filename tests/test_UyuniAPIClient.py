@@ -983,3 +983,91 @@ def test_actionchain_add_nonexisting_command(client, host_id):
 
     # cleanup
     client.delete_actionchain(chain_label)
+
+
+def test_host_upgrade_scripts(host_obj, client):
+    """
+    Set pre/post scripts and run maintenance
+    """
+    # get available upgrades
+    upgrades = client.get_host_upgrades(
+        host_obj.management_id
+    )
+    if not upgrades:
+        raise EmptySetException("No upgrades available - reset uyuniclient VM")
+
+    # set custom variables
+    _vars = {
+        "katprep_pre-script": "sleep 10",
+        "katprep_post-script": "sleep 10"
+    }
+    for _var in _vars:
+        client.host_add_custom_variable(
+            host_obj.management_id,
+            _var, _vars[_var]
+        )
+        host_obj._params[_var] = _vars[_var]
+
+    # install random upgrade
+    _upgrades = [x["to_package_id"] for x in upgrades]
+    # install upgrade
+    _action_ids = client.install_upgrades(
+        host_obj,
+        [random.choice(_upgrades)]
+    )
+
+    # check for tasks
+    _actions = [x['id'] for x in client.get_host_actions(host_obj.management_id)]
+    for _act in _action_ids:
+        assert _act in _actions
+
+    # remove custom variables
+    for _var in _vars:
+        client.host_delete_custom_variable(
+            host_obj.management_id,
+            _var
+        )
+
+
+def test_host_patch_scripts(host_obj, client):
+    """
+    Set pre/post scripts and run maintenance
+    """
+    # get available patches
+    patches = client.get_host_patches(
+        host_obj.management_id
+    )
+    if not patches:
+        raise EmptySetException("No patches available - reset uyuniclient VM")
+
+    # set custom variables
+    _vars = {
+        "katprep_pre-script": "sleep 10",
+        "katprep_post-script": "sleep 10"
+    }
+    for _var in _vars:
+        client.host_add_custom_variable(
+            host_obj.management_id,
+            _var, _vars[_var]
+        )
+        host_obj._params[_var] = _vars[_var]
+
+    # install random patch
+    _patches = [x["id"] for x in patches]
+    # install upgrade
+    _action_ids = client.install_patches(
+        host_obj,
+        [random.choice(_patches)]
+    )
+
+    # check for tasks
+    _actions = [x['id'] for x in client.get_host_actions(host_obj.management_id)]
+    for _act in _action_ids:
+        assert _act in _actions
+
+    # remove custom variables
+    for _var in _vars:
+        client.host_delete_custom_variable(
+            host_obj.management_id,
+            _var
+        )
