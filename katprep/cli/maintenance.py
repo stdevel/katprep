@@ -242,12 +242,20 @@ def execute(options, args):
 
 
 def _install_erratas(host, dry_run):
-    LOGGER.debug("Erratas of the host %s: %s", host, host.patches)
+    LOGGER.debug("Errata of the host %s: %s", host, host.patches)
     if host.patches:
-        patch_ids = [str(errata.id) for errata in host.patches]
+        patch_ids = [errata.id for errata in host.patches]
+        # show scripts and patches
+        if host.pre_script:
+            LOGGER.info("Host '%s' --> running pre-script", host)
         LOGGER.info(
-            "Host '%s' --> installing %i patches: %s", host, len(host.patches), ", ".join(patch_ids)
+            "Host '%s' --> installing %i patches: %s",
+            host,
+            len(host.patches),
+            ", ".join(str(x) for x in patch_ids)
         )
+        if host.post_script:
+            LOGGER.info("Host '%s' --> running post-script", host)
 
         if not dry_run:
             try:
