@@ -250,7 +250,10 @@ def _install_erratas(host, dry_run):
         )
 
         if not dry_run:
-            SAT_CLIENT.install_patches(host)
+            try:
+                SAT_CLIENT.install_patches(host, patch_ids)
+            except EmptySetException:
+                LOGGER.error("Errata not found, maybe already installed?")
     else:
         LOGGER.info("No errata for host %s available", host)
 
