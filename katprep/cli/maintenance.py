@@ -416,7 +416,7 @@ def status(options, args):
         script_tasks = [x for x in script_tasks if today in x['created']]
         LOGGER.debug("Erratas for host '%s': %s", int(host_id), len(errata_tasks))
         LOGGER.debug("Upgrades for host '%s': %s", int(host_id), len(upgrade_tasks))
-        LOGGER.debug("Scripts for host '%s': %s", int(host_id), len(upgrade_tasks))
+        LOGGER.debug("Scripts for host '%s': %s", int(host_id), len(script_tasks))
 
         # check all the tasks
         _tasks = errata_tasks + upgrade_tasks + script_tasks
