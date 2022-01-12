@@ -1,4 +1,4 @@
-# System maintenance report $if(params.name)$for $params.name$$endif$
+# System maintenance report $if(hostname)$for $hostname$$endif$
 
 ## Meta information
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>System maintenance report$if(params.name)$ for $params.name$$endif$</title>
+<title>System maintenance report$if(hostname)$ for $hostname$$endif$</title>
 <style>
 table {
   width:100%;
@@ -19,7 +19,7 @@ table tr:nth-child(odd) {
 </style>
 </head>
 <body>
-<h1>System maintenance report$if(params.name)$ for $params.name$$endif$</h1>
+<h1>System maintenance report$if(hostname)$ for $hostname$$endif$</h1>
 
 <h2>Meta information</h2>
 <table>
