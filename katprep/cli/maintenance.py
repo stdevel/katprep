@@ -401,11 +401,14 @@ def status(options, args):
         errata_tasks = [x for x in errata_tasks if today in x['created']]
         upgrade_tasks = SAT_CLIENT.get_upgrade_task_status(int(host_id))
         upgrade_tasks = [x for x in upgrade_tasks if today in x['created']]
+        script_tasks = SAT_CLIENT.get_script_task_status(int(host_id))
+        script_tasks = [x for x in script_tasks if today in x['created']]
         LOGGER.debug("Erratas for host '%s': %s", int(host_id), len(errata_tasks))
         LOGGER.debug("Upgrades for host '%s': %s", int(host_id), len(upgrade_tasks))
+        LOGGER.debug("Scripts for host '%s': %s", int(host_id), len(upgrade_tasks))
 
         # check all the tasks
-        _tasks = errata_tasks + upgrade_tasks
+        _tasks = errata_tasks + upgrade_tasks + script_tasks
         for _task in _tasks:
 
             # TODO: We might need to change keys/adopt format
