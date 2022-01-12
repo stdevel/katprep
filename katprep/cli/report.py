@@ -13,14 +13,12 @@ import logging
 import json
 import datetime
 import os
+import sys
 #import pypandoc
 import yaml
 from .. import __version__, is_writable, which
 from ..reports import is_valid_report, load_report
 
-"""
-str: Program version
-"""
 LOGGER = logging.getLogger('katprep_report')
 """
 logging: Logger instance
@@ -124,17 +122,14 @@ def get_file_by_age(file_a, file_b, return_older=False):
     """
     try:
         if os.path.getctime(file_a) < os.path.getctime(file_b):
-            #file_b is newer
+            # file_b is newer
             if return_older:
                 return file_a
-            else:
-                return file_b
-        else:
-            #file_a is newer
-            if return_older:
-                return file_b
-            else:
-                return file_a
+            return file_b
+        # file_a is newer
+        if return_older:
+            return file_b
+        return file_a
     except IOError as err:
         LOGGER.error("Unable to open file: '%s'", err)
 
@@ -220,17 +215,17 @@ def create_delta(options):
         try:
             old_host = REPORT_OLD[host_id]
         except KeyError:
-            LOGGER.warn(f"Host {host_id} missing in old report")
+            LOGGER.warning("Host %s missing in old report", host_id)
             continue
 
         try:
             new_host = REPORT_NEW[host_id]
         except KeyError:
-            LOGGER.warn(f"Host {host_id} missing in new report")
+            LOGGER.warning("Host %s missing in new report", host_id)
             continue
 
         if old_host.patches == new_host.patches:
-            LOGGER.debug(f"Host {host_id!r} has not been patched #ohman")
+            LOGGER.debug("Host %s has not been patched #ohman", host_id)
             continue
 
         # store delta report
@@ -266,11 +261,14 @@ def create_reports(options):
         if os.path.isfile("{}.yml".format(filename)):
             LOGGER.debug("Creating report for host '%s'", host)
             LOGGER.debug("%s.yml", filename)
-            #TODO: figure out why pypandoc doesn't work at this point
-            os.system("pandoc {}.yml --template {} -o {}.{}".format(filename, \
-                options.template_file, filename, options.output_type))
+            # TODO: figure out why pypandoc doesn't work at this point
+            # os.system("pandoc {}.yml --template {} -o {}.{}".format(filename, \
+            #     options.template_file, filename, options.output_type))
+            os.system(
+                f"pandoc {filename}.yml --template {options.template_file} -o {filename}.{options.output_type}"
+            )
             if not options.preserve_yaml:
-                #Remove file
+                # remove file
                 os.remove("{}.yml".format(filename))
         else:
             LOGGER.debug(
@@ -295,7 +293,7 @@ def main(options, args):
             "Could not detect type of template," \
             "please add a file extension such as .md"
         )
-        exit(1)
+        sys.exit(1)
 
     #set output file
     if options.output_path == "":
