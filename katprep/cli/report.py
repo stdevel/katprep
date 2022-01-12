@@ -242,7 +242,7 @@ def create_delta(options):
 
         with open(filename, "w") as json_file:
             yaml.dump(
-                yaml.load(host_json),
+                yaml.load(host_json, Loader=yaml.FullLoader),
                 json_file,
                 default_flow_style=False,
                 explicit_start=True,
