@@ -420,6 +420,11 @@ def status(options, args):
                     "%s task for host '%s' FAILED!",
                     _task['name'], host
                 )
+            else:
+                LOGGER.info(
+                    "%s task for host '%s' still running...",
+                    _task['name'], host
+                )
 
 
 def cleanup(options, args):
