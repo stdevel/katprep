@@ -427,17 +427,17 @@ def status(options, args):
             if _task["successful_count"] != 0:
                 LOGGER.info(
                     "%s task for host '%s' succeeded",
-                    _task['name'], host
+                    _task['action_type'], host
                 )
             elif _task["failed_count"] != 0:
                 LOGGER.info(
                     "%s task for host '%s' FAILED!",
-                    _task['name'], host
+                    _task['action_type'], host
                 )
             else:
                 LOGGER.info(
                     "%s task for host '%s' still running...",
-                    _task['name'], host
+                    _task['action_type'], host
                 )
 
 
