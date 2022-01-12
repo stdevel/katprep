@@ -689,12 +689,21 @@ class UyuniAPIClient(BaseConnector):
 
     def get_upgrade_task_status(self, system_id):
         """
-        Get the status of package upgrades for the given host.
+        Get the status of package upgrades for the given host
 
         :param system_id: profile ID
         :type system_id: int
         """
         return self.get_action_by_type(system_id, 'Package Install')
+
+    def get_script_task_status(self, system_id):
+        """
+        Get the status of script executions for the given host
+
+        :param system_id: profile ID
+        :type system_id: int
+        """
+        return self.get_action_by_type(system_id, 'Run an arbitrary script')
 
     def get_custom_variables(self):
         """
