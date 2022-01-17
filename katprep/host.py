@@ -144,7 +144,7 @@ class Host:
             "cls": self.type,
             "verifications": self._verifications,
             "patches": [patch.to_dict() for patch in self._patches],
-            "upgrades": self._upgrades,
+            "upgrades": [upgrade.to_dict() for upgrade in self._upgrades],
         }
 
         if self._location:

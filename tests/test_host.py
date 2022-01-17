@@ -266,6 +266,27 @@ def test_host_json_conversion_with_verifications_and_patches():
     assert original_dict == new_dict
 
 
+def test_host_json_conversion_with_upgrades():
+    original_dict = {
+        "hostname": "hans.hubert",
+        "params": {"sesame": "street"},
+        "organization": "Funky town",
+        "location": "Digges B",
+        "cls": "host",
+        "verifications": {"virt_snapshot": True},
+        "patches": [],
+        "upgrades": [
+            {"cls": "upgrade", "package_name": "tar"},
+            {"cls": "upgrade", "package_name": "gzip"}
+        ]
+    }
+
+    host = Host.from_dict(original_dict)
+    new_dict = host.to_dict()
+
+    assert original_dict == new_dict
+
+
 def test_host_str_contains_hostname():
     hostname = "some.hostname"
     assert hostname in str(Host(hostname, {}, None))
