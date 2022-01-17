@@ -252,7 +252,15 @@ class UyuniAPIClient(BaseConnector):
             )
             return patch
         except Fault as err:
-            if "no such patch" in err.faultString.lower():
+            def missing_patch(error_message):
+                message = error_message.lower()
+                if ("no such patch" in message or
+                    ("the patch" in message and "cannot be found" in message)):
+                    return True
+
+                return False
+
+            if missing_patch(err.faultString):
                 raise EmptySetException(
                     f"Patch not found: {patch_name!r}"
                 )
