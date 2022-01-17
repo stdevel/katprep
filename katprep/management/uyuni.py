@@ -311,7 +311,7 @@ class UyuniAPIClient(BaseConnector):
                     self._api_key, pkg["to_package_id"]
                 )
                 if not erratum:
-                    _packages.append(pkg)
+                    _packages.append(pkg["name"])
 
             self.LOGGER.debug("Found %i upgrades for %s: %s", len(_packages), system_id, _packages)
             return _packages
