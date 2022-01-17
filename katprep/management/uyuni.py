@@ -311,7 +311,7 @@ class UyuniAPIClient(BaseConnector):
                     self._api_key, pkg["to_package_id"]
                 )
                 if not erratum:
-                    _packages.append(pkg["name"])
+                    _packages.append(pkg)
 
             self.LOGGER.debug("Found %i upgrades for %s: %s", len(_packages), system_id, _packages)
             return _packages
@@ -457,24 +457,27 @@ class UyuniAPIClient(BaseConnector):
 
         if upgrades is None:
             upgrades = self.get_host_upgrades(system_id)
-            upgrades = [
-                Upgrade(package["to_package_id"])
-                for package in upgrades
-            ]
+            upgrades = [Upgrade.from_dict(package) for package in upgrades]
         if not upgrades:
             self.LOGGER.debug("No upgrades for %s", host)
             return  # Nothing to do
 
+        upgrade_ids = []
         try:
-            upgrades = [package.package_name for package in upgrades]
-        except (TypeError, AttributeError) as conversion_error:
+            for upgrade in upgrades:
+                package_id = upgrade.package_id
+                if package_id is None:
+                    raise ValueError("{!r} has no valid package id set!".format(upgrade))
+
+                upgrade_ids.append(package_id)
+        except (TypeError, AttributeError, ValueError) as conversion_error:
             raise EmptySetException("Invalid package type") from conversion_error
 
         earliest_execution = DateTime(datetime.now().timetuple())
 
         try:
             action_id = self._session.system.schedulePackageInstall(
-                self._api_key, system_id, upgrades, earliest_execution
+                self._api_key, system_id, upgrade_ids, earliest_execution
             )
 
             # returning an array to be consistent with install_patches

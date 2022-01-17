@@ -7,7 +7,7 @@ import random
 import re
 import time
 import pytest
-from katprep.host import Erratum, Host
+from katprep.host import Erratum, Host, Upgrade
 from katprep.management.uyuni import UyuniAPIClient
 from katprep.exceptions import (
     EmptySetException,
@@ -454,8 +454,8 @@ def test_host_upgrade_do_install(client, host):
         raise EmptySetException("No upgrades available - reset uyuniclient VM")
 
     # install random upgrade
-    _upgrades = [x["to_package_id"] for x in upgrades]
-    # install upgrade
+    _upgrades = [Upgrade.from_dict(x) for x in upgrades]
+
     action_id = client.install_upgrades(
         host,
         [random.choice(_upgrades)]
@@ -487,8 +487,8 @@ def test_host_upgrade_nonexistent(client, host):
     """
     with pytest.raises(EmptySetException):
         client.install_upgrades(
-            host_id,
-            [random.randint(64000, 128000)]
+            host,
+            [Upgrade("this-does-not-exist"), random.randint(60000, 140000)]
         )
 
 
