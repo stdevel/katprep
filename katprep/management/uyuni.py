@@ -467,8 +467,8 @@ class UyuniAPIClient(BaseConnector):
 
         try:
             upgrades = [package.package_name for package in upgrades]
-        except TypeError as terr:
-            raise EmptySetException("Invalid package type") from terr
+        except (TypeError, AttributeError) as conversion_error:
+            raise EmptySetException("Invalid package type") from conversion_error
 
         earliest_execution = DateTime(datetime.now().timetuple())
 
