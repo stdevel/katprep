@@ -10,7 +10,7 @@ from ..connector import BaseConnector
 
 class ManagementClient(BaseConnector):
     @abstractmethod
-    def install_patches(self, host, patches=Optional[List]):
+    def install_patches(self, host, patches: Optional[List] = None):
         """
         Apply patches on the given host.
 
@@ -19,11 +19,13 @@ class ManagementClient(BaseConnector):
         """
 
     @abstractmethod
-    def install_upgrades(self, host):
+    def install_upgrades(self, host, upgrades: Optional[List] = None):
         """
-        Upgrade all packages on the given host.
+        Upgrade packages on the given host.
+        This does include upgrades that are not part of an errata.
 
-        This does include ugrades that are not part of an errata.
+        If `upgrades` is `None` all upgrades on the host will be
+        installed.
         """
 
     @abstractmethod

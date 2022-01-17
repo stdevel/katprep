@@ -233,6 +233,20 @@ def execute(options, args):
     )
     dry_run = options.generic_dry_run
 
+    upgrade_packages = options.upgrade_packages
+    if upgrade_packages:
+        LOGGER.debug("Installing package upgrades on hosts")
+        included_upgrades = set(options.include_upgrades)
+        LOGGER.debug(
+            "Only including the following upgrades: %s",
+            ", ".join(included_upgrades)
+        )
+        excluded_upgrades = set(options.exclude_upgrades)
+        LOGGER.debug(
+            "Excluding the following upgrades: %s",
+            ", ".join(excluded_upgrades)
+        )
+
     try:
         for host_obj in REPORT.values():
             LOGGER.debug("Patching host '%s'...", host_obj)
@@ -244,8 +258,13 @@ def execute(options, args):
                 excluded_patches
             )
 
-            if options.upgrade_packages:
-                _install_package_upgrades(host_obj, dry_run)
+            if upgrade_packages:
+                _install_package_upgrades(
+                    host_obj,
+                    dry_run,
+                    included_upgrades,
+                    excluded_upgrades
+                )
 
             reboot_wanted = SAT_CLIENT.is_reboot_required(host_obj)
             if options.mgmt_reboot or \
@@ -303,13 +322,34 @@ def _filter_host_patches(host, patches_to_include, patches_to_exclude) -> list:
     return patches
 
 
-def _install_package_upgrades(host, dry_run):
+def _install_package_upgrades(host, dry_run, upgrades_to_include, upgrades_to_exclude):
     LOGGER.info(
         "Host '%s' --> install package upgrades", host
     )
 
+    upgrades = None
+    if upgrades_to_include or upgrades_to_exclude:
+        upgrades = host.upgrades
+        if upgrades_to_exclude:
+            upgrades = [
+                upgrade for upgrade in upgrades
+                if upgrade.package_name not in upgrades_to_exclude
+            ]
+
+        if upgrades_to_include:
+            upgrades = [
+                upgrade for upgrade in upgrades
+                if upgrade.package_name in upgrades_to_include
+            ]
+
+        LOGGER.debug(
+            "Upgrades to install on %s after filtering: %s",
+            host,
+            ", ".join(upgrades)
+        )
+
     if not dry_run:
-        SAT_CLIENT.install_upgrades(host)
+        SAT_CLIENT.install_upgrades(host, upgrades)
 
 
 def revert(options, args):
@@ -650,6 +690,10 @@ def parse_options(args=None):
     cmd_execute.add_argument("-p", "--include-packages", action="store_true", \
     default=False, dest="upgrade_packages", help="installs available package" \
     " upgrades (default: no)")
+    cmd_execute.add_argument("--include-upgrades", dest="include_upgrades",
+        nargs="+", default=[], help="Include the given upgrades")
+    cmd_execute.add_argument("--exclude-upgrades", dest="exclude_upgrades",
+        nargs="+", default=[], help="Exclude the given upgrades")
     cmd_execute.add_argument("--include-patches", nargs="+", default=[], dest="include_patches",
         help="Include the given patches")
     cmd_execute.add_argument("--exclude-patches", nargs="+", default=[], dest="exclude_patches",

@@ -444,13 +444,25 @@ class ForemanAPIClient(ManagementClient):
             json.dumps({"errata_ids": erratas})
         )
 
-    def install_upgrades(self, host):
+    def install_upgrades(self, host, upgrades=None):
         # TODO: can we use host.management_id for this?
         host_id = self.get_id_by_name(host.hostname, "host")
-        self.api_put(
-            f"/hosts/{host_id}/packages/upgrade_all",
-            json.dumps({})
-        )
+
+        if upgrades is None:
+            self.api_put(
+                f"/hosts/{host_id}/packages/upgrade_all",
+                json.dumps({})
+            )
+        else:
+            raise NotImplementedError(
+                "Upgrading only specific packages is currently not "
+                "supported with foreman."
+            )
+
+            self.api_put(
+                f"/hosts/{host_id}/packages/upgrade",
+                json.dumps({})
+            )
 
     def reboot_host(self, host):
         # TODO: can we use host.management_id for this?

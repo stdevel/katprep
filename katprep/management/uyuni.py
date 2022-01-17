@@ -443,20 +443,32 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_upgrades(self, host):
+    def install_upgrades(self, host, upgrades=None):
         """
         Install package upgrades on a given system
 
         :param host: The host to upgrade
         :type host: Host
+        :param upgrades: Specific upgrades to install
+        :type upgrades: list
         """
         system_id = host.management_id
-        upgrades = self.get_host_upgrades(system_id)
+
+        if upgrades is None:
+            upgrades = self.get_host_upgrades(system_id)
+            upgrades = [
+                Upgrade(package["to_package_id"])
+                for package in upgrades
+            ]
         if not upgrades:
-            self.LOGGER.debug("No upgrades for %s found", host)
+            self.LOGGER.debug("No upgrades for %s", host)
             return  # Nothing to do
 
-        upgrades = [package["to_package_id"] for package in upgrades]
+        try:
+            upgrades = [package.package_name for package in upgrades]
+        except TypeError as terr:
+            raise EmptySetException("Invalid package type") from terr
+
         earliest_execution = DateTime(datetime.now().timetuple())
 
         try:
