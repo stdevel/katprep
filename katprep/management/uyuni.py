@@ -263,10 +263,11 @@ class UyuniAPIClient(BaseConnector):
             if missing_patch(err.faultString):
                 raise EmptySetException(
                     f"Patch not found: {patch_name!r}"
-                )
+                ) from err
+
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
-            )
+            ) from err
 
     def get_package_by_file_name(self, file_name):
         """
