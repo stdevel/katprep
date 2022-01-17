@@ -16,6 +16,7 @@ from ..exceptions import (
     SessionException,
     SSLCertVerificationError,
 )
+from ..host import Upgrade
 
 
 class UyuniAPIClient(BaseConnector):
