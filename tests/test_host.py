@@ -276,8 +276,8 @@ def test_host_json_conversion_with_upgrades():
         "verifications": {"virt_snapshot": True},
         "patches": [],
         "upgrades": [
-            {"cls": "upgrade", "package_name": "tar"},
-            {"cls": "upgrade", "package_name": "gzip"}
+            {"cls": "upgrade", "package_name": "tar", "package_id": None},
+            {"cls": "upgrade", "package_name": "gzip", "package_id": None}
         ]
     }
 
@@ -500,6 +500,30 @@ def test_upgrade():
     assert upgrade.package_name == "tar"
 
 
+def test_upgrade_representation():
+    upgrade = Upgrade("tar", package_id=1)
+
+    representation = repr(upgrade)
+
+    assert representation.startswith("Upgrade(")
+    assert representation.endswith(")")
+
+    assert repr(upgrade.package_name) in representation
+    assert repr(upgrade.package_id) in representation
+
+
+def test_upgrade_representation_with_package_id():
+    upgrade = Upgrade("tar", package_id=1)
+
+    representation = repr(upgrade)
+
+    assert representation.startswith("Upgrade(")
+    assert representation.endswith(")")
+
+    assert repr(upgrade.package_name) in representation
+    assert "package_id=" + repr(upgrade.package_id) in representation
+
+
 def test_upgrade_repr_contains_package_name():
     package_name = "tar"
     upgrade = Upgrade(package_name)
@@ -515,3 +539,14 @@ def test_create_upgrade_from_dict():
     upgrade = Upgrade.from_dict({"package_name": "gzup"})
 
     assert upgrade.package_name == "gzup"
+
+def test_upgrade_json_conversion():
+    original_dict = {
+        "package_name": "entree",
+        "package_id": None,
+        "cls": "upgrade"
+    }
+    upgrade = Upgrade.from_dict(original_dict)
+    new_dict = upgrade.to_dict()
+
+    assert new_dict == original_dict

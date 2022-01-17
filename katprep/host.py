@@ -394,12 +394,17 @@ class Upgrade:
 
     _OBJECT_TYPE = "upgrade"
 
-    def __init__(self, package_name):
+    def __init__(self, package_name, package_id=None):
         self._package_name = package_name
+        self._package_id = package_id
 
     @property
     def package_name(self):
         return self._package_name
+
+    @property
+    def package_id(self):
+        return self._package_id
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -408,17 +413,31 @@ class Upgrade:
         except KeyError:
             package_name = data["name"]  # Uyuni
 
+        try:
+            package_id = data["package_id"]
+        except KeyError:
+            package_id = data.get("to_package_id", None)
+
         return cls(
             package_name,
+            package_id,
         )
 
     def to_dict(self):
         return {
             "cls": self._OBJECT_TYPE,
-            "package_name": self._package_name
+            "package_name": self._package_name,
+            "package_id": self._package_id,
         }
 
     def __repr__(self):
+        if self._package_id:
+            return "{}({!r}, package_id={!r})".format(
+                self.__class__.__name__,
+                self.package_name,
+                self.package_id,
+            )
+
         return "{}({!r})".format(
             self.__class__.__name__,
             self.package_name,
