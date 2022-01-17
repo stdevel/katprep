@@ -267,7 +267,7 @@ def create_report(system_info):
         else:
             LOGGER.info("Report '%s' created.", OUTPUT_FILE)
     else:
-        LOGGER.info("Empty report - please check.")
+        LOGGER.warning("Empty report - please check.")
 
 
 def main(options, args):
