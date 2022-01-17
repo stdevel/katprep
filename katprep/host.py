@@ -390,7 +390,6 @@ class Erratum:
         )
 
 
-
 class Upgrade:
 
     _OBJECT_TYPE = "upgrade"
