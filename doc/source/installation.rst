@@ -129,3 +129,11 @@ Specifying the **--spec-only** parameter will only create a RPM spec file::
 
    $ python setup.py bdist_rpm --spec-only
    $ less dist/katprep.spec
+
+-------------------
+Python dependencies
+-------------------
+
+Ensure having requirements defined in ``requirements.txt`` installed - depending on your distribution you might want to install requirements using your package manager (*e.g. on SUSE*)::
+
+   # zypper in python3-{lxml,pyvmomi,PyYAML,cryptography,libvirt-python}
