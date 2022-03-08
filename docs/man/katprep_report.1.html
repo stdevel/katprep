@@ -43,9 +43,11 @@
 </div>
 <div class="section" id="synopsis">
 <h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_report</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>] [<strong>-p</strong>
-<em>path</em>] [<strong>-o</strong> <em>path</em>] [<strong>-x</strong>] [<strong>-t</strong> <em>file</em>] <em>snapshot_file</em>
-<em>snapshot_file</em></p>
+<div class="line-block">
+<div class="line"><strong>katprep_report</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>] [<strong>-p</strong> <em>path</em>]
+[<strong>-o</strong> <em>path</em>] [<strong>-x</strong>] [<strong>-t</strong> <em>file</em>] <em>snapshot_file</em>
+<em>snapshot_file</em></div>
+</div>
 </div>
 <div class="section" id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
@@ -57,25 +59,15 @@ report change times.</p>
 <strong>katprep_maintenance(1)</strong>.</p>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
-<td>Prints brief usage information.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></td>
-<td>Prints the current version number.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
-<td>Supresses printing status messages to stdout.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
-<td>Enables debugging outputs.</td></tr>
-</tbody>
-</table>
 <dl class="docutils">
+<dt>-h, –help</dt>
+<dd>Prints brief usage information.</dd>
+<dt>-v, –version</dt>
+<dd>Prints the current version number.</dd>
+<dt>-q, –quiet</dt>
+<dd>Supresses printing status messages to stdout.</dd>
+<dt>-d, –debug</dt>
+<dd>Enables debugging outputs.</dd>
 <dt>-p <em>path</em>, –output-path <em>path</em></dt>
 <dd>Defines the report output path (default: current directory)</dd>
 <dt>-C <em>filename</em>, –auth-container <em>filename</em></dt>
@@ -84,19 +76,9 @@ report change times.</p>
 <dt>-o <em>type</em>, –output-tpe <em>type</em></dt>
 <dd>Defines the Pandoc output file type, usually this is set
 automatically based on the template file extension (default: no)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-x</span>, <span class="option">--preserve-yaml</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Keeps the YAML metadata after creating the reports, useful for
-debugging (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
+<dt>-x, –preserve-yaml</dt>
+<dd>Keeps the YAML metadata after creating the reports, useful for
+debugging (default: no)</dd>
 <dt>-t <em>file</em>, –template <em>file</em></dt>
 <dd>Defined the Pandoc template to use</dd>
 </dl>

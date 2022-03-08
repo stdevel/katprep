@@ -44,21 +44,22 @@ hosts</p>
 </div>
 <div class="section" id="synopsis">
 <h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_parameters</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
-[<strong>-n</strong>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
+<div class="line-block">
+<div class="line"><strong>katprep_parameters</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>] [<strong>-n</strong>]
+[<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
 [<strong>–insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-l</strong> <em>name</em>|<em>id</em> | <strong>-o</strong>
-<em>name</em>|<em>id</em> | <strong>-g</strong> <em>name</em>|<em>id</em> | <strong>-e</strong> <em>name</em>|<em>id</em>]
-[<strong>-A</strong> | <strong>–add-optional-parameters</strong> | <strong>-R</strong> | <strong>-D</strong> | <strong>-U</strong>
-| <strong>-L</strong>]</p>
+<em>name</em>|<em>id</em> | <strong>-g</strong> <em>name</em>|<em>id</em> | <strong>-e</strong>
+<em>name</em>|<em>id</em>] [<strong>-A</strong> | <strong>–add-optional-parameters</strong> | <strong>-R</strong> |
+<strong>-D</strong> | <strong>-U</strong> | <strong>-L</strong>]</div>
+</div>
 </div>
 <div class="section" id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
 <p>Creates, removes, updates or audits Puppet host parameters used by the
 <strong>katprep(1)</strong> framework in order to automate system maintenance. Use
-this utility to bulk edit host parameters, e.g. to change snapshot
+this utility to bulk edit host parameters, e.g.&nbsp;to change snapshot
 protection settings per hostgroup. For the first integration of your
-infrastructure, use <strong>katprep_populate(1)</strong> as it offers
-auto-discovery.</p>
+infrastructure, use <strong>katprep_populate(1)</strong> as it offers auto-discovery.</p>
 <div class="section" id="host-parameters">
 <h2>Host parameters<a class="headerlink" href="#host-parameters" title="Permalink to this headline">¶</a></h2>
 <p>The following Puppet host parameters are created/updated:</p>
@@ -88,45 +89,25 @@ libvirt)</dd>
 </div>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
-<td>Prints brief usage information.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></td>
-<td>Prints the current version number.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
-<td>Supresses printing status messages to stdout.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
-<td>Enables debugging outputs.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
-<td>Only simulates what would be done (default: no)</td></tr>
-</tbody>
-</table>
 <dl class="docutils">
+<dt>-h, –help</dt>
+<dd>Prints brief usage information.</dd>
+<dt>-v, –version</dt>
+<dd>Prints the current version number.</dd>
+<dt>-q, –quiet</dt>
+<dd>Supresses printing status messages to stdout.</dd>
+<dt>-d, –debug</dt>
+<dd>Enables debugging outputs.</dd>
+<dt>-n, –dry-run</dt>
+<dd>Only simulates what would be done (default: no)</dd>
 <dt>-C <em>filename</em>, –auth-container <em>filename</em></dt>
 <dd>Defines an authentication container file (see also
 <strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</dd>
 <dt>-P <em>passphrase</em>, –auth-password <em>passphrase</em></dt>
 <dd>Defines the authentication container password to avoid password
 prompt (unattented mode)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">--insecure</span></kbd></td>
-<td>Disables SSL verification (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
+<dt>–insecure</dt>
+<dd>Disables SSL verification (default: no)</dd>
 <dt>-s <em>hostname</em>, –server <em>hostname</em></dt>
 <dd>Defines the Foreman server to use (default: localhost)</dd>
 <dt>-l <em>name</em>|<em>id</em>, –location <em>name</em>|<em>id</em></dt>
@@ -137,41 +118,22 @@ prompt (unattented mode)</dd>
 <dd>filters by particular hostgroup</dd>
 <dt>-e <em>name</em>|<em>id</em>, –environment <em>name</em>|<em>id</em></dt>
 <dd>filters by particular Puppet environment</dd>
+<dt>-A, –add-parameters</dt>
+<dd>Adds built-in parameters (<em>katprep_mon</em>, <em>katprep_virt</em>,
+<em>katprep_virt_snapshot</em>) to all affected hosts (default: no)</dd>
+<dt>–add-optional-parameters</dt>
+<dd>Adds optoinal built-in parameters (<em>katprep_mon_type</em>,
+<em>katprep_mon_name</em>, <em>katprep_virt_name</em>, <em>katprep_virt_type</em>) to all
+affected hosts (default: no)</dd>
+<dt>-R, –remove-parameters</dt>
+<dd>Removes built-in parameters from all affected hosts (default: no)</dd>
+<dt>-D, –display-parameters</dt>
+<dd>Lists values of defined parameters for affected hosts (default: no)</dd>
+<dt>-U, –update-parameters</dt>
+<dd>Updates values of defined parameters for affected hosts (default: no)</dd>
+<dt>-L, –list-parameters</dt>
+<dd>Only lists available parameters (default: no)</dd>
 </dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-A</span>, <span class="option">--add-parameters</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Adds built-in parameters (<em>katprep_mon</em>, <em>katprep_virt</em>,
-<em>katprep_virt_snapshot</em>) to all affected hosts (default: no)</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">--add-optional-parameters</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Adds optoinal built-in parameters (<em>katprep_mon_type</em>,
-<em>katprep_mon_name</em>, <em>katprep_virt_name</em>, <em>katprep_virt_type</em>)
-to all affected hosts (default: no)</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-R</span>, <span class="option">--remove-parameters</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Removes built-in parameters from all affected hosts (default: no)</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-D</span>, <span class="option">--display-parameters</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Lists values of defined parameters for affected hosts (default: no)</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-U</span>, <span class="option">--update-parameters</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Updates values of defined parameters for affected hosts (default:
-no)</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-L</span>, <span class="option">--list-parameters</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Only lists available parameters (default: no)</td></tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="section" id="files">

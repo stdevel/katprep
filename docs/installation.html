@@ -186,6 +186,10 @@ $ cd katprep-master
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py develop --user
 </pre></div>
 </div>
+<p>Depending on your distribution (<em>e.g. on SUSE</em>), you might need to alter your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable to include <code class="docutils literal notranslate"><span class="pre">~/.local/bin</span></code> when using <code class="docutils literal notranslate"><span class="pre">--user</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s2">&quot;$PATH:~/.local/bin&quot;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="build-rpm">
 <h2>Build RPM<a class="headerlink" href="#build-rpm" title="Permalink to this headline">¶</a></h2>
@@ -197,6 +201,13 @@ $ sudo yum localinstall dist/katprep*.rpm
 <p>Specifying the <strong>–spec-only</strong> parameter will only create a RPM spec file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py bdist_rpm --spec-only
 $ less dist/katprep.spec
+</pre></div>
+</div>
+</div>
+<div class="section" id="python-dependencies">
+<h2>Python dependencies<a class="headerlink" href="#python-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Ensure having requirements defined in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> installed - depending on your distribution you might want to install requirements using your package manager (<em>e.g. on SUSE</em>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># zypper in python3-{lxml,pyvmomi,PyYAML,cryptography,libvirt-python}</span>
 </pre></div>
 </div>
 </div>
@@ -221,6 +232,7 @@ $ less dist/katprep.spec
 <li><a class="reference internal" href="#installation">Installation</a><ul>
 <li><a class="reference internal" href="#manual-installation">Manual installation</a></li>
 <li><a class="reference internal" href="#build-rpm">Build RPM</a></li>
+<li><a class="reference internal" href="#python-dependencies">Python dependencies</a></li>
 </ul>
 </li>
 </ul>

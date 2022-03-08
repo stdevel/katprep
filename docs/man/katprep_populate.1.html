@@ -44,12 +44,14 @@ hypervisor information for managed systems</p>
 </div>
 <div class="section" id="synopsis">
 <h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_populate</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
-[<strong>-n</strong>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
+<div class="line-block">
+<div class="line"><strong>katprep_populate</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>] [<strong>-n</strong>]
+[<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
 [<strong>–ipv6-only</strong>] [<strong>–insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-u</strong>]
 [<strong>–virt-uri</strong> <em>uri</em>] [<strong>–virt-type</strong> <em>libvirt</em>|<em>pyvmomi</em>]
 [<strong>–skip-virt</strong>] [<strong>–mon-url</strong> <em>url</em>] [<strong>–mon-type</strong>
-<em>nagios</em>|<em>icinga</em>] [<strong>–skip-mon</strong>]</p>
+<em>nagios</em>|<em>icinga</em>] [<strong>–skip-mon</strong>]</div>
+</div>
 </div>
 <div class="section" id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
@@ -60,8 +62,9 @@ and hypervisor are detected and configured as host parameters (see also
 <strong>Host parameters</strong>).</p>
 <p>To only update particular host parameters, utilize the
 <strong>katprep_parameters(1)</strong> utility.</p>
+</div>
 <div class="section" id="host-parameters">
-<h2>Host parameters<a class="headerlink" href="#host-parameters" title="Permalink to this headline">¶</a></h2>
+<h1>Host parameters<a class="headerlink" href="#host-parameters" title="Permalink to this headline">¶</a></h1>
 <p>The following Puppet host parameters are created/updated:</p>
 <dl class="docutils">
 <dt>katprep_mon</dt>
@@ -82,96 +85,49 @@ snapshot</dd>
 libvirt)</dd>
 </dl>
 <p>For valid Virtualization URIs and monitoring URLs, see <strong>katprep(1)</strong>.</p>
-</div>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
-<td>Prints brief usage information.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></td>
-<td>Prints the current version number.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
-<td>Supresses printing status messages to stdout.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
-<td>Enables debugging outputs.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
-<td>Only simulates what would be done (default: no)</td></tr>
-</tbody>
-</table>
 <dl class="docutils">
+<dt>-h, –help</dt>
+<dd>Prints brief usage information.</dd>
+<dt>-v, –version</dt>
+<dd>Prints the current version number.</dd>
+<dt>-q, –quiet</dt>
+<dd>Supresses printing status messages to stdout.</dd>
+<dt>-d, –debug</dt>
+<dd>Enables debugging outputs.</dd>
+<dt>-n, –dry-run</dt>
+<dd>Only simulates what would be done (default: no)</dd>
 <dt>-C <em>filename</em>, –auth-container <em>filename</em></dt>
 <dd>Defines an authentication container file (see also
 <strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</dd>
 <dt>-P <em>passphrase</em>, –auth-password <em>passphrase</em></dt>
 <dd>Defines the authentication container password to avoid password
 prompt (unattented mode)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">--ipv6-only</span></kbd></td>
-<td>Filters for IPv6-only addresses (default: no)</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">--insecure</span></kbd></td>
-<td>Disables SSL verification (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
+<dt>–ipv6-only</dt>
+<dd>Filters for IPv6-only addresses (default: no)</dd>
+<dt>–insecure</dt>
+<dd>Disables SSL verification (default: no)</dd>
 <dt>-s <em>hostname</em>, –server <em>hostname</em></dt>
 <dd>Defines the Foreman server to use (default: localhost)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">-u</span>, <span class="option">--update</span></kbd></td>
-<td>Updates pre-existing host parameters (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
+<dt>-u, –update</dt>
+<dd>Updates pre-existing host parameters (default: no)</dd>
 <dt>–virt-uri <em>uri</em></dt>
 <dd>Defines an URI to use (see also <strong>Virtualization URIs</strong>)</dd>
 <dt>–virt-type <em>libvirt</em>|<em>pyvmomi</em></dt>
 <dd>Defines the library to use for accessing the hypervisor, currently
 supported: <em>libvirt</em> or <em>pyvmomi</em> (VMware vSphere). (default:
 libvirt)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">--skip-virt</span></kbd></td>
-<td>Skips gathering data from hypervisor (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
+<dt>–skip-virt</dt>
+<dd>Skips gathering data from hypervisor (default: no)</dd>
 <dt>–mon-url <em>url</em></dt>
 <dd>Defines a monitoring URL to use (see also <strong>Monitoring URLs</strong>)</dd>
 <dt>–mon-type <em>nagios</em>|<em>icinga</em></dt>
 <dd>Defines the monitoring sytem type, currently supported: <em>nagios</em>
 (Nagios, Icinga 1.x) or <em>icinga</em> (Icinga 2). (default: icinga)</dd>
+<dt>–skip-mon</dt>
+<dd>Skips gathering data from monitoring system (default: no)</dd>
 </dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">--skip-mon</span></kbd></td>
-<td>Skips gathering data from monitoring system (default: no)</td></tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="section" id="examples">
@@ -179,17 +135,17 @@ libvirt)</dd>
 <p>It is a good idea to start-over by specifying your monitoring and
 hypervisor systems and enabling <strong>dry-run</strong> mode:</p>
 <div class="line-block">
-<div class="line">$ katprep_populate –virt-uri st-vcsa03.stankowic.loc –virt-type</div>
+<div class="line">$ katprep_populate –virt-uri st-vcsa03.stankowic.loc –virt-type
+pyvmomi –mon-url <a class="reference external" href="https://st-mon03.stankowic.loc:5665">https://st-mon03.stankowic.loc:5665</a> -C pinkepank.auth
+–dry-run</div>
+<div class="line"><a class="reference external" href="INFO:katprep_populate:This">INFO:katprep_populate:This</a> is just a SIMULATION - no changes will be
+made.</div>
+<div class="line"><a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> ‘giertz.stankowic.loc’ ==&gt; set/update
+parameter/value: katprep_virt/st-vcsa03.stankowic.loc</div>
+<div class="line"><a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> ‘giertz.stankowic.loc’ ==&gt; set/update
+parameter/value: katprep_mon_type/icinga</div>
+<div class="line">…</div>
 </div>
-<p>pyvmomi –mon-url <a class="reference external" href="https://st-mon03.stankowic.loc:5665">https://st-mon03.stankowic.loc:5665</a> -C pinkepank.auth
-–dry-run
-| <a class="reference external" href="INFO:katprep_populate:This">INFO:katprep_populate:This</a> is just a SIMULATION - no changes will be
-made.
-| <a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> ‘giertz.stankowic.loc’ ==&gt; set/update
-parameter/value: katprep_virt/st-vcsa03.stankowic.loc
-| <a class="reference external" href="INFO:katprep_populate:Host">INFO:katprep_populate:Host</a> ‘giertz.stankowic.loc’ ==&gt; set/update
-parameter/value: katprep_mon_type/icinga
-| …</p>
 <p>Check the values that would be set - run the command again with omitting
 the <strong>dry-run</strong> parameter if they are correct.</p>
 </div>
@@ -225,8 +181,8 @@ the <strong>dry-run</strong> parameter if they are correct.</p>
   <ul>
 <li><a class="reference internal" href="#">NAME</a></li>
 <li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
-<li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
-<li><a class="reference internal" href="#host-parameters">Host parameters</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a></li>
+<li><a class="reference internal" href="#host-parameters">Host parameters</a><ul>
 <li><a class="reference internal" href="#options">Options</a></li>
 </ul>
 </li>

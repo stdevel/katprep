@@ -54,17 +54,27 @@ snapshots)</li>
 <li>Checking monitoring and snapshot status</li>
 <li>Reverting VM snapshots</li>
 <li>Removing downtimes and snapshots</li>
-<li>Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
+<li>Generating maintenance reports (e.g.&nbsp;because of of ISO/IEC 27001:2005
 IT certifications)</li>
 </ul>
 <p>For VM management, the <strong>libvirt</strong> and <strong>pyVmomi</strong> (VMware vSphere
 Python API bindings) libraries are used, therefore at least the
-following hypervisors are supported: - VMware vSphere, Workstation,
-Player - VirtualBox - QEMU - KVM - XEN - Microsoft Hyper-V</p>
+following hypervisors are supported:</p>
+<ul class="simple">
+<li>VMware vSphere, Workstation, Player</li>
+<li>VirtualBox</li>
+<li>QEMU</li>
+<li>KVM</li>
+<li>XEN</li>
+<li>Microsoft Hyper-V</li>
+</ul>
 <p>Check-out the libvirt website (<a class="reference external" href="https://libvirt.org/drivers.html">https://libvirt.org/drivers.html</a>) for
 additional drivers.</p>
-<p>For managing monitoring, the following products are supported: -
-Nagios/Icinga 1.x - Icinga2</p>
+<p>For managing monitoring, the following products are supported:</p>
+<ul class="simple">
+<li>Nagios/Icinga 1.x</li>
+<li>Icinga2</li>
+</ul>
 <p>When creating reports, the document converter Pandoc is used. This
 enables exporting reports in various formats; this utility offers
 pre-defined Markdown and HTML templates.</p>
@@ -98,7 +108,9 @@ Icinga 1.x URL - make sure <strong>not</strong> to include <strong>/cgi-bin</str
 </div>
 <p>When using <strong>icinga</strong> (<em>IcingaAPIClient</em>), specify the full API URL
 including the port - such as:</p>
-<p><a class="reference external" href="https://bigbrother.giertz.loc:5665">https://bigbrother.giertz.loc:5665</a></p>
+<div class="line-block">
+<div class="line"><a class="reference external" href="https://bigbrother.giertz.loc:5665">https://bigbrother.giertz.loc:5665</a></div>
+</div>
 </div>
 <div class="section" id="utilities">
 <h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>

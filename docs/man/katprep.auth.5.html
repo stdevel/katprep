@@ -60,10 +60,14 @@ dictionary specifying the following fields:</p>
 <p class="last">Example:</p>
 </dd>
 </dl>
-<p>{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “chad”}</p>
+<div class="line-block">
+<div class="line">{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “chad”}</div>
+</div>
 <p>Once encrypted, corresponding password entries are replaced with
 symmetric Fernet hashes:</p>
-<p>{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “s/gAAAA…”}</p>
+<div class="line-block">
+<div class="line">{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “s/gAAAA…”}</div>
+</div>
 <p>To modify an authentication container, utilize the
 <strong>katprep_authconfig(1)</strong> utility - manually editing the file is <strong>not
 supported</strong>.</p>
