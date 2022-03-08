@@ -113,6 +113,10 @@ If you're a developer and want to contribute, you might prefer to install katpre
 
    $ python setup.py develop --user
 
+Depending on your distribution (*e.g. on SUSE*), you might need to alter your ``PATH`` variable to include ``~/.local/bin`` when using ``--user``::
+
+   export PATH="$PATH:~/.local/bin"
+
 ---------
 Build RPM
 ---------
