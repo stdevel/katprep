@@ -25,3 +25,5 @@ Luckily older version snapshots are [still available online](https://build.opens
 | 2021.08 | 13.08.2021 | https://build.opensuse.org/project/show/systemsmanagement:Uyuni:Snapshots:2021.08 | https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Snapshots:/2021.08/images/ |
 | 2021.09 | 23.09.2021 | https://build.opensuse.org/project/show/systemsmanagement:Uyuni:Snapshots:2021.09 | https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Snapshots:/2021.09/images/ |
 | 2021.12 | 09.12.2021 | https://build.opensuse.org/project/show/systemsmanagement:Uyuni:Snapshots:2021.12 | https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Snapshots:/2021.12/images/ |
+| 2022.01 | 26.01.2022 | https://build.opensuse.org/project/show/systemsmanagement:Uyuni:Snapshots:2022.01 | https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Snapshots:/2022.01/images/ |
+| 2022.02 | 25.02.2022 | https://build.opensuse.org/project/show/systemsmanagement:Uyuni:Snapshots:2022.02 | https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Snapshots:/2022.02/images/ |
