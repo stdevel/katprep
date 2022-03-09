@@ -248,24 +248,31 @@ class PyvmomiClient(BaseConnector, SnapshotManager, PowerManager):
                         is_valid_address = is_ipv4
                         self.LOGGER.debug("Filtering for IPv4")
 
-                    target_ip = obj.summary.guest.ipAddress
-                    self.LOGGER.debug(
-                        "Primary guest address: '%s'", target_ip
-                    )
+                    try:
+                        target_ip = obj.summary.guest.ipAddress
+                        self.LOGGER.debug(
+                            "Primary guest address: '%s'", target_ip
+                        )
 
-                    if not is_valid_address(target_ip):
-                        # other NICs
-                        for nic in obj.guest.net:
-                            for address in nic.ipConfig.ipAddress:
+                        if not is_valid_address(target_ip):
+                            # other NICs
+                            for nic in obj.guest.net:
+                                for address in nic.ipConfig.ipAddress:
+                                    if is_valid_address(address.ipAddress):
+                                        target_ip = address.ipAddress
+                                        self.LOGGER.debug(
+                                            "NIC address: '%s'", target_ip
+                                        )
+                                        break
+
                                 if is_valid_address(address.ipAddress):
-                                    target_ip = address.ipAddress
-                                    self.LOGGER.debug(
-                                        "NIC address: '%s'", target_ip
-                                    )
                                     break
-
-                            if is_valid_address(address.ipAddress):
-                                break
+                    except AttributeError as err:
+                        if "has no attribute" in str(err).lower():
+                            # VM has no valid IP address
+                            pass
+                        else:
+                            self.LOGGER.error("Unable to get VM IP information: '%s'", err)
 
                     self.LOGGER.debug(
                         "Set IP address to '%s'", target_ip
