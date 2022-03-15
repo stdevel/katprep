@@ -1,7 +1,6 @@
 import logging
-import mock
+
 import pytest
-import ssl
 from katprep.network import is_ipv4
 
 from .utilities import load_config
