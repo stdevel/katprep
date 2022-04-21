@@ -1109,30 +1109,33 @@ class UyuniAPIClient(BaseConnector):
         :param patches: patch IDs
         :type patches: int array
         """
+        if not (host.pre_script or host.post_script):
+            return self.install_plain_patches(host, patches)
+
+        # We have a pre or post-script and work with an action chain
         system_id = host.management_id
+        chain_label = f"{system_id}_patch"
+        self.add_actionchain(chain_label)
         action_ids = []
+
         if host.pre_script:
-            # create required action chain
-            chain_label = f"{system_id}_patch"
-            self.add_actionchain(chain_label)
-            # add pre-script
             action_ids.append(
                 self.install_pre_script(host, chain_label)
             )
-            # add patches
-            action_ids.append(
-                self.actionchain_add_patches(chain_label, system_id, patches)
-            )
+
+        # add patches
+        action_ids.append(
+            self.actionchain_add_patches(chain_label, system_id, patches)
+        )
+
         if host.post_script:
-            # add post script
             action_ids.append(
                 self.install_post_script(host, chain_label)
             )
-            # schedule execution
-            self.run_actionchain(chain_label)
-        else:
-            # simply install patches
-            return self.install_plain_patches(host, patches)
+
+        # schedule execution
+        self.run_actionchain(chain_label)
+
         return action_ids
 
     def install_upgrades(self, host, upgrades):
@@ -1144,30 +1147,33 @@ class UyuniAPIClient(BaseConnector):
         :param upgrades: package IDs
         :type upgrade: int array
         """
+        if not (host.pre_script or host.post_script):
+            # simply install patches
+            return self.install_plain_upgrades(host, upgrades)
+
+        # We have pre-script or post-script
         system_id = host.management_id
+        chain_label = f"{system_id}_upgrade"
+        self.add_actionchain(chain_label)
         action_ids = []
         if host.pre_script:
-            # create required action chain
-            chain_label = f"{system_id}_upgrade"
-            self.add_actionchain(chain_label)
-            # add pre-script
             action_ids.append(
                 self.install_pre_script(host, chain_label)
             )
-            # add upgrades
-            action_ids.append(
-                self.actionchain_add_upgrades(chain_label, system_id, upgrades)
-            )
+
+        # add upgrades
+        action_ids.append(
+            self.actionchain_add_upgrades(chain_label, system_id, upgrades)
+        )
+
         if host.post_script:
-            # add post script
             action_ids.append(
                 self.install_post_script(host, chain_label)
             )
-            # schedule execution
-            self.run_actionchain(chain_label)
-        else:
-            # simply install patches
-            return self.install_plain_upgrades(host, upgrades)
+
+        # schedule execution
+        self.run_actionchain(chain_label)
+
         return action_ids
 
     def install_pre_script(self, host, chain_label):
