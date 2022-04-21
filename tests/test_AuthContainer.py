@@ -2,6 +2,7 @@ import logging
 import os
 import os.path
 from collections import namedtuple
+from random import choice
 
 import pytest
 from katprep.AuthContainer import AuthContainer, ContainerException
@@ -98,6 +99,27 @@ def test_removing_credential(container, hostname, username, password):
 
     container.remove_credentials(hostname)
     assert None == container.get_credential(hostname)
+
+
+def test_stripping_whitespace(container, hostname, username, password):
+    whitespace = (" ", "\t", "\n")
+
+    def add_whitespace(string):
+        return choice(whitespace) + string + choice(whitespace)
+
+    new_user = add_whitespace(username)
+    new_pw = add_whitespace(password)
+
+    container.add_credentials(hostname, new_user, new_pw)
+
+    credentials = container.get_credential(hostname)
+
+    assert not credentials.username.endswith(whitespace)
+    assert not credentials.username.startswith(whitespace)
+    assert credentials.username == username
+    assert not credentials.password.startswith(whitespace)
+    assert not credentials.password.endswith(whitespace)
+    assert credentials.password == password
 
 
 @pytest.fixture(

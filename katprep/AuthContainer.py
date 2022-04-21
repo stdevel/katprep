@@ -148,6 +148,7 @@ class AuthContainer:
                     type(password)
                 )
             )
+        password = password.strip()
 
         hostname = self.cut_hostname(hostname)
 
@@ -161,7 +162,7 @@ class AuthContainer:
                 raise ContainerException("Invalid password specified!")
 
         self.__credentials[hostname] = {
-            "username": username,
+            "username": username.strip(),
             "password": password,
         }
 
