@@ -57,11 +57,39 @@ class Host:
             return None
 
     @property
+    def pre_script_user(self):
+        try:
+            return self._params['katprep_pre-script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def pre_script_group(self):
+        try:
+            return self._params['katprep_pre-script_group']
+        except KeyError:
+            return "root"
+
+    @property
     def post_script(self):
         try:
             return self._params['katprep_post-script']
         except KeyError:
             return None
+
+    @property
+    def post_script_user(self):
+        try:
+            return self._params['katprep_post-script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def post_script_group(self):
+        try:
+            return self._params['katprep_post-script_group']
+        except KeyError:
+            return "root"
 
     @property
     def type(self):
