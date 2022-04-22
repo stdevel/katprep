@@ -50,9 +50,9 @@
 <p>katprep uses multiple Puppet host parameters to control maintenance preparation and executing per system. Some parameters are created automatically using <code class="docutils literal notranslate"><span class="pre">katprep_parameters</span></code>, some need to be created manually. The following table gives an overview:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="17%" />
-<col width="17%" />
-<col width="66%" />
+<col width="20%" />
+<col width="16%" />
+<col width="64%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Parameter</th>
@@ -93,9 +93,25 @@
 <td>/opt/stop_node.sh</td>
 <td>Script to run before maintenance</td>
 </tr>
+<tr class="row-even"><td>katprep_pre-script_user</td>
+<td>root</td>
+<td>Effective pre-script user</td>
+</tr>
+<tr class="row-odd"><td>katprep_pre-script_group</td>
+<td>root</td>
+<td>Effective pre-script group</td>
+</tr>
 <tr class="row-even"><td>katprep_post-script</td>
 <td>/opt/start_node.sh</td>
 <td>Script to run after maintenance</td>
+</tr>
+<tr class="row-odd"><td>katprep_post-script_user</td>
+<td>root</td>
+<td>Effective post-script user</td>
+</tr>
+<tr class="row-even"><td>katprep_post-script_group</td>
+<td>root</td>
+<td>Effective post-script group</td>
 </tr>
 </tbody>
 </table>
