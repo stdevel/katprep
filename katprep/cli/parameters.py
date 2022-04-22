@@ -52,7 +52,11 @@ OPT_PARAMETERS = {
     "katprep_virt_name": "Object name within hypervisor if not FQDN",
     "katprep_virt_type": "Virtualization host type: (libvirt)/pyvmomi",
     "katprep_pre-script": "Script to run before maintenance",
-    "katprep_post-script": "Script to run after maintenance"
+    "katprep_pre-script_user": "Effective pre-script user",
+    "katprep_pre-script_group": "Effective pre-script group",
+    "katprep_post-script": "Script to run after maintenance",
+    "katprep_post-script_user": "Effective post-script user",
+    "katprep_post-script_group": "Effective post-script group"
 }
 """
 dict: Built-in optional host parameters
