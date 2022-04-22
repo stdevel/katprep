@@ -181,6 +181,23 @@ def test_get_hosts(client):
         assert isinstance(host, int)
 
 
+def test_get_hosts_by_hostgroup(client, hostgroup_name):
+    """
+    Ensure that hosts can be found by hostgroup names
+    """
+    for host in client.get_hosts_by_hostgroup(hostgroup_name):
+        # we only deal with integers
+        assert isinstance(host, int)
+
+
+def test_get_hosts_by_hostgroup_nonexistent(client):
+    """
+    Ensure that hosts cannot be found by invalides hostgroups
+    """
+    with pytest.raises(EmptySetException):
+        client.get_hosts_by_hostgroup("SLE%s" % random.randint(8, 16))
+
+
 def test_get_host_id(client, config, host_id):
     """
     Ensure that host ID can retrieved by name

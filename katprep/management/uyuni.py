@@ -148,6 +148,44 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
+    def get_hosts_by_organization(self, organization):
+        """
+        Returns all systems by organisation
+        """
+        # filter not implemented by Uyuni API
+        # simply return _all_ the hosts
+        return self.get_hosts()
+
+    def get_hosts_by_location(self, location):
+        """
+        Returns all systems by location
+        """
+        # filter not implemented by Uyuni API
+        # simply return _all_ the hosts
+        return self.get_hosts()
+
+    def get_hosts_by_hostgroup(self, hostgroup):
+        """
+        Returns all systems by hostgroup
+        """
+        try:
+            hosts = self._session.systemgroup.listSystems(
+                self._api_key, hostgroup
+            )
+            if hosts:
+                return [x["id"] for x in hosts]
+            raise EmptySetException(
+                "No systems found"
+            )
+        except Fault as err:
+            if "unable to locate" in err.faultString.lower():
+                raise EmptySetException(
+                    "No systems found"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
     def get_host_id(self, hostname):
         """
         Returns the profile ID of a particular system
