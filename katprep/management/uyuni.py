@@ -1189,8 +1189,8 @@ class UyuniAPIClient(BaseConnector):
             chain_label,
             host.management_id,
             host.pre_script,
-            user="root",
-            group="root"
+            user=host.pre_script_user,
+            group=host.pre_script_group
         )
 
     def install_post_script(self, host, chain_label):
@@ -1206,6 +1206,6 @@ class UyuniAPIClient(BaseConnector):
             chain_label,
             host.management_id,
             host.post_script,
-            user="root",
-            group="root"
+            user=host.post_script_user,
+            group=host.post_script_group
         )

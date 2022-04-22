@@ -247,7 +247,12 @@ def _install_erratas(host, dry_run):
         patch_ids = [errata.id for errata in host.patches]
         # show scripts and patches
         if host.pre_script:
-            LOGGER.info("Host '%s' --> running pre-script", host)
+            LOGGER.info(
+                "Host '%s' --> running pre-script (as %s:%s)",
+                host,
+                host.pre_script_user,
+                host.pre_script_group
+            )
         LOGGER.info(
             "Host '%s' --> installing %i patches: %s",
             host,
@@ -255,7 +260,12 @@ def _install_erratas(host, dry_run):
             ", ".join(str(x) for x in patch_ids)
         )
         if host.post_script:
-            LOGGER.info("Host '%s' --> running post-script", host)
+            LOGGER.info(
+                "Host '%s' --> running post-script (as %s:%s)",
+                host,
+                host.post_script_user,
+                host.post_script_group
+            )
 
         if not dry_run:
             try:
