@@ -86,6 +86,20 @@ def host_id(config):
     return config["valid_objects"]["host"]["id"]
 
 @pytest.fixture
+def host_name(config):
+    """
+    Return hostname from configuration
+    """
+    return config["valid_objects"]["host"]["name"]
+
+@pytest.fixture
+def hostgroup_name(config):
+    """
+    Return hostgroup name from configuration
+    """
+    return config["valid_objects"]["hostgroup"]["name"]
+
+@pytest.fixture
 def hostparams(config):
     """
     Return host parameters
@@ -214,6 +228,24 @@ def test_get_host_id_nonexistent(client):
     """
     with pytest.raises(EmptySetException):
         client.get_host_id("web%s" % random.randint(800, 1500))
+
+
+def test_get_hostname_by_id(client, host_id, host_name):
+    """
+    Ensure that hostname can retrieved by ID
+    """
+    system_name = client.get_hostname_by_id(
+        host_id
+    )
+    assert system_name == host_name
+
+
+def test_get_hostname_by_id_nonexistent(client):
+    """
+    Ensure that hostname cannot retrieved by invalid ID
+    """
+    with pytest.raises(EmptySetException):
+        client.get_hostname_by_id(random.randint(800, 1500))
 
 
 def test_get_host_params(client, config, host_id):

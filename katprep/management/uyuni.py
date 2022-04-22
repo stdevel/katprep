@@ -211,6 +211,27 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
+    def get_hostname_by_id(self, system_id):
+        """
+        Returns the hostname of a particular system
+
+        :param system_id: profile ID
+        :type system_id: int
+        """
+        try:
+            host = self._session.system.getName(
+                self._api_key, system_id
+            )
+            return host["name"]
+        except Fault as err:
+            if "no such system" in err.faultString.lower():
+                raise EmptySetException(
+                    f"System not found: {system_id!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
     def get_host_params(self, system_id):
         """
         Returns the parameters of a particular system
