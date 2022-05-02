@@ -12,7 +12,7 @@ import argparse
 import logging
 import getpass
 
-from .. import __version__, get_credentials, validate_filters
+from .. import __version__, get_credentials
 from ..exceptions import CustomVariableExistsException, EmptySetException
 from ..management import get_management_client
 
@@ -425,9 +425,6 @@ def main(options, args):
             options.server,
             verify=options.ssl_verify,
         )
-
-        # validate filters
-        # TODO: validate_filters(options, SAT_CLIENT)
 
         # do the stuff
         manage_params(options)
