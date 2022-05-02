@@ -14,7 +14,8 @@ import json
 import getpass
 
 from .. import __version__, get_credentials, validate_filters, get_filter
-from ..management.foreman import ForemanAPIClient
+from ..exceptions import CustomVariableExistsException, EmptySetException
+from ..management import get_management_client
 
 
 """
@@ -85,8 +86,8 @@ def change_param(options, host, mode="add", dry_run=True):
     Adds/updates/removes parameters for a particular host. For this, a
     host result object and a mode need to be specified.
 
-    :param host: Foreman API result dictionary
-    :type host: dict
+    :param host: Host ID
+    :type host: int
     :param mode: Mode (add, delete, update)
     :type mode: str
     :param dry_run: Only simulates what woule be done
@@ -99,59 +100,56 @@ def change_param(options, host, mode="add", dry_run=True):
     else:
         LOGGER.debug("Adding parameter...")
 
-    if options.action_addopt:
-        #add optional parameters
-        my_params = OPT_PARAMETERS
-    else:
-        #add mandatory parameters
+    if options.include_opt:
+        # add optional parameters
         my_params = PARAMETERS
-    #add _all_ the params
+        my_params.update(OPT_PARAMETERS)
+    else:
+        # add mandatory parameters
+        my_params = PARAMETERS
+
+    hostname = SAT_CLIENT.get_hostname_by_id(host)
+    LOGGER.debug(hostname)
+
+    # alter parameters
     for param in my_params:
-        if VALUES[param] != "":
+        try:
             if dry_run:
                 LOGGER.info(
                     "Host '%s' (#%s) --> %s parameter '%s'",
-                    host["name"], host["id"], mode, param
+                    hostname, host, mode, param
                 )
-            else:
-                #get ID of parameter
-                if mode.lower() != "add":
-                    param_id = SAT_CLIENT.get_hostparam_id_by_name(
-                        host["id"], param
-                    )
+                continue
 
-                #set payload
-                payload = {}
-                if mode.lower() == "delete":
-                    #set parameter ID
-                    payload["parameter"] = {"id": param_id}
-                else:
-                    #set parameter name/value
-                    payload["parameter"] = {
-                        "name": param, "value": VALUES[param]
-                    }
+            if mode.lower() == "add":
+                # create parameters
                 LOGGER.debug(
-                    "JSON payload: %s", str(json.dumps(payload))
+                    "Creating param '%s' ('%s')",
+                    param, my_params[param]
                 )
+                SAT_CLIENT.create_custom_variable(param, my_params[param])
 
-                #send request
-                if mode.lower() == "del":
-                    #delete parameter
-                    SAT_CLIENT.api_delete(
-                        "/hosts/{}/parameters/{}".format(host["id"], param_id),
-                        json.dumps(payload))
-                elif mode.lower() == "update":
-                    #update parameter
-                    SAT_CLIENT.api_put(
-                        "/hosts/{}/parameters/{}".format(host["id"], param_id),
-                        json.dumps(payload))
-                else:
-                    #add parameter
-                    SAT_CLIENT.api_post("/hosts/{}/parameters".format(
-                        host["id"]
-                    ), json.dumps(payload))
-        else:
-            LOGGER.debug("Empty value for '%s', not changing anything!", param)
+            elif mode.lower() == "update":
+                # update parameter
+                LOGGER.debug(
+                    "Updating param '%s' ('%s') for %s",
+                    param, VALUES[param], hostname
+                )
+                SAT_CLIENT.host_update_custom_variable(host, param, VALUES[param])
+
+            elif mode.lower() == "delete":
+                # delete parameter
+                LOGGER.debug(
+                    "Removing param '%s' ('%s') from %s",
+                    param, my_params[param], hostname
+                )
+                SAT_CLIENT.host_delete_custom_variable(host, param)
+
+        except EmptySetException:
+            # don't add empty value
+            pass
+        except CustomVariableExistsException:
+            pass
 
 
 
@@ -159,50 +157,39 @@ def manage_params(options):
     """
     Adds/removes/displays/updates parameter definitions.
     """
+    # get all the hosts depending on the filter
+    if options.location:
+        hosts = SAT_CLIENT.get_hosts_by_location(options.location)
+    elif options.organization:
+        hosts = SAT_CLIENT.get_hosts_by_organization(options.organization)
+    elif options.hostgroup:
+        hosts = SAT_CLIENT.get_hosts_by_hostgroup(options.hostgroup)
+    else:
+        hosts = SAT_CLIENT.get_hosts()
+    LOGGER.debug("Hosts found: %s", hosts)
 
-    #get all the hosts depending on the filter
-    filter_url = get_filter(options, "host")
-    LOGGER.debug("Filter URL will be '%s'", filter_url)
-    result_obj = json.loads(
-        SAT_CLIENT.api_get("{}".format(filter_url))
-    )
-
-    #manage _all_ the hosts
-    for entry in result_obj["results"]:
-        LOGGER.debug(
-            "Found host '%s' (#%s),", entry["name"], entry["id"]
-        )
-        #execute action
-        if options.action_add or options.action_addopt:
-            change_param(options, entry, "add", options.dry_run)
+    # manage hosts/parameters
+    for host in hosts:
+        if options.action_add:
+            change_param(options, host, "add", options.dry_run)
         elif options.action_update:
-            change_param(options, entry, "update", options.dry_run)
+            change_param(options, host, "update", options.dry_run)
         elif options.action_remove:
-            change_param(options, entry, "del", options.dry_run)
+            change_param(options, host, "delete", options.dry_run)
         else:
+            # print current host parameters
             LOGGER.debug("Displaying parameter values...")
+            hostname = SAT_CLIENT.get_hostname_by_id(host)
 
-            #display _all_ the params
-            params_obj = json.loads(
-                SAT_CLIENT.api_get("/hosts/{}/parameters".format(entry["id"]))
-            )
-            for setting in params_obj["results"]:
-                #TODO: nicer way than looping, numpy?
-                if "katprep_" in setting["name"]:
-                    #warn if default value detected
-                    if setting["name"] in PARAMETERS and \
-                    setting["value"] == VALUES[setting["name"]]:
-                        note = "DEFAULT (!) "
-                    else:
-                        note = ""
-                    LOGGER.info(
-                        "Host '%s' (#%s) --> setting '%s' has %s value '%s'"
-                        " (created: %s - last updated: %s)",
-                        entry["name"], entry["id"], setting["name"],
-                        note, setting["value"], setting["created_at"],
-                        setting["updated_at"]
-                    )
-
+            params = SAT_CLIENT.get_host_custom_variables(host)
+            for _param in params:
+                LOGGER.info(
+                    "Host '%s' (#%s) --> setting '%s' has value '%s'",
+                    hostname,
+                    host,
+                    _param,
+                    params[_param],
+                )
 
 
 def parse_options(args=None):
@@ -251,8 +238,23 @@ def parse_options(args=None):
     dest="auth_password", action="store", metavar="PASSWORD", \
     help="defines the authentication container password in case you don't " \
     "want to enter it manually (useful for scripted automation)")
+    #--include-optional-parameters
+    gen_opts.add_argument("--include-optional-parameters", \
+    action="store_true", default=False, dest="include_opt", \
+    help="includes optional built-in parameters to all affected hosts (default: no)")
 
     #SERVER ARGUMENTS
+    #--mgmt-type
+    srv_opts.add_argument(
+        "--mgmt-type",
+        dest="mgmt_type",
+        metavar="foreman|uyuni",
+        choices=["foreman", "uyuni"],
+        default="foreman",
+        type=str,
+        help="defines the library used to operate with management host: "
+        "foreman or uyuni (default: foreman)",
+    )
     #-s / --server
     srv_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
     default="localhost", help="defines the server to use (default: localhost)")
@@ -273,20 +275,12 @@ def parse_options(args=None):
     filter_opts_excl.add_argument("-g", "--hostgroup", action="store", \
     default="", dest="hostgroup", metavar="NAME|ID", \
     help="filters by a particular hostgroup (default: no)")
-    #-e / --environment
-    filter_opts_excl.add_argument("-e", "--environment", action="store", \
-    default="", dest="environment", metavar="NAME|ID", \
-    help="filters by an particular environment (default: no)")
 
     #ACTION ARGUMENTS
     #-A / --add-parameters
     action_opts_excl.add_argument("-A", "--add-parameters", \
     action="store_true", default=False, dest="action_add", \
     help="adds built-in parameters to all affected hosts (default: no)")
-    #--add-optional-parameters
-    action_opts_excl.add_argument("--add-optional-parameters", \
-    action="store_true", default=False, dest="action_addopt", \
-    help="adds optional built-in parameters to all affected hosts (default: no)")
     #-R / --remove-parameters
     action_opts_excl.add_argument("-R", "--remove-parameters", \
     action="store_true", default=False, dest="action_remove", \
@@ -330,32 +324,35 @@ def main(options, args):
         #only list parameters
         list_params()
 
+    params = PARAMETERS.copy()
+    if options.include_opt:
+        params.update(OPT_PARAMETERS)
+
     if options.action_update:
-        #retrieve values for parameters
-        for param in PARAMETERS:
+        # retrieve values for parameters
+        for param in params:
             #prompt for _all_ the parameters
-            user_input = ""
-            #while user_input == "":
             user_input = input(
                 "Enter value for '{}' (hint: {}): ".format(
-                    param, PARAMETERS[param]
+                    param, params[param]
                 )
             )
             VALUES[param] = user_input
 
     if not options.action_list:
         #initalize Satellite connection
-        (sat_user, sat_pass) = get_credentials(
-            "Satellite", options.server, options.auth_container,
+        (management_user, management_password) = get_credentials(
+            f"Management ({options.mgmt_type})", options.server, options.auth_container,
             options.auth_password
         )
-        SAT_CLIENT = ForemanAPIClient(
-            LOG_LEVEL, options.server, sat_user,
-            sat_pass, options.ssl_verify
+        SAT_CLIENT = get_management_client(
+            options.mgmt_type, LOG_LEVEL,
+            management_user, management_password, options.server,
+            verify=options.ssl_verify
         )
 
         #validate filters
-        validate_filters(options, SAT_CLIENT)
+        # TODO: validate_filters(options, SAT_CLIENT)
 
         #do the stuff
         manage_params(options)
