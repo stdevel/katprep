@@ -16,10 +16,6 @@ import getpass
 from .. import __version__, get_credentials, validate_filters, get_filter
 from ..management.foreman import ForemanAPIClient
 
-try:
-    raw_input
-except NameError:  # Python 3
-    raw_input = input
 
 """
 str: Program version
@@ -340,7 +336,7 @@ def main(options, args):
             #prompt for _all_ the parameters
             user_input = ""
             #while user_input == "":
-            user_input = raw_input(
+            user_input = input(
                 "Enter value for '{}' (hint: {}): ".format(
                     param, PARAMETERS[param]
                 )
