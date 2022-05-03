@@ -24,13 +24,23 @@ API users
 =========
 To ensure that katprep is able to control hosts and retrieve data from connected management systems, create appropriate service users:
 
+-----
+Uyuni
+-----
+Ensure to assign **one** of the following roles to the user:
+  * Organization Administrator
+  * System Group Administrator
+
+Please note that the **Read-only API user** flag is not sufficient as it lacks patch/package installation and script execution permissions.
+
 -------
 Foreman
 -------
-Basically, katprep only needs read access to Foreman/Katello - ensure to assign the following roles to your API user:
+Basically, katprep mainly needs read access and Remote Execution permissions to Foreman/Katello - ensure to assign the following roles to your API user:
   * Viewer
   * View hosts
   * Tasks Reader
+  * Remote Execution User
 
 If you want to automate create Puppet host parameters (*which can be done by using katprep_parameters and katprep_populate*) it is also necessary to assign the **Manager** role.
 
