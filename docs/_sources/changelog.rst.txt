@@ -8,7 +8,7 @@ Version 0.6.x
 -------------
 Release date: **2022/xx/xx**
 
-.. note:: This is a development version that most likely breaks Red Hat Satellite support. The next version will re-implement this support.
+.. warning:: This is a development version that most likely breaks Red Hat Satellite support. The next version will re-implement this support.
 
 Changes since previous development releases:
 
