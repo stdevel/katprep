@@ -48,6 +48,50 @@
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This page shows changes of the latest releases.</p>
+<div class="section" id="version-0-6-x">
+<h2>Version 0.6.x<a class="headerlink" href="#version-0-6-x" title="Permalink to this headline">¶</a></h2>
+<p>Release date: <strong>2022/xx/xx</strong></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is a development version that most likely breaks Red Hat Satellite support. The next version will re-implement this support.</p>
+</div>
+<p>Changes since previous development releases:</p>
+<div class="section" id="general">
+<h3>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>Uyuni / SUSE Manager support implemented</strong> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/43">issue43</a>)</li>
+<li><strong>Pre/post script suuport implemented</strong> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/123">issue123</a>)</li>
+<li>Python 2.7 is dropped, at least Python 3.6 is required (<a class="reference external" href="https://github.com/stdevel/katprep/issues/125">issue125</a>)</li>
+<li>cleaned-up code heavily</li>
+<li>simplified contributions by supplying a Vagrant configuration and Ansible code (<a class="reference external" href="https://github.com/stdevel/katprep/issues/108">issue108</a>)</li>
+<li>use relative imports</li>
+<li>make code more modular by implementing abstract base classes</li>
+<li>added code coverage (<a class="reference external" href="https://github.com/stdevel/katprep/issues/96">issue96</a>)</li>
+<li>fixed a bug where modules couldn’t be executed directly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/97">issue97</a>)</li>
+<li>renamed <code class="docutils literal notranslate"><span class="pre">dummy_call</span></code> to <code class="docutils literal notranslate"><span class="pre">is_authenticated</span></code> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/102">issue102</a>)</li>
+<li>replaced <code class="docutils literal notranslate"><span class="pre">mock</span></code> with <code class="docutils literal notranslate"><span class="pre">unittest.mock</span></code> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/156">issue156</a>)</li>
+</ul>
+</div>
+<div class="section" id="katprep-authconfig">
+<h3>katprep_authconfig<a class="headerlink" href="#katprep-authconfig" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>fixed a bug where utilizing encrypted authentication containers wasn’t possible (<a class="reference external" href="https://github.com/stdevel/katprep/issues/85">issue85</a>)</li>
+<li>fixed a bug where <code class="docutils literal notranslate"><span class="pre">katprep_authconfig</span></code> wasn’t working in Python 3.6 (<a class="reference external" href="https://github.com/stdevel/katprep/issues/150">issue150</a>)</li>
+</ul>
+</div>
+<div class="section" id="katprep-maintenance">
+<h3>katprep_maintenance<a class="headerlink" href="#katprep-maintenance" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>fixed a bug where trying to remove already removed snapshots crashed with EmptySetException (<a class="reference external" href="https://github.com/stdevel/katprep/issues/90">issue90</a>)</li>
+</ul>
+</div>
+<div class="section" id="katprep-snapshot">
+<h3>katprep_snapshot<a class="headerlink" href="#katprep-snapshot" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>fixed a bug where filtering using the organization name wasn’t working (<a class="reference external" href="https://github.com/stdevel/katprep/issues/94">issue94</a>)</li>
+</ul>
+</div>
+</div>
 <div class="section" id="version-0-5-0">
 <h2>Version 0.5.0<a class="headerlink" href="#version-0-5-0" title="Permalink to this headline">¶</a></h2>
 <p>Release date: <strong>2018/06/29</strong></p>
@@ -56,8 +100,8 @@
 <p class="last">Red Hat Satellite 6.x users need to update to version 6.3 in order to enable VM reboots after system maintenance. Also, you will need to ensure that your virtualization infrastructure is registered within Foreman to link VMs to hosts.</p>
 </div>
 <p>Changes since previous development releases:</p>
-<div class="section" id="katprep-maintenance">
-<h3>katprep_maintenance<a class="headerlink" href="#katprep-maintenance" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>katprep_maintenance<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>added posibility to suppress reboots under any circumstances (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
 <li>changed default reboot behavior to only reboot if erratum suggests it (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
@@ -70,8 +114,8 @@
 <li>implemented <code class="docutils literal notranslate"><span class="pre">revert</span></code> command (<a class="reference external" href="https://github.com/stdevel/katprep/issues/6">issue6</a>)</li>
 </ul>
 </div>
-<div class="section" id="katprep-snapshot">
-<h3>katprep_snapshot<a class="headerlink" href="#katprep-snapshot" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>katprep_snapshot<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>fixed a bug where detecting physical hosts was not working properly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/44">issue44</a>)</li>
 <li>fixed a bug where unregistered content hosts forced crashes (<a class="reference external" href="https://github.com/stdevel/katprep/issues/52">issue52</a>)</li>
@@ -132,9 +176,16 @@
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#version-0-5-0">Version 0.5.0</a><ul>
+<li><a class="reference internal" href="#version-0-6-x">Version 0.6.x</a><ul>
+<li><a class="reference internal" href="#general">General</a></li>
+<li><a class="reference internal" href="#katprep-authconfig">katprep_authconfig</a></li>
 <li><a class="reference internal" href="#katprep-maintenance">katprep_maintenance</a></li>
 <li><a class="reference internal" href="#katprep-snapshot">katprep_snapshot</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#version-0-5-0">Version 0.5.0</a><ul>
+<li><a class="reference internal" href="#id1">katprep_maintenance</a></li>
+<li><a class="reference internal" href="#id2">katprep_snapshot</a></li>
 <li><a class="reference internal" href="#katprep-populate">katprep_populate</a></li>
 <li><a class="reference internal" href="#katprep-report">katprep_report</a></li>
 <li><a class="reference internal" href="#api-integrations">API integrations</a></li>
