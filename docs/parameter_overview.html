@@ -73,45 +73,49 @@
 <td>nagios</td>
 <td>Monitoring host type: Nagios/Icinga 1.x (<em>nagios</em>) or Icinga2 (<em>icinga, default</em>)</td>
 </tr>
-<tr class="row-odd"><td>katprep_virt</td>
-<td>vpx://esx.test.loc</td>
-<td>Virtualization URL of the system (<em>libvirt or pyvmomi hostname</em>)</td>
-</tr>
-<tr class="row-even"><td>katprep_virt_name</td>
-<td>MYVM001</td>
-<td>VM name within hypervisor if not FQDN</td>
-</tr>
-<tr class="row-odd"><td>katprep_virt_type</td>
-<td>pyvmomi</td>
-<td>Virtualization host type: pyvmomi (<em>VMware</em>) or libvirt (<em>default</em>)</td>
-</tr>
-<tr class="row-even"><td>katprep_virt_snapshot</td>
-<td>1</td>
-<td>Boolean (<em>1/0</em>) whether system needs to be protected by a snapshot before maintenance</td>
-</tr>
-<tr class="row-odd"><td>katprep_pre-script</td>
-<td>/opt/stop_node.sh</td>
-<td>Script to run before maintenance</td>
-</tr>
-<tr class="row-even"><td>katprep_pre-script_user</td>
-<td>root</td>
-<td>Effective pre-script user</td>
-</tr>
-<tr class="row-odd"><td>katprep_pre-script_group</td>
-<td>root</td>
-<td>Effective pre-script group</td>
+<tr class="row-odd"><td>katprep_owner</td>
+<td>ppinkepank</td>
+<td>System owner - <strong>REQUIRED</strong> as katprep won’t manage the system otherwise</td>
 </tr>
 <tr class="row-even"><td>katprep_post-script</td>
 <td>/opt/start_node.sh</td>
 <td>Script to run after maintenance</td>
 </tr>
-<tr class="row-odd"><td>katprep_post-script_user</td>
+<tr class="row-odd"><td>katprep_post-script_group</td>
+<td>root</td>
+<td>Effective post-script group</td>
+</tr>
+<tr class="row-even"><td>katprep_post-script_user</td>
 <td>root</td>
 <td>Effective post-script user</td>
 </tr>
-<tr class="row-even"><td>katprep_post-script_group</td>
+<tr class="row-odd"><td>katprep_pre-script</td>
+<td>/opt/stop_node.sh</td>
+<td>Script to run before maintenance</td>
+</tr>
+<tr class="row-even"><td>katprep_pre-script_group</td>
 <td>root</td>
-<td>Effective post-script group</td>
+<td>Effective pre-script group</td>
+</tr>
+<tr class="row-odd"><td>katprep_pre-script_user</td>
+<td>root</td>
+<td>Effective pre-script user</td>
+</tr>
+<tr class="row-even"><td>katprep_virt</td>
+<td>vpx://esx.test.loc</td>
+<td>Virtualization URL of the system (<em>libvirt or pyvmomi hostname</em>)</td>
+</tr>
+<tr class="row-odd"><td>katprep_virt_name</td>
+<td>MYVM001</td>
+<td>VM name within hypervisor if not FQDN</td>
+</tr>
+<tr class="row-even"><td>katprep_virt_snapshot</td>
+<td>1</td>
+<td>Boolean (<em>1/0</em>) whether system needs to be protected by a snapshot before maintenance</td>
+</tr>
+<tr class="row-odd"><td>katprep_virt_type</td>
+<td>pyvmomi</td>
+<td>Virtualization host type: pyvmomi (<em>VMware</em>) or libvirt (<em>default</em>)</td>
 </tr>
 </tbody>
 </table>
