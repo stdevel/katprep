@@ -50,16 +50,17 @@
 <p>In order to install and use katprep, the following requirements need to be met:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Python 2.7 or newer</li>
+<li>Python 3.6 or newer</li>
 <li>Python modules:</li>
 </ul>
 <blockquote>
 <div><ul class="simple">
-<li>simplejson</li>
 <li>PyYAML</li>
 <li>PyPandoc</li>
 <li>Libvirt (<em>usually part of the libvirt-python package</em>)</li>
 <li>PyVmomi (<em>VMware vSphere Python SDK</em>)</li>
+<li>fernet</li>
+<li>lxml</li>
 </ul>
 </div></blockquote>
 <ul class="simple">
@@ -73,14 +74,27 @@
 <div class="section" id="api-users">
 <h1>API users<a class="headerlink" href="#api-users" title="Permalink to this headline">¶</a></h1>
 <p>To ensure that katprep is able to control hosts and retrieve data from connected management systems, create appropriate service users:</p>
+<div class="section" id="uyuni">
+<h2>Uyuni<a class="headerlink" href="#uyuni" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Ensure to assign <strong>one</strong> of the following roles to the user:</dt>
+<dd><ul class="first last simple">
+<li>Organization Administrator</li>
+<li>System Group Administrator</li>
+</ul>
+</dd>
+</dl>
+<p>Please note that the <strong>Read-only API user</strong> flag is not sufficient as it lacks patch/package installation and script execution permissions.</p>
+</div>
 <div class="section" id="foreman">
 <h2>Foreman<a class="headerlink" href="#foreman" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
-<dt>Basically, katprep only needs read access to Foreman/Katello - ensure to assign the following roles to your API user:</dt>
+<dt>Basically, katprep mainly needs read access and Remote Execution permissions to Foreman/Katello - ensure to assign the following roles to your API user:</dt>
 <dd><ul class="first last simple">
 <li>Viewer</li>
 <li>View hosts</li>
 <li>Tasks Reader</li>
+<li>Remote Execution User</li>
 </ul>
 </dd>
 </dl>
@@ -113,7 +127,7 @@
 <div class="section" id="icinga2">
 <h2>Icinga2<a class="headerlink" href="#icinga2" title="Permalink to this headline">¶</a></h2>
 <p>To enable scheduling/removing downtimes and reading host configuration from Icinga2, create an API user with the following permissions:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#katprep user</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># katprep user</span>
 <span class="nb">object</span> <span class="n">ApiUser</span> <span class="s2">&quot;svc-katprep&quot;</span> <span class="p">{</span>
         <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;shittyrobots&quot;</span>
         <span class="n">permissions</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;status/query&quot;</span><span class="p">,</span> <span class="s2">&quot;objects/query/*&quot;</span><span class="p">,</span> <span class="s2">&quot;actions/*&quot;</span> <span class="p">]</span>
@@ -175,15 +189,15 @@ $ cd katprep-master
 <div class="section" id="manual-installation">
 <h2>Manual installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
 <p>Proceed with the following steps:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py install
 </pre></div>
 </div>
 <p>In case you want to install the toolkit only for your current user (<em>e.g. because of file system restrictions</em>), use the <strong>–user parameter</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py install --user
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py install --user
 </pre></div>
 </div>
 <p>If you’re a developer and want to contribute, you might prefer to install katprep in developer mode within your user context:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py develop --user
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py develop --user
 </pre></div>
 </div>
 <p>Depending on your distribution (<em>e.g. on SUSE</em>), you might need to alter your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable to include <code class="docutils literal notranslate"><span class="pre">~/.local/bin</span></code> when using <code class="docutils literal notranslate"><span class="pre">--user</span></code>:</p>
@@ -194,12 +208,12 @@ $ cd katprep-master
 <div class="section" id="build-rpm">
 <h2>Build RPM<a class="headerlink" href="#build-rpm" title="Permalink to this headline">¶</a></h2>
 <p>Ensure to have RPM development utilities installed and proceed with the following steps:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py bdist_rpm
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py bdist_rpm
 $ sudo yum localinstall dist/katprep*.rpm
 </pre></div>
 </div>
 <p>Specifying the <strong>–spec-only</strong> parameter will only create a RPM spec file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py bdist_rpm --spec-only
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py bdist_rpm --spec-only
 $ less dist/katprep.spec
 </pre></div>
 </div>
@@ -223,6 +237,7 @@ $ less dist/katprep.spec
   <ul>
 <li><a class="reference internal" href="#">Requirements</a></li>
 <li><a class="reference internal" href="#api-users">API users</a><ul>
+<li><a class="reference internal" href="#uyuni">Uyuni</a></li>
 <li><a class="reference internal" href="#foreman">Foreman</a></li>
 <li><a class="reference internal" href="#nagios-icinga">Nagios/Icinga</a></li>
 <li><a class="reference internal" href="#icinga2">Icinga2</a></li>
