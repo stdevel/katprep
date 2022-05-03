@@ -4,6 +4,58 @@ Changelog
 This page shows changes of the latest releases.
 
 -------------
+Version 0.6.x
+-------------
+Release date: **2022/xx/xx**
+
+.. note:: This is a development version that most likely breaks Red Hat Satellite support. The next version will re-implement this support.
+
+Changes since previous development releases:
+
+General
+=======
+* **Uyuni / SUSE Manager support implemented** (`issue43`_)
+* **Pre/post script suuport implemented** (`issue123`_)
+* Python 2.7 is dropped, at least Python 3.6 is required (`issue125`_)
+* cleaned-up code heavily
+* simplified contributions by supplying a Vagrant configuration and Ansible code (`issue108`_)
+* use relative imports
+* make code more modular by implementing abstract base classes
+* added code coverage (`issue96`_)
+* fixed a bug where modules couldn't be executed directly (`issue97`_)
+* renamed ``dummy_call`` to ``is_authenticated`` (`issue102`_)
+* replaced ``mock`` with ``unittest.mock`` (`issue156`_)
+
+.. _issue43: https://github.com/stdevel/katprep/issues/43
+.. _issue96: https://github.com/stdevel/katprep/issues/96
+.. _issue97: https://github.com/stdevel/katprep/issues/97
+.. _issue102: https://github.com/stdevel/katprep/issues/102
+.. _issue108: https://github.com/stdevel/katprep/issues/108
+.. _issue123: https://github.com/stdevel/katprep/issues/123
+.. _issue125: https://github.com/stdevel/katprep/issues/125
+.. _issue156: https://github.com/stdevel/katprep/issues/156
+
+katprep_authconfig
+==================
+* fixed a bug where utilizing encrypted authentication containers wasn't possible (`issue85`_)
+* fixed a bug where ``katprep_authconfig`` wasn't working in Python 3.6 (`issue150`_)
+
+.. _issue85: https://github.com/stdevel/katprep/issues/85
+.. _issue150: https://github.com/stdevel/katprep/issues/150
+
+katprep_maintenance
+===================
+* fixed a bug where trying to remove already removed snapshots crashed with EmptySetException (`issue90`_)
+
+.. _issue90: https://github.com/stdevel/katprep/issues/90
+
+katprep_snapshot
+================
+* fixed a bug where filtering using the organization name wasn't working (`issue94`_)
+
+.. _issue94: https://github.com/stdevel/katprep/issues/94
+
+-------------
 Version 0.5.0
 -------------
 Release date: **2018/06/29**
