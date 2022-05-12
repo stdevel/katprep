@@ -6,12 +6,12 @@
     - role: geerlingguy.repo-epel
     - role: stdevel.omd
       omd_sites:
-        - name: nagios
-          core: nagios
-          default_gui: thruk
-          thruk_cookie_auth: false
-          remove_nagios_protection: false
-          admin_password: ilikeoldstuff
+        # - name: nagios
+        #   core: nagios
+        #   default_gui: thruk
+        #   thruk_cookie_auth: false
+        #   remove_nagios_protection: false
+        #   admin_password: ilikeoldstuff
         - name: icinga2
           core: icinga2
           default_gui: thruk
