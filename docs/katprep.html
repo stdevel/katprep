@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Package &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -28,7 +27,8 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Package</a></li> 
       </ul>
     </div>  
 
@@ -37,438 +37,314 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="package">
+  <section id="package">
 <h1>Package<a class="headerlink" href="#package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-katprep">
-<span id="mod-package"></span><h2>:mod:` Package<a class="headerlink" href="#module-katprep" title="Permalink to this headline">¶</a></h2>
-<p>A shared library containing functions used by other scripts of the
-katprep toolkit.</p>
-<dl class="data">
-<dt id="katprep.LOGGER">
-<code class="descclassname">katprep.</code><code class="descname">LOGGER</code><em class="property"> = &lt;Logger katprep_shared (WARNING)&gt;</em><a class="headerlink" href="#katprep.LOGGER" title="Permalink to this definition">¶</a></dt>
-<dd><p>logging: Logger instance</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.get_credentials">
-<code class="descclassname">katprep.</code><code class="descname">get_credentials</code><span class="sig-paren">(</span><em>prefix</em>, <em>hostname=None</em>, <em>auth_container=None</em>, <em>auth_pass=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#get_credentials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.get_credentials" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves credentials for a particular external system (e.g. Satellite).
-This function checks whether a hostname is part of an authentication
-container or retrieves credentials from an authentication file. If both
-approaches fail, logon credentials are prompted.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – prefix for the external system (used in variables/prompts)</li>
-<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – external system hostname</li>
-<li><strong>auth_container</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – authentication container file name</li>
-<li><strong>auth_pass</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – authentication container password</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.get_filter">
-<code class="descclassname">katprep.</code><code class="descname">get_filter</code><span class="sig-paren">(</span><em>options</em>, <em>api_object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#get_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.get_filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up a filter URL based on arguments set-up with argpase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – argparse options dict</li>
-<li><strong>api_object</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Foreman object type (e.g. host, environment)</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.is_exe">
-<code class="descclassname">katprep.</code><code class="descname">is_exe</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#is_exe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.is_exe" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns whether a file is an executable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – path to the file</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.is_writable">
-<code class="descclassname">katprep.</code><code class="descname">is_writable</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#is_writable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.is_writable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks whether a particular directory is writable.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – path to check for write access</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.validate_filters">
-<code class="descclassname">katprep.</code><code class="descname">validate_filters</code><span class="sig-paren">(</span><em>options</em>, <em>api_client</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#validate_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.validate_filters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ensures using IDs for the Foreman API rather than human-readable names.
-This is done by detecting strings and translating them into IDs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – argparse options dict</li>
-<li><strong>api_client</strong> (<em>ForemanAPIClient</em>) – ForemanAPIClient object</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="katprep.which">
-<code class="descclassname">katprep.</code><code class="descname">which</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#which"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#katprep.which" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks whether a command name links to an existing binary (like whoami).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – command name to check</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-AuthContainer">
+<section id="mod-package">
+<h2>:mod:` Package<a class="headerlink" href="#mod-package" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-AuthContainer">
 <span id="authcontainer-module"></span><h2><a class="reference internal" href="#module-AuthContainer" title="AuthContainer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AuthContainer</span></code></a> Module<a class="headerlink" href="#module-AuthContainer" title="Permalink to this headline">¶</a></h2>
 <p>Class for managing multiple authentication credentials</p>
-<dl class="class">
-<dt id="AuthContainer.AuthContainer">
-<em class="property">class </em><code class="descclassname">AuthContainer.</code><code class="descname">AuthContainer</code><span class="sig-paren">(</span><em>log_level</em>, <em>filename</em>, <em>key=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AuthContainer.</span></span><span class="sig-name descname"><span class="pre">AuthContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="class">
-<dt id="AuthContainer.AuthContainer.AuthContainer">
-<em class="property">class </em><code class="descname">AuthContainer</code><a class="headerlink" href="#AuthContainer.AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.AuthContainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AuthContainer</span></span><a class="headerlink" href="#AuthContainer.AuthContainer.AuthContainer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.add_credentials">
-<code class="descname">add_credentials</code><span class="sig-paren">(</span><em>hostname</em>, <em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.add_credentials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.add_credentials" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.add_credentials">
+<span class="sig-name descname"><span class="pre">add_credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.add_credentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.add_credentials" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds credentials to the authentication container.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</li>
-<li><strong>username</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – username</li>
-<li><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – corresponding password</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</p></li>
+<li><p><strong>username</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – username</p></li>
+<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – corresponding password</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
-<dt id="AuthContainer.AuthContainer.cut_hostname">
-<em class="property">static </em><code class="descname">cut_hostname</code><span class="sig-paren">(</span><em>snippet</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.cut_hostname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.cut_hostname" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.cut_hostname">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cut_hostname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snippet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.cut_hostname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.cut_hostname" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function removes protocol pre- and postfix data in order to
 find/create generic authentication information.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>snippet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – connection string, URI/URL,…</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>snippet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – connection string, URI/URL,…</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.get_credential">
-<code class="descname">get_credential</code><span class="sig-paren">(</span><em>hostname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_credential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_credential" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.get_credential">
+<span class="sig-name descname"><span class="pre">get_credential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_credential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_credential" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns credentials for a particular hostname.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.get_hostnames">
-<code class="descname">get_hostnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_hostnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_hostnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.get_hostnames">
+<span class="sig-name descname"><span class="pre">get_hostnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.get_hostnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.get_hostnames" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns hostnames</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.is_encrypted">
-<code class="descname">is_encrypted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.is_encrypted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.is_encrypted" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.is_encrypted">
+<span class="sig-name descname"><span class="pre">is_encrypted</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.is_encrypted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.is_encrypted" title="Permalink to this definition">¶</a></dt>
 <dd><p>This functions returns whether the authentication container is
 encrypted.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.remove_credentials">
-<code class="descname">remove_credentials</code><span class="sig-paren">(</span><em>hostname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.remove_credentials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.remove_credentials" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.remove_credentials">
+<span class="sig-name descname"><span class="pre">remove_credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.remove_credentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.remove_credentials" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes credentials from the authentication container.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – hostname</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.save">
-<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.save" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function stores the changed authentication container to disk.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="AuthContainer.AuthContainer.set_key">
-<code class="descname">set_key</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.set_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.AuthContainer.set_key" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="AuthContainer.AuthContainer.set_key">
+<span class="sig-name descname"><span class="pre">set_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AuthContainer.html#AuthContainer.set_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.AuthContainer.set_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function set or changes the key used for encryption/decryption.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – key</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – key</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="AuthContainer.ContainerException">
-<em class="property">exception </em><code class="descclassname">AuthContainer.</code><code class="descname">ContainerException</code><a class="reference internal" href="_modules/AuthContainer.html#ContainerException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AuthContainer.ContainerException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="AuthContainer.ContainerException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AuthContainer.</span></span><span class="sig-name descname"><span class="pre">ContainerException</span></span><a class="reference internal" href="_modules/AuthContainer.html#ContainerException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AuthContainer.ContainerException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <blockquote>
-<div>Dummy class for authentication container errors</div></blockquote>
-<dl class="class">
-<dt id="AuthContainer.ContainerException.ContainerException">
-<em class="property">class </em><code class="descname">ContainerException</code><a class="headerlink" href="#AuthContainer.ContainerException.ContainerException" title="Permalink to this definition">¶</a></dt>
+<div><p>Dummy class for authentication container errors</p>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="AuthContainer.ContainerException.ContainerException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContainerException</span></span><a class="headerlink" href="#AuthContainer.ContainerException.ContainerException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="AuthContainer.Credentials">
-<em class="property">class </em><code class="descclassname">AuthContainer.</code><code class="descname">Credentials</code><span class="sig-paren">(</span><em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="headerlink" href="#AuthContainer.Credentials" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="AuthContainer.Credentials">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AuthContainer.</span></span><span class="sig-name descname"><span class="pre">Credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AuthContainer.Credentials" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
-<dl class="attribute">
-<dt id="AuthContainer.Credentials.password">
-<code class="descname">password</code><a class="headerlink" href="#AuthContainer.Credentials.password" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AuthContainer.Credentials.password">
+<span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#AuthContainer.Credentials.password" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="AuthContainer.Credentials.username">
-<code class="descname">username</code><a class="headerlink" href="#AuthContainer.Credentials.username" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AuthContainer.Credentials.username">
+<span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#AuthContainer.Credentials.username" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="authconfig-module">
+</section>
+<section id="authconfig-module">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">authconfig</span></code> Module<a class="headerlink" href="#authconfig-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-exceptions">
+</section>
+<section id="module-exceptions">
 <span id="exceptions-module"></span><h2><a class="reference internal" href="#module-exceptions" title="exceptions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">exceptions</span></code></a> Module<a class="headerlink" href="#module-exceptions" title="Permalink to this headline">¶</a></h2>
 <p>Exceptions used by the management classes</p>
-<dl class="exception">
-<dt id="exceptions.APILevelNotSupportedException">
-<em class="property">exception </em><code class="descname">APILevelNotSupportedException</code><a class="reference internal" href="_modules/exceptions.html#APILevelNotSupportedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.APILevelNotSupportedException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">APILevelNotSupportedException</span></span><a class="reference internal" href="_modules/exceptions.html#APILevelNotSupportedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for unsupported API levels</p>
-<dl class="class">
-<dt id="exceptions.APILevelNotSupportedException.APILevelNotSupportedException">
-<em class="property">class </em><code class="descname">APILevelNotSupportedException</code><a class="headerlink" href="#exceptions.APILevelNotSupportedException.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.APILevelNotSupportedException.APILevelNotSupportedException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">APILevelNotSupportedException</span></span><a class="headerlink" href="#exceptions.APILevelNotSupportedException.APILevelNotSupportedException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.CustomVariableExistsException">
-<em class="property">exception </em><code class="descname">CustomVariableExistsException</code><a class="reference internal" href="_modules/exceptions.html#CustomVariableExistsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.CustomVariableExistsException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.CustomVariableExistsException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">CustomVariableExistsException</span></span><a class="reference internal" href="_modules/exceptions.html#CustomVariableExistsException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.CustomVariableExistsException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for already existing custom variables</p>
-<dl class="class">
-<dt id="exceptions.CustomVariableExistsException.CustomVariableExistsException">
-<em class="property">class </em><code class="descname">CustomVariableExistsException</code><a class="headerlink" href="#exceptions.CustomVariableExistsException.CustomVariableExistsException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.CustomVariableExistsException.CustomVariableExistsException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CustomVariableExistsException</span></span><a class="headerlink" href="#exceptions.CustomVariableExistsException.CustomVariableExistsException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.EmptySetException">
-<em class="property">exception </em><code class="descname">EmptySetException</code><a class="reference internal" href="_modules/exceptions.html#EmptySetException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.EmptySetException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.EmptySetException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">EmptySetException</span></span><a class="reference internal" href="_modules/exceptions.html#EmptySetException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.EmptySetException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for empty result sets</p>
-<dl class="class">
-<dt id="exceptions.EmptySetException.EmptySetException">
-<em class="property">class </em><code class="descname">EmptySetException</code><a class="headerlink" href="#exceptions.EmptySetException.EmptySetException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.EmptySetException.EmptySetException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EmptySetException</span></span><a class="headerlink" href="#exceptions.EmptySetException.EmptySetException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.InvalidCredentialsException">
-<em class="property">exception </em><code class="descname">InvalidCredentialsException</code><a class="reference internal" href="_modules/exceptions.html#InvalidCredentialsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.InvalidCredentialsException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.InvalidCredentialsException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidCredentialsException</span></span><a class="reference internal" href="_modules/exceptions.html#InvalidCredentialsException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.InvalidCredentialsException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for invalid credentials</p>
-<dl class="class">
-<dt id="exceptions.InvalidCredentialsException.InvalidCredentialsException">
-<em class="property">class </em><code class="descname">InvalidCredentialsException</code><a class="headerlink" href="#exceptions.InvalidCredentialsException.InvalidCredentialsException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.InvalidCredentialsException.InvalidCredentialsException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InvalidCredentialsException</span></span><a class="headerlink" href="#exceptions.InvalidCredentialsException.InvalidCredentialsException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.InvalidHostnameFormatException">
-<em class="property">exception </em><code class="descname">InvalidHostnameFormatException</code><a class="reference internal" href="_modules/exceptions.html#InvalidHostnameFormatException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.InvalidHostnameFormatException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.InvalidHostnameFormatException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidHostnameFormatException</span></span><a class="reference internal" href="_modules/exceptions.html#InvalidHostnameFormatException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.InvalidHostnameFormatException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for invalid hostname formats (non-FQDN)</p>
-<dl class="class">
-<dt id="exceptions.InvalidHostnameFormatException.InvalidHostnameFormatException">
-<em class="property">class </em><code class="descname">InvalidHostnameFormatException</code><a class="headerlink" href="#exceptions.InvalidHostnameFormatException.InvalidHostnameFormatException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.InvalidHostnameFormatException.InvalidHostnameFormatException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InvalidHostnameFormatException</span></span><a class="headerlink" href="#exceptions.InvalidHostnameFormatException.InvalidHostnameFormatException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.SSLCertVerificationError">
-<em class="property">exception </em><code class="descname">SSLCertVerificationError</code><a class="reference internal" href="_modules/exceptions.html#SSLCertVerificationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.SSLCertVerificationError" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.SSLCertVerificationError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">SSLCertVerificationError</span></span><a class="reference internal" href="_modules/exceptions.html#SSLCertVerificationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.SSLCertVerificationError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for invalid SSL certificates</p>
-<dl class="class">
-<dt id="exceptions.SSLCertVerificationError.SSLCertVerificationError">
-<em class="property">class </em><code class="descname">SSLCertVerificationError</code><a class="headerlink" href="#exceptions.SSLCertVerificationError.SSLCertVerificationError" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.SSLCertVerificationError.SSLCertVerificationError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SSLCertVerificationError</span></span><a class="headerlink" href="#exceptions.SSLCertVerificationError.SSLCertVerificationError" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.SessionException">
-<em class="property">exception </em><code class="descname">SessionException</code><a class="reference internal" href="_modules/exceptions.html#SessionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.SessionException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.SessionException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">SessionException</span></span><a class="reference internal" href="_modules/exceptions.html#SessionException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.SessionException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for session errors</p>
-<dl class="class">
-<dt id="exceptions.SessionException.SessionException">
-<em class="property">class </em><code class="descname">SessionException</code><a class="headerlink" href="#exceptions.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.SessionException.SessionException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SessionException</span></span><a class="headerlink" href="#exceptions.SessionException.SessionException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.SnapshotExistsException">
-<em class="property">exception </em><code class="descname">SnapshotExistsException</code><a class="reference internal" href="_modules/exceptions.html#SnapshotExistsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.SnapshotExistsException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.SnapshotExistsException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">SnapshotExistsException</span></span><a class="reference internal" href="_modules/exceptions.html#SnapshotExistsException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.SnapshotExistsException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for already existing snapshots</p>
-<dl class="class">
-<dt id="exceptions.SnapshotExistsException.SnapshotExistsException">
-<em class="property">class </em><code class="descname">SnapshotExistsException</code><a class="headerlink" href="#exceptions.SnapshotExistsException.SnapshotExistsException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.SnapshotExistsException.SnapshotExistsException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SnapshotExistsException</span></span><a class="headerlink" href="#exceptions.SnapshotExistsException.SnapshotExistsException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.UnauthenticatedError">
-<em class="property">exception </em><code class="descname">UnauthenticatedError</code><a class="reference internal" href="_modules/exceptions.html#UnauthenticatedError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.UnauthenticatedError" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.UnauthenticatedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">UnauthenticatedError</span></span><a class="reference internal" href="_modules/exceptions.html#UnauthenticatedError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.UnauthenticatedError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></a></p>
 <p>Exception for showing that a client wasn’t able to authenticate itself</p>
-<dl class="class">
-<dt id="exceptions.UnauthenticatedError.UnauthenticatedError">
-<em class="property">class </em><code class="descname">UnauthenticatedError</code><a class="headerlink" href="#exceptions.UnauthenticatedError.UnauthenticatedError" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.UnauthenticatedError.UnauthenticatedError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnauthenticatedError</span></span><a class="headerlink" href="#exceptions.UnauthenticatedError.UnauthenticatedError" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.UnsupportedFilterException">
-<em class="property">exception </em><code class="descname">UnsupportedFilterException</code><a class="reference internal" href="_modules/exceptions.html#UnsupportedFilterException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.UnsupportedFilterException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.UnsupportedFilterException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">UnsupportedFilterException</span></span><a class="reference internal" href="_modules/exceptions.html#UnsupportedFilterException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.UnsupportedFilterException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for unsupported filters</p>
-<dl class="class">
-<dt id="exceptions.UnsupportedFilterException.UnsupportedFilterException">
-<em class="property">class </em><code class="descname">UnsupportedFilterException</code><a class="headerlink" href="#exceptions.UnsupportedFilterException.UnsupportedFilterException" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.UnsupportedFilterException.UnsupportedFilterException">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnsupportedFilterException</span></span><a class="headerlink" href="#exceptions.UnsupportedFilterException.UnsupportedFilterException" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="exception">
-<dt id="exceptions.UnsupportedRequestException">
-<em class="property">exception </em><code class="descname">UnsupportedRequestException</code><a class="reference internal" href="_modules/exceptions.html#UnsupportedRequestException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exceptions.UnsupportedRequestException" title="Permalink to this definition">¶</a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="exceptions.UnsupportedRequestException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exceptions.</span></span><span class="sig-name descname"><span class="pre">UnsupportedRequestException</span></span><a class="reference internal" href="_modules/exceptions.html#UnsupportedRequestException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exceptions.UnsupportedRequestException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception for unsupported requests</p>
-<dl class="class">
-<dt id="exceptions.UnsupportedRequestException.UnsupportedRequest">
-<em class="property">class </em><code class="descname">UnsupportedRequest</code><a class="headerlink" href="#exceptions.UnsupportedRequestException.UnsupportedRequest" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="exceptions.UnsupportedRequestException.UnsupportedRequest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnsupportedRequest</span></span><a class="headerlink" href="#exceptions.UnsupportedRequestException.UnsupportedRequest" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="maintenance-module">
+</section>
+<section id="maintenance-module">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">maintenance</span></code> Module<a class="headerlink" href="#maintenance-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="parameters-module">
+</section>
+<section id="parameters-module">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">parameters</span></code> Module<a class="headerlink" href="#parameters-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="populate-module">
+</section>
+<section id="populate-module">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">populate</span></code> Module<a class="headerlink" href="#populate-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="report-module">
+</section>
+<section id="report-module">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">report</span></code> Module<a class="headerlink" href="#report-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="snapshot-module">
+</section>
+<section id="snapshot-module">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">snapshot</span></code> Module<a class="headerlink" href="#snapshot-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="subpackages">
+</section>
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="katprep.management.html">management Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#foreman-module"><code class="docutils literal notranslate"><span class="pre">foreman</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#spacewalk-module"><code class="docutils literal notranslate"><span class="pre">spacewalk</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#libvirt-module"><code class="docutils literal notranslate"><span class="pre">libvirt</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#vmware-module"><code class="docutils literal notranslate"><span class="pre">vmware</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#foreman-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">foreman</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#spacewalk-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">spacewalk</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#libvirt-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">libvirt</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.management.html#vmware-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vmware</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="katprep.monitoring.html">monitoring Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="katprep.monitoring.html#monitoring-icinga2-module"><code class="docutils literal notranslate"><span class="pre">monitoring.icinga2</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="katprep.monitoring.html#monitoring-nagios-module"><code class="docutils literal notranslate"><span class="pre">monitoring.nagios</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.monitoring.html#monitoring-icinga2-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">monitoring.icinga2</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="katprep.monitoring.html#monitoring-nagios-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">monitoring.nagios</span></code> Module</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -477,15 +353,15 @@ encrypted.</p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Package</a><ul>
-<li><a class="reference internal" href="#module-katprep">:mod:` Package</a></li>
-<li><a class="reference internal" href="#module-AuthContainer"><code class="docutils literal notranslate"><span class="pre">AuthContainer</span></code> Module</a></li>
-<li><a class="reference internal" href="#authconfig-module"><code class="docutils literal notranslate"><span class="pre">authconfig</span></code> Module</a></li>
-<li><a class="reference internal" href="#module-exceptions"><code class="docutils literal notranslate"><span class="pre">exceptions</span></code> Module</a></li>
-<li><a class="reference internal" href="#maintenance-module"><code class="docutils literal notranslate"><span class="pre">maintenance</span></code> Module</a></li>
-<li><a class="reference internal" href="#parameters-module"><code class="docutils literal notranslate"><span class="pre">parameters</span></code> Module</a></li>
-<li><a class="reference internal" href="#populate-module"><code class="docutils literal notranslate"><span class="pre">populate</span></code> Module</a></li>
-<li><a class="reference internal" href="#report-module"><code class="docutils literal notranslate"><span class="pre">report</span></code> Module</a></li>
-<li><a class="reference internal" href="#snapshot-module"><code class="docutils literal notranslate"><span class="pre">snapshot</span></code> Module</a></li>
+<li><a class="reference internal" href="#mod-package">:mod:` Package</a></li>
+<li><a class="reference internal" href="#module-AuthContainer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AuthContainer</span></code> Module</a></li>
+<li><a class="reference internal" href="#authconfig-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">authconfig</span></code> Module</a></li>
+<li><a class="reference internal" href="#module-exceptions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">exceptions</span></code> Module</a></li>
+<li><a class="reference internal" href="#maintenance-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">maintenance</span></code> Module</a></li>
+<li><a class="reference internal" href="#parameters-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parameters</span></code> Module</a></li>
+<li><a class="reference internal" href="#populate-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">populate</span></code> Module</a></li>
+<li><a class="reference internal" href="#report-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">report</span></code> Module</a></li>
+<li><a class="reference internal" href="#snapshot-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">snapshot</span></code> Module</a></li>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 </ul>
 </li>
@@ -499,17 +375,15 @@ encrypted.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -523,12 +397,13 @@ encrypted.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>

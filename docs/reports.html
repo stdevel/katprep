@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Customizing &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,7 +35,8 @@
         <li class="right" >
           <a href="landscape.html" title="Represent your system landscape"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Customizing</a></li> 
       </ul>
     </div>  
 
@@ -45,7 +45,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="customizing">
+  <section id="customizing">
 <h1>Customizing<a class="headerlink" href="#customizing" title="Permalink to this headline">¶</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">katprep_report</span></code> utility uses <strong>Pandoc</strong> and special templates in order to automate creating patch reports per host. Default templates are part of every katprep installation - it is also possible to alter these templates to match your company needs (<em>e.g. corporate identity</em>).</p>
 <p>To start over, check-out the <code class="docutils literal notranslate"><span class="pre">templates</span></code> directory as it contains the basic templates.</p>
@@ -53,67 +53,67 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_report *.json -t templates/my_strange.tmp -o html
 </pre></div>
 </div>
-<div class="section" id="variables">
+<section id="variables">
 <h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
 <p>When creating host reports, a temporary YAML file is created per host. This file contains all the variables that are rendered into a host report using Pandoc. Use <code class="docutils literal notranslate"><span class="pre">katprep_report</span></code> along with the <code class="docutils literal notranslate"><span class="pre">-x</span></code> / <code class="docutils literal notranslate"><span class="pre">--preserve-yaml</span></code> parameter to keep this file. Refer to that file to explore available variables.</p>
 <p>The following tables list commonly used variables:</p>
-<div class="section" id="errata-information">
+<section id="errata-information">
 <h3>Errata information<a class="headerlink" href="#errata-information" title="Permalink to this headline">¶</a></h3>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="42%" />
-<col width="58%" />
+<col style="width: 42%" />
+<col style="width: 58%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Parameter</th>
-<th class="head">Explanation</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Explanation</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>errata.cves</td>
-<td>Common Vulnerability and Exposure names</td>
+<tbody>
+<tr class="row-even"><td><p>errata.cves</p></td>
+<td><p>Common Vulnerability and Exposure names</p></td>
 </tr>
-<tr class="row-odd"><td>errata.description</td>
-<td>Erratum description</td>
+<tr class="row-odd"><td><p>errata.description</p></td>
+<td><p>Erratum description</p></td>
 </tr>
-<tr class="row-even"><td>errata.errata_id</td>
-<td>Erratum ID (<em>packager naming convention</em>)</td>
+<tr class="row-even"><td><p>errata.errata_id</p></td>
+<td><p>Erratum ID (<em>packager naming convention</em>)</p></td>
 </tr>
-<tr class="row-odd"><td>errata.hosts_applicable_count</td>
-<td>Number of hosts erratum is applicable to</td>
+<tr class="row-odd"><td><p>errata.hosts_applicable_count</p></td>
+<td><p>Number of hosts erratum is applicable to</p></td>
 </tr>
-<tr class="row-even"><td>errata.hosts_available_count</td>
-<td>Number of hosts erratum is available to</td>
+<tr class="row-even"><td><p>errata.hosts_available_count</p></td>
+<td><p>Number of hosts erratum is available to</p></td>
 </tr>
-<tr class="row-odd"><td>errata.id</td>
-<td>Katello erratum ID</td>
+<tr class="row-odd"><td><p>errata.id</p></td>
+<td><p>Katello erratum ID</p></td>
 </tr>
-<tr class="row-even"><td>errata.installable</td>
-<td>Flag whether installable on this host</td>
+<tr class="row-even"><td><p>errata.installable</p></td>
+<td><p>Flag whether installable on this host</p></td>
 </tr>
-<tr class="row-odd"><td>errata.issued</td>
-<td>Erratum release date</td>
+<tr class="row-odd"><td><p>errata.issued</p></td>
+<td><p>Erratum release date</p></td>
 </tr>
-<tr class="row-even"><td>errata.packages</td>
-<td>Package names relevant to this erratum</td>
+<tr class="row-even"><td><p>errata.packages</p></td>
+<td><p>Package names relevant to this erratum</p></td>
 </tr>
-<tr class="row-odd"><td>errata.reboot_suggested</td>
-<td>Flag whether reboot is suggested</td>
+<tr class="row-odd"><td><p>errata.reboot_suggested</p></td>
+<td><p>Flag whether reboot is suggested</p></td>
 </tr>
-<tr class="row-even"><td>errata.severity</td>
-<td>Erratum severity</td>
+<tr class="row-even"><td><p>errata.severity</p></td>
+<td><p>Erratum severity</p></td>
 </tr>
-<tr class="row-odd"><td>errata.solution</td>
-<td>Erratum solution description/link</td>
+<tr class="row-odd"><td><p>errata.solution</p></td>
+<td><p>Erratum solution description/link</p></td>
 </tr>
-<tr class="row-even"><td>errata.summary</td>
-<td>Erratum short summary</td>
+<tr class="row-even"><td><p>errata.summary</p></td>
+<td><p>Erratum short summary</p></td>
 </tr>
-<tr class="row-odd"><td>errata.title</td>
-<td>Erratum title</td>
+<tr class="row-odd"><td><p>errata.title</p></td>
+<td><p>Erratum title</p></td>
 </tr>
-<tr class="row-even"><td>errata.type</td>
-<td>Erratum type (<em>enhancement, bugfix,…</em>)</td>
+<tr class="row-even"><td><p>errata.type</p></td>
+<td><p>Erratum type (<em>enhancement, bugfix,…</em>)</p></td>
 </tr>
 </tbody>
 </table>
@@ -129,103 +129,104 @@
 $endfor$
 </pre></div>
 </div>
-</div>
-<div class="section" id="host-parameter-information">
+</section>
+<section id="host-parameter-information">
 <h3>Host parameter information<a class="headerlink" href="#host-parameter-information" title="Permalink to this headline">¶</a></h3>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="36%" />
-<col width="64%" />
+<col style="width: 36%" />
+<col style="width: 64%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Parameter</th>
-<th class="head">Explanation</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Explanation</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>params.date</td>
-<td>Maintenance data</td>
+<tbody>
+<tr class="row-even"><td><p>params.date</p></td>
+<td><p>Maintenance data</p></td>
 </tr>
-<tr class="row-odd"><td>params.environment_name</td>
-<td>Host puppet environment name</td>
+<tr class="row-odd"><td><p>params.environment_name</p></td>
+<td><p>Host puppet environment name</p></td>
 </tr>
-<tr class="row-even"><td>params.ip</td>
-<td>Host IP address</td>
+<tr class="row-even"><td><p>params.ip</p></td>
+<td><p>Host IP address</p></td>
 </tr>
-<tr class="row-odd"><td>params.katprep_virt</td>
-<td>Virtualization URI</td>
+<tr class="row-odd"><td><p>params.katprep_virt</p></td>
+<td><p>Virtualization URI</p></td>
 </tr>
-<tr class="row-even"><td>params.katprep_virt_name</td>
-<td>VM name (<em>if not FQDN</em>)</td>
+<tr class="row-even"><td><p>params.katprep_virt_name</p></td>
+<td><p>VM name (<em>if not FQDN</em>)</p></td>
 </tr>
-<tr class="row-odd"><td>params.katprep_virt_snapshot</td>
-<td>Flag whether VM needs to be protected by a snapshot</td>
+<tr class="row-odd"><td><p>params.katprep_virt_snapshot</p></td>
+<td><p>Flag whether VM needs to be protected by a snapshot</p></td>
 </tr>
-<tr class="row-even"><td>params.katprep_virt_type</td>
-<td>Hypervisor type (<em>libvirt or pyvmomi</em>)</td>
+<tr class="row-even"><td><p>params.katprep_virt_type</p></td>
+<td><p>Hypervisor type (<em>libvirt or pyvmomi</em>)</p></td>
 </tr>
-<tr class="row-odd"><td>params.location_name</td>
-<td>Location name</td>
+<tr class="row-odd"><td><p>params.location_name</p></td>
+<td><p>Location name</p></td>
 </tr>
-<tr class="row-even"><td>params.name</td>
-<td>Host name</td>
+<tr class="row-even"><td><p>params.name</p></td>
+<td><p>Host name</p></td>
 </tr>
-<tr class="row-odd"><td>params.operatingsystem_name</td>
-<td>Operating system name</td>
+<tr class="row-odd"><td><p>params.operatingsystem_name</p></td>
+<td><p>Operating system name</p></td>
 </tr>
-<tr class="row-even"><td>params.organization_name</td>
-<td>Organization name</td>
+<tr class="row-even"><td><p>params.organization_name</p></td>
+<td><p>Organization name</p></td>
 </tr>
-<tr class="row-odd"><td>params.owner</td>
-<td>System owner</td>
+<tr class="row-odd"><td><p>params.owner</p></td>
+<td><p>System owner</p></td>
 </tr>
-<tr class="row-even"><td>params.system_physical</td>
-<td>Flag whether physical system</td>
+<tr class="row-even"><td><p>params.system_physical</p></td>
+<td><p>Flag whether physical system</p></td>
 </tr>
-<tr class="row-odd"><td>params.time</td>
-<td>Maintenance time</td>
+<tr class="row-odd"><td><p>params.time</p></td>
+<td><p>Maintenance time</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="verification-information">
+</section>
+<section id="verification-information">
 <h3>Verification information<a class="headerlink" href="#verification-information" title="Permalink to this headline">¶</a></h3>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="42%" />
-<col width="58%" />
+<col style="width: 42%" />
+<col style="width: 58%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Parameter</th>
-<th class="head">Explanation</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Explanation</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>verification.virt_snapshot</td>
-<td>Flag whether snapshot was created</td>
+<tbody>
+<tr class="row-even"><td><p>verification.virt_snapshot</p></td>
+<td><p>Flag whether snapshot was created</p></td>
 </tr>
-<tr class="row-odd"><td>verification.virt_cleanup</td>
-<td>Flag whether snapshot was removed</td>
+<tr class="row-odd"><td><p>verification.virt_cleanup</p></td>
+<td><p>Flag whether snapshot was removed</p></td>
 </tr>
-<tr class="row-even"><td>verification.mon_downtime</td>
-<td>Flag whether downtime was scheduled</td>
+<tr class="row-even"><td><p>verification.mon_downtime</p></td>
+<td><p>Flag whether downtime was scheduled</p></td>
 </tr>
-<tr class="row-odd"><td>verification.mon_cleanup</td>
-<td>Flag whether scheduled downtime was removed</td>
+<tr class="row-odd"><td><p>verification.mon_cleanup</p></td>
+<td><p>Flag whether scheduled downtime was removed</p></td>
 </tr>
-<tr class="row-even"><td>verification.mon_status</td>
-<td>Monitoring status</td>
+<tr class="row-even"><td><p>verification.mon_status</p></td>
+<td><p>Monitoring status</p></td>
 </tr>
-<tr class="row-odd"><td>verification.mon_status_detail</td>
-<td>Detailed monitoring status (<em>if not 0</em>)</td>
+<tr class="row-odd"><td><p>verification.mon_status_detail</p></td>
+<td><p>Detailed monitoring status (<em>if not 0</em>)</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -258,17 +259,15 @@ $endfor$
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -288,12 +287,13 @@ $endfor$
         <li class="right" >
           <a href="landscape.html" title="Represent your system landscape"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Customizing</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>
