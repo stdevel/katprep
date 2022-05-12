@@ -829,8 +829,8 @@ def test_set_update_delete_host_custom_variables(client, host_id):
     Ensure that host custom values can be set and updated
     """
     _variables = {
-        "katprep_pre-script": "sleep 60",
-        "katprep_post-script": "sleep 30"
+        "katprep_patch_pre_script": "sleep 60",
+        "katprep_patch_post_script": "sleep 30"
     }
     for _var in _variables:
         # set custom variable

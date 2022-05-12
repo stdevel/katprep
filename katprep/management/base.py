@@ -40,10 +40,10 @@ class ManagementClient(BaseConnector):
         """
         Apply the patches with the given errata_ids on the given host.
         """
-        if host.pre_script:
+        if host.patch_pre_script:
             self.install_pre_script(host)
         self.install_plain_patches(host)
-        if host.post_script:
+        if host.patch_post_script:
             self.install_post_script(host)
 
     def install_upgrades(self, host):
@@ -52,10 +52,10 @@ class ManagementClient(BaseConnector):
 
         This does include upgrades that are not part of an errata.
         """
-        if host.pre_script:
+        if host.patch_pre_script:
             self.install_pre_script(host)
         self.install_plain_upgrades(host)
-        if host.post_script:
+        if host.patch_post_script:
             self.install_post_script(host)
 
     @abstractmethod

@@ -44,12 +44,12 @@ OPT_PARAMETERS = {
     "katprep_mon_type": "Monitoring system type: nagios/(icinga)",
     "katprep_virt_name": "Object name within hypervisor if not FQDN",
     "katprep_virt_type": "Virtualization host type: (libvirt)/pyvmomi",
-    "katprep_pre-script": "Script to run before maintenance",
-    "katprep_pre-script_user": "Effective pre-script user",
-    "katprep_pre-script_group": "Effective pre-script group",
-    "katprep_post-script": "Script to run after maintenance",
-    "katprep_post-script_user": "Effective post-script user",
-    "katprep_post-script_group": "Effective post-script group",
+    "katprep_patch_pre_script": "Script to run before maintenance",
+    "katprep_patch_pre_script_user": "Effective pre-script user",
+    "katprep_patch_pre_script_group": "Effective pre-script group",
+    "katprep_patch_post_script": "Script to run after maintenance",
+    "katprep_patch_post_script_user": "Effective post-script user",
+    "katprep_patch_post_script_group": "Effective post-script group",
 }
 """
 dict: Built-in optional host parameters

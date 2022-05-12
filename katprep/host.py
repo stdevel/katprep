@@ -50,44 +50,44 @@ class Host:
         self._patches = patches or []
 
     @property
-    def pre_script(self):
+    def patch_pre_script(self):
         try:
-            return self._params['katprep_pre-script']
+            return self._params['katprep_patch_pre_script']
         except KeyError:
             return None
 
     @property
-    def pre_script_user(self):
+    def patch_pre_script_user(self):
         try:
-            return self._params['katprep_pre-script_user']
+            return self._params['katprep_patch_pre_script_user']
         except KeyError:
             return "root"
 
     @property
-    def pre_script_group(self):
+    def patch_pre_script_group(self):
         try:
-            return self._params['katprep_pre-script_group']
+            return self._params['katprep_patch_pre_script_group']
         except KeyError:
             return "root"
 
     @property
-    def post_script(self):
+    def patch_post_script(self):
         try:
-            return self._params['katprep_post-script']
+            return self._params['katprep_patch_post_script']
         except KeyError:
             return None
 
     @property
-    def post_script_user(self):
+    def patch_post_script_user(self):
         try:
-            return self._params['katprep_post-script_user']
+            return self._params['katprep_patch_post_script_user']
         except KeyError:
             return "root"
 
     @property
-    def post_script_group(self):
+    def patch_post_script_group(self):
         try:
-            return self._params['katprep_post-script_group']
+            return self._params['katprep_patch_post_script_group']
         except KeyError:
             return "root"
 

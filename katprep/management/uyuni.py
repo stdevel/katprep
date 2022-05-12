@@ -1168,7 +1168,7 @@ class UyuniAPIClient(BaseConnector):
         :param patches: patch IDs
         :type patches: int array
         """
-        if not (host.pre_script or host.post_script):
+        if not (host.patch_pre_script or host.patch_post_script):
             return self.install_plain_patches(host, patches)
 
         # We have a pre or post-script and work with an action chain
@@ -1177,7 +1177,7 @@ class UyuniAPIClient(BaseConnector):
         self.add_actionchain(chain_label)
         action_ids = []
 
-        if host.pre_script:
+        if host.patch_pre_script:
             action_ids.append(
                 self.install_pre_script(host, chain_label)
             )
@@ -1187,7 +1187,7 @@ class UyuniAPIClient(BaseConnector):
             self.actionchain_add_patches(chain_label, system_id, patches)
         )
 
-        if host.post_script:
+        if host.patch_post_script:
             action_ids.append(
                 self.install_post_script(host, chain_label)
             )
@@ -1206,7 +1206,7 @@ class UyuniAPIClient(BaseConnector):
         :param upgrades: package IDs
         :type upgrade: int array
         """
-        if not (host.pre_script or host.post_script):
+        if not (host.patch_pre_script or host.patch_post_script):
             # simply install patches
             return self.install_plain_upgrades(host, upgrades)
 
@@ -1215,7 +1215,7 @@ class UyuniAPIClient(BaseConnector):
         chain_label = f"{system_id}_upgrade"
         self.add_actionchain(chain_label)
         action_ids = []
-        if host.pre_script:
+        if host.patch_pre_script:
             action_ids.append(
                 self.install_pre_script(host, chain_label)
             )
@@ -1225,7 +1225,7 @@ class UyuniAPIClient(BaseConnector):
             self.actionchain_add_upgrades(chain_label, system_id, upgrades)
         )
 
-        if host.post_script:
+        if host.patch_post_script:
             action_ids.append(
                 self.install_post_script(host, chain_label)
             )
@@ -1247,9 +1247,9 @@ class UyuniAPIClient(BaseConnector):
         return self.actionchain_add_command(
             chain_label,
             host.management_id,
-            host.pre_script,
-            user=host.pre_script_user,
-            group=host.pre_script_group
+            host.patch_pre_script,
+            user=host.patch_pre_script_user,
+            group=host.patch_pre_script_group
         )
 
     def install_post_script(self, host, chain_label):
@@ -1264,7 +1264,7 @@ class UyuniAPIClient(BaseConnector):
         return self.actionchain_add_command(
             chain_label,
             host.management_id,
-            host.post_script,
-            user=host.post_script_user,
-            group=host.post_script_group
+            host.patch_post_script,
+            user=host.patch_post_script_user,
+            group=host.patch_post_script_group
         )

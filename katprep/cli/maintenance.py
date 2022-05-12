@@ -246,12 +246,12 @@ def _install_erratas(host, dry_run):
     if host.patches:
         patch_ids = [errata.id for errata in host.patches]
         # show scripts and patches
-        if host.pre_script:
+        if host.patch_pre_script:
             LOGGER.info(
-                "Host '%s' --> running pre-script (as %s:%s)",
+                "Host '%s' --> running pre_script (as %s:%s)",
                 host,
-                host.pre_script_user,
-                host.pre_script_group
+                host.patch_pre_script_user,
+                host.patch_pre_script_group
             )
         LOGGER.info(
             "Host '%s' --> installing %i patches: %s",
@@ -259,12 +259,12 @@ def _install_erratas(host, dry_run):
             len(host.patches),
             ", ".join(str(x) for x in patch_ids)
         )
-        if host.post_script:
+        if host.patch_post_script:
             LOGGER.info(
-                "Host '%s' --> running post-script (as %s:%s)",
+                "Host '%s' --> running post_script (as %s:%s)",
                 host,
-                host.post_script_user,
-                host.post_script_group
+                host.patch_post_script_user,
+                host.patch_post_script_group
             )
 
         if not dry_run:
@@ -277,9 +277,24 @@ def _install_erratas(host, dry_run):
 
 
 def _install_package_upgrades(host, dry_run):
+    # show scripts and upgrades
+    if host.patch_pre_script:
+        LOGGER.info(
+            "Host '%s' --> running pre_script (as %s:%s)",
+            host,
+            host.patch_pre_script_user,
+            host.patch_pre_script_group
+        )
     LOGGER.info(
         "Host '%s' --> install package upgrades", host
     )
+    if host.patch_post_script:
+        LOGGER.info(
+            "Host '%s' --> running post_script (as %s:%s)",
+            host,
+            host.patch_post_script_user,
+            host.patch_post_script_group
+        )
 
     if not dry_run:
         SAT_CLIENT.install_upgrades(host)
