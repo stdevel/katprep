@@ -92,6 +92,48 @@ class Host:
             return "root"
 
     @property
+    def reboot_pre_script(self):
+        try:
+            return self._params['katprep_reboot_pre_script']
+        except KeyError:
+            return None
+
+    @property
+    def reboot_pre_script_user(self):
+        try:
+            return self._params['katprep_reboot_pre_script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def reboot_pre_script_group(self):
+        try:
+            return self._params['katprep_reboot_pre_script_group']
+        except KeyError:
+            return "root"
+
+    @property
+    def reboot_post_script(self):
+        try:
+            return self._params['katprep_reboot_post_script']
+        except KeyError:
+            return None
+
+    @property
+    def reboot_post_script_user(self):
+        try:
+            return self._params['katprep_reboot_post_script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def reboot_post_script_group(self):
+        try:
+            return self._params['katprep_reboot_post_script_group']
+        except KeyError:
+            return "root"
+
+    @property
     def type(self):
         return self._OBJECT_TYPE
 

@@ -50,6 +50,12 @@ OPT_PARAMETERS = {
     "katprep_patch_post_script": "Script to run after maintenance",
     "katprep_patch_post_script_user": "Effective post-script user",
     "katprep_patch_post_script_group": "Effective post-script group",
+    "katprep_reboot_pre_script": "Script to run before reboot",
+    "katprep_reboot_pre_script_user": "Effective pre-script user",
+    "katprep_reboot_pre_script_group": "Effective pre-script group",
+    "katprep_reboot_post_script": "Script to run after reboot",
+    "katprep_reboot_post_script_user": "Effective post-script user",
+    "katprep_reboot_post_script_group": "Effective post-script group",
 }
 """
 dict: Built-in optional host parameters
