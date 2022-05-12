@@ -69,6 +69,24 @@ katprep_patch_post_script_group
 katprep_patch_post_script_user
    Effective post-script user
 
+katprep_reboot_pre_script
+   Script to run before reboot
+
+katprep_reboot_pre_script_group
+   Effective pre-script group
+
+katprep_reboot_pre_script_user
+   Effective pre-script user
+
+katprep_reboot_post_script
+   Script to run after reboot
+
+katprep_reboot_post_script_group
+   Effective post-script group
+
+katprep_reboot_post_script_user
+   Effective post-script user
+
 For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
 Options
