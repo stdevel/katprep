@@ -1,22 +1,20 @@
 % errata-diff.yml(5) Version 0.5.0 | katprep documentation
 
-NAME
-====
+# NAME
 
 **errata-diff.yml** — An individual katprep host maintenance report variable file
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 A _errata-diff.yml_ file is an individual katprep host maintenance report variable file used by **katprep_report(1)** in order to create host reports. The following information can be found in the variable file:
 
- - Generic system information (hostname, IP address,...)
- - Verification data obtained by **katprep_maintenance(1)**
- - Errata delta information (CVEs, packages,...) between two infrastructure snapshot reports created by **katprep_snapshot(1)**
+- Generic system information (hostname, IP address,...)
+- Verification data obtained by **katprep_maintenance(1)**
+- Errata delta information (CVEs, packages,...) between two infrastructure snapshot reports created by **katprep_snapshot(1)**
 
 Usually, these variable files are removed automatically - but for debugging purposes or writing your own templates it might be necessary to check the content. To preserve YAML files execute **katprep_report(1)** like this:
 
-| $ katprep_report errata*json -t _template_ -x
+| $ katprep_report errata*.json -t _template_ -x
 
 A valid variable file is written in YAML and contains the following dictionaries:
 
@@ -99,18 +97,14 @@ mon_status_detail
 virt_cleanup
 :   Flag whether snapshot has been removed
 
-
-BUGS
-====
+# BUGS
 
 See GitHub issues: <https://github.com/stdevel/katprep/issues>
 
-AUTHOR
-======
+# AUTHOR
 
 Christian Stankowic <info@cstan.io>
 
-SEE ALSO
-========
+# SEE ALSO
 
 **katprep(1)**, **katprep_maintenance(1)**, **katprep_report(1)**, **katprep_snapshot(1)**

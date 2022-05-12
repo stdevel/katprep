@@ -234,7 +234,24 @@ def execute(options, args):
             if options.mgmt_reboot or \
                 (reboot_wanted and not options.mgmt_no_reboot):
 
+                if host_obj.reboot_pre_script:
+                    LOGGER.info(
+                        "Host '%s' --> running reboot pre_script (as %s:%s)",
+                        host_obj,
+                        host_obj.reboot_pre_script_user,
+                        host_obj.reboot_pre_script_group
+                    )
+
                 LOGGER.info("Host '%s' --> reboot host", host_obj)
+
+                if host_obj.reboot_post_script:
+                    LOGGER.info(
+                        "Host '%s' --> running reboot post_script (as %s:%s)",
+                        host_obj,
+                        host_obj.reboot_post_script_user,
+                        host_obj.reboot_post_script_group
+                    )
+
                 if not options.generic_dry_run:
                     SAT_CLIENT.reboot_host(host_obj)
     except ValueError as err:
@@ -242,23 +259,59 @@ def execute(options, args):
 
 
 def _install_erratas(host, dry_run):
-    LOGGER.debug("Erratas of the host %s: %s", host, host.patches)
+    LOGGER.debug("Errata of the host %s: %s", host, host.patches)
     if host.patches:
-        patch_ids = [str(errata.id) for errata in host.patches]
+        patch_ids = [errata.id for errata in host.patches]
+        # show scripts and patches
+        if host.patch_pre_script:
+            LOGGER.info(
+                "Host '%s' --> running patch pre_script (as %s:%s)",
+                host,
+                host.patch_pre_script_user,
+                host.patch_pre_script_group
+            )
         LOGGER.info(
-            "Host '%s' --> installing %i patches: %s", host, len(host.patches), ", ".join(patch_ids)
+            "Host '%s' --> installing %i patches: %s",
+            host,
+            len(host.patches),
+            ", ".join(str(x) for x in patch_ids)
         )
+        if host.patch_post_script:
+            LOGGER.info(
+                "Host '%s' --> running patch post_script (as %s:%s)",
+                host,
+                host.patch_post_script_user,
+                host.patch_post_script_group
+            )
 
         if not dry_run:
-            SAT_CLIENT.install_patches(host)
+            try:
+                SAT_CLIENT.install_patches(host, patch_ids)
+            except EmptySetException:
+                LOGGER.error("Errata not found, maybe already installed?")
     else:
         LOGGER.info("No errata for host %s available", host)
 
 
 def _install_package_upgrades(host, dry_run):
+    # show scripts and upgrades
+    if host.patch_pre_script:
+        LOGGER.info(
+            "Host '%s' --> running pre_script (as %s:%s)",
+            host,
+            host.patch_pre_script_user,
+            host.patch_pre_script_group
+        )
     LOGGER.info(
         "Host '%s' --> install package upgrades", host
     )
+    if host.patch_post_script:
+        LOGGER.info(
+            "Host '%s' --> running post_script (as %s:%s)",
+            host,
+            host.patch_post_script_user,
+            host.patch_post_script_group
+        )
 
     if not dry_run:
         SAT_CLIENT.install_upgrades(host)
@@ -401,11 +454,14 @@ def status(options, args):
         errata_tasks = [x for x in errata_tasks if today in x['created']]
         upgrade_tasks = SAT_CLIENT.get_upgrade_task_status(int(host_id))
         upgrade_tasks = [x for x in upgrade_tasks if today in x['created']]
+        script_tasks = SAT_CLIENT.get_script_task_status(int(host_id))
+        script_tasks = [x for x in script_tasks if today in x['created']]
         LOGGER.debug("Erratas for host '%s': %s", int(host_id), len(errata_tasks))
         LOGGER.debug("Upgrades for host '%s': %s", int(host_id), len(upgrade_tasks))
+        LOGGER.debug("Scripts for host '%s': %s", int(host_id), len(script_tasks))
 
         # check all the tasks
-        _tasks = errata_tasks + upgrade_tasks
+        _tasks = errata_tasks + upgrade_tasks + script_tasks
         for _task in _tasks:
 
             # TODO: We might need to change keys/adopt format
@@ -413,12 +469,17 @@ def status(options, args):
             if _task["successful_count"] != 0:
                 LOGGER.info(
                     "%s task for host '%s' succeeded",
-                    _task['name'], host
+                    _task['action_type'], host
                 )
             elif _task["failed_count"] != 0:
                 LOGGER.info(
                     "%s task for host '%s' FAILED!",
-                    _task['name'], host
+                    _task['action_type'], host
+                )
+            else:
+                LOGGER.info(
+                    "%s task for host '%s' still running...",
+                    _task['action_type'], host
                 )
 
 

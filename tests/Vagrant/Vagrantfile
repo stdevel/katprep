@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "monitoring" do |monitoring|
     monitoring.vm.hostname = "monitoring.example.com"
     monitoring.vm.box = "generic/centos7"
-    monitoring.vm.box_version = "3.2.8"
+    monitoring.vm.box_version = "~> 3.6"
     # forward some ports
     monitoring.vm.network "forwarded_port", guest: 80, host: 8080
     monitoring.vm.network "forwarded_port", guest: 443, host: 8443
@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "zabbix", autostart: false do |zabbix|
     zabbix.vm.hostname = "zabbix.example.com"
     zabbix.vm.box = "generic/centos7"
-    zabbix.vm.box_version = "3.2.8"
+    zabbix.vm.box_version = "~> 3.6"
     # forward some ports
     zabbix.vm.network "forwarded_port", guest: 80, host: 8081
     zabbix.vm.network "forwarded_port", guest: 443, host: 8444
@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "kvm", autostart: false do |kvm|
     kvm.vm.hostname = "kvm.example.com"
     kvm.vm.box = "generic/centos7"
-    kvm.vm.box_version = "3.2.8"
+    kvm.vm.box_version = "~> 3.6"
     # add private network
     kvm.vm.network "private_network", ip: "192.168.23.40"
     # set CPU and memory
@@ -88,7 +88,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "katello" do |katello|
     katello.vm.hostname = "katello.example.com"
     katello.vm.box = "generic/centos7"
-    katello.vm.box_version = "3.2.8"
+    katello.vm.box_version = "~> 3.6"
     # forward some ports
     katello.vm.network "forwarded_port", guest: 80, host: 8083
     katello.vm.network "forwarded_port", guest: 443, host: 8446
@@ -117,7 +117,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "uyuni" do |uyuni|
     uyuni.vm.hostname = "uyuni.example.com"
     uyuni.vm.box = "generic/opensuse15"
-    uyuni.vm.box_version = "3.2.4"
+    uyuni.vm.box_version = "~> 3.6"
     # copy files
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     # forward some ports
@@ -136,9 +136,6 @@ Vagrant.configure("2") do |config|
       libvirt.disk_bus = "scsi" # needed to boot (see also https://github.com/lavabit/robox/issues/152#issue-632631234)
     end
     # configure system
-    uyuni.vm.provision "shell", inline: <<-SHELL
-      zypper --non-interactive install python2-rpm python-xml
-    SHELL
     uyuni.vm.provision "ansible_local" do |ansible|
       ansible.galaxy_role_file = "requirements_uyuni.yml"
       ansible.galaxy_roles_path = "/etc/ansible/roles"
@@ -151,7 +148,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "uyuniclient" do |uyuniclient|
     uyuniclient.vm.hostname = "uyuniclient.example.com"
     uyuniclient.vm.box = "generic/opensuse15"
-    uyuniclient.vm.box_version = "3.2.4"
+    uyuniclient.vm.box_version = "~> 3.6"
     # copy files
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     # add private network

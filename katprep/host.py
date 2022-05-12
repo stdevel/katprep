@@ -50,6 +50,90 @@ class Host:
         self._patches = patches or []
 
     @property
+    def patch_pre_script(self):
+        try:
+            return self._params['katprep_patch_pre_script']
+        except KeyError:
+            return None
+
+    @property
+    def patch_pre_script_user(self):
+        try:
+            return self._params['katprep_patch_pre_script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def patch_pre_script_group(self):
+        try:
+            return self._params['katprep_patch_pre_script_group']
+        except KeyError:
+            return "root"
+
+    @property
+    def patch_post_script(self):
+        try:
+            return self._params['katprep_patch_post_script']
+        except KeyError:
+            return None
+
+    @property
+    def patch_post_script_user(self):
+        try:
+            return self._params['katprep_patch_post_script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def patch_post_script_group(self):
+        try:
+            return self._params['katprep_patch_post_script_group']
+        except KeyError:
+            return "root"
+
+    @property
+    def reboot_pre_script(self):
+        try:
+            return self._params['katprep_reboot_pre_script']
+        except KeyError:
+            return None
+
+    @property
+    def reboot_pre_script_user(self):
+        try:
+            return self._params['katprep_reboot_pre_script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def reboot_pre_script_group(self):
+        try:
+            return self._params['katprep_reboot_pre_script_group']
+        except KeyError:
+            return "root"
+
+    @property
+    def reboot_post_script(self):
+        try:
+            return self._params['katprep_reboot_post_script']
+        except KeyError:
+            return None
+
+    @property
+    def reboot_post_script_user(self):
+        try:
+            return self._params['katprep_reboot_post_script_user']
+        except KeyError:
+            return "root"
+
+    @property
+    def reboot_post_script_group(self):
+        try:
+            return self._params['katprep_reboot_post_script_group']
+        except KeyError:
+            return "root"
+
+    @property
     def type(self):
         return self._OBJECT_TYPE
 
@@ -164,7 +248,7 @@ class Host:
             org = host_dict["organization"]
 
         try:
-            # getting org from katello
+            # getting location from katello
             location = host_dict["params"]["location_name"]
         except KeyError:
             location = host_dict.get("location")

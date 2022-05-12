@@ -13,6 +13,7 @@ TODO
 .buildinfo
 build/
 dist/
+uyuni_config.json.lab
 
 # Python dirs
 __pycache__

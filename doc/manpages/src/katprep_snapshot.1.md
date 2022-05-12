@@ -1,17 +1,14 @@
 % katprep_snapshot(1) Version 0.5.0 | katprep documentation
 
-NAME
-====
+# NAME
 
 **katprep_snapshot** — Creates infrastructure status overview snapshots
 
-SYNOPSIS
-========
+# SYNOPSIS
 
 | **katprep_snapshot** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-p** _path_] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**-s** _server_] \[**--insecure**] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-E** _name_]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Creates infrastructure status overview snapshots including host information such as:
 
@@ -23,8 +20,7 @@ These information are required by the **katprep(1)** framework in order to creat
 
 Run this utility before and after maintaining systems using **katprep_maintenance(1)**.
 
-Options
--------
+## Options
 
 -h, --help
 
@@ -82,8 +78,7 @@ Options
 
 :   filters by particular Puppet environment
 
-FILES
-=====
+# FILES
 
 *~/.katpreprc*
 
@@ -93,17 +88,14 @@ FILES
 
 :   Individual katprep authentication container file.
 
-BUGS
-====
+# BUGS
 
 See GitHub issues: <https://github.com/stdevel/katprep/issues>
 
-AUTHOR
-======
+# AUTHOR
 
 Christian Stankowic <info@cstan.io>
 
-SEE ALSO
-========
+# SEE ALSO
 
 **katprep(1)**, **katprep_maintenance(1)**, **katprep_report(1)**

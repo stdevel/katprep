@@ -13,6 +13,7 @@ import logging
 import json
 import getpass
 from .. import __version__, get_credentials
+from ..management import get_management_client
 from ..management.foreman import ForemanAPIClient
 from ..monitoring import get_monitoring_client
 from ..virtualization import get_virtualization_client
@@ -25,9 +26,9 @@ LOG_LEVEL = None
 """
 LOG_LEVEL: Logger level
 """
-SAT_CLIENT = None
+MGMT_CLIENT = None
 """
-SAT_CLIENT: Foreman API client handle
+MGMT_CLIENT: Management client
 """
 VIRT_CLIENT = None
 """
@@ -49,13 +50,12 @@ def populate(options):
         "This *WILL* take some time - please be patient.")
     try:
         #retrieve host information
-        hosts = json.loads(SAT_CLIENT.api_get("/hosts"))
+        hosts = MGMT_CLIENT.get_hosts()
         required_settings = {}
 
         #retrieve VM/IP information
         if not options.virt_skip:
             vm_hosts = VIRT_CLIENT.get_vm_ips(ipv6_only=options.ipv6_only)
-            #print vm_hosts
             for host in vm_hosts:
                 LOGGER.debug(
                     "HYPERVISOR: Found VM '%s' with IP '%s'",
@@ -71,40 +71,38 @@ def populate(options):
                     host["name"], host["ip"]
                 )
 
-        #check _all_ the hosts
-        if options.ipv6_only:
-            ip_filter = "ip6"
-        else:
-            ip_filter = "ip"
+        for host in hosts:
+            # TODO: make this more generic? useful for re-implementing Foreman support
+            _details = MGMT_CLIENT.get_host_details(host)
+            _network = MGMT_CLIENT.get_host_network(host)
+            _ip = _network["ip6"] if options.ipv6_only else _network["ip"]
 
-        for host in hosts["results"]:
             LOGGER.debug(
-                "SATELLITE: Found host '%s' with IP '%s'",
-                host["name"], host[ip_filter]
+                "MGMT: Found host '%s' with IP '%s'",
+                _details["profile_name"], _ip
             )
 
             #check if host parameters set appropriately
             required_settings = {}
             try:
-                if host["ip"] in [x["ip"] for x in vm_hosts]:
-                    LOGGER.debug("Host '%s' is a VM", host["name"])
-
+                if _ip in [x["ip"] for x in vm_hosts]:
+                    LOGGER.debug("Host '%s' is a VM", _details["profile_name"])
                     required_settings["katprep_virt"] = options.virt_uri
                     required_settings["katprep_virt_type"] = options.virt_type
-                    vm_name = [x["object_name"] for x in vm_hosts if x["ip"] == host["ip"]]
-                    if host["name"] != vm_name[0]:
+                    vm_name = [x["object_name"] for x in vm_hosts if x["ip"] == _ip]
+                    if _details["profile_name"] != vm_name[0]:
                         required_settings["katprep_virt_name"] = vm_name[0]
             except UnboundLocalError:
                 pass
 
             try:
-                if host["ip"] in [x["ip"] for x in mon_hosts]:
-                    LOGGER.debug("Host '%s' is monitored", host["name"])
+                if _ip in [x["ip"] for x in mon_hosts]:
+                    LOGGER.debug("Host '%s' is monitored", _details["profile_name"])
 
                     required_settings["katprep_mon"] = options.mon_url
                     required_settings["katprep_mon_type"] = options.mon_type
-                    mon_name = [x["name"] for x in mon_hosts if x["ip"] == host["ip"]]
-                    if host["name"] != mon_name[0]:
+                    mon_name = [x["name"] for x in mon_hosts if x["ip"] == _ip]
+                    if _details["profile_name"] != mon_name[0]:
                         required_settings["katprep_mon_name"] = mon_name[0]
             except UnboundLocalError:
                 pass
@@ -114,51 +112,14 @@ def populate(options):
                 if options.generic_dry_run:
                     LOGGER.info(
                         "Host '%s' ==> set/update parameter/value: %s/%s",
-                        host["name"], setting, required_settings[setting]
+                        _details["profile_name"], setting, required_settings[setting]
                     )
                 else:
-                    #host_id = SAT_CLIENT.get_id_by_name(host["name"], "host")
-                    host_params = SAT_CLIENT.get_host_params(host["id"])
-                    key_exists = [x for x in host_params if x["name"] == setting]
-                    #set payload
-                    payload = {}
-                    payload["parameter"] = {
-                        "name": setting, "value": required_settings[setting]
-                    }
-                    #update or create parameter
-                    if len(key_exists) > 0:
-                        if options.foreman_update:
-                            LOGGER.debug(
-                                "Host '%s' ==> UPDATE parameter/value: %s/%s",
-                                host["name"], setting, required_settings[setting]
-                            )
-                            #get parameter ID to update
-                            param_id = SAT_CLIENT.get_hostparam_id_by_name(
-                                host["id"], setting
-                            )
-                            #update parameter
-                            SAT_CLIENT.api_put(
-                                "/hosts/{}/parameters/{}".format(host["id"], param_id),
-                                json.dumps(payload)
-                            )
-                        else:
-                            LOGGER.error(
-                                "Parameter '%s' for host '%s' already exists "
-                                "and updating values has not been enabled!",
-                                setting, host["name"]
-                            )
-                    else:
-                        LOGGER.debug(
-                            "Host '%s' ==> CREATE parameter/value: %s/%s",
-                            host["name"], setting, required_settings[setting]
-                        )
-                        #add parameter
-                        SAT_CLIENT.api_post(
-                            "/hosts/{}/parameters".format(
-                                host["id"]
-                            ),
-                            json.dumps(payload)
-                        )
+                    # TODO: how to deal with non-existing custom infos?
+                    # IDEA: add parameter in katprep_parameters for creating them
+                    MGMT_CLIENT.host_add_custom_variable(
+                        host, setting, required_settings[setting]
+                    )
     except ValueError as err:
         LOGGER.error("Unable to populate virtualization data: '%s'", err)
 
@@ -177,7 +138,7 @@ def parse_options(args=None):
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
-    fman_opts = parser.add_argument_group("Foreman arguments")
+    mgmt_opts = parser.add_argument_group("management arguments")
     virt_opts = parser.add_argument_group("virtualization arguments")
     mon_opts = parser.add_argument_group("monitoring arguments")
 
@@ -211,12 +172,28 @@ def parse_options(args=None):
     action="store_false", help="Disables SSL verification (default: no)")
 
     #FOREMAN ARGUMENTS
-    #-s / --foreman-server
-    fman_opts.add_argument("-s", "--foreman-server", \
-    dest="foreman_server", metavar="SERVER", default="localhost", \
-    help="defines the Foreman server to use (default: localhost)")
+    # --mgmt-type
+    mgmt_opts.add_argument(
+        "--mgmt-type",
+        dest="mgmt_type",
+        metavar="foreman|uyuni",
+        choices=['foreman', 'uyuni'],
+        default="foreman",
+        type=str,
+        help="defines the library used to operate with management host: "
+        "foreman or uyuni (default: foreman)",
+    )
+    # -s / --server
+    mgmt_opts.add_argument(
+        "-s",
+        "--server",
+        dest="server",
+        metavar="SERVER",
+        default="localhost",
+        help="defines the server to use (default: localhost)",
+    )
     #-u / --update
-    fman_opts.add_argument("-u", "--update", dest="foreman_update", \
+    mgmt_opts.add_argument("-u", "--update", dest="foreman_update", \
     action="store_true", default=False, help="Updates pre-existing host " \
     "parameters (default: no)")
 
@@ -259,7 +236,7 @@ def parse_options(args=None):
 
 def main(options, args):
     """Main function, starts the logic based on parameters."""
-    global SAT_CLIENT, VIRT_CLIENT, MON_CLIENT
+    global MGMT_CLIENT, VIRT_CLIENT, MON_CLIENT
 
     LOGGER.debug("Options: %s", str(options))
     LOGGER.debug("Arguments: %s", str(args))
@@ -278,13 +255,19 @@ def main(options, args):
         LOGGER.info("This is just a SIMULATION - no changes will be made.")
 
     #initialize APIs
-    (fman_user, fman_pass) = get_credentials(
-        "Foreman", options.foreman_server, options.generic_auth_container,
+    (mgmt_user, mgmt_pass) = get_credentials(
+        f"Management ({options.mgmt_type})",
+        options.server,
+        options.generic_auth_container,
         options.auth_password
     )
-    SAT_CLIENT = ForemanAPIClient(
-        LOG_LEVEL, options.foreman_server, fman_user,
-        fman_pass, options.ssl_verify
+    MGMT_CLIENT = get_management_client(
+        options.mgmt_type,
+        LOG_LEVEL,
+        mgmt_user,
+        mgmt_pass,
+        options.server,
+        verify=options.ssl_verify,
     )
 
     #get virtualization host credentials

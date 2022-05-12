@@ -1,0 +1,10 @@
+---
+"MD013": false  # line-length
+"MD014": false  # show commands output
+"MD024": false  # duplicate headings
+"MD025": false  # multiple top-level headings in the same document
+"MD026": false  # no trailing punction (? at the end)
+"MD033": false  # inline HTML
+"MD034": false  # no bare-urls (required for manpages)
+"MD036": false  # no emphasis as heading (command descriptions)
+"MD041": false  # leading comments (beginning not heading)

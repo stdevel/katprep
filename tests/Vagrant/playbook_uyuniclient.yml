@@ -7,6 +7,7 @@
       template:
         src: "hosts.j2"
         dest: /etc/hosts
+
     - name: Configure NTP
       block:
         - name: Install chrony
@@ -20,11 +21,13 @@
         - name: Set timezone
           timezone:
             name: Europe/Berlin
+
   tasks:
     - name: Download script
       get_url:
-        url: http://uyuni.example.com//pub/bootstrap/bootstrap.sh
+        url: http://uyuni.example.com/pub/bootstrap/bootstrap.sh
         dest: /tmp/bootstrap.sh
+
     - name: Bootstrap client
       command: bash /tmp/bootstrap.sh
       args:

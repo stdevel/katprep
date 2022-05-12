@@ -13,8 +13,7 @@ import logging
 import json
 import time
 import getpass
-from .. import (__version__, get_credentials, is_writable,
-                validate_filters, get_filter)
+from .. import (__version__, get_credentials, is_writable)
 from ..exceptions import SessionException
 from ..management import get_management_client
 from ..network import validate_hostname
@@ -310,9 +309,6 @@ def main(options, args):
             options.server,
             verify=options.ssl_verify,
         )
-
-        # TODO: validate filters
-        # validate_filters(options, MGMT_CLIENT)
 
         # scan systems and create report
         info = scan_systems(options)

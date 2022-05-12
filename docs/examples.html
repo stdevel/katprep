@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Examples &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -32,7 +31,8 @@
         <li class="right" >
           <a href="parameter_overview.html" title="Parameter overview"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Examples</a></li> 
       </ul>
     </div>  
 
@@ -41,28 +41,27 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="examples">
+  <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="simple-installation">
+<section id="simple-installation">
 <h2>Simple installation<a class="headerlink" href="#simple-installation" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>The following example consists of:</dt>
-<dd><ul class="first last simple">
-<li>an Foreman/Katello host managing hosts (<code class="docutils literal notranslate"><span class="pre">foreman.localdomain.loc</span></code>)</li>
-<li>an ESXi host serving some VMs (<code class="docutils literal notranslate"><span class="pre">esxi.localdomain.loc</span></code>)</li>
-<li>a Nagios server monitoring those VMs (<code class="docutils literal notranslate"><span class="pre">nagios.localdomain.loc</span></code>)</li>
-<li>snapshot protection for all VMs</li>
+<dl class="simple">
+<dt>The following example consists of:</dt><dd><ul class="simple">
+<li><p>an Foreman/Katello host managing hosts (<code class="docutils literal notranslate"><span class="pre">foreman.localdomain.loc</span></code>)</p></li>
+<li><p>an ESXi host serving some VMs (<code class="docutils literal notranslate"><span class="pre">esxi.localdomain.loc</span></code>)</p></li>
+<li><p>a Nagios server monitoring those VMs (<code class="docutils literal notranslate"><span class="pre">nagios.localdomain.loc</span></code>)</p></li>
+<li><p>snapshot protection for all VMs</p></li>
 </ul>
 </dd>
 </dl>
-<div class="figure">
+<figure class="align-default">
 <img alt="alternate text" src="_images/example_1.png" />
-</div>
-<div class="section" id="create-users">
+</figure>
+<section id="create-users">
 <h3>Create users<a class="headerlink" href="#create-users" title="Permalink to this headline">¶</a></h3>
 <p>The first step is to create appropriate service users within VMware ESXi and Nagios. These users are used to manage snapshots and downtimes. This process is described under <a class="reference external" href="installation.html#api-users">Installation</a>.</p>
-</div>
-<div class="section" id="authentication">
+</section>
+<section id="authentication">
 <h3>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h3>
 <p>The next step is to store authentication credentials in an authentication container. This is done using the <code class="docutils literal notranslate"><span class="pre">katprep_authconfig</span></code> utility:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_authconfig mycontainer.auth add
@@ -89,8 +88,8 @@ esxi.localdomain.loc (Username: svc-katprep / Password: xxx)
 nagios.localdomain.loc (Username: svc-katprep / Password: xxx)
 </pre></div>
 </div>
-</div>
-<div class="section" id="auto-discovery">
+</section>
+<section id="auto-discovery">
 <h3>Auto-discovery<a class="headerlink" href="#auto-discovery" title="Permalink to this headline">¶</a></h3>
 <p>To automatically detect hosts managed by Foreman/Katello configured in Nagios and within the hypervisor, we can utilize the <code class="docutils literal notranslate"><span class="pre">katprep_populate</span></code> command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_populate -C mycontainer.auth -s foreman.localdomain.loc --virt-uri esxi.localdomain.loc --virt-type pyvmomi --mon-url http://nagios.localdomain.loc --mon-type nagios --dry-run
@@ -110,8 +109,8 @@ INFO:katprep_populate:Host &#39;pinkepank.test.loc&#39; ==&gt; set/update parame
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_populate -C mycontainer.auth -s foreman.localdomain.loc --virt-uri esxi.localdomain.loc --virt-type pyvmomi --mon-url http://nagios.localdomain.loc --mon-type nagios
 </pre></div>
 </div>
-</div>
-<div class="section" id="configuration">
+</section>
+<section id="configuration">
 <h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
 <p>VM snapshot flags are not set automatically using <code class="docutils literal notranslate"><span class="pre">katprep_populate</span></code> - we need to bulk set this flag with <code class="docutils literal notranslate"><span class="pre">katprep_parameters</span></code>. Basically, another simulation might be a good idea. The script will ask for values for all basic katprep parameters. Entering no values will ignore changing this value. As we only want to change the <code class="docutils literal notranslate"><span class="pre">katprep_virt_snapshot</span></code> parameter, we will just skip all other parameters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U -n
@@ -127,8 +126,8 @@ INFO:katprep_parameters:Host &#39;pinkepank.test.loc&#39; (#2) --&gt; update par
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_parameters -C mycontainer.auth -s foreman.localdomain.loc -U
 </pre></div>
 </div>
-</div>
-<div class="section" id="system-maintenance">
+</section>
+<section id="system-maintenance">
 <h3>System maintenance<a class="headerlink" href="#system-maintenance" title="Permalink to this headline">¶</a></h3>
 <p>In order to automate system maintenance we need to utilize the <code class="docutils literal notranslate"><span class="pre">katprep_snapshot</span></code> and <code class="docutils literal notranslate"><span class="pre">katprep_maintenance</span></code> commands. The first step is to create a snapshot report containing information about managed hosts, available errata, hypervisor/monitoring information and so on:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_snapshot -C mycontainer.auth -s foreman.localdomain.loc
@@ -161,8 +160,8 @@ INFO:katprep_maintenance:Host &#39;pinkepank.test.loc&#39; --&gt; install: FEDOR
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">For rebooting VMs after system maintenance, at least Foreman 1.15.x or Red Hat Satellite 6.3 is required.</p>
+<p class="admonition-title">Note</p>
+<p>For rebooting VMs after system maintenance, at least Foreman 1.15.x or Red Hat Satellite 6.3 is required.</p>
 </div>
 <p>Once the systems have been patched (<em>and maybe also rebooted</em>), it’s time to check whether the monitoring status is fine, again:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_maintenance -C mycontainer.auth -S foreman.localdomian.loc errata-snapshot-*.json verify
@@ -187,27 +186,26 @@ ERROR:PyvmomiClient:Unable to get snapshots: &#39;&#39;NoneType&#39; object has 
 INFO:katprep_maintenance:No snapshot for host &#39;pinkepank.test.loc&#39; found, probably cleaned-up.
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="advanced-setup">
+</section>
+</section>
+<section id="advanced-setup">
 <h2>Advanced setup<a class="headerlink" href="#advanced-setup" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>The following example consists of:</dt>
-<dd><ul class="first last simple">
-<li>an Foreman/Katello host managing hosts (<code class="docutils literal notranslate"><span class="pre">foreman.localdomain.loc</span></code>)</li>
-<li>an ESXi cluster of two nodes hosting some VMs (<code class="docutils literal notranslate"><span class="pre">esxi01.localdomain.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">esxi02.localdomain.loc</span></code>)</li>
-<li>a vCenter Server installation managing the cluster (<code class="docutils literal notranslate"><span class="pre">vcenter.localdomain.loc</span></code>)</li>
-<li>an Icinga2 and Nagios server monitoring those VMs (<code class="docutils literal notranslate"><span class="pre">icinga.localdomain.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">nagios.localdomain.loc</span></code>)</li>
-<li>VM and Monitoring names differing from the FQDN (e.g. <code class="docutils literal notranslate"><span class="pre">myhost</span></code> instead of <code class="docutils literal notranslate"><span class="pre">myhost.localdomain.loc</span></code>)</li>
-<li>snapshot protection for some VMs depending on the Puppet environment (<code class="docutils literal notranslate"><span class="pre">production</span></code> is protected while other are not protected)</li>
+<dl class="simple">
+<dt>The following example consists of:</dt><dd><ul class="simple">
+<li><p>an Foreman/Katello host managing hosts (<code class="docutils literal notranslate"><span class="pre">foreman.localdomain.loc</span></code>)</p></li>
+<li><p>an ESXi cluster of two nodes hosting some VMs (<code class="docutils literal notranslate"><span class="pre">esxi01.localdomain.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">esxi02.localdomain.loc</span></code>)</p></li>
+<li><p>a vCenter Server installation managing the cluster (<code class="docutils literal notranslate"><span class="pre">vcenter.localdomain.loc</span></code>)</p></li>
+<li><p>an Icinga2 and Nagios server monitoring those VMs (<code class="docutils literal notranslate"><span class="pre">icinga.localdomain.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">nagios.localdomain.loc</span></code>)</p></li>
+<li><p>VM and Monitoring names differing from the FQDN (e.g. <code class="docutils literal notranslate"><span class="pre">myhost</span></code> instead of <code class="docutils literal notranslate"><span class="pre">myhost.localdomain.loc</span></code>)</p></li>
+<li><p>snapshot protection for some VMs depending on the Puppet environment (<code class="docutils literal notranslate"><span class="pre">production</span></code> is protected while other are not protected)</p></li>
 </ul>
 </dd>
 </dl>
-<div class="figure">
+<figure class="align-default">
 <img alt="alternate text" src="_images/example_2.png" />
-</div>
+</figure>
 <p>Users are installed and auto-discovery is executed as metioned above.</p>
-<div class="section" id="id1">
+<section id="id1">
 <h3>Configuration<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>The first step is to set-up the authentication container. As a vCenter Server instance is used, we don’t need to enter ESXi host credentials:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_authconfig mycontainer.auth add -H foreman.localdomain.loc -u svc-katprep
@@ -260,11 +258,12 @@ INFO:katprep_parameters:Host &#39;giertz.stankowic.loc&#39; (#1) --&gt; update p
 </pre></div>
 </div>
 <p>For system maintenance, refer to the previous example.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -300,17 +299,15 @@ INFO:katprep_parameters:Host &#39;giertz.stankowic.loc&#39; (#1) --&gt; update p
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -327,12 +324,13 @@ INFO:katprep_parameters:Host &#39;giertz.stankowic.loc&#39; (#1) --&gt; update p
         <li class="right" >
           <a href="parameter_overview.html" title="Parameter overview"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Examples</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>
