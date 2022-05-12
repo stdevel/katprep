@@ -17,6 +17,7 @@
       template:
         src: "hosts.j2"
         dest: /etc/hosts
+
     - name: Configure NTP
       block:
         - name: Install chrony
@@ -30,8 +31,10 @@
         - name: Set timezone
           timezone:
             name: Europe/Berlin
+
   roles:
     - role: stdevel.uyuni
+      uyuni_release: '2022.05'
       uyuni_use_lvm: false
       uyuni_org_login: "{{ username }}"
       uyuni_org_passowrd: "{{ password }}"
@@ -42,6 +45,7 @@
           arch: x86_64
         - name: opensuse_leap15_3-uyuni-client
           arch: x86_64
+
   post_tasks:
     - name: Create activation key
       block:
