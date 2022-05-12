@@ -2,7 +2,7 @@
 Parameter overview
 ==================
 
-katprep uses multiple Puppet host parameters to control maintenance preparation and executing per system. Some parameters are created automatically using ``katprep_parameters``, some need to be created manually. The following table gives an overview:
+katprep uses multiple host parameters to control maintenance preparation and execution per system. Some parameters are created automatically using ``katprep_parameters``, some need to be created manually. The following table gives an overview:
 
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
 | Parameter                        | Example              | Explanation                                                                           |
@@ -27,13 +27,13 @@ katprep uses multiple Puppet host parameters to control maintenance preparation 
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
 | katprep_patch_pre_script_user    | root                 | Effective pre-script user                                                             |
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
-| katprep_reboot_post_script       | /opt/start_node.sh   | Script to run after reboot                                                       |
+| katprep_reboot_post_script       | /opt/start_cache.sh  | Script to run after reboot                                                            |
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
 | katprep_reboot_post_script_group | root                 | Effective post-script group                                                           |
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
 | katprep_reboot_post_script_user  | root                 | Effective post-script user                                                            |
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
-| katprep_reboot_pre_script        | /opt/stop_node.sh    | Script to run before reboot                                                      |
+| katprep_reboot_pre_script        | /opt/wipe_cache.sh   | Script to run before reboot                                                           |
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
 | katprep_reboot_pre_script_group  | root                 | Effective pre-script group                                                            |
 +----------------------------------+----------------------+---------------------------------------------------------------------------------------+
