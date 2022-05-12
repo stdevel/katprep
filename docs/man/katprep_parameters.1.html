@@ -62,7 +62,7 @@ protection settings per hostgroup. For the first integration of your
 infrastructure, use <strong>katprep_populate(1)</strong> as it offers auto-discovery.</p>
 <section id="host-parameters">
 <h2>Host parameters<a class="headerlink" href="#host-parameters" title="Permalink to this headline">¶</a></h2>
-<p>The following Puppet host parameters are created/updated:</p>
+<p>The following host parameters are created/updated:</p>
 <dl class="simple">
 <dt>katprep_mon</dt><dd><p>URL of the monitoring system (see also <strong>Monitoring URLs</strong>)</p>
 </dd>
@@ -80,9 +80,17 @@ snapshot</p>
 <dt>katprep_virt_type</dt><dd><p>Virtualization host type, [<em>libvirt</em>|<em>pyvmovmi</em>] (default:
 libvirt)</p>
 </dd>
-<dt>katprep_pre-script</dt><dd><p>Script to run before maintenance</p>
+<dt>katprep_patch_pre_script</dt><dd><p>Script to run before maintenance</p>
 </dd>
-<dt>katprep_post-script</dt><dd><p>Script to run after maintenance</p>
+<dt>katprep_patch_pre_script_group</dt><dd><p>Effective pre-script group</p>
+</dd>
+<dt>katprep_patch_pre_script_user</dt><dd><p>Effective pre-script user</p>
+</dd>
+<dt>katprep_patch_post_script</dt><dd><p>Script to run after maintenance</p>
+</dd>
+<dt>katprep_patch_post_script_group</dt><dd><p>Effective post-script group</p>
+</dd>
+<dt>katprep_patch_post_script_user</dt><dd><p>Effective post-script user</p>
 </dd>
 </dl>
 <p>For valid Virtualization URIs and monitoring URLs, see <strong>katprep(1)</strong>.</p>

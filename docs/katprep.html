@@ -39,8 +39,97 @@
             
   <section id="package">
 <h1>Package<a class="headerlink" href="#package" title="Permalink to this headline">¶</a></h1>
-<section id="mod-package">
-<h2>:mod:` Package<a class="headerlink" href="#mod-package" title="Permalink to this headline">¶</a></h2>
+<section id="module-katprep">
+<span id="mod-package"></span><h2>:mod:` Package<a class="headerlink" href="#module-katprep" title="Permalink to this headline">¶</a></h2>
+<p>A shared library containing functions used by other scripts of the
+katprep toolkit.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="katprep.LOGGER">
+<span class="sig-prename descclassname"><span class="pre">katprep.</span></span><span class="sig-name descname"><span class="pre">LOGGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Logger</span> <span class="pre">katprep_shared</span> <span class="pre">(WARNING)&gt;</span></em><a class="headerlink" href="#katprep.LOGGER" title="Permalink to this definition">¶</a></dt>
+<dd><p>logging: Logger instance</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="katprep.get_credentials">
+<span class="sig-prename descclassname"><span class="pre">katprep.</span></span><span class="sig-name descname"><span class="pre">get_credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_container</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#get_credentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#katprep.get_credentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves credentials for a particular external system (e.g. Satellite).
+This function checks whether a hostname is part of an authentication
+container or retrieves credentials from an authentication file. If both
+approaches fail, logon credentials are prompted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – prefix for the external system (used in variables/prompts)</p></li>
+<li><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – external system hostname</p></li>
+<li><p><strong>auth_container</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – authentication container file name</p></li>
+<li><p><strong>auth_pass</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – authentication container password</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="katprep.get_filter">
+<span class="sig-prename descclassname"><span class="pre">katprep.</span></span><span class="sig-name descname"><span class="pre">get_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#get_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#katprep.get_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up a filter URL based on arguments set-up with argpase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – argparse options dict</p></li>
+<li><p><strong>api_object</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Foreman object type (e.g. host, environment)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="katprep.is_exe">
+<span class="sig-prename descclassname"><span class="pre">katprep.</span></span><span class="sig-name descname"><span class="pre">is_exe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#is_exe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#katprep.is_exe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether a file is an executable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – path to the file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="katprep.is_writable">
+<span class="sig-prename descclassname"><span class="pre">katprep.</span></span><span class="sig-name descname"><span class="pre">is_writable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#is_writable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#katprep.is_writable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether a particular directory is writable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – path to check for write access</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="katprep.validate_filters">
+<span class="sig-prename descclassname"><span class="pre">katprep.</span></span><span class="sig-name descname"><span class="pre">validate_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#validate_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#katprep.validate_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures using IDs for the Foreman API rather than human-readable names.
+This is done by detecting strings and translating them into IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – argparse options dict</p></li>
+<li><p><strong>api_client</strong> (<em>ForemanAPIClient</em>) – ForemanAPIClient object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="katprep.which">
+<span class="sig-prename descclassname"><span class="pre">katprep.</span></span><span class="sig-name descname"><span class="pre">which</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/katprep.html#which"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#katprep.which" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether a command name links to an existing binary (like whoami).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – command name to check</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-AuthContainer">
 <span id="authcontainer-module"></span><h2><a class="reference internal" href="#module-AuthContainer" title="AuthContainer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AuthContainer</span></code></a> Module<a class="headerlink" href="#module-AuthContainer" title="Permalink to this headline">¶</a></h2>
@@ -353,7 +442,7 @@ encrypted.</p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Package</a><ul>
-<li><a class="reference internal" href="#mod-package">:mod:` Package</a></li>
+<li><a class="reference internal" href="#module-katprep">:mod:` Package</a></li>
 <li><a class="reference internal" href="#module-AuthContainer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AuthContainer</span></code> Module</a></li>
 <li><a class="reference internal" href="#authconfig-module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">authconfig</span></code> Module</a></li>
 <li><a class="reference internal" href="#module-exceptions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">exceptions</span></code> Module</a></li>
