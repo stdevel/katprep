@@ -564,7 +564,43 @@ class UyuniAPIClient(BaseConnector):
 
     def reboot_host(self, host):
         """
-        Reboots a system immediately
+        Reboots a system
+
+        :param host: host to reboot
+        :type host: host object
+        """
+        if not (host.reboot_pre_script or host.reboot_post_script):
+            # simply reboot host
+            return self.plain_reboot_host(host)
+
+        # We have pre-script or post-script
+        system_id = host.management_id
+        chain_label = f"{system_id}_reboot"
+        self.add_actionchain(chain_label)
+        action_ids = []
+        if host.reboot_pre_script:
+            action_ids.append(
+                self.reboot_pre_script(host, chain_label)
+            )
+
+        # add reboot
+        action_ids.append(
+            self.actionchain_add_reboot(chain_label, system_id)
+        )
+
+        if host.reboot_post_script:
+            action_ids.append(
+                self.reboot_post_script(host, chain_label)
+            )
+
+        # schedule execution
+        self.run_actionchain(chain_label)
+
+        return action_ids
+
+    def plain_reboot_host(self, host):
+        """
+        Reboots a system
 
         :param host: host to reboot
         :type host: host object
@@ -1159,6 +1195,34 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
+    def actionchain_add_reboot(self, chain_label, system_id):
+        """
+        :param chain_label: chain label
+        :type chain_label: str
+        :param system_id: profile ID
+        :type system_id: int
+        """
+        if not isinstance(system_id, int):
+            raise EmptySetException(
+                "No system found - use system profile IDs"
+            )
+
+        try:
+            action_id = self._session.actionchain.addSystemReboot(
+                self._api_key,
+                system_id,
+                chain_label,
+            )
+            return action_id
+        except Fault as err:
+            if "no such action chain" in err.faultString.lower():
+                raise EmptySetException(
+                    f"Action chain not found: {chain_label!r}"
+                )
+            raise SessionException(
+                f"Generic remote communication error: {err.faultString!r}"
+            )
+
     def install_patches(self, host, patches):
         """
         Installs patches
@@ -1267,4 +1331,38 @@ class UyuniAPIClient(BaseConnector):
             host.patch_post_script,
             user=host.patch_post_script_user,
             group=host.patch_post_script_group
+        )
+
+    def reboot_pre_script(self, host, chain_label):
+        """
+        Runs the reboot pre-script
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param chain_label: chain label
+        :type chain_label: str
+        """
+        return self.actionchain_add_command(
+            chain_label,
+            host.management_id,
+            host.reboot_pre_script,
+            user=host.reboot_pre_script_user,
+            group=host.reboot_pre_script_group
+        )
+
+    def reboot_post_script(self, host, chain_label):
+        """
+        Runs the reboot post-script
+
+        :param system_id: profile ID
+        :type system_id: int
+        :param chain_label: chain label
+        :type chain_label: str
+        """
+        return self.actionchain_add_command(
+            chain_label,
+            host.management_id,
+            host.reboot_post_script,
+            user=host.reboot_post_script_user,
+            group=host.reboot_post_script_group
         )

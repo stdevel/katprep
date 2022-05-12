@@ -234,7 +234,24 @@ def execute(options, args):
             if options.mgmt_reboot or \
                 (reboot_wanted and not options.mgmt_no_reboot):
 
+                if host_obj.reboot_pre_script:
+                    LOGGER.info(
+                        "Host '%s' --> running reboot pre_script (as %s:%s)",
+                        host_obj,
+                        host_obj.reboot_pre_script_user,
+                        host_obj.reboot_pre_script_group
+                    )
+
                 LOGGER.info("Host '%s' --> reboot host", host_obj)
+
+                if host_obj.reboot_post_script:
+                    LOGGER.info(
+                        "Host '%s' --> running reboot post_script (as %s:%s)",
+                        host_obj,
+                        host_obj.reboot_post_script_user,
+                        host_obj.reboot_post_script_group
+                    )
+
                 if not options.generic_dry_run:
                     SAT_CLIENT.reboot_host(host_obj)
     except ValueError as err:
@@ -248,7 +265,7 @@ def _install_erratas(host, dry_run):
         # show scripts and patches
         if host.patch_pre_script:
             LOGGER.info(
-                "Host '%s' --> running pre_script (as %s:%s)",
+                "Host '%s' --> running patch pre_script (as %s:%s)",
                 host,
                 host.patch_pre_script_user,
                 host.patch_pre_script_group
@@ -261,7 +278,7 @@ def _install_erratas(host, dry_run):
         )
         if host.patch_post_script:
             LOGGER.info(
-                "Host '%s' --> running post_script (as %s:%s)",
+                "Host '%s' --> running patch post_script (as %s:%s)",
                 host,
                 host.patch_post_script_user,
                 host.patch_post_script_group

@@ -63,6 +63,11 @@ class ManagementClient(BaseConnector):
         """
         Soft reboot of the given host.
         """
+        if host.reboot_pre_script:
+            self.reboot_pre_script(host)
+        self.plain_reboot_host(host)
+        if host.reboot_post_script:
+            self.reboot_post_script(host)
 
     @abstractmethod
     def is_reboot_required(self, host) -> bool:
