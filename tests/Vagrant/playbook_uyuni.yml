@@ -5,6 +5,14 @@
     username: admin
     password: admin
   pre_tasks:
+    - name: Remove package manager locks (required for Vagrantbox)
+      command: zypper rl "{{ item }}"
+      register: zypper_out
+      changed_when: "'successfully removed' in zypper_out.stdout"
+      loop:
+        - snapper
+        - snapper-zypp-plugin
+
     - name: "Update /etc/hosts"
       template:
         src: "hosts.j2"
