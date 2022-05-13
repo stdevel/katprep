@@ -1287,7 +1287,7 @@ class UyuniAPIClient(BaseConnector):
 
         # add patches
         action_ids.append(
-            self.actionchain_add_patches(chain_label, system_id, patches)
+            self.actionchain_add_patches(chain_label, system_id, [p.id for p in patches])
         )
 
         if host.patch_post_script:
