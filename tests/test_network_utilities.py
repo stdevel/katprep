@@ -1,8 +1,6 @@
 import logging
-
 import pytest
 from katprep.network import is_ipv4
-
 from .utilities import load_config
 
 
