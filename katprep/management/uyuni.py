@@ -608,8 +608,7 @@ class UyuniAPIClient(BaseConnector):
 
         # We have pre-script or post-script
         system_id = host.management_id
-        chain_label = f"{system_id}_reboot"
-        self.add_actionchain(chain_label)
+        chain_label = f"{system_id}_patch"
         action_ids = []
         if host.reboot_pre_script:
             action_ids.append(
