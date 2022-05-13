@@ -188,6 +188,7 @@
                     <span class="nb">type</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="n">hostname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_hostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
 
@@ -201,7 +202,7 @@
                 <span class="k">raise</span> <span class="n">ContainerException</span><span class="p">(</span><span class="s2">&quot;Invalid password specified!&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__credentials</span><span class="p">[</span><span class="n">hostname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+            <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
             <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span>
         <span class="p">}</span></div>
 
