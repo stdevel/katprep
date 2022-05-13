@@ -1,4 +1,4 @@
-% katprep_authconfig(1) Version 0.5.0 | katprep documentation
+% katprep_authconfig(1) Version 0.6.0 | katprep documentation
 
 # NAME
 
@@ -6,7 +6,7 @@
 
 # SYNOPSIS
 
-| **katprep_authconfig** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[_file_] \[**list**|**add**|**remove**|**password**]
+| **katprep_authconfig** \[**-h**] \[**--version**] \[**-q**] \[**-d**] \[_file_] \[**list**|**add**|**remove**|**password**]
 
 # DESCRIPTION
 
@@ -19,7 +19,7 @@ Authentication containers are JSON documents that can also be protected by a pas
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 

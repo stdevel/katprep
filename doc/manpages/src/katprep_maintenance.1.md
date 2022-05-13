@@ -1,4 +1,4 @@
-% katprep_maintenance(1) Version 0.5.0 | katprep documentation
+% katprep_maintenance(1) Version 0.6.0 | katprep documentation
 
 # NAME
 
@@ -6,7 +6,7 @@
 
 # SYNOPSIS
 
-| **katprep_maintenance** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--insecure**] \[**-s** _server_] \[**-r**] \[**-R**] \[**--virt-uri** _uri_] \[**-k**] \[**--mon-url** _url_] \[**--mon-type** _nagios_|_icinga_] \[**-S**] \[**-t** _hours_] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-E** _name_] \[**-I** _name_] _snapshot\_report_ \[**prepare**|**execute**|**status**|**revert**|**verify**|**cleanup**]
+| **katprep_maintenance** \[**-h**] \[**--version**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--insecure**] \[**--mgmt-type** _foreman_|_uyuni_] \[**-s** _server_] \[**-r**] \[**-R**] \[**--virt-uri** _uri_] \[**-k**] \[**--mon-url** _url_] \[**--mon-type** _nagios_|_icinga2_] \[**-K**] \[**-S**] \[**-t** _hours_] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-E** _name_] \[**-I** _name_] _snapshot\_report_ \[**prepare**|**execute**|**status**|**revert**|**verify**|**cleanup**]
 
 # DESCRIPTION
 
@@ -31,7 +31,7 @@ You can filter maintenance tasks per various entities, such as hostgroups, hostn
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 

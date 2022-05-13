@@ -1,4 +1,4 @@
-% errata-diff.yml(5) Version 0.5.0 | katprep documentation
+% errata-diff.yml(5) Version 0.6.0 | katprep documentation
 
 # NAME
 

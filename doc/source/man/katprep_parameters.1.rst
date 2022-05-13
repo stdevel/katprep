@@ -9,9 +9,9 @@ SYNOPSIS
 
 | **katprep_parameters** [**-h**] [**-v**] [**-q**] [**-d**] [**-n**]
   [**-C** *authentication_contianer*] [**-P** *password*]
-  [**--insecure**] [**-s** *server*] [**-l** *name*\ \|\ *id* \| **-o**
+  [**–insecure**] [**-s** *server*] [**-l** *name*\ \|\ *id* \| **-o**
   *name*\ \|\ *id* \| **-g** *name*\ \|\ *id* \| **-e**
-  *name*\ \|\ *id*] [**-A** \| **--add-optional-parameters** \| **-R** \|
+  *name*\ \|\ *id*] [**-A** \| **–add-optional-parameters** \| **-R** \|
   **-D** \| **-U** \| **-L**]
 
 DESCRIPTION
@@ -26,7 +26,7 @@ infrastructure, use **katprep_populate(1)** as it offers auto-discovery.
 Host parameters
 ---------------
 
-The following host parameters are created/updated:
+The following Puppet host parameters are created/updated:
 
 katprep_mon
    URL of the monitoring system (see also **Monitoring URLs**)
@@ -51,106 +51,76 @@ katprep_virt_type
    Virtualization host type, [*libvirt*\ \|\ *pyvmovmi*] (default:
    libvirt)
 
-katprep_patch_pre_script
+katprep_pre-script
    Script to run before maintenance
 
-katprep_patch_pre_script_group
-   Effective pre-script group
-
-katprep_patch_pre_script_user
-   Effective pre-script user
-
-katprep_patch_post_script
+katprep_post-script
    Script to run after maintenance
-
-katprep_patch_post_script_group
-   Effective post-script group
-
-katprep_patch_post_script_user
-   Effective post-script user
-
-katprep_reboot_pre_script
-   Script to run before reboot
-
-katprep_reboot_pre_script_group
-   Effective pre-script group
-
-katprep_reboot_pre_script_user
-   Effective pre-script user
-
-katprep_reboot_post_script
-   Script to run after reboot
-
-katprep_reboot_post_script_group
-   Effective post-script group
-
-katprep_reboot_post_script_user
-   Effective post-script user
 
 For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
 Options
 -------
 
--h, --help
+-h, –help
    Prints brief usage information.
 
--v, --version
+–version
    Prints the current version number.
 
--q, --quiet
+-q, –quiet
    Supresses printing status messages to stdout.
 
--d, --debug
+-d, –debug
    Enables debugging outputs.
 
--n, --dry-run
+-n, –dry-run
    Only simulates what would be done (default: no)
 
--C *filename*, --auth-container *filename*
+-C *filename*, –auth-container *filename*
    Defines an authentication container file (see also
    **katprep.auth(5)** and **katprep_authconfig(1)**)
 
--P *passphrase*, --auth-password *passphrase*
+-P *passphrase*, –auth-password *passphrase*
    Defines the authentication container password to avoid password
    prompt (unattented mode)
 
---insecure
+–insecure
    Disables SSL verification (default: no)
 
--s *hostname*, --server *hostname*
+-s *hostname*, –server *hostname*
    Defines the Foreman server to use (default: localhost)
 
--l *name*\ \|\ *id*, --location *name*\ \|\ *id*
+-l *name*\ \|\ *id*, –location *name*\ \|\ *id*
    filters by particular location
 
--o *name*\ \|\ *id*, --organization *name*\ \|\ *id*
+-o *name*\ \|\ *id*, –organization *name*\ \|\ *id*
    filters by particular organization
 
--g *name*\ \|\ *id*, --hostgroup *name*\ \|\ *id*
+-g *name*\ \|\ *id*, –hostgroup *name*\ \|\ *id*
    filters by particular hostgroup
 
--e *name*\ \|\ *id*, --environment *name*\ \|\ *id*
+-e *name*\ \|\ *id*, –environment *name*\ \|\ *id*
    filters by particular Puppet environment
 
--A, --add-parameters
+-A, –add-parameters
    Adds built-in parameters (*katprep_mon*, *katprep_virt*,
    *katprep_virt_snapshot*) to all affected hosts (default: no)
 
---add-optional-parameters
+–add-optional-parameters
    Adds optoinal built-in parameters (*katprep_mon_type*,
    *katprep_mon_name*, *katprep_virt_name*, *katprep_virt_type*) to all
    affected hosts (default: no)
 
--R, --remove-parameters
+-R, –remove-parameters
    Removes built-in parameters from all affected hosts (default: no)
 
--D, --display-parameters
+-D, –display-parameters
    Lists values of defined parameters for affected hosts (default: no)
 
--U, --update-parameters
+-U, –update-parameters
    Updates values of defined parameters for affected hosts (default: no)
--L, --list-parameters
+-L, –list-parameters
    Only lists available parameters (default: no)
 
 FILES

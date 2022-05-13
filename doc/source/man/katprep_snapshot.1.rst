@@ -6,13 +6,11 @@ NAME
 SYNOPSIS
 ========
 
-| **katprep_snapshot** [**-h**] [**--version**] [**-q**] [**-d**] [**-p**
+| **katprep_snapshot** [**-h**] [**–version**] [**-q**] [**-d**] [**-p**
   *path*] [**-C** *authentication_contianer*] [**-P** *password*]
-  [--mgmt-type foreman|uyuni] [**-s** *server*] [**--insecure**]
-  [**-l** *name*\ \|\ *id* \| **-o** 
+  [**-s** *server*] [**–insecure**] [**-l** *name*\ \|\ *id* \| **-o**
   *name*\ \|\ *id* \| **-g** *name*\ \|\ *id* \| **-e**
-  *name*\ \|\ *id*]
-  [**-E** *name*]
+  *name*\ \|\ *id*] [**-E** *name*]
 
 DESCRIPTION
 ===========
@@ -34,52 +32,48 @@ Run this utility before and after maintaining systems using
 Options
 -------
 
--h, --help
+-h, –help
    Prints brief usage information.
 
---version
+-v, –version
    Prints the current version number.
 
--q, --quiet
+-q, –quiet
    Supresses printing status messages to stdout.
 
--d, --debug
+-d, –debug
    Enables debugging outputs.
 
--p *path*, --output-path *path*
+-p *path*, –output-path *path*
    Defines the report output path (default: current directory)
 
--C *filename*, --auth-container *filename*
+-C *filename*, –auth-container *filename*
    Defines an authentication container file (see also
    **katprep.auth(5)** and **katprep_authconfig(1)**)
 
--P *passphrase*, --auth-password *passphrase*
+-P *passphrase*, –auth-password *passphrase*
    Defines the authentication container password to avoid password
    prompt (unattented mode)
 
---mgmt-type
-   defines the library used to operate with management host:
-   foreman or uyuni (default: foreman)
-
--s *hostname*, --server *hostname*
+-s *hostname*, –server *hostname*
    Defines the Foreman server to use (default: localhost)
 
---insecure
+–insecure
    Disables SSL verification (default: no)
 
--E *hostname*, --exclude *hostname*
+-E *hostname*, –exclude *hostname*
    Excludes particular hosts, using wildcards is possible.
 
--l *name*\ \|\ *id*, --location *name*\ \|\ *id*
+-l *name*\ \|\ *id*, –location *name*\ \|\ *id*
    filters by particular location
 
--o *name*\ \|\ *id*, --organization *name*\ \|\ *id*
+-o *name*\ \|\ *id*, –organization *name*\ \|\ *id*
    filters by particular organization
 
--g *name*\ \|\ *id*, --hostgroup *name*\ \|\ *id*
+-g *name*\ \|\ *id*, –hostgroup *name*\ \|\ *id*
    filters by particular hostgroup
 
--e *name*\ \|\ *id*, --environment *name*\ \|\ *id*
+-e *name*\ \|\ *id*, –environment *name*\ \|\ *id*
    filters by particular Puppet environment
 
 FILES

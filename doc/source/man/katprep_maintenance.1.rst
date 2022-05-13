@@ -1,20 +1,20 @@
 NAME
 ====
 
-**katprep_maintenance** - Prepares, executes and verifies system
+**katprep_maintenance** — Prepares, executes and verifies system
 maintenance tasks
 
 SYNOPSIS
 ========
 
-| **katprep_maintenance** [**-h**] [**--version**] [**-q**] [**-d**] [**-n**]
-  [**-C** *authentication_contianer*] [**-P** *password*]
-  [**--insecure**] [**--mgmt-type** foreman|uyuni] [**-s** *server*] [**-r**]
-  [**-R**] [**--virt-uri** *uri*] [**-k**] [**--mon-url** *url*]
-  [**--mon-type** *nagios*\ \|\ *icinga*] [**-K**] [**-S**] [**-t** *hours*]
-  [**-l** *name*\ \|\ *id* \| **-o** *name*\ \|\ *id* \| **-g** *name*\ \|\ *id*
-  \| **-e** *name*\ \|\ *id*] [**-E** *name*] [**-I** *name*]
-  *snapshot_report*
+| **katprep_maintenance** [**-h**] [**–version**] [**-q**] [**-d**]
+  [**-n**] [**-C** *authentication_contianer*] [**-P** *password*]
+  [**–insecure**] [**–mgmt-type** *foreman*\ \|\ *uyuni*] [**-s**
+  *server*] [**-r**] [**-R**] [**–virt-uri** *uri*] [**-k**]
+  [**–mon-url** *url*] [**–mon-type** *nagios*\ \|\ *icinga2*] [**-K**]
+  [**-S**] [**-t** *hours*] [**-l** *name*\ \|\ *id* \| **-o**
+  *name*\ \|\ *id* \| **-g** *name*\ \|\ *id* \| **-e**
+  *name*\ \|\ *id*] [**-E** *name*] [**-I** *name*] *snapshot_report*
   [**prepare**\ \|\ **execute**\ \|\ **status**\ \|\ **revert**\ \|\ **verify**\ \|\ **cleanup**]
 
 DESCRIPTION
@@ -45,76 +45,76 @@ hostgroups, hostnames, locations and organizations.
 Options
 -------
 
--h, --help
+-h, –help
    Prints brief usage information.
 
--v, --version
+–version
    Prints the current version number.
 
--q, --quiet
+-q, –quiet
    Supresses printing status messages to stdout.
 
--d, --debug
+-d, –debug
    Enables debugging outputs.
 
--n, --dry-run
+-n, –dry-run
    Only simulates what would be done (default: no)
 
--C *filename*, --auth-container *filename*
+-C *filename*, –auth-container *filename*
    Defines an authentication container file (see also
    **katprep.auth(5)** and **katprep_authconfig(1)**)
 
--P *passphrase*, --auth-password *passphrase*
+-P *passphrase*, –auth-password *passphrase*
    Defines the authentication container password to avoid password
    prompt (unattented mode)
 
---insecure
+–insecure
    Disables SSL verification (default: no)
 
--s *hostname*, --server *hostname*
+-s *hostname*, –server *hostname*
    Defines the Foreman server to use (default: localhost)
 
--r, --reboot-systems
+-r, –reboot-systems
    Always reboot systems after successful errata installation (default:
    no, only if ``reboot_suggested`` flag set)
 
--R, --no-reboot
+-R, –no-reboot
    Suppresses rebooting the system under any circumstances (default: no)
---virt-uri *uri*
+–virt-uri *uri*
    Defines an URI to use (see also **Virtualization URIs**)
 
--k, --skip-snapshot
+-k, –skip-snapshot
    Skips gathering data from hypervisor (default: no)
 
---mon-url *url*
+–mon-url *url*
    Defines a monitoring URL to use (see also **Monitoring URLs**)
 
---mon-type *nagios*\ \|\ *icinga*
+–mon-type *nagios*\ \|\ *icinga*
    Defines the monitoring sytem type, currently supported: *nagios*
    (Nagios, Icinga 1.x) or *icinga* (Icinga 2). (default: icinga)
 
---skip-downtime
+–skip-downtime
    Skips gathering data from monitoring system (default: no)
 
--S, --mon-suggested
+-S, –mon-suggested
    Only schedules downtime if suggested (default: no)
 
--t *hours*, --mon-downtime *hours*
+-t *hours*, –mon-downtime *hours*
    Downtime period (default: 8 hours)
 
--l *name*\ \|\ *id*, --location *name*\ \|\ *id*
+-l *name*\ \|\ *id*, –location *name*\ \|\ *id*
    filters by particular location
 
--o *name*\ \|\ *id*, --organization *name*\ \|\ *id*
+-o *name*\ \|\ *id*, –organization *name*\ \|\ *id*
    filters by particular organization
 
--e *name*\ \|\ *id*, --environment *name*\ \|\ *id*
+-e *name*\ \|\ *id*, –environment *name*\ \|\ *id*
    filters by particular Puppet environment
 
--E *hostname*, --exclude *hostname*
+-E *hostname*, –exclude *hostname*
    Excludes particular hosts, using wildcards is possible.
 
--I *hostname*, --include-only *hostname*
+-I *hostname*, –include-only *hostname*
    Only includes particular hosts (default: no)
 
 Commands
@@ -124,7 +124,7 @@ This utility supports the following commands
 
 -  **prepare** - Preparing maintenance
 -  **execute** - Installing errata and optionally package upgrades
-   (**-p** / **--include-packages** parameter)
+   (**-p** / **–include-packages** parameter)
 -  **status** - Display software maintenance progress (Foreman tasks)
 -  **revert** - Reverting changes (currently only reverting snapshots is
    supported)

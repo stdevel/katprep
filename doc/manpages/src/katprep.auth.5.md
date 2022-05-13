@@ -1,4 +1,4 @@
-% katprep_auth(5) Version 0.5.0 | katprep documentation
+% katprep_auth(5) Version 0.6.0 | katprep documentation
 
 # NAME
 

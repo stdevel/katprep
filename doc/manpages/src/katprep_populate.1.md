@@ -1,4 +1,4 @@
-% katprep_populate(1) Version 0.5.0 | katprep documentation
+% katprep_populate(1) Version 0.6.0 | katprep documentation
 
 # NAME
 
@@ -6,7 +6,7 @@
 
 # SYNOPSIS
 
-| **katprep_populate** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--ipv6-only**] \[**--insecure**] \[**-s** _server_] \[**-u**] \[**--virt-uri** _uri_] \[**--virt-type** _libvirt_|_pyvmomi_] \[**--skip-virt**] \[**--mon-url** _url_] \[**--mon-type** _nagios_|_icinga_] \[**--skip-mon**]
+| **katprep_populate** \[**-h**] \[**--version**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--ipv6-only**] \[**--insecure**] \[**--mgmt-type** _foreman_|_uyuni_] \[**-s** _server_] \[**-u**] \[**--virt-uri** _uri_] \[**--virt-type** _libvirt_|_pyvmomi_] \[**--skip-virt**] \[**--mon-url** _url_] \[**--mon-type** _nagios_|_icinga_] \[**--skip-mon**]
 
 # DESCRIPTION
 
@@ -16,7 +16,7 @@ To only update particular host parameters, utilize the **katprep_parameters(1)**
 
 # Host parameters
 
-The following Puppet host parameters are created/updated:
+The following host parameters are created/updated:
 
 katprep_mon
 
@@ -30,17 +30,69 @@ katprep_mon_type
 
 :   Monitoring system type: \[_nagios_|_icinga_] (default: icinga)
 
+katprep_owner
+
+:   System owner - REQUIRED as katprep won't manage the system otherwise
+
+katprep_patch_post_script
+
+:   Script to run after maintenance
+
+katprep_patch_post_script_group
+
+:   Effective post-script group
+
+katprep_patch_post_script_user
+
+:   Effective post-script user
+
+katprep_patch_pre_script
+
+:   Script to run before maintenance
+
+katprep_patch_pre_script_group
+
+:   Effective pre-script group
+
+katprep_patch_pre_script_user
+
+:   Effective pre-script user
+
+katprep_reboot_post_script
+
+:   Script to run after reboot
+
+katprep_reboot_post_script_group
+
+:   Effective post-script group
+
+katprep_reboot_post_script_user
+
+:   Effective post-script user
+
+katprep_reboot_pre_script
+
+:   Script to run before reboot
+
+katprep_reboot_pre_script_group
+
+:   Effective pre-script group
+
+katprep_reboot_pre_script_user
+
+:   Effective pre-script user
+
 katprep_virt
 
 :   URI of the virtualization host (see also **Virtualization URIs**)
 
-katprep_virt_snapshot
-
-:   Boolean \[_0_|_1_] whether the system needs to be protected by a snapshot
-
 katprep_virt_name
 
 :   Object name within hypervisor if not FQDN
+
+katprep_virt_snapshot
+
+:   Boolean \[_0_|_1_] whether the system needs to be protected by a snapshot
 
 katprep_virt_type
 
@@ -54,7 +106,7 @@ For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 

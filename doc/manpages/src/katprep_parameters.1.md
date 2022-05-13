@@ -1,4 +1,4 @@
-% katprep_parameters(1) Version 0.5.0 | katprep documentation
+% katprep_parameters(1) Version 0.6.0 | katprep documentation
 
 # NAME
 
@@ -61,7 +61,7 @@ For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 

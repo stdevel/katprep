@@ -1,4 +1,4 @@
-% katprep_report(1) Version 0.5.0 | katprep documentation
+% katprep_report(1) Version 0.6.0 | katprep documentation
 
 # NAME
 
@@ -6,7 +6,7 @@
 
 # SYNOPSIS
 
-| **katprep_report** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-p** _path_] \[**-o** _path_] \[**-x**] \[**-t** _file_] _snapshot\_file_ _snapshot\_file_
+| **katprep_report** \[**-h**] \[**--version**] \[**-q**] \[**-d**] \[**-p** _path_] \[**-o** _path_] \[**-x**] \[**-t** _file_] _snapshot\_file_ _snapshot\_file_
 
 # DESCRIPTION
 
@@ -20,7 +20,7 @@ Run this utility after maintaining systems using **katprep_maintenance(1)**.
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 

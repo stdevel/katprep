@@ -1,4 +1,4 @@
-% katprep_snapshot(1) Version 0.5.0 | katprep documentation
+% katprep_snapshot(1) Version 0.6.0 | katprep documentation
 
 # NAME
 
@@ -6,7 +6,7 @@
 
 # SYNOPSIS
 
-| **katprep_snapshot** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-p** _path_] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**-s** _server_] \[**--insecure**] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-E** _name_]
+| **katprep_snapshot** \[**-h**] \[**--version**] \[**-q**] \[**-d**] \[**-p** _path_] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**-s** _server_] \[**--insecure**] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-E** _name_]
 
 # DESCRIPTION
 

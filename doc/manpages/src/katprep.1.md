@@ -1,8 +1,8 @@
-% katprep(1) Version 0.5.0 | katprep documentation
+% katprep(1) Version 0.6.0 | katprep documentation
 
 # NAME
 
-**katprep** — Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Red Hat Satellite 6.x
+**katprep** — Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Uyuni
 
 # DESCRIPTION
 
