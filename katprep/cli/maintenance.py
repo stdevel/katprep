@@ -339,19 +339,19 @@ def _filter_host_patches(host, patches_to_include, patches_to_exclude) -> list:
     if patches_to_exclude:
         patches = [
             patch for patch in patches
-            if patch.id not in patches_to_exclude
+            if str(patch.id) not in patches_to_exclude
         ]
 
     if patches_to_include:
         patches = [
             patch for patch in patches
-            if patch.id in patches_to_include
+            if str(patch.id) in patches_to_include
         ]
 
     LOGGER.debug(
         "Patches for %s after filtering: %s",
         host,
-        ", ".join(patch.id for patch in patches)
+        ", ".join(str(patch.id) for patch in patches)
     )
     return patches
 
