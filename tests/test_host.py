@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from katprep.host import Host, Erratum
+from katprep.host import Host, Erratum, Upgrade
 
 
 def test_getting_custom_virt_name():
@@ -52,6 +52,12 @@ def test_host_with_custom_location():
     host = Host("a", {}, "org", "my loc")
 
     assert host.location == "my loc"
+
+
+def test_host_with_upgrades():
+    host = Host("my.hostname", {}, "org", upgrades=["hot", "espresso"])
+
+    assert host.upgrades == ["hot", "espresso"]
 
 
 @pytest.mark.parametrize(
@@ -120,6 +126,11 @@ def test_host_with_custom_location():
             Host("a", {}, "org a", management_id="abc123"),
             Host("a", {}, "org a", management_id="def123"),
             marks=pytest.mark.xfail(reason="Different management IDs"),
+        ),
+        pytest.param(
+            Host("a", {}, "org a", upgrades=["123"]),
+            Host("a", {}, "org a", upgrades=["456"]),
+            marks=pytest.mark.xfail(reason="Different upgrades"),
         ),
         (
             Host("a", {}, "org a", management_id="abc123"),
@@ -194,6 +205,7 @@ def test_converting_host_to_dict():
         "cls": "host",
         "verifications": {},
         "patches": [],
+        "upgrades": []
     }
 
 
@@ -210,6 +222,7 @@ def test_host_json_conversion():
 
     del new_dict["verifications"]
     del new_dict["patches"]
+    del new_dict["upgrades"]
 
     assert original_dict == new_dict
 
@@ -227,6 +240,7 @@ def test_host_json_conversion_with_verifications():
     new_dict = host.to_dict()
 
     del new_dict["patches"]
+    del new_dict["upgrades"]
 
     assert original_dict == new_dict
 
@@ -243,6 +257,28 @@ def test_host_json_conversion_with_verifications_and_patches():
             {'cls': 'erratum', 'type': 'testing', 'id': 1, 'name': 'katprep-12', 'summary': 'Nice updates', 'issued_at': '2021-09-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False},
             {'cls': 'erratum', 'type': 'testing', 'id': 2, 'name': 'katprep-34', 'summary': 'Noice noice noice', 'issued_at': '2021-08-16T00:00:00', 'updated_at': '2021-09-16T00:00:00', 'reboot_suggested': False}
         ],
+        "upgrades": []
+    }
+
+    host = Host.from_dict(original_dict)
+    new_dict = host.to_dict()
+
+    assert original_dict == new_dict
+
+
+def test_host_json_conversion_with_upgrades():
+    original_dict = {
+        "hostname": "hans.hubert",
+        "params": {"sesame": "street"},
+        "organization": "Funky town",
+        "location": "Digges B",
+        "cls": "host",
+        "verifications": {"virt_snapshot": True},
+        "patches": [],
+        "upgrades": [
+            {"cls": "upgrade", "package_name": "tar", "package_id": None},
+            {"cls": "upgrade", "package_name": "gzip", "package_id": None}
+        ]
     }
 
     host = Host.from_dict(original_dict)
@@ -263,8 +299,10 @@ def test_host_representation():
     loc = "Japan"
     verifications = {"snapshot": "1"}
     patches = ["patch-1"]
+    management_id = "managed-987"
+    upgrades = ["upgrade-2"]
 
-    host = Host(hostname, params, org, loc, verifications, patches)
+    host = Host(hostname, params, org, loc, verifications, patches, management_id, upgrades)
     representation = repr(host)
     assert hostname in representation
     assert repr(params) in representation
@@ -272,6 +310,8 @@ def test_host_representation():
     assert loc in representation
     assert repr(verifications) in representation
     assert repr(patches) in representation
+    assert repr(management_id) in representation
+    assert repr(upgrades) in representation
 
 
 def test_host_type_identifier():
@@ -452,3 +492,61 @@ def test_erratum_comparison_by_id(uyuni_erratum):
     erratum2.id = erratum1.id + 1
 
     assert erratum1 != erratum2
+
+
+def test_upgrade():
+    upgrade = Upgrade("tar")
+
+    assert upgrade.package_name == "tar"
+
+
+def test_upgrade_representation():
+    upgrade = Upgrade("tar", package_id=1)
+
+    representation = repr(upgrade)
+
+    assert representation.startswith("Upgrade(")
+    assert representation.endswith(")")
+
+    assert repr(upgrade.package_name) in representation
+    assert repr(upgrade.package_id) in representation
+
+
+def test_upgrade_representation_with_package_id():
+    upgrade = Upgrade("tar", package_id=1)
+
+    representation = repr(upgrade)
+
+    assert representation.startswith("Upgrade(")
+    assert representation.endswith(")")
+
+    assert repr(upgrade.package_name) in representation
+    assert "package_id=" + repr(upgrade.package_id) in representation
+
+
+def test_upgrade_repr_contains_package_name():
+    package_name = "tar"
+    upgrade = Upgrade(package_name)
+
+    representation = repr(upgrade)
+
+    assert representation.startswith("Upgrade(")
+    assert representation.endswith(")")
+    assert repr(package_name) in representation
+
+
+def test_create_upgrade_from_dict():
+    upgrade = Upgrade.from_dict({"package_name": "gzup"})
+
+    assert upgrade.package_name == "gzup"
+
+def test_upgrade_json_conversion():
+    original_dict = {
+        "package_name": "entree",
+        "package_id": None,
+        "cls": "upgrade"
+    }
+    upgrade = Upgrade.from_dict(original_dict)
+    new_dict = upgrade.to_dict()
+
+    assert new_dict == original_dict

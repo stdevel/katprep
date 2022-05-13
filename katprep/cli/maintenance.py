@@ -221,14 +221,50 @@ def execute(options, args):
     :param args: argparse options dictionary containing parameters
     :type args: argparse options dict
     """
+    included_patches = set(options.include_patches)
+    LOGGER.debug(
+        "Only including only the following patches: %s",
+        ", ".join(included_patches)
+    )
+    excluded_patches = set(options.exclude_patches)
+    LOGGER.debug(
+        "Excluding the following patches: %s",
+        ", ".join(excluded_patches)
+    )
+    dry_run = options.generic_dry_run
+
+    upgrade_packages = options.upgrade_packages
+    if upgrade_packages:
+        LOGGER.debug("Installing package upgrades on hosts")
+        included_upgrades = set(options.include_upgrades)
+        LOGGER.debug(
+            "Only including the following upgrades: %s",
+            ", ".join(included_upgrades)
+        )
+        excluded_upgrades = set(options.exclude_upgrades)
+        LOGGER.debug(
+            "Excluding the following upgrades: %s",
+            ", ".join(excluded_upgrades)
+        )
+
     try:
         for host_obj in REPORT.values():
             LOGGER.debug("Patching host '%s'...", host_obj)
 
-            _install_erratas(host_obj, options.generic_dry_run)
+            _install_erratas(
+                host_obj,
+                dry_run,
+                included_patches,
+                excluded_patches
+            )
 
-            if options.upgrade_packages:
-                _install_package_upgrades(host_obj, options.generic_dry_run)
+            if upgrade_packages:
+                _install_package_upgrades(
+                    host_obj,
+                    dry_run,
+                    included_upgrades,
+                    excluded_upgrades
+                )
 
             reboot_wanted = SAT_CLIENT.is_reboot_required(host_obj)
             if options.mgmt_reboot or \
@@ -258,10 +294,11 @@ def execute(options, args):
         LOGGER.error("Error maintaining host: '%s'", err)
 
 
-def _install_erratas(host, dry_run):
-    LOGGER.debug("Errata of the host %s: %s", host, host.patches)
+def _install_erratas(host, dry_run, included_patches, excluded_patches):
+    LOGGER.debug("Erratas of the host %s: %s", host, host.patches)
     if host.patches:
-        patch_ids = [errata.id for errata in host.patches]
+        patches = _filter_host_patches(host, included_patches, excluded_patches)
+        patch_ids = [str(errata.id) for errata in patches]
         # show scripts and patches
         if host.patch_pre_script:
             LOGGER.info(
@@ -271,10 +308,7 @@ def _install_erratas(host, dry_run):
                 host.patch_pre_script_group
             )
         LOGGER.info(
-            "Host '%s' --> installing %i patches: %s",
-            host,
-            len(host.patches),
-            ", ".join(str(x) for x in patch_ids)
+            "Host '%s' --> installing %i patches: %s", host, len(patches), ", ".join(patch_ids)
         )
         if host.patch_post_script:
             LOGGER.info(
@@ -284,16 +318,45 @@ def _install_erratas(host, dry_run):
                 host.patch_post_script_group
             )
 
+        if not patches:
+            LOGGER.debug("No patches to install: skipping %s", host)
+
         if not dry_run:
             try:
-                SAT_CLIENT.install_patches(host, patch_ids)
+                SAT_CLIENT.install_patches(host, patches)
             except EmptySetException:
                 LOGGER.error("Errata not found, maybe already installed?")
     else:
         LOGGER.info("No errata for host %s available", host)
 
 
-def _install_package_upgrades(host, dry_run):
+def _filter_host_patches(host, patches_to_include, patches_to_exclude) -> list:
+    """
+    Filtering patches of a host based on a allowlist and denylist.
+    """
+    patches = host.patches
+
+    if patches_to_exclude:
+        patches = [
+            patch for patch in patches
+            if str(patch.id) not in patches_to_exclude
+        ]
+
+    if patches_to_include:
+        patches = [
+            patch for patch in patches
+            if str(patch.id) in patches_to_include
+        ]
+
+    LOGGER.debug(
+        "Patches for %s after filtering: %s",
+        host,
+        ", ".join(str(patch.id) for patch in patches)
+    )
+    return patches
+
+
+def _install_package_upgrades(host, dry_run, upgrades_to_include, upgrades_to_exclude):
     # show scripts and upgrades
     if host.patch_pre_script:
         LOGGER.info(
@@ -313,8 +376,29 @@ def _install_package_upgrades(host, dry_run):
             host.patch_post_script_group
         )
 
+    upgrades = None
+    if upgrades_to_include or upgrades_to_exclude:
+        upgrades = host.upgrades
+        if upgrades_to_exclude:
+            upgrades = [
+                upgrade for upgrade in upgrades
+                if upgrade.package_name not in upgrades_to_exclude
+            ]
+
+        if upgrades_to_include:
+            upgrades = [
+                upgrade for upgrade in upgrades
+                if upgrade.package_name in upgrades_to_include
+            ]
+
+        LOGGER.debug(
+            "Upgrades to install on %s after filtering: %s",
+            host,
+            ", ".join(upgrades)
+        )
+
     if not dry_run:
-        SAT_CLIENT.install_upgrades(host)
+        SAT_CLIENT.install_upgrades(host, upgrades)
 
 
 def revert(options, args):
@@ -663,6 +747,15 @@ def parse_options(args=None):
     cmd_execute.add_argument("-p", "--include-packages", action="store_true", \
     default=False, dest="upgrade_packages", help="installs available package" \
     " upgrades (default: no)")
+    cmd_execute.add_argument("--include-upgrades", dest="include_upgrades",
+        nargs="+", default=[], help="Include the given upgrades")
+    cmd_execute.add_argument("--exclude-upgrades", dest="exclude_upgrades",
+        nargs="+", default=[], help="Exclude the given upgrades")
+    cmd_execute.add_argument("--include-patches", nargs="+", default=[], dest="include_patches",
+        help="Include the given patches")
+    cmd_execute.add_argument("--exclude-patches", nargs="+", default=[], dest="exclude_patches",
+        help="Exclude the given patches")
+
     cmd_status = subparsers.add_parser("status", help="Display software " \
     "maintenance progress")
     cmd_status.set_defaults(func=status)
