@@ -698,9 +698,8 @@ def parse_options(args=None):
     metavar="URL", default="", help="defines a monitoring URL to use")
     #--mon-type
     mon_opts.add_argument("--mon-type", dest="mon_type", \
-    metavar="TYPE", type=str, choices="nagios|icinga|icinga2", default="icinga2", \
-    help="defines the monitoring system type: nagios, icinga (Icinga 1.x) or" \
-    " icinga2 (Icinga 2.x). (default: icinga2)")
+    metavar="nagios|icinga2", type=str, choices="nagios|icinga2", default="icinga2", \
+    help="defines the monitoring system type: nagios, icinga2. (default: icinga2)")
     #-K / --skip-downtime
     mon_opts.add_argument("-K", "--skip-downtime", dest="mon_skip_downtime", \
     action="store_true", default=False, \
