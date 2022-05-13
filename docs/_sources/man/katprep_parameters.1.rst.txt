@@ -26,7 +26,7 @@ infrastructure, use **katprep_populate(1)** as it offers auto-discovery.
 Host parameters
 ---------------
 
-The following host parameters are created/updated:
+The following Puppet host parameters are created/updated:
 
 katprep_mon
    URL of the monitoring system (see also **Monitoring URLs**)
@@ -51,41 +51,11 @@ katprep_virt_type
    Virtualization host type, [*libvirt*\ \|\ *pyvmovmi*] (default:
    libvirt)
 
-katprep_patch_pre_script
+katprep_pre-script
    Script to run before maintenance
 
-katprep_patch_pre_script_group
-   Effective pre-script group
-
-katprep_patch_pre_script_user
-   Effective pre-script user
-
-katprep_patch_post_script
+katprep_post-script
    Script to run after maintenance
-
-katprep_patch_post_script_group
-   Effective post-script group
-
-katprep_patch_post_script_user
-   Effective post-script user
-
-katprep_reboot_pre_script
-   Script to run before reboot
-
-katprep_reboot_pre_script_group
-   Effective pre-script group
-
-katprep_reboot_pre_script_user
-   Effective pre-script user
-
-katprep_reboot_post_script
-   Script to run after reboot
-
-katprep_reboot_post_script_group
-   Effective post-script group
-
-katprep_reboot_post_script_user
-   Effective post-script user
 
 For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
@@ -95,7 +65,7 @@ Options
 -h, –help
    Prints brief usage information.
 
--v, –version
+–version
    Prints the current version number.
 
 -q, –quiet

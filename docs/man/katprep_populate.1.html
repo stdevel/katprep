@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>NAME &#8212; katprep 0.5.0 documentation</title>
+    <title>NAME &#8212; katprep 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>  
@@ -45,12 +45,13 @@ hypervisor information for managed systems</p>
 <section id="synopsis">
 <h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
 <div class="line-block">
-<div class="line"><strong>katprep_populate</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>] [<strong>-n</strong>]
-[<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
-[<strong>–ipv6-only</strong>] [<strong>–insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-u</strong>]
-[<strong>–virt-uri</strong> <em>uri</em>] [<strong>–virt-type</strong> <em>libvirt</em>|<em>pyvmomi</em>]
-[<strong>–skip-virt</strong>] [<strong>–mon-url</strong> <em>url</em>] [<strong>–mon-type</strong>
-<em>nagios</em>|<em>icinga</em>] [<strong>–skip-mon</strong>]</div>
+<div class="line"><strong>katprep_populate</strong> [<strong>-h</strong>] [<strong>–version</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
+[<strong>-n</strong>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
+[<strong>–ipv6-only</strong>] [<strong>–insecure</strong>] [<strong>–mgmt-type</strong>
+<em>foreman</em>|<em>uyuni</em>] [<strong>-s</strong> <em>server</em>] [<strong>-u</strong>] [<strong>–virt-uri</strong>
+<em>uri</em>] [<strong>–virt-type</strong> <em>libvirt</em>|<em>pyvmomi</em>] [<strong>–skip-virt</strong>]
+[<strong>–mon-url</strong> <em>url</em>] [<strong>–mon-type</strong> <em>nagios</em>|<em>icinga</em>]
+[<strong>–skip-mon</strong>]</div>
 </div>
 </section>
 <section id="description">
@@ -65,7 +66,7 @@ and hypervisor are detected and configured as host parameters (see also
 </section>
 <section id="host-parameters">
 <h1>Host parameters<a class="headerlink" href="#host-parameters" title="Permalink to this headline">¶</a></h1>
-<p>The following Puppet host parameters are created/updated:</p>
+<p>The following host parameters are created/updated:</p>
 <dl class="simple">
 <dt>katprep_mon</dt><dd><p>URL of the monitoring system (see also <strong>Monitoring URLs</strong>)</p>
 </dd>
@@ -73,12 +74,38 @@ and hypervisor are detected and configured as host parameters (see also
 </dd>
 <dt>katprep_mon_type</dt><dd><p>Monitoring system type: [<em>nagios</em>|<em>icinga</em>] (default: icinga)</p>
 </dd>
+<dt>katprep_owner</dt><dd><p>System owner - REQUIRED as katprep won’t manage the system otherwise</p>
+</dd>
+<dt>katprep_patch_post_script</dt><dd><p>Script to run after maintenance</p>
+</dd>
+<dt>katprep_patch_post_script_group</dt><dd><p>Effective post-script group</p>
+</dd>
+<dt>katprep_patch_post_script_user</dt><dd><p>Effective post-script user</p>
+</dd>
+<dt>katprep_patch_pre_script</dt><dd><p>Script to run before maintenance</p>
+</dd>
+<dt>katprep_patch_pre_script_group</dt><dd><p>Effective pre-script group</p>
+</dd>
+<dt>katprep_patch_pre_script_user</dt><dd><p>Effective pre-script user</p>
+</dd>
+<dt>katprep_reboot_post_script</dt><dd><p>Script to run after reboot</p>
+</dd>
+<dt>katprep_reboot_post_script_group</dt><dd><p>Effective post-script group</p>
+</dd>
+<dt>katprep_reboot_post_script_user</dt><dd><p>Effective post-script user</p>
+</dd>
+<dt>katprep_reboot_pre_script</dt><dd><p>Script to run before reboot</p>
+</dd>
+<dt>katprep_reboot_pre_script_group</dt><dd><p>Effective pre-script group</p>
+</dd>
+<dt>katprep_reboot_pre_script_user</dt><dd><p>Effective pre-script user</p>
+</dd>
 <dt>katprep_virt</dt><dd><p>URI of the virtualization host (see also <strong>Virtualization URIs</strong>)</p>
+</dd>
+<dt>katprep_virt_name</dt><dd><p>Object name within hypervisor if not FQDN</p>
 </dd>
 <dt>katprep_virt_snapshot</dt><dd><p>Boolean [<em>0</em>|<em>1</em>] whether the system needs to be protected by a
 snapshot</p>
-</dd>
-<dt>katprep_virt_name</dt><dd><p>Object name within hypervisor if not FQDN</p>
 </dd>
 <dt>katprep_virt_type</dt><dd><p>Virtualization host type, [<em>libvirt</em>|<em>pyvmovmi</em>] (default:
 libvirt)</p>
@@ -90,7 +117,7 @@ libvirt)</p>
 <dl class="simple">
 <dt>-h, –help</dt><dd><p>Prints brief usage information.</p>
 </dd>
-<dt>-v, –version</dt><dd><p>Prints the current version number.</p>
+<dt>–version</dt><dd><p>Prints the current version number.</p>
 </dd>
 <dt>-q, –quiet</dt><dd><p>Supresses printing status messages to stdout.</p>
 </dd>
@@ -224,12 +251,12 @@ the <strong>dry-run</strong> parameter if they are correct.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Christian Stankowic.
+        &#169; Copyright 2022, Christian Stankowic.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>

@@ -2,8 +2,7 @@ NAME
 ====
 
 **katprep** — Python toolkit for automating system maintenance and
-generating patch reports along with Foreman/Katello and Red Hat
-Satellite 6.x
+generating patch reports along with Foreman/Katello and Uyuni
 
 DESCRIPTION
 ===========

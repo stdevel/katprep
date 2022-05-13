@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Represent your system landscape &#8212; katprep 0.5.0 documentation</title>
+    <title>Represent your system landscape &#8212; katprep 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="authentication.html" title="Authentication"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.6.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Represent your system landscape</a></li> 
       </ul>
     </div>  
@@ -47,12 +47,12 @@
             
   <section id="represent-your-system-landscape">
 <h1>Represent your system landscape<a class="headerlink" href="#represent-your-system-landscape" title="Permalink to this headline">¶</a></h1>
-<p>In order to use katprep it is necessary to assign necessary meta information to your hosts managed by Foreman/Katello or Red Hat Satellite. katprep utilizes these information to automate maintenance tasks.</p>
+<p>In order to use katprep it is necessary to assign necessary meta information to your hosts managed by Foreman/Katello or Uyuni. katprep utilizes these information to automate maintenance tasks.</p>
 <p>See <strong>this site</strong> to see a list of available host parameters and how they affect katprep.</p>
 <p>To assign these parameters, katprep offers two utilities:</p>
 <section id="katprep-populate">
 <h2>katprep_populate<a class="headerlink" href="#katprep-populate" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">katprep_populate</span></code> retrieves hosts and network information from your monitoring system and hypervisor. Afterwards it tries to link these information with the hosts managed by Foreman/Katello or Red Hat Satellite. In other words, it will discover which of your managed hosts are monitored and also detects virtual machines. Afterwards, these meta information are added host parameters to enable further automation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">katprep_populate</span></code> retrieves hosts and network information from your monitoring system and hypervisor. Afterwards it tries to link these information with the hosts managed by Foreman/Katello or Uyuni. In other words, it will discover which of your managed hosts are monitored and also detects virtual machines. Afterwards, these meta information are added host parameters to enable further automation.</p>
 <p>The following example scans a vCenter Server installation (<code class="docutils literal notranslate"><span class="pre">--virt-uri</span></code>) via the pyVmomi API (<code class="docutils literal notranslate"><span class="pre">virt-type</span></code>) and an Icinga2 monitoring host (<code class="docutils literal notranslate"><span class="pre">--mon-url</span></code>). Authentication credentials are retrieved from an authentication container (<code class="docutils literal notranslate"><span class="pre">-C</span></code>). Changes are not merged into Foreman/Katello, <code class="docutils literal notranslate"><span class="pre">katprep_populate</span></code> only simulates what would be done (<code class="docutils literal notranslate"><span class="pre">--dry-run</span></code>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_populate --virt-uri st-vcsa03.stankowic.loc --virt-type pyvmomi --mon-url https://st-mon03.stankowic.loc:5665 -C pinkepank.auth --dry-run
 INFO:katprep_populate:This is just a SIMULATION - no changes will be made.
@@ -157,12 +157,12 @@ Enter value for &#39;katprep_mon&#39; (hint: URL of the monitoring system): http
         <li class="right" >
           <a href="authentication.html" title="Authentication"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.6.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Represent your system landscape</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Christian Stankowic.
+        &#169; Copyright 2022, Christian Stankowic.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>

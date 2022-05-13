@@ -6,8 +6,8 @@ NAME
 SYNOPSIS
 ========
 
-| **katprep_report** [**-h**] [**-v**] [**-q**] [**-d**] [**-p** *path*]
-  [**-o** *path*] [**-x**] [**-t** *file*] *snapshot_file*
+| **katprep_report** [**-h**] [**–version**] [**-q**] [**-d**] [**-p**
+  *path*] [**-o** *path*] [**-x**] [**-t** *file*] *snapshot_file*
   *snapshot_file*
 
 DESCRIPTION
@@ -27,7 +27,7 @@ Options
 -h, –help
    Prints brief usage information.
 
--v, –version
+–version
    Prints the current version number.
 
 -q, –quiet

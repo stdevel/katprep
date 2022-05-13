@@ -7,8 +7,8 @@ triggered by katprep
 SYNOPSIS
 ========
 
-| **katprep_authconfig** [**-h**] [**-v**] [**-q**] [**-d**] [*file*]
-  [**list**\ \|\ **add**\ \|\ **remove**\ \|\ **password**]
+| **katprep_authconfig** [**-h**] [**–version**] [**-q**] [**-d**]
+  [*file*] [**list**\ \|\ **add**\ \|\ **remove**\ \|\ **password**]
 
 DESCRIPTION
 ===========
@@ -27,7 +27,7 @@ Options
 -h, –help
    Prints brief usage information.
 
--v, –version
+–version
    Prints the current version number.
 
 -q, –quiet

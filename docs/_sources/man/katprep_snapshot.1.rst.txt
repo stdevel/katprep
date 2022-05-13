@@ -6,7 +6,7 @@ NAME
 SYNOPSIS
 ========
 
-| **katprep_snapshot** [**-h**] [**-v**] [**-q**] [**-d**] [**-p**
+| **katprep_snapshot** [**-h**] [**–version**] [**-q**] [**-d**] [**-p**
   *path*] [**-C** *authentication_contianer*] [**-P** *password*]
   [**-s** *server*] [**–insecure**] [**-l** *name*\ \|\ *id* \| **-o**
   *name*\ \|\ *id* \| **-g** *name*\ \|\ *id* \| **-e**
