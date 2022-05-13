@@ -2,8 +2,7 @@ NAME
 ====
 
 **katprep** — Python toolkit for automating system maintenance and
-generating patch reports along with Foreman/Katello and Red Hat
-Satellite 6.x
+generating patch reports along with Foreman/Katello and Uyuni.
 
 DESCRIPTION
 ===========
@@ -17,7 +16,7 @@ katprep is a toolkit for automating system maintenance tasks such as:
 -  Checking monitoring and snapshot status
 -  Reverting VM snapshots
 -  Removing downtimes and snapshots
--  Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
+-  Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
    IT certifications)
 
 For VM management, the **libvirt** and **pyVmomi** (VMware vSphere

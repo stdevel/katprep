@@ -6,9 +6,8 @@ NAME
 SYNOPSIS
 ========
 
-| **katprep_report** [**-h**] [**-v**] [**-q**] [**-d**] [**-p** *path*]
-  [**-o** *path*] [**-x**] [**-t** *file*] *snapshot_file*
-  *snapshot_file*
+| **katprep_report** [**-h**] [**--version**] [**-q**] [**-d**] [**-p** *path*]
+  [**-o** *path*] [**-x**] [**-t** *file*] *snapshot_files*
 
 DESCRIPTION
 ===========
@@ -24,34 +23,34 @@ Run this utility after maintaining systems using
 Options
 -------
 
--h, –help
+-h, --help
    Prints brief usage information.
 
--v, –version
+-v, --version
    Prints the current version number.
 
--q, –quiet
+-q, --quiet
    Supresses printing status messages to stdout.
 
--d, –debug
+-d, --debug
    Enables debugging outputs.
 
--p *path*, –output-path *path*
+-p *path*, --output-path *path*
    Defines the report output path (default: current directory)
 
--C *filename*, –auth-container *filename*
+-C *filename*, --auth-container *filename*
    Defines an authentication container file (see also
    **katprep.auth(5)** and **katprep_authconfig(1)**)
 
--o *type*, –output-tpe *type*
+-o *type*, --output-type *type*
    Defines the Pandoc output file type, usually this is set
    automatically based on the template file extension (default: no)
 
--x, –preserve-yaml
+-x, --preserve-yaml
    Keeps the YAML metadata after creating the reports, useful for
    debugging (default: no)
 
--t *file*, –template *file*
+-t *file*, --template *file*
    Defined the Pandoc template to use
 
 FILES
