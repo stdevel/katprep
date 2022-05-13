@@ -54,6 +54,9 @@ def test_loading_katello_report(example_katello_report_path):
         assert erratum.issued_at == datetime(year=2020, month=5, day=10)
         assert erratum.updated_at == datetime(year=2021, month=3, day=23)
 
+        assert isinstance(host.upgrades, list)
+        assert 0 == len(host.upgrades)
+
 
 @pytest.fixture
 def temp_report_path(tmp_path):
@@ -127,6 +130,9 @@ def test_reading_uyuni_snapshot_report(example_uyuni_report_path):
         for patch in patches:
             assert isinstance(patch, Erratum)
         # TODO: Test the patch contents
+
+        assert isinstance(host.upgrades, list)
+        assert 0 == len(host.upgrades)
 
 
 def test_uyuni_report_validation(example_uyuni_report_path):

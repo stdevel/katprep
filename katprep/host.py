@@ -23,6 +23,8 @@ def from_dict(some_dict):
         return HostGroup.from_dict(some_dict)
     elif object_type == "erratum":
         return Erratum.from_dict(some_dict)
+    elif object_type == "upgrade":
+        return Upgrade.from_dict(some_dict)
     else:
         raise ValueError("Unknown type {!r}".format(object_type))
 
@@ -40,6 +42,7 @@ class Host:
         verifications=None,
         patches=None,
         management_id=None,
+        upgrades=None
     ):
         self._hostname = hostname
         self._management_id = management_id
@@ -48,6 +51,7 @@ class Host:
         self._location = location
         self._verifications = verifications or {}
         self._patches = patches or []
+        self._upgrades = upgrades or []
 
     @property
     def patch_pre_script(self):
@@ -174,6 +178,10 @@ class Host:
     def management_id(self):
         return self._management_id or self._hostname
 
+    @property
+    def upgrades(self):
+        return self._upgrades
+
     def get_param(self, key):
         """
         Get the parameter from the host.
@@ -220,6 +228,7 @@ class Host:
             "cls": self.type,
             "verifications": self._verifications,
             "patches": [patch.to_dict() for patch in self._patches],
+            "upgrades": [upgrade.to_dict() for upgrade in self._upgrades],
         }
 
         if self._location:
@@ -270,6 +279,9 @@ class Host:
         except KeyError:
             management_id = host_dict.get("management_id")
 
+        upgrades = host_dict.get("upgrades", [])
+        upgrades = [Upgrade.from_dict(upgrade) for upgrade in upgrades]
+
         return Host(
             hostname,
             host_dict["params"],
@@ -278,17 +290,19 @@ class Host:
             verifications,
             patches,
             management_id,
+            upgrades,
         )
 
     def __repr__(self):
-        return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
+        return "Host({!r}, {!r}, {!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
             self._hostname,
             self._params,
             self._organization,
             self._location,
             self._verifications,
             self._patches,
-            self._management_id
+            self._management_id,
+            self._upgrades
         )
 
     def __str__(self):
@@ -314,6 +328,9 @@ class Host:
             return False
 
         if self.management_id != other.management_id:
+            return False
+
+        if self.upgrades != other.upgrades:
             return False
 
         return True
@@ -454,6 +471,60 @@ class Erratum:
             self.issued_at,
             self.updated_at,
             self.reboot_suggested,
+        )
+
+
+class Upgrade:
+
+    _OBJECT_TYPE = "upgrade"
+
+    def __init__(self, package_name, package_id=None):
+        self._package_name = package_name
+        self._package_id = package_id
+
+    @property
+    def package_name(self):
+        return self._package_name
+
+    @property
+    def package_id(self):
+        return self._package_id
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        try:
+            package_name = data["package_name"]
+        except KeyError:
+            package_name = data["name"]  # Uyuni
+
+        try:
+            package_id = data["package_id"]
+        except KeyError:
+            package_id = data.get("to_package_id", None)
+
+        return cls(
+            package_name,
+            package_id,
+        )
+
+    def to_dict(self):
+        return {
+            "cls": self._OBJECT_TYPE,
+            "package_name": self._package_name,
+            "package_id": self._package_id,
+        }
+
+    def __repr__(self):
+        if self._package_id:
+            return "{}({!r}, package_id={!r})".format(
+                self.__class__.__name__,
+                self.package_name,
+                self.package_id,
+            )
+
+        return "{}({!r})".format(
+            self.__class__.__name__,
+            self.package_name,
         )
 
 

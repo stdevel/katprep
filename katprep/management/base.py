@@ -3,7 +3,7 @@ Basic management client
 """
 
 from abc import abstractmethod
-
+from typing import List, Optional
 from ..connector import BaseConnector
 
 
@@ -36,9 +36,12 @@ class ManagementClient(BaseConnector):
         Installs upgrades without running the pre-script
         """
 
-    def install_patches(self, host):
+    def install_patches(self, host, patches: Optional[List] = None):
         """
-        Apply the patches with the given errata_ids on the given host.
+        Apply patches on the given host.
+
+        If no `patches` are given all patches that are available for
+        the host will be installed.
         """
         if host.patch_pre_script:
             self.install_pre_script(host)
@@ -46,11 +49,14 @@ class ManagementClient(BaseConnector):
         if host.patch_post_script:
             self.install_post_script(host)
 
-    def install_upgrades(self, host):
+    @abstractmethod
+    def install_upgrades(self, host, upgrades: Optional[List] = None):
         """
-        Upgrade all packages on the given host.
-
+        Upgrade packages on the given host.
         This does include upgrades that are not part of an errata.
+
+        If `upgrades` is `None` all upgrades on the host will be
+        installed.
         """
         if host.patch_pre_script:
             self.install_pre_script(host)

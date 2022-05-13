@@ -10,13 +10,13 @@ from __future__ import absolute_import
 
 import argparse
 import logging
-import json
 import time
 import getpass
 from .. import (__version__, get_credentials, is_writable)
 from ..exceptions import SessionException
 from ..management import get_management_client
 from ..network import validate_hostname
+from ..reports import write_report
 
 LOGGER = logging.getLogger("katprep_snapshot")
 """
@@ -260,14 +260,13 @@ def create_report(system_info):
     """
     if system_info:
         try:
-            with open(OUTPUT_FILE, "w") as target:
-                target.write(json.dumps(system_info))
+            write_report(OUTPUT_FILE, system_info)
         except IOError as err:
             LOGGER.error("Unable to store report: '%s'", err)
         else:
             LOGGER.info("Report '%s' created.", OUTPUT_FILE)
     else:
-        LOGGER.info("Empty report - please check.")
+        LOGGER.warning("Empty report - please check.")
 
 
 def main(options, args):

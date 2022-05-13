@@ -18,6 +18,7 @@ from ..exceptions import (
     SSLCertVerificationError,
     CustomVariableExistsException
 )
+from ..host import Upgrade
 
 
 class UyuniAPIClient(BaseConnector):
@@ -338,13 +339,22 @@ class UyuniAPIClient(BaseConnector):
             )
             return patch
         except Fault as err:
-            if "no such patch" in err.faultString.lower():
+            def missing_patch(error_message):
+                message = error_message.lower()
+                if ("no such patch" in message or
+                    ("the patch" in message and "cannot be found" in message)):
+                    return True
+
+                return False
+
+            if missing_patch(err.faultString):
                 raise EmptySetException(
                     f"Patch not found: {patch_name!r}"
-                )
+                ) from err
+
             raise SessionException(
                 f"Generic remote communication error: {err.faultString!r}"
-            )
+            ) from err
 
     def get_package_by_file_name(self, file_name):
         """
@@ -488,22 +498,33 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_plain_patches(self, host, patches):
+    def install_plain_patches(self, host, patches=None):
         """
         Install patches on a given system
 
-        :param host: host on which to install updates
-        :type host: host object
-        :param patches: patches to be installed
-        :type patches: int array
+        :param host: The host on which to install updates
+        :type host: Host
+        :param patches: If given only installs the given patches.
+        :type patches: list
         """
-        system_id = host.management_id
+        # system_id = host.management_id
         # ensure that only integers are given
-        patches = [x for x in patches if isinstance(x, int)]
-        if not patches:
-            raise EmptySetException(
-                "No patches supplied - use patch IDs"
-            )
+        # TODO: remove???
+        # patches = [x for x in patches if isinstance(x, int)]
+        if patches is None:
+            patches = host.patches  # installing all patches
+
+        # if not patches:
+        #     raise EmptySetException(
+        #         "No patches supplied - use patch IDs"
+        #     )
+
+        try:
+            patches = [errata.id for errata in patches]
+        except AttributeError as atterr:
+            raise EmptySetException("Unable to get patch IDs") from atterr
+
+        system_id = host.management_id
 
         try:
             action_id = self._session.system.scheduleApplyErrata(
@@ -523,28 +544,40 @@ class UyuniAPIClient(BaseConnector):
                 f"Generic remote communication error: {err.faultString!r}"
             )
 
-    def install_plain_upgrades(self, host, upgrades):
+    def install_plain_upgrades(self, host, upgrades=None):
         """
         Install package upgrades on a given system
 
-        :param host: host to upgrade
-        :type host: host object
-        :param patches: patches to be installed
-        :type patches: int array
+        :param host: The host to upgrade
+        :type host: Host
+        :param upgrades: Specific upgrades to install
+        :type upgrades: list
         """
         system_id = host.management_id
-        # ensure that only integers are given
-        upgrades = [x for x in upgrades if isinstance(x, int)]
+
+        if upgrades is None:
+            upgrades = self.get_host_upgrades(system_id)
+            upgrades = [Upgrade.from_dict(package) for package in upgrades]
         if not upgrades:
-            raise EmptySetException(
-                "No upgrades supplied - use package IDs"
-            )
+            self.LOGGER.debug("No upgrades for %s", host)
+            return  # Nothing to do
+
+        upgrade_ids = []
+        try:
+            for upgrade in upgrades:
+                package_id = upgrade.package_id
+                if package_id is None:
+                    raise ValueError("{!r} has no valid package id set!".format(upgrade))
+
+                upgrade_ids.append(package_id)
+        except (TypeError, AttributeError, ValueError) as conversion_error:
+            raise EmptySetException("Invalid package type") from conversion_error
 
         earliest_execution = DateTime(datetime.now().timetuple())
 
         try:
             action_id = self._session.system.schedulePackageInstall(
-                self._api_key, system_id, upgrades, earliest_execution
+                self._api_key, system_id, upgrade_ids, earliest_execution
             )
 
             # returning an array to be consistent with install_patches
@@ -605,7 +638,13 @@ class UyuniAPIClient(BaseConnector):
         :param host: host to reboot
         :type host: host object
         """
-        system_id = host.management_id
+        try:
+            system_id = host.management_id
+        except AttributeError as attrerr:
+            raise EmptySetException(
+                f"Unable to get management id from {host}"
+            ) from attrerr
+
         if not isinstance(system_id, int):
             raise EmptySetException(
                 "No system found - use system profile IDs"
