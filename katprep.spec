@@ -1,7 +1,7 @@
 %define name katprep
-%define version 0.5.0
-%define unmangled_version 0.5.0
-%define unmangled_version 0.5.0
+%define version 0.6.0
+%define unmangled_version 0.6.0
+%define unmangled_version 0.6.0
 %define release 1
 
 Summary: Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Uyuni
