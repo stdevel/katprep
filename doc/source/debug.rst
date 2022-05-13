@@ -8,7 +8,7 @@ This software is at an early stage, so perhaps things might explode. This page d
 Getting help
 ------------
 Basically, the best idea when having problems is to open an issue on GitHub_. Please supply the following information:
- - the Foreman/Katello or Red Hat Satellite version you are using
+ - the Foreman/Katello or Uyuni version you are using
  - the katprep version you're using
  - a short description of your landscape (*e.g. single Foreman instance with some VMs running on a single ESXi host*)
  - debugging output of the command you're facing errors with (*see also Debugging*) - please attach a file instead of pasting the console output directly in the issue

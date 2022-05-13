@@ -24,7 +24,7 @@ setup(
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.5.0',
-    description='Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Red Hat Satellite 6.x',
+    description='Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Uyuni',
     long_description=long_description,
     url='https://github.com/stdevel/katprep',
     author='Christian Stankowic',

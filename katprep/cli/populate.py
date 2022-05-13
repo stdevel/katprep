@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=not-callable
 """
-A script which populates the Foreman/Katello or Red Hat Satellite 6 host
+A script which populates the Foreman/Katello or Uyuni host
 parameters with information from Nagios/Icinga or a virtualization host
 """
 
@@ -127,7 +127,7 @@ def populate(options):
 def parse_options(args=None):
     """Parses options and arguments."""
     desc = '''%(prog)s is used for populating/updating
-    Foreman/Katello and Red Hat Satellite 6 host parameters with information
+    Foreman/Katello and Uyuni host parameters with information
     gathered from Nagios, Icinga and Icinga2 and virtualization environments
     accessible via libvirt or pyVmomi (VMware vSphere Python API).
     '''

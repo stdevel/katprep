@@ -3,7 +3,7 @@
 # pylint: disable=not-callable
 """
 A script for managing Puppet host parameters for systems managed with
-Foreman/Katello or Red Hat Satellite 6.
+Foreman/Katello or Uyuni.
 """
 
 from __future__ import absolute_import
@@ -191,7 +191,7 @@ def manage_params(options):
 def parse_options(args=None):
     """Parses options and arguments."""
     desc = """%(prog)s is used for managing Puppet host parameters
-    for systems managed with Foreman/Katello or Red Hat Satellite 6. You can
+    for systems managed with Foreman/Katello or Uyuni. You can
     create, remove and audit host parameters for all systems. These parameters
     are evaluated by katprep_snapshot to create significant reports.
     Login credentials need to be entered interactively or specified using

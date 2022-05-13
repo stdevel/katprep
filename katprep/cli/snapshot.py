@@ -3,7 +3,7 @@
 # pylint: disable=not-callable
 """
 A script for creating a snapshot report of available errata and updates for
-systems managed with Foreman/Katello or Red Hat Satellite 6.
+systems managed with Foreman/Katello or Uyuni.
 """
 
 from __future__ import absolute_import

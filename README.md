@@ -29,7 +29,7 @@ You want to contribute? That's great! Please check-out the [**Issues**](https://
 
 ## How does this work?
 
-katprep uses Puppet host parameters to assign additional meta information to systems managed with Foreman/Katello or Red Hat Satellite such as:
+katprep uses Puppet host parameters to assign additional meta information to systems managed with Foreman/Katello or Uyuni such as:
 
 - monitoring/virtualization system managing the host
 - differing object names within those systems
@@ -41,4 +41,4 @@ If you plan to execute maintenance tasks, katprep triggers (*`katprep_maintenanc
 
 As a result, patching big system landscapes becomes less time-consuming with katprep: it's only executing three commands - independent whether you are patching 1 host or 1000 hosts.
 
-To make the installation even easier, an auto-discover functionality can scan your monitoring systems and hypervisors and link gathered information with Foreman/Katello and Red Hat Satellite automatically (``katprep_populate``).
+To make the installation even easier, an auto-discover functionality can scan your monitoring systems and hypervisors and link gathered information with Foreman/Katello and Uyuni automatically (``katprep_populate``).
