@@ -450,7 +450,7 @@ def test_get_host_actions_nonexistent(client):
         client.get_host_actions(random.randint(800, 1500))
 
 
-def test_host_patch_do_install(client, host):
+def test_host_patch_do_install(client, host, host_obj):
     """
     Ensure that patches can be installed
     """
@@ -460,7 +460,7 @@ def test_host_patch_do_install(client, host):
         raise EmptySetException("No patches available - reset uyuniclient VM")
 
     # install random patch
-    _patches = [Erratum.from_dict(raw_patch) for raw_patch in patches]
+    _patches = [Erratum.from_dict(raw_patch) for raw_patch in host_obj.patches]
     action_id = client.install_patches(
         host,
         [random.choice(_patches)]
@@ -473,7 +473,7 @@ def test_host_patch_do_install(client, host):
         task = client.get_host_action(host_obj.management_id, action_id)[0]
 
 
-def test_host_patch_invalid_format(client, host):
+def test_host_patch_invalid_format(client, host, host_obj):
     """
     Ensure that patches cannot be installed when supplying
     invalid formats (strings instead of integers)
@@ -536,7 +536,7 @@ def test_host_patch_already_installed(client, host_obj):
         )
 
 
-def test_host_upgrade_do_install(client, host):
+def test_host_upgrade_do_install(client, host, host_obj):
     """
     Ensure that package upgrades can be installed
     """
@@ -1091,8 +1091,8 @@ def test_host_upgrade_scripts(host_obj, client):
 
     # set custom variables
     _vars = {
-        "katprep_pre-script": "sleep 10",
-        "katprep_post-script": "sleep 10"
+        "katprep_patch_pre_script": "sleep 10",
+        "katprep_patch_post_script": "sleep 10"
     }
     for _var in _vars:
         client.host_add_custom_variable(
@@ -1135,8 +1135,8 @@ def test_host_patch_scripts(host_obj, client):
 
     # set custom variables
     _vars = {
-        "katprep_pre-script": "sleep 10",
-        "katprep_post-script": "sleep 10"
+        "katprep_pre_script": "sleep 10",
+        "katprep_post_script": "sleep 10"
     }
     for _var in _vars:
         client.host_add_custom_variable(
