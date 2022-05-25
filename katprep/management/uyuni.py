@@ -1171,6 +1171,11 @@ class UyuniAPIClient(BaseConnector):
                 "No system found - use system profile IDs"
             )
 
+        if not upgrades:
+            raise EmptySetException(
+                "No upgrades defined"
+            )
+
         try:
             action_id = self._session.actionchain.addPackageUpgrade(
                 self._api_key, system_id, upgrades, chain_label
@@ -1323,9 +1328,13 @@ class UyuniAPIClient(BaseConnector):
             )
 
         # add upgrades
-        action_ids.append(
-            self.actionchain_add_upgrades(chain_label, system_id, upgrades)
-        )
+        try:
+            action_ids.append(
+                self.actionchain_add_upgrades(chain_label, system_id, upgrades)
+            )
+        except EmptySetException as err:
+            if err == "No upgrades defined":
+                pass
 
         if host.patch_post_script:
             action_ids.append(
