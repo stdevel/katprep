@@ -2,7 +2,7 @@
 Represent your system landscape
 ===============================
 
-In order to use katprep it is necessary to assign necessary meta information to your hosts managed by Foreman/Katello or Red Hat Satellite. katprep utilizes these information to automate maintenance tasks.
+In order to use katprep it is necessary to assign necessary meta information to your hosts managed by Foreman/Katello or Uyuni. katprep utilizes these information to automate maintenance tasks.
 
 See **this site** to see a list of available host parameters and how they affect katprep.
 
@@ -11,7 +11,7 @@ To assign these parameters, katprep offers two utilities:
 ----------------
 katprep_populate
 ----------------
-``katprep_populate`` retrieves hosts and network information from your monitoring system and hypervisor. Afterwards it tries to link these information with the hosts managed by Foreman/Katello or Red Hat Satellite. In other words, it will discover which of your managed hosts are monitored and also detects virtual machines. Afterwards, these meta information are added host parameters to enable further automation.
+``katprep_populate`` retrieves hosts and network information from your monitoring system and hypervisor. Afterwards it tries to link these information with the hosts managed by Foreman/Katello or Uyuni. In other words, it will discover which of your managed hosts are monitored and also detects virtual machines. Afterwards, these meta information are added host parameters to enable further automation.
 
 The following example scans a vCenter Server installation (``--virt-uri``) via the pyVmomi API (``virt-type``) and an Icinga2 monitoring host (``--mon-url``). Authentication credentials are retrieved from an authentication container (``-C``). Changes are not merged into Foreman/Katello, ``katprep_populate`` only simulates what would be done (``--dry-run``)::
 

@@ -5,5 +5,5 @@ python:
 install: "pip install -r requirements-tests.txt"
 
 script:
-  - pytest --cov=katprep
+  - pytest
   - codecov

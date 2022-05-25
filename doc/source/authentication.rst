@@ -3,7 +3,7 @@ Authentication
 ==============
 Scripts of the **katprep** framework require access to various management systems including:
 
-* Foreman/Katello or Red Hat Satellite 6.x
+* Foreman/Katello or Uyuni
 * Nagios/Icinga or Icinga2
 * VMware vSphere / vCenter Server or other hypervisors (*such as Microsoft Hyper-V*)
 

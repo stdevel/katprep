@@ -8,12 +8,12 @@
 errata-*.html
 errata-*.yml
 errata-*.md
-test*.py
 test*.yml
 TODO
 .buildinfo
 build/
 dist/
+uyuni_config.json.lab
 
 # Python dirs
 __pycache__

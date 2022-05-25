@@ -125,17 +125,15 @@ class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
         return (current_time, end_time)
 
     def _manage_downtime(
-        self, object_name, object_type, hours, comment, remove_downtime
+        self, obj, hours, comment, remove_downtime
     ):
         """
         Adds or removes scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
         You can also specify a comment and downtime period.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: host or hostgroup
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         :param hours: Amount of hours for the downtime
         :type hours: int
         :param comment: Downtime comment
@@ -146,18 +144,18 @@ class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
         # calculate timerange
         (current_time, end_time) = self.calculate_time_range(hours)
 
-        if object_type.lower() == "hostgroup":
+        if obj.type == "hostgroup":
             if remove_downtime:
                 # remove hostgroup downtime
                 payload = {
                     "type": "Host",
-                    "filter": '"{}" in host.groups'.format(object_name),
+                    "filter": '"{}" in host.groups'.format(obj.monitoring_id),
                 }
             else:
                 # create hostgroup downtime
                 payload = {
                     "type": "Host",
-                    "filter": '"{}" in host.groups'.format(object_name),
+                    "filter": '"{}" in host.groups'.format(obj.monitoring_id),
                     "start_time": current_time.timestamp(),
                     "end_time": end_time.timestamp(),
                     "fixed": True,
@@ -169,13 +167,13 @@ class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
                 # remove host downtime
                 payload = {
                     "type": "Host",
-                    "filter": 'host.name=="{}"'.format(object_name),
+                    "filter": 'host.name=="{}"'.format(obj.monitoring_id),
                 }
             else:
                 # create host downtime
                 payload = {
                     "type": "Host",
-                    "filter": 'host.name=="{}"'.format(object_name),
+                    "filter": 'host.name=="{}"'.format(obj.monitoring_id),
                     "start_time": current_time.timestamp(),
                     "end_time": end_time.timestamp(),
                     "fixed": True,
@@ -203,65 +201,55 @@ class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
 
         return result
 
-    def schedule_downtime(
-        self, object_name, object_type, hours=8, comment=DOWNTIME_COMMENT
-    ):
+    def schedule_downtime(self, obj, hours=8, comment=DOWNTIME_COMMENT):
         """
         Adds scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
         Optionally, you can specify a customized comment and downtime
         period (the default is 8 hours).
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: host or hostgroup
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         :param hours: Amount of hours for the downtime (default: 8 hours)
         :type hours: int
         :param comment: Downtime comment
         :type comment: str
         """
-        return self._manage_downtime(
-            object_name, object_type, hours, comment, remove_downtime=False
-        )
+        return self._manage_downtime(obj, hours, comment, remove_downtime=False)
 
-    def remove_downtime(self, object_name, object_type):
+    def remove_downtime(self, obj):
         """
         Removes scheduled downtime for a host or hostgroup
         For this, a object name is required.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: host or hostgroup
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         """
         return self._manage_downtime(
-            object_name,
-            object_type,
+            obj,
             8,
             "Downtime managed by katprep",
             remove_downtime=True,
         )
 
-    def has_downtime(self, object_name, object_type="host"):
+    def has_downtime(self, obj):
         """
         Returns whether a particular object (host, hostgroup) is currently in
         scheduled downtime. This required specifying an object name and type.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: Host or hostgroup (default: host)
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         """
         # retrieve and load data
         try:
             result = self._api_get(
-                "/objects/{}s?host={}".format(object_type, object_name)
+                "/objects/{}s?host={}".format(obj.type, obj.monitoring_id)
             )
             data = json.loads(result.text)
+
             # check if downtime
             # TODO: how to do this for hostgroups?!
-            if object_type == "host":
+            if obj.type == "host":
                 for result in data["results"]:
                     if result["attrs"]["downtime_depth"] > 0:
                         return True
@@ -270,18 +258,18 @@ class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
             if "404" in err.message:
                 raise EmptySetException("Host not found")
 
-    def get_services(self, object_name, only_failed=True):
+    def get_services(self, obj, only_failed=True):
         """
         Returns all or failed services for a particular host.
 
-        :param object_name:
-        :type object_name: str
+        :param obj: Host to get services from
+        :type obj: Host
         :param only_failed: True will only report failed services
         :type only_failed: bool
         """
         # retrieve result
         result = self._api_get(
-            '/objects/services?filter=match("{}",host.name)'.format(object_name)
+            '/objects/services?filter=match("{}",host.name)'.format(obj.monitoring_id)
         )
         data = json.loads(result.text)
         services = []
@@ -297,7 +285,7 @@ class Icinga2APIClient(MonitoringClientBase, HttpApiClient):
 
         if len(services) == 0:
             # empty set
-            raise EmptySetException("No results for host {!r}".format(object_name))
+            raise EmptySetException("No results for host {!r}".format(obj.monitoring_id))
 
         return services
 

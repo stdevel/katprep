@@ -1,18 +1,20 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>NAME &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>NAME &#8212; katprep 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
@@ -25,7 +27,8 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>  
 
@@ -34,11 +37,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="name">
+  <section id="name">
 <h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
 <p><strong>katprep.auth</strong> — An individual katprep authentication container file</p>
-</div>
-<div class="section" id="description">
+</section>
+<section id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
 <p>A <em>katprep.auth</em> file is an individual authentication container file
 used by the <strong>katprep(1)</strong> framework in order to gain access to external
@@ -49,42 +52,46 @@ also be protected by a passphrase. In this case, you need to enter the
 passphrase once when using the container.</p>
 <p>A valid document contains a dictionary containing hostnames and another
 dictionary specifying the following fields:</p>
-<dl class="docutils">
-<dt>username</dt>
-<dd>A valid username</dd>
-<dt>password</dt>
-<dd><p class="first">Appropriate password</p>
-<p class="last">Example:</p>
+<dl>
+<dt>username</dt><dd><p>A valid username</p>
+</dd>
+<dt>password</dt><dd><p>Appropriate password</p>
+<p>Example:</p>
 </dd>
 </dl>
-<p>{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “chad”}</p>
+<div class="line-block">
+<div class="line">{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “chad”}</div>
+</div>
 <p>Once encrypted, corresponding password entries are replaced with
 symmetric Fernet hashes:</p>
-<p>{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “s/gAAAA…”}</p>
+<div class="line-block">
+<div class="line">{“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “s/gAAAA…”}</div>
+</div>
 <p>To modify an authentication container, utilize the
 <strong>katprep_authconfig(1)</strong> utility - manually editing the file is <strong>not
 supported</strong>.</p>
-</div>
-<div class="section" id="bugs">
+</section>
+<section id="bugs">
 <h1>BUGS<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
 <p>See GitHub issues: <a class="reference external" href="https://github.com/stdevel/katprep/issues">https://github.com/stdevel/katprep/issues</a></p>
-</div>
-<div class="section" id="author">
+</section>
+<section id="author">
 <h1>AUTHOR<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h1>
 <p>Christian Stankowic <a class="reference external" href="mailto:info&#37;&#52;&#48;cstan&#46;io">info<span>&#64;</span>cstan<span>&#46;</span>io</a></p>
-</div>
-<div class="section" id="see-also">
+</section>
+<section id="see-also">
 <h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
 <p><strong>katprep(1)</strong>, <strong>katprep_authconfig(1)</strong></p>
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">NAME</a></li>
 <li><a class="reference internal" href="#description">DESCRIPTION</a></li>
@@ -101,17 +108,15 @@ supported</strong>.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -125,12 +130,13 @@ supported</strong>.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
+        &#169; Copyright 2022, Christian Stankowic.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>

@@ -1,18 +1,20 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>NAME &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>NAME &#8212; katprep 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
@@ -25,7 +27,8 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>  
 
@@ -34,210 +37,158 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="name">
+  <section id="name">
 <h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
 <p><strong>katprep_maintenance</strong> — Prepares, executes and verifies system
 maintenance tasks</p>
-</div>
-<div class="section" id="synopsis">
+</section>
+<section id="synopsis">
 <h1>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
-<p><strong>katprep_maintenance</strong> [<strong>-h</strong>] [<strong>-v</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
+<div class="line-block">
+<div class="line"><strong>katprep_maintenance</strong> [<strong>-h</strong>] [<strong>–version</strong>] [<strong>-q</strong>] [<strong>-d</strong>]
 [<strong>-n</strong>] [<strong>-C</strong> <em>authentication_contianer</em>] [<strong>-P</strong> <em>password</em>]
-[<strong>–insecure</strong>] [<strong>-s</strong> <em>server</em>] [<strong>-r</strong>] [<strong>-R</strong>]
-[<strong>–virt-uri</strong> <em>uri</em>] [<strong>-k</strong>] [<strong>–mon-url</strong> <em>url</em>] [<strong>–mon-type</strong>
-<em>nagios</em>|<em>icinga</em>] [<strong>-S</strong>] [<strong>-t</strong> <em>hours</em>] [<strong>-l</strong>
-<em>name</em>|<em>id</em> | <strong>-o</strong> <em>name</em>|<em>id</em> | <strong>-g</strong> <em>name</em>|<em>id</em>
-| <strong>-e</strong> <em>name</em>|<em>id</em>] [<strong>-E</strong> <em>name</em>] [<strong>-I</strong> <em>name</em>]
-<em>snapshot_report</em>
-[<strong>prepare</strong>|<strong>execute</strong>|<strong>status</strong>|<strong>revert</strong>|<strong>verify</strong>|<strong>cleanup</strong>]</p>
+[<strong>–insecure</strong>] [<strong>–mgmt-type</strong> <em>foreman</em>|<em>uyuni</em>] [<strong>-s</strong>
+<em>server</em>] [<strong>-r</strong>] [<strong>-R</strong>] [<strong>–virt-uri</strong> <em>uri</em>] [<strong>-k</strong>]
+[<strong>–mon-url</strong> <em>url</em>] [<strong>–mon-type</strong> <em>nagios</em>|<em>icinga2</em>] [<strong>-K</strong>]
+[<strong>-S</strong>] [<strong>-t</strong> <em>hours</em>] [<strong>-l</strong> <em>name</em>|<em>id</em> | <strong>-o</strong>
+<em>name</em>|<em>id</em> | <strong>-g</strong> <em>name</em>|<em>id</em> | <strong>-e</strong>
+<em>name</em>|<em>id</em>] [<strong>-E</strong> <em>name</em>] [<strong>-I</strong> <em>name</em>] <em>snapshot_report</em>
+[<strong>prepare</strong>|<strong>execute</strong>|<strong>status</strong>|<strong>revert</strong>|<strong>verify</strong>|<strong>cleanup</strong>]</div>
 </div>
-<div class="section" id="description">
+</section>
+<section id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
 <p>This utility controls maintenance tasks such as:</p>
 <ul class="simple">
-<li>Preparing system maintenance (scheduling downtimes, creating VM
-snapshots)</li>
-<li>Installing errata and non-erratum package upgrades</li>
-<li>Showing status of maintenance progress</li>
-<li>Checking monitoring and snapshot status</li>
-<li>Reverting VM snapshots</li>
-<li>Removing downtimes and snapshots</li>
+<li><p>Preparing system maintenance (scheduling downtimes, creating VM
+snapshots)</p></li>
+<li><p>Installing errata and non-erratum package upgrades</p></li>
+<li><p>Showing status of maintenance progress</p></li>
+<li><p>Checking monitoring and snapshot status</p></li>
+<li><p>Reverting VM snapshots</p></li>
+<li><p>Removing downtimes and snapshots</p></li>
 </ul>
 <p>For this, host parameters for your infrastructure need to be set (see
 also <strong>katprep_populate(1)</strong> and <strong>katprep_parameters(1)</strong>) and a
 infrastructure snapshot needs to be available (see also
 <strong>katprep_snapshot(1)</strong>).</p>
 <p>If these requirements are set, all necessary information are retrieved
-from Foreman - but you can also override them (e.g. force using
+from Foreman - but you can also override them (e.g. force using
 dedicated monitoring system).</p>
 <p>You can filter maintenance tasks per various entities, such as
 hostgroups, hostnames, locations and organizations.</p>
-<div class="section" id="options">
+<section id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
-<td>Prints brief usage information.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></td>
-<td>Prints the current version number.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
-<td>Supresses printing status messages to stdout.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-d</span>, <span class="option">--debug</span></kbd></td>
-<td>Enables debugging outputs.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
-<td>Only simulates what would be done (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>-C <em>filename</em>, –auth-container <em>filename</em></dt>
-<dd>Defines an authentication container file (see also
-<strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</dd>
-<dt>-P <em>passphrase</em>, –auth-password <em>passphrase</em></dt>
-<dd>Defines the authentication container password to avoid password
-prompt (unattented mode)</dd>
+<dl class="simple">
+<dt>-h, –help</dt><dd><p>Prints brief usage information.</p>
+</dd>
+<dt>–version</dt><dd><p>Prints the current version number.</p>
+</dd>
+<dt>-q, –quiet</dt><dd><p>Supresses printing status messages to stdout.</p>
+</dd>
+<dt>-d, –debug</dt><dd><p>Enables debugging outputs.</p>
+</dd>
+<dt>-n, –dry-run</dt><dd><p>Only simulates what would be done (default: no)</p>
+</dd>
+<dt>-C <em>filename</em>, –auth-container <em>filename</em></dt><dd><p>Defines an authentication container file (see also
+<strong>katprep.auth(5)</strong> and <strong>katprep_authconfig(1)</strong>)</p>
+</dd>
+<dt>-P <em>passphrase</em>, –auth-password <em>passphrase</em></dt><dd><p>Defines the authentication container password to avoid password
+prompt (unattented mode)</p>
+</dd>
+<dt>–insecure</dt><dd><p>Disables SSL verification (default: no)</p>
+</dd>
+<dt>-s <em>hostname</em>, –server <em>hostname</em></dt><dd><p>Defines the Foreman server to use (default: localhost)</p>
+</dd>
+<dt>-r, –reboot-systems</dt><dd><p>Always reboot systems after successful errata installation (default:
+no, only if <code class="docutils literal notranslate"><span class="pre">reboot_suggested</span></code> flag set)</p>
+</dd>
+<dt>-R, –no-reboot</dt><dd><p>Suppresses rebooting the system under any circumstances (default: no)</p>
+</dd>
+<dt>–virt-uri <em>uri</em></dt><dd><p>Defines an URI to use (see also <strong>Virtualization URIs</strong>)</p>
+</dd>
+<dt>-k, –skip-snapshot</dt><dd><p>Skips gathering data from hypervisor (default: no)</p>
+</dd>
+<dt>–mon-url <em>url</em></dt><dd><p>Defines a monitoring URL to use (see also <strong>Monitoring URLs</strong>)</p>
+</dd>
+<dt>–mon-type <em>nagios</em>|<em>icinga</em></dt><dd><p>Defines the monitoring sytem type, currently supported: <em>nagios</em>
+(Nagios, Icinga 1.x) or <em>icinga</em> (Icinga 2). (default: icinga)</p>
+</dd>
+<dt>–skip-downtime</dt><dd><p>Skips gathering data from monitoring system (default: no)</p>
+</dd>
+<dt>-S, –mon-suggested</dt><dd><p>Only schedules downtime if suggested (default: no)</p>
+</dd>
+<dt>-t <em>hours</em>, –mon-downtime <em>hours</em></dt><dd><p>Downtime period (default: 8 hours)</p>
+</dd>
+<dt>-l <em>name</em>|<em>id</em>, –location <em>name</em>|<em>id</em></dt><dd><p>filters by particular location</p>
+</dd>
+<dt>-o <em>name</em>|<em>id</em>, –organization <em>name</em>|<em>id</em></dt><dd><p>filters by particular organization</p>
+</dd>
+<dt>-e <em>name</em>|<em>id</em>, –environment <em>name</em>|<em>id</em></dt><dd><p>filters by particular Puppet environment</p>
+</dd>
+<dt>-E <em>hostname</em>, –exclude <em>hostname</em></dt><dd><p>Excludes particular hosts, using wildcards is possible.</p>
+</dd>
+<dt>-I <em>hostname</em>, –include-only <em>hostname</em></dt><dd><p>Only includes particular hosts (default: no)</p>
+</dd>
 </dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">--insecure</span></kbd></td>
-<td>Disables SSL verification (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>-s <em>hostname</em>, –server <em>hostname</em></dt>
-<dd>Defines the Foreman server to use (default: localhost)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-r</span>, <span class="option">--reboot-systems</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Always reboot systems after successful errata installation (default:
-no, only if <code class="docutils literal notranslate"><span class="pre">reboot_suggested</span></code> flag set)</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-R</span>, <span class="option">--no-reboot</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Suppresses rebooting the system under any circumstances (default:
-no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>–virt-uri <em>uri</em></dt>
-<dd>Defines an URI to use (see also <strong>Virtualization URIs</strong>)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-k</span>, <span class="option">--skip-snapshot</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Skips gathering data from hypervisor (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>–mon-url <em>url</em></dt>
-<dd>Defines a monitoring URL to use (see also <strong>Monitoring URLs</strong>)</dd>
-<dt>–mon-type <em>nagios</em>|<em>icinga</em></dt>
-<dd>Defines the monitoring sytem type, currently supported: <em>nagios</em>
-(Nagios, Icinga 1.x) or <em>icinga</em> (Icinga 2). (default: icinga)</dd>
-</dl>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">--skip-downtime</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Skips gathering data from monitoring system (default: no)</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd><span class="option">-S</span>, <span class="option">--mon-suggested</span></kbd></td>
-</tr>
-<tr><td>&#160;</td><td>Only schedules downtime if suggested (default: no)</td></tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>-t <em>hours</em>, –mon-downtime <em>hours</em></dt>
-<dd>Downtime period (default: 8 hours)</dd>
-<dt>-l <em>name</em>|<em>id</em>, –location <em>name</em>|<em>id</em></dt>
-<dd>filters by particular location</dd>
-<dt>-o <em>name</em>|<em>id</em>, –organization <em>name</em>|<em>id</em></dt>
-<dd>filters by particular organization</dd>
-<dt>-e <em>name</em>|<em>id</em>, –environment <em>name</em>|<em>id</em></dt>
-<dd>filters by particular Puppet environment</dd>
-<dt>-E <em>hostname</em>, –exclude <em>hostname</em></dt>
-<dd>Excludes particular hosts, using wildcards is possible.</dd>
-<dt>-I <em>hostname</em>, –include-only <em>hostname</em></dt>
-<dd>Only includes particular hosts (default: no)</dd>
-</dl>
-</div>
-<div class="section" id="commands">
+</section>
+<section id="commands">
 <h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
 <p>This utility supports the following commands</p>
 <ul class="simple">
-<li><strong>prepare</strong> - Preparing maintenance</li>
-<li><strong>execute</strong> - Installing errata and optionally package upgrades
-(<strong>-p</strong> / <strong>–include-packages</strong> parameter)</li>
-<li><strong>status</strong> - Display software maintenance progress (Foreman tasks)</li>
-<li><strong>revert</strong> - Reverting changes (currently only reverting snapshots is
-supported)</li>
-<li><strong>verify</strong> - Verifying status (checking snapshots and downtime)</li>
-<li><strong>cleanup</strong> - Cleaning-up (removing downtimes and snapshots)</li>
+<li><p><strong>prepare</strong> - Preparing maintenance</p></li>
+<li><p><strong>execute</strong> - Installing errata and optionally package upgrades
+(<strong>-p</strong> / <strong>–include-packages</strong> parameter)</p></li>
+<li><p><strong>status</strong> - Display software maintenance progress (Foreman tasks)</p></li>
+<li><p><strong>revert</strong> - Reverting changes (currently only reverting snapshots is
+supported)</p></li>
+<li><p><strong>verify</strong> - Verifying status (checking snapshots and downtime)</p></li>
+<li><p><strong>cleanup</strong> - Cleaning-up (removing downtimes and snapshots)</p></li>
 </ul>
 <p><strong>IMPORTANT NOTE</strong>: For rebooting VMs after system maintenance, at least
 Foreman 1.15.x or Red Hat Satellite 6.3 is required.</p>
-</div>
-</div>
-<div class="section" id="files">
-<h1>FILES<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h1>
-<dl class="docutils">
-<dt><em>~/.katpreprc</em></dt>
-<dd>Per-user katprep configuration file.</dd>
-<dt><em>katprep.auth</em></dt>
-<dd>Individual katprep authentication container file.</dd>
+</section>
+<section id="files">
+<h2>FILES<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt><em>~/.katpreprc</em></dt><dd><p>Per-user katprep configuration file.</p>
+</dd>
+<dt><em>katprep.auth</em></dt><dd><p>Individual katprep authentication container file.</p>
+</dd>
 </dl>
-</div>
-<div class="section" id="bugs">
+</section>
+</section>
+<section id="bugs">
 <h1>BUGS<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
 <p>See GitHub issues: <a class="reference external" href="https://github.com/stdevel/katprep/issues">https://github.com/stdevel/katprep/issues</a></p>
-</div>
-<div class="section" id="author">
+</section>
+<section id="author">
 <h1>AUTHOR<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h1>
 <p>Christian Stankowic <a class="reference external" href="mailto:info&#37;&#52;&#48;cstan&#46;io">info<span>&#64;</span>cstan<span>&#46;</span>io</a></p>
-</div>
-<div class="section" id="see-also">
+</section>
+<section id="see-also">
 <h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
 <p><strong>katprep(1)</strong>, <strong>katprep.authconfig(1)</strong>, <strong>katprep_parameters(1)</strong>,
 <strong>katprep_populate(1)</strong>, <strong>katprep_snapshot(1)</strong></p>
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">NAME</a></li>
 <li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
 <li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
 <li><a class="reference internal" href="#options">Options</a></li>
 <li><a class="reference internal" href="#commands">Commands</a></li>
+<li><a class="reference internal" href="#files">FILES</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#files">FILES</a></li>
 <li><a class="reference internal" href="#bugs">BUGS</a></li>
 <li><a class="reference internal" href="#author">AUTHOR</a></li>
 <li><a class="reference internal" href="#see-also">SEE ALSO</a></li>
@@ -251,17 +202,15 @@ Foreman 1.15.x or Red Hat Satellite 6.3 is required.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -275,12 +224,13 @@ Foreman 1.15.x or Red Hat Satellite 6.3 is required.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
+        &#169; Copyright 2022, Christian Stankowic.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>

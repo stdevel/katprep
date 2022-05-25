@@ -1,18 +1,20 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Debugging and getting help &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Debugging and getting help &#8212; katprep 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Requirements" href="installation.html" />
@@ -33,7 +35,8 @@
         <li class="right" >
           <a href="issues.html" title="Common Issues"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Debugging and getting help</a></li> 
       </ul>
     </div>  
 
@@ -42,44 +45,44 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="debugging-and-getting-help">
+  <section id="debugging-and-getting-help">
 <h1>Debugging and getting help<a class="headerlink" href="#debugging-and-getting-help" title="Permalink to this headline">¶</a></h1>
 <p>This software is at an early stage, so perhaps things might explode. This page describes how to get in touch with the development team to get help.</p>
-<div class="section" id="getting-help">
+<section id="getting-help">
 <h2>Getting help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>Basically, the best idea when having problems is to open an issue on <a class="reference external" href="https://github.com/stdevel/katprep/issues">GitHub</a>. Please supply the following information:</dt>
-<dd><ul class="first last simple">
-<li>the Foreman/Katello or Red Hat Satellite version you are using</li>
-<li>the katprep version you’re using</li>
-<li>a short description of your landscape (<em>e.g. single Foreman instance with some VMs running on a single ESXi host</em>)</li>
-<li>debugging output of the command you’re facing errors with (<em>see also Debugging</em>) - please attach a file instead of pasting the console output directly in the issue</li>
+<dl class="simple">
+<dt>Basically, the best idea when having problems is to open an issue on <a class="reference external" href="https://github.com/stdevel/katprep/issues">GitHub</a>. Please supply the following information:</dt><dd><ul class="simple">
+<li><p>the Foreman/Katello or Uyuni version you are using</p></li>
+<li><p>the katprep version you’re using</p></li>
+<li><p>a short description of your landscape (<em>e.g. single Foreman instance with some VMs running on a single ESXi host</em>)</p></li>
+<li><p>debugging output of the command you’re facing errors with (<em>see also Debugging</em>) - please attach a file instead of pasting the console output directly in the issue</p></li>
 </ul>
 </dd>
 </dl>
 <p>With these information it is easier to reproduce the error you’re reporting.</p>
-</div>
-<div class="section" id="debugging">
+</section>
+<section id="debugging">
 <h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h2>
 <p>Every katprep command offers a <code class="docutils literal notranslate"><span class="pre">-d</span></code> / <code class="docutils literal notranslate"><span class="pre">--debug</span></code> parameter. When investigating on an error, use this parameter to enable debugging outputs. Keep in mind, that the output will be quite long, so using these parameters along with <code class="docutils literal notranslate"><span class="pre">tee</span></code> is basically a good idea:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ katprep_snapshot -C mycontainer.auth -s myforeman.giertz.loc -d 2&gt;&amp;1 | tee myerror.log
 </pre></div>
 </div>
 <p>This command will dump all standard and error output into a file named <code class="docutils literal notranslate"><span class="pre">myerror.log</span></code>. When opening an issue on GitHub, please attach this file.</p>
-</div>
-<div class="section" id="common-issues">
+</section>
+<section id="common-issues">
 <h2>Common issues<a class="headerlink" href="#common-issues" title="Permalink to this headline">¶</a></h2>
 <p>Please checkout the <a class="reference external" href="issues.html">issues</a> page - it contains some common issues and how to fix them.</p>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Debugging and getting help</a><ul>
 <li><a class="reference internal" href="#getting-help">Getting help</a></li>
@@ -103,17 +106,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -133,12 +134,13 @@
         <li class="right" >
           <a href="issues.html" title="Common Issues"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Debugging and getting help</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
+        &#169; Copyright 2022, Christian Stankowic.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>

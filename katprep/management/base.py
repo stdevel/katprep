@@ -1,151 +1,94 @@
-# -*- coding: utf-8 -*-
 """
-Base for creating management classes.
+Basic management client
 """
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
+from typing import List, Optional
+from ..connector import BaseConnector
 
 
-class BaseConnector(metaclass=ABCMeta):
+class ManagementClient(BaseConnector):
     """
-    Basic management connector that connects on creation.
-    """
-
-    def __init__(self, username, password, **kwargs):
-        self._username = username
-        self._password = password
-        self._session = None
-        self._connect()
-
-    @abstractmethod
-    def _connect(self):
-        pass
-
-
-class SnapshotManager(metaclass=ABCMeta):
-    """
-    Managers with snapshot support.
-
-    This base class provides a general interface for manager classes
-    that support the use of snapshots.
+    Management client class stub
     """
 
     @abstractmethod
-    def _manage_snapshot(self, vm_name, snapshot_title, snapshot_text, action="create"):
+    def install_pre_script(self, host):
         """
-        Helper function to perform creating, reverting or removing a snapshot.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        :param snapshot_text: Descriptive text for the snapshot
-        :type snapshot_text: str
-        :param action: The action to perform. create, remove or revert.
-        :type action: str
+        Runs the installation pre-script
         """
 
     @abstractmethod
-    def has_snapshot(self, vm_name, snapshot_title):
+    def install_post_script(self, host):
         """
-        Returns whether a particular virtual machine is currently protected
-        by a snapshot. This requires specifying a VM name.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-
-    def create_snapshot(self, vm_name, snapshot_title, snapshot_text):
-        """
-        Creates a snapshot for a particular virtual machine.
-        This requires specifying a VM, comment title and text.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        :param snapshot_text: Descriptive text for the snapshot
-        :type snapshot_text: str
-        """
-        return self._manage_snapshot(
-            vm_name, snapshot_title, snapshot_text, action="create"
-        )
-
-    def remove_snapshot(self, vm_name, snapshot_title):
-        """
-        Removes a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        return self._manage_snapshot(vm_name, snapshot_title, "", action="remove")
-
-    def revert_snapshot(self, vm_name, snapshot_title):
-        """
-        Reverts to  a snapshot for a particular virtual machine.
-        This requires specifying a VM and a comment title.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param snapshot_title: Snapshot title
-        :type snapshot_title: str
-        """
-        return self._manage_snapshot(vm_name, snapshot_title, "", action="revert")
-
-
-class PowerManager(metaclass=ABCMeta):
-    @abstractmethod
-    def _manage_power(self, vm_name, action="poweroff"):
-        """
-        Powers a particual virtual machine on/off forcefully.
-
-        :param vm_name: Name of the virtual machine
-        :type vm_name: str
-        :param action: action (poweroff, poweron)
-        :type action: str
+        Runs the installation post-script
         """
 
     @abstractmethod
-    def powerstate_vm(self, vm_name):
+    def install_plain_patches(self, host):
         """
-        Returns the power state of a particular virtual machine.
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        Installs patches without running the pre-script
         """
-        # TODO: powerstate enum
 
     @abstractmethod
-    def restart_vm(self, vm_name, force=False):
+    def install_plain_upgrades(self, host):
         """
-        Restarts a particular VM (default: soft reboot using guest tools).
-
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
-        :param force: Flag whether a hard reboot is requested
-        :type force: bool
+        Installs upgrades without running the pre-script
         """
 
-    # Aliases
-    def poweroff_vm(self, vm_name):
+    def install_patches(self, host, patches: Optional[List] = None):
         """
-        Turns off a particual virtual machine forcefully.
+        Apply patches on the given host.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        If no `patches` are given all patches that are available for
+        the host will be installed.
         """
-        return self._manage_power(vm_name, "poweroff")
+        if host.patch_pre_script:
+            self.install_pre_script(host)
+        self.install_plain_patches(host)
+        if host.patch_post_script:
+            self.install_post_script(host)
 
-    def poweron_vm(self, vm_name):
+    @abstractmethod
+    def install_upgrades(self, host, upgrades: Optional[List] = None):
         """
-        Turns on a particual virtual machine forcefully.
+        Upgrade packages on the given host.
+        This does include upgrades that are not part of an errata.
 
-        :param vm_name: Name of a virtual machine
-        :type vm_name: str
+        If `upgrades` is `None` all upgrades on the host will be
+        installed.
         """
-        return self._manage_power(vm_name, action="poweron")
+        if host.patch_pre_script:
+            self.install_pre_script(host)
+        self.install_plain_upgrades(host)
+        if host.patch_post_script:
+            self.install_post_script(host)
+
+    @abstractmethod
+    def reboot_host(self, host):
+        """
+        Soft reboot of the given host.
+        """
+        if host.reboot_pre_script:
+            self.reboot_pre_script(host)
+        self.plain_reboot_host(host)
+        if host.reboot_post_script:
+            self.reboot_post_script(host)
+
+    @abstractmethod
+    def is_reboot_required(self, host) -> bool:
+        """
+        Checks if the client requires a reboot.
+        """
+
+    @abstractmethod
+    def get_errata_task_status(self, host):
+        """
+        Get the status of errata installations for the given host.
+        """
+
+    @abstractmethod
+    def get_upgrade_task_status(self, host):
+        """
+        Get the status of package upgrades for the given host.
+        """

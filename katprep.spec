@@ -1,10 +1,10 @@
 %define name katprep
-%define version 0.5.0
-%define unmangled_version 0.5.0
-%define unmangled_version 0.5.0
+%define version 0.6.0
+%define unmangled_version 0.6.0
+%define unmangled_version 0.6.0
 %define release 1
 
-Summary: Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Red Hat Satellite 6.x
+Summary: Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Uyuni
 Name: %{name}
 Version: %{version}
 Release: %{release}
@@ -21,7 +21,7 @@ Url: https://github.com/stdevel/katprep
 [![Build Status](https://travis-ci.org/stdevel/katprep.svg?branch=master)](https://travis-ci.org/stdevel/katprep)
 
 # katprep
-**katprep** is a Python toolkit for automating system maintenance and generating patch reports for systems managed with [Foreman](http://www.theforeman.org/)/[Katello](http://www.katello.org/) or [Red Hat Satellite 6.x](http://www.redhat.com/products/enterprise-linux/satellite/).
+**katprep** is a Python toolkit for automating system maintenance and generating patch reports for systems managed with [Foreman](http://www.theforeman.org/)/[Katello](http://www.katello.org/) or [Uyuni](http://www.redhat.com/products/enterprise-linux/satellite/).
 
 This can be very useful if you need to document software changes due to IT certifications like [ISO/IEC 27001:2005](http://en.wikipedia.org/wiki/ISO/IEC_27001:2005) or many other.
 

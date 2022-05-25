@@ -1,23 +1,19 @@
-% katprep_parameters(1) Version 0.5.0 | katprep documentation
+% katprep_parameters(1) Version 0.6.0 | katprep documentation
 
-NAME
-====
+# NAME
 
 **katprep_parameters** — Bulk edits Puppet host parameters for managed hosts
 
-SYNOPSIS
-========
+# SYNOPSIS
 
 | **katprep_parameters** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--insecure**] \[**-s** _server_] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-A** | **--add-optional-parameters** | **-R** | **-D** | **-U** | **-L**]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Creates, removes, updates or audits Puppet host parameters used by the **katprep(1)** framework in order to automate system maintenance.
 Use this utility to bulk edit host parameters, e.g. to change snapshot protection settings per hostgroup. For the first integration of your infrastructure, use **katprep_populate(1)** as it offers auto-discovery.
 
-Host parameters
----------------
+## Host parameters
 
 The following Puppet host parameters are created/updated:
 
@@ -49,16 +45,23 @@ katprep_virt_type
 
 :   Virtualization host type, \[_libvirt_|_pyvmovmi_] (default: libvirt)
 
+katprep_pre-script
+
+:   Script to run before maintenance
+
+katprep_post-script
+
+:   Script to run after maintenance
+
 For valid Virtualization URIs and monitoring URLs, see **katprep(1)**.
 
-Options
--------
+## Options
 
 -h, --help
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 
@@ -128,8 +131,7 @@ Options
 -L, --list-parameters
 :   Only lists available parameters (default: no)
 
-FILES
-=====
+# FILES
 
 *~/.katpreprc*
 
@@ -139,17 +141,14 @@ FILES
 
 :   Individual katprep authentication container file.
 
-BUGS
-====
+# BUGS
 
 See GitHub issues: <https://github.com/stdevel/katprep/issues>
 
-AUTHOR
-======
+# AUTHOR
 
 Christian Stankowic <info@cstan.io>
 
-SEE ALSO
-========
+# SEE ALSO
 
 **katprep(1)**, **katprep_authconfig(1)**, **katprep_populate(1)**

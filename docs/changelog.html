@@ -1,18 +1,20 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Changelog &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Changelog &#8212; katprep 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Tested setups" href="tested_setups.html" />
@@ -33,7 +35,8 @@
         <li class="right" >
           <a href="index.html" title="Welcome to katprep’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
       </ul>
     </div>  
 
@@ -42,96 +45,148 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="changelog">
+  <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This page shows changes of the latest releases.</p>
-<div class="section" id="version-0-5-0">
+<section id="version-0-6-x">
+<h2>Version 0.6.x<a class="headerlink" href="#version-0-6-x" title="Permalink to this headline">¶</a></h2>
+<p>Release date: <strong>2022/xx/xx</strong></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is a development version that most likely breaks Red Hat Satellite support. The next version will re-implement this support.</p>
+</div>
+<p>Changes since previous development releases:</p>
+<section id="general">
+<h3>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Uyuni / SUSE Manager support implemented</strong> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/43">issue43</a>)</p></li>
+<li><p><strong>Pre/post script suuport implemented</strong> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/123">issue123</a>)</p></li>
+<li><p>Python 2.7 is dropped, at least Python 3.6 is required (<a class="reference external" href="https://github.com/stdevel/katprep/issues/125">issue125</a>)</p></li>
+<li><p>cleaned-up code heavily</p></li>
+<li><p>simplified contributions by supplying a Vagrant configuration and Ansible code (<a class="reference external" href="https://github.com/stdevel/katprep/issues/108">issue108</a>)</p></li>
+<li><p>use relative imports</p></li>
+<li><p>make code more modular by implementing abstract base classes</p></li>
+<li><p>added code coverage (<a class="reference external" href="https://github.com/stdevel/katprep/issues/96">issue96</a>)</p></li>
+<li><p>fixed a bug where modules couldn’t be executed directly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/97">issue97</a>)</p></li>
+<li><p>renamed <code class="docutils literal notranslate"><span class="pre">dummy_call</span></code> to <code class="docutils literal notranslate"><span class="pre">is_authenticated</span></code> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/102">issue102</a>)</p></li>
+<li><p>replaced <code class="docutils literal notranslate"><span class="pre">mock</span></code> with <code class="docutils literal notranslate"><span class="pre">unittest.mock</span></code> (<a class="reference external" href="https://github.com/stdevel/katprep/issues/156">issue156</a>)</p></li>
+</ul>
+</section>
+<section id="katprep-authconfig">
+<h3>katprep_authconfig<a class="headerlink" href="#katprep-authconfig" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>fixed a bug where utilizing encrypted authentication containers wasn’t possible (<a class="reference external" href="https://github.com/stdevel/katprep/issues/85">issue85</a>)</p></li>
+<li><p>fixed a bug where <code class="docutils literal notranslate"><span class="pre">katprep_authconfig</span></code> wasn’t working in Python 3.6 (<a class="reference external" href="https://github.com/stdevel/katprep/issues/150">issue150</a>)</p></li>
+</ul>
+</section>
+<section id="katprep-maintenance">
+<h3>katprep_maintenance<a class="headerlink" href="#katprep-maintenance" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>fixed a bug where trying to remove already removed snapshots crashed with EmptySetException (<a class="reference external" href="https://github.com/stdevel/katprep/issues/90">issue90</a>)</p></li>
+</ul>
+</section>
+<section id="katprep-snapshot">
+<h3>katprep_snapshot<a class="headerlink" href="#katprep-snapshot" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>fixed a bug where filtering using the organization name wasn’t working (<a class="reference external" href="https://github.com/stdevel/katprep/issues/94">issue94</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="version-0-5-0">
 <h2>Version 0.5.0<a class="headerlink" href="#version-0-5-0" title="Permalink to this headline">¶</a></h2>
 <p>Release date: <strong>2018/06/29</strong></p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Red Hat Satellite 6.x users need to update to version 6.3 in order to enable VM reboots after system maintenance. Also, you will need to ensure that your virtualization infrastructure is registered within Foreman to link VMs to hosts.</p>
+<p class="admonition-title">Note</p>
+<p>Red Hat Satellite 6.x users need to update to version 6.3 in order to enable VM reboots after system maintenance. Also, you will need to ensure that your virtualization infrastructure is registered within Foreman to link VMs to hosts.</p>
 </div>
 <p>Changes since previous development releases:</p>
-<div class="section" id="katprep-maintenance">
-<h3>katprep_maintenance<a class="headerlink" href="#katprep-maintenance" title="Permalink to this headline">¶</a></h3>
+<section id="id1">
+<h3>katprep_maintenance<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>added posibility to suppress reboots under any circumstances (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
-<li>changed default reboot behavior to only reboot if erratum suggests it (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
-<li>fixed a bug where errata were tried to install if no errata were applicable (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</li>
-<li>fixed a bug where enabled reboots were executed before gracefully completing errata installation (<a class="reference external" href="https://github.com/stdevel/katprep/issues/40">issue40</a>)</li>
-<li>implemented <code class="docutils literal notranslate"><span class="pre">-p</span></code> / <code class="docutils literal notranslate"><span class="pre">--include-packages</span></code> parameters to also include non-erratum package upgrades during maintenance (<a class="reference external" href="https://github.com/stdevel/katprep/issues/33">issue33</a>)</li>
-<li>implemented <code class="docutils literal notranslate"><span class="pre">-E</span></code> / <code class="docutils literal notranslate"><span class="pre">--exclude</span></code> parameters to exclude particular hosts by hostname wildcards (<a class="reference external" href="https://github.com/stdevel/katprep/issues/38">issue38</a>)</li>
-<li>fixed bug where non-existent snapshots forced crashes</li>
-<li>implemented <code class="docutils literal notranslate"><span class="pre">-I</span></code> / <code class="docutils literal notranslate"><span class="pre">--include-only</span></code> parameters to only include particular hosts by hostname wildcards (<a class="reference external" href="https://github.com/stdevel/katprep/issues/63">issue63</a>)</li>
-<li>implemented <code class="docutils literal notranslate"><span class="pre">revert</span></code> command (<a class="reference external" href="https://github.com/stdevel/katprep/issues/6">issue6</a>)</li>
+<li><p>added posibility to suppress reboots under any circumstances (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</p></li>
+<li><p>changed default reboot behavior to only reboot if erratum suggests it (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</p></li>
+<li><p>fixed a bug where errata were tried to install if no errata were applicable (<a class="reference external" href="https://github.com/stdevel/katprep/issues/39">issue39</a>)</p></li>
+<li><p>fixed a bug where enabled reboots were executed before gracefully completing errata installation (<a class="reference external" href="https://github.com/stdevel/katprep/issues/40">issue40</a>)</p></li>
+<li><p>implemented <code class="docutils literal notranslate"><span class="pre">-p</span></code> / <code class="docutils literal notranslate"><span class="pre">--include-packages</span></code> parameters to also include non-erratum package upgrades during maintenance (<a class="reference external" href="https://github.com/stdevel/katprep/issues/33">issue33</a>)</p></li>
+<li><p>implemented <code class="docutils literal notranslate"><span class="pre">-E</span></code> / <code class="docutils literal notranslate"><span class="pre">--exclude</span></code> parameters to exclude particular hosts by hostname wildcards (<a class="reference external" href="https://github.com/stdevel/katprep/issues/38">issue38</a>)</p></li>
+<li><p>fixed bug where non-existent snapshots forced crashes</p></li>
+<li><p>implemented <code class="docutils literal notranslate"><span class="pre">-I</span></code> / <code class="docutils literal notranslate"><span class="pre">--include-only</span></code> parameters to only include particular hosts by hostname wildcards (<a class="reference external" href="https://github.com/stdevel/katprep/issues/63">issue63</a>)</p></li>
+<li><p>implemented <code class="docutils literal notranslate"><span class="pre">revert</span></code> command (<a class="reference external" href="https://github.com/stdevel/katprep/issues/6">issue6</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="katprep-snapshot">
-<h3>katprep_snapshot<a class="headerlink" href="#katprep-snapshot" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id2">
+<h3>katprep_snapshot<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>fixed a bug where detecting physical hosts was not working properly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/44">issue44</a>)</li>
-<li>fixed a bug where unregistered content hosts forced crashes (<a class="reference external" href="https://github.com/stdevel/katprep/issues/52">issue52</a>)</li>
-<li>changed missing key log facility to debug</li>
-<li>fixed a bug where hostnames were not verified</li>
-<li>fixed a bug where <code class="docutils literal notranslate"><span class="pre">reboot_required</span></code> flags were not set correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</li>
-<li>fixed a bug where physical host/VMs flags were not set correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</li>
+<li><p>fixed a bug where detecting physical hosts was not working properly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/44">issue44</a>)</p></li>
+<li><p>fixed a bug where unregistered content hosts forced crashes (<a class="reference external" href="https://github.com/stdevel/katprep/issues/52">issue52</a>)</p></li>
+<li><p>changed missing key log facility to debug</p></li>
+<li><p>fixed a bug where hostnames were not verified</p></li>
+<li><p>fixed a bug where <code class="docutils literal notranslate"><span class="pre">reboot_required</span></code> flags were not set correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</p></li>
+<li><p>fixed a bug where physical host/VMs flags were not set correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="katprep-populate">
+</section>
+<section id="katprep-populate">
 <h3>katprep_populate<a class="headerlink" href="#katprep-populate" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>implemented a IPv6 filter (<a class="reference external" href="https://github.com/stdevel/katprep/issues/35">issue35</a>)</li>
+<li><p>implemented a IPv6 filter (<a class="reference external" href="https://github.com/stdevel/katprep/issues/35">issue35</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="katprep-report">
+</section>
+<section id="katprep-report">
 <h3>katprep_report<a class="headerlink" href="#katprep-report" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>fixed several bugs where report information were incorrect (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</li>
+<li><p>fixed several bugs where report information were incorrect (<a class="reference external" href="https://github.com/stdevel/katprep/issues/61">issue61</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="api-integrations">
+</section>
+<section id="api-integrations">
 <h3>API integrations<a class="headerlink" href="#api-integrations" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>All: implemented unit tests for API clients (<a class="reference external" href="https://github.com/stdevel/katprep/issues/13">issue13</a>)</li>
-<li>NagiosCGIClient, Icinga2APIClient, PyvmomiClient: implemented IPv4/6 filters</li>
-<li>NagiosCGIClient: fixed a bug where scheduling downtime for hosts was not possible (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</li>
-<li>NagiosCGIClient: implemented Nagios legacy detection throwing execptions for non-supported actions (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</li>
-<li>NagiosCGIClient: fixed several bugs where web-scraping was not working properly forcing incorrect results (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</li>
-<li>NagiosCGIClient: fixed a bug where scheduling downtimes was not possible</li>
-<li>NagiosCGIClient: made <code class="docutils literal notranslate"><span class="pre">has_downtime()</span></code> more efficient and overhauled webscraping (<a class="reference external" href="https://github.com/stdevel/katprep/issues/64">issue64</a>)</li>
-<li>SpacewalkAPIClient: first integration stubs</li>
-<li>ForemanAPIClient, SpacewalkAPIClient: Moved hostname verification to shared library</li>
-<li>Icinga2APIClient: Fixed a bug where some information were not retrieved correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/60">issue60</a>)</li>
+<li><p>All: implemented unit tests for API clients (<a class="reference external" href="https://github.com/stdevel/katprep/issues/13">issue13</a>)</p></li>
+<li><p>NagiosCGIClient, Icinga2APIClient, PyvmomiClient: implemented IPv4/6 filters</p></li>
+<li><p>NagiosCGIClient: fixed a bug where scheduling downtime for hosts was not possible (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</p></li>
+<li><p>NagiosCGIClient: implemented Nagios legacy detection throwing execptions for non-supported actions (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</p></li>
+<li><p>NagiosCGIClient: fixed several bugs where web-scraping was not working properly forcing incorrect results (<a class="reference external" href="https://github.com/stdevel/katprep/issues/41">issue41</a>)</p></li>
+<li><p>NagiosCGIClient: fixed a bug where scheduling downtimes was not possible</p></li>
+<li><p>NagiosCGIClient: made <code class="docutils literal notranslate"><span class="pre">has_downtime()</span></code> more efficient and overhauled webscraping (<a class="reference external" href="https://github.com/stdevel/katprep/issues/64">issue64</a>)</p></li>
+<li><p>SpacewalkAPIClient: first integration stubs</p></li>
+<li><p>ForemanAPIClient, SpacewalkAPIClient: Moved hostname verification to shared library</p></li>
+<li><p>Icinga2APIClient: Fixed a bug where some information were not retrieved correctly (<a class="reference external" href="https://github.com/stdevel/katprep/issues/60">issue60</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="shared-library">
+</section>
+<section id="shared-library">
 <h3>Shared library<a class="headerlink" href="#shared-library" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>added parameters <code class="docutils literal notranslate"><span class="pre">-P</span></code> / <code class="docutils literal notranslate"><span class="pre">--auth-password</span></code> for pre-defining authentication container password (<a class="reference external" href="https://github.com/stdevel/katprep/issues/36">issue36</a>)</li>
+<li><p>added parameters <code class="docutils literal notranslate"><span class="pre">-P</span></code> / <code class="docutils literal notranslate"><span class="pre">--auth-password</span></code> for pre-defining authentication container password (<a class="reference external" href="https://github.com/stdevel/katprep/issues/36">issue36</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="miscellaneous">
+</section>
+<section id="miscellaneous">
 <h3>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>added manpages (<a class="reference external" href="https://github.com/stdevel/katprep/issues/11">issue11</a>)</li>
+<li><p>added manpages (<a class="reference external" href="https://github.com/stdevel/katprep/issues/11">issue11</a>)</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#version-0-5-0">Version 0.5.0</a><ul>
+<li><a class="reference internal" href="#version-0-6-x">Version 0.6.x</a><ul>
+<li><a class="reference internal" href="#general">General</a></li>
+<li><a class="reference internal" href="#katprep-authconfig">katprep_authconfig</a></li>
 <li><a class="reference internal" href="#katprep-maintenance">katprep_maintenance</a></li>
 <li><a class="reference internal" href="#katprep-snapshot">katprep_snapshot</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#version-0-5-0">Version 0.5.0</a><ul>
+<li><a class="reference internal" href="#id1">katprep_maintenance</a></li>
+<li><a class="reference internal" href="#id2">katprep_snapshot</a></li>
 <li><a class="reference internal" href="#katprep-populate">katprep_populate</a></li>
 <li><a class="reference internal" href="#katprep-report">katprep_report</a></li>
 <li><a class="reference internal" href="#api-integrations">API integrations</a></li>
@@ -157,17 +212,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -187,12 +240,13 @@
         <li class="right" >
           <a href="index.html" title="Welcome to katprep’s documentation!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
+        &#169; Copyright 2022, Christian Stankowic.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>

@@ -3,14 +3,15 @@ Requirements
 ============
 In order to install and use katprep, the following requirements need to be met:
 
- * Python 2.7 or newer
+ * Python 3.6 or newer
  * Python modules:
 
-  * simplejson
   * PyYAML
   * PyPandoc
   * Libvirt (*usually part of the libvirt-python package*)
   * PyVmomi (*VMware vSphere Python SDK*)
+  * fernet
+  * lxml
 
  * Pandoc (*for creating the reports*)
  * System running katprep needs access to the Foreman/Katello host using HTTPS
@@ -23,13 +24,23 @@ API users
 =========
 To ensure that katprep is able to control hosts and retrieve data from connected management systems, create appropriate service users:
 
+-----
+Uyuni
+-----
+Ensure to assign **one** of the following roles to the user:
+  * Organization Administrator
+  * System Group Administrator
+
+Please note that the **Read-only API user** flag is not sufficient as it lacks patch/package installation and script execution permissions.
+
 -------
 Foreman
 -------
-Basically, katprep only needs read access to Foreman/Katello - ensure to assign the following roles to your API user:
+Basically, katprep mainly needs read access and Remote Execution permissions to Foreman/Katello - ensure to assign the following roles to your API user:
   * Viewer
   * View hosts
   * Tasks Reader
+  * Remote Execution User
 
 If you want to automate create Puppet host parameters (*which can be done by using katprep_parameters and katprep_populate*) it is also necessary to assign the **Manager** role.
 
@@ -58,7 +69,7 @@ Icinga2
 -------
 To enable scheduling/removing downtimes and reading host configuration from Icinga2, create an API user with the following permissions::
 
-   #katprep user
+   # katprep user
    object ApiUser "svc-katprep" {
            password = "shittyrobots"
            permissions = [ "status/query", "objects/query/*", "actions/*" ]
@@ -103,25 +114,37 @@ Manual installation
 -------------------
 Proceed with the following steps::
 
-   $ python setup.py install
+   $ python3 setup.py install
 
 In case you want to install the toolkit only for your current user (*e.g. because of file system restrictions*), use the **--user parameter**::
 
-   $ python setup.py install --user
+   $ python3 setup.py install --user
 
 If you're a developer and want to contribute, you might prefer to install katprep in developer mode within your user context::
 
-   $ python setup.py develop --user
+   $ python3 setup.py develop --user
+
+Depending on your distribution (*e.g. on SUSE*), you might need to alter your ``PATH`` variable to include ``~/.local/bin`` when using ``--user``::
+
+   export PATH="$PATH:~/.local/bin"
 
 ---------
 Build RPM
 ---------
 Ensure to have RPM development utilities installed and proceed with the following steps::
 
-   $ python setup.py bdist_rpm
+   $ python3 setup.py bdist_rpm
    $ sudo yum localinstall dist/katprep*.rpm
 
 Specifying the **--spec-only** parameter will only create a RPM spec file::
 
-   $ python setup.py bdist_rpm --spec-only
+   $ python3 setup.py bdist_rpm --spec-only
    $ less dist/katprep.spec
+
+-------------------
+Python dependencies
+-------------------
+
+Ensure having requirements defined in ``requirements.txt`` installed - depending on your distribution you might want to install requirements using your package manager (*e.g. on SUSE*)::
+
+   # zypper in python3-{lxml,pyvmomi,PyYAML,cryptography,libvirt-python}

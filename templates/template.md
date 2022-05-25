@@ -1,10 +1,10 @@
-# System maintenance report $if(params.name)$for $params.name$$endif$
+# System maintenance report $if(hostname)$for $hostname$$endif$
 
 ## Meta information
 
-IP | Date | Time | Owner
+Hostname | Date | Time | Owner
 -- | ---- | ---- | -----
-$if(params.ip)$$params.ip$$endif$ | $if(params.date)$$params.date$$endif$ | $if(params.time)$$params.time$$endif$ | $if(params.owner)$$params.owner$$endif$ |
+$if(hostname)$$hostname$$endif$ | $if(date)$$date$$endif$ | $if(time)$$time$$endif$ | $if(params.katprep_owner)$$params.katprep_owner$$endif$ |
 
 ## Task checklist
 
@@ -16,12 +16,12 @@ System rebooted | $if(verification.system_reboot)$$verification.system_reboot$$e
 Monitoring status | $if(verification.mon_status)$$verification.mon_status$$endif$ | $if(verification.mon_status_detail)$$verification.mon_status_detail$$endif$
 Monitoring enabled | $if(verification.mon_cleanup)$$verification.mon_cleanup$$endif$ | $if(params.environment)$$params.environment$ lifecycle$endif$
 
-## Patch list
+## patches list
 
 Type | Name | Date | Description | Reboot required?
 ---- | ---- | ---- | ----------- | ----------------
-$for(errata)$
-$if(errata.type)$$errata.type$$endif$ | $if(errata.errata_id)$$errata.errata_id$$endif$ | $if(errata.issued)$$errata.issued$$endif$ | $if(errata.description)$$errata.description$$endif$ | $if(errata.reboot_suggested)$$errata.reboot_suggested$$endif$
+$for(patches)$
+$if(patches.type)$$patches.type$$endif$ | $if(patches.name)$$patches.name$$endif$ | $if(patches.issued_at)$$patches.issued_at$$endif$ | $if(patches.summary)$$patches.summary$$endif$ | $if(patches.reboot_suggested)$$patches.reboot_suggested$$endif$
 $endfor$
 
 *This report was created automatically by [katprep](https://github.com/stdevel/katprep)*

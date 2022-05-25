@@ -1,0 +1,34 @@
+---
+- hosts: uyuniclient
+  remote_user: root
+  become: true
+  pre_tasks:
+    - name: "Update /etc/hosts"
+      template:
+        src: "hosts.j2"
+        dest: /etc/hosts
+
+    - name: Configure NTP
+      block:
+        - name: Install chrony
+          zypper:
+            name: chrony
+        - name: Enable service
+          service:
+            name: chronyd
+            state: started
+            enabled: true
+        - name: Set timezone
+          timezone:
+            name: Europe/Berlin
+
+  tasks:
+    - name: Download script
+      get_url:
+        url: http://uyuni.example.com/pub/bootstrap/bootstrap.sh
+        dest: /tmp/bootstrap.sh
+
+    - name: Bootstrap client
+      command: bash /tmp/bootstrap.sh
+      args:
+        creates: /etc/salt/minion

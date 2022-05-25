@@ -21,7 +21,7 @@ def config():
 
 @pytest.fixture
 def client(config):
-    LibvirtClient = pytest.importorskip("katprep.clients.LibvirtClient")
+    LibvirtClient = pytest.importorskip("katprep.virtualization.libvirt.LibvirtClient")
 
     return LibvirtClient.LibvirtClient(
         logging.ERROR,
@@ -35,7 +35,7 @@ def test_invalid_login(config):
     """
     Ensure exceptions on invalid logins
     """
-    LibvirtClient = pytest.importorskip("katprep.clients.LibvirtClient")
+    LibvirtClient = pytest.importorskip("katprep.virtualization.libvirt.LibvirtClient")
 
     with pytest.raises(InvalidCredentialsException):
         LibvirtClient.LibvirtClient(

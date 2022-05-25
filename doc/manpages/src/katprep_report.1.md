@@ -1,30 +1,26 @@
-% katprep_report(1) Version 0.5.0 | katprep documentation
+% katprep_report(1) Version 0.6.0 | katprep documentation
 
-NAME
-====
+# NAME
 
 **katprep_report** — Creates reports after system maintenance
 
-SYNOPSIS
-========
+# SYNOPSIS
 
-| **katprep_report** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-p** _path_] \[**-o** _path_] \[**-x**] \[**-t** _file_] _snapshot\_file_ _snapshot\_file_
+| **katprep_report** \[**-h**] \[**--version**] \[**-q**] \[**-d**] \[**-p** _path_] \[**-o** _path_] \[**-x**] \[**-t** _file_] _snapshot\_file_ _snapshot\_file_
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Creates reports after system maintenance based on two infrastructure status snapshots created by **katprep_snapshot(1)**. The utility will automatically detect previous and current snapshots by checking the report change times.
 
 Run this utility after maintaining systems using **katprep_maintenance(1)**.
 
-Options
--------
+## Options
 
 -h, --help
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 
@@ -56,8 +52,7 @@ Options
 
 :   Defined the Pandoc template to use
 
-FILES
-=====
+# FILES
 
 *~/.katpreprc*
 
@@ -67,17 +62,14 @@ FILES
 
 :   Individual katprep authentication container file.
 
-BUGS
-====
+# BUGS
 
 See GitHub issues: <https://github.com/stdevel/katprep/issues>
 
-AUTHOR
-======
+# AUTHOR
 
 Christian Stankowic <info@cstan.io>
 
-SEE ALSO
-========
+# SEE ALSO
 
 **katprep(1)**, **errata-diff.yml(5)**, **katprep_maintenance(1)**, **katprep_snapshot(1)**

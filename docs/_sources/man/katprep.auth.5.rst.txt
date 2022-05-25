@@ -18,22 +18,21 @@ A valid document contains a dictionary containing hostnames and another
 dictionary specifying the following fields:
 
 username
-    A valid username
-
+   A valid username
 password
-    Appropriate password
+   Appropriate password
 
-    Example:
+   Example:
 
-{"vcenter.giertz.loc": {"username": "stdevel", "password": "chad"}
+| {“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “chad”}
 
 Once encrypted, corresponding password entries are replaced with
 symmetric Fernet hashes:
 
-{"vcenter.giertz.loc": {"username": "stdevel", "password": "s/gAAAA..."}
+| {“vcenter.giertz.loc”: {“username”: “stdevel”, “password”: “s/gAAAA…”}
 
 To modify an authentication container, utilize the
-**katprep\_authconfig(1)** utility - manually editing the file is **not
+**katprep_authconfig(1)** utility - manually editing the file is **not
 supported**.
 
 BUGS
@@ -49,4 +48,4 @@ Christian Stankowic info@cstan.io
 SEE ALSO
 ========
 
-**katprep(1)**, **katprep\_authconfig(1)**
+**katprep(1)**, **katprep_authconfig(1)**

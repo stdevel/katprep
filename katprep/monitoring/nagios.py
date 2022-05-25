@@ -29,10 +29,6 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
     """
     dict: Default headers set for every HTTP request
     """
-    obsolete = False
-    """
-    bool: Nagios system
-    """
 
     def __init__(self, log_level, url, username, password, verify_ssl=True):
         """
@@ -56,6 +52,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             # add trailing slash
             url = "{}/".format(url)
 
+        self._obsolete = False
         if "nagios" in url.lower():
             self.LOGGER.debug("The 90s called, they want their monitoring system back")
             self.set_nagios(True)
@@ -72,7 +69,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
         :param flag: boolean whether Nagios system
         :type flag: bool
         """
-        self.obsolete = flag
+        self._obsolete = flag
 
     def _api_request(self, method, sub_url, payload=""):
         """
@@ -100,11 +97,12 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                 # going home
                 raise SessionException("Illegal method '{}' specified".format(method))
 
+            address = "{}{}".format(self._url, sub_url)
             # execute request
             if method.lower() == "post":
                 # POST
                 result = self._session.post(
-                    "{}{}".format(self._url, sub_url),
+                    address,
                     headers=self.HEADERS,
                     data=payload,
                     verify=self._verify_ssl,
@@ -112,7 +110,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             else:
                 # GET
                 result = self._session.get(
-                    "{}{}".format(self._url, sub_url),
+                    address,
                     headers=self.HEADERS,
                     verify=self._verify_ssl,
                 )
@@ -122,7 +120,11 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             if "error" in result.text.lower():
                 tree = html.fromstring(result.text)
                 data = tree.xpath("//div[@class='errorMessage']/text()")
-                raise SessionException("CGI error: {}".format(data[0]))
+                if data:
+                    try:
+                        raise SessionException("CGI error: {}".format(data[0]))
+                    except IndexError:
+                        raise SessionException("CGI error: {}".format(data))
 
             if result.status_code in [401, 403]:
                 raise SessionException("Unauthorized")
@@ -156,18 +158,14 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
         )
         return (current_time, end_time)
 
-    def _manage_downtime(
-        self, object_name, object_type, hours, comment, remove_downtime
-    ):
+    def _manage_downtime(self, obj, hours, comment, remove_downtime):
         """
         Adds or removes scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
         You can also specify a comment and downtime period.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: host or hostgroup
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         :param hours: Amount of hours for the downtime
         :type hours: int
         :param comment: Downtime comment
@@ -180,7 +178,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
 
         # set-up payload
         payload = {}
-        if object_type.lower() == "hostgroup":
+        if obj.type == "hostgroup":
             if remove_downtime:
                 # there is now way to unschedule downtime for a whole hostgroup
                 raise UnsupportedRequestException(
@@ -191,7 +189,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                 payload[0] = {
                     "cmd_typ": "85",
                     "cmd_mod": "2",
-                    "hostgroup": object_name,
+                    "hostgroup": obj.monitoring_id,
                     "com_data": comment,
                     "trigger": "0",
                     "fixed": "1",
@@ -206,7 +204,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                 }
         else:
             if remove_downtime:
-                if self.obsolete:
+                if self._obsolete:
                     # you really like old stuff don't you
                     raise UnsupportedRequestException(
                         "Unscheduling downtimes is not supported with Nagios!"
@@ -215,14 +213,14 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                     payload[0] = {
                         "cmd_typ": "171",
                         "cmd_mod": "2",
-                        "host": object_name,
+                        "host": obj.monitoring_id,
                         "btnSubmit": "Commit",
                     }
             else:
                 payload[0] = {
                     "cmd_typ": "86",
                     "cmd_mod": "2",
-                    "host": object_name,
+                    "host": obj.monitoring_id,
                     "com_data": comment,
                     "trigger": "0",
                     "fixed": "1",
@@ -234,7 +232,7 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
                     "com_author": self._username,
                     "childoptions": "0",
                 }
-                if self.obsolete:
+                if self._obsolete:
                     # we need to make two calls as legacy hurts twice
                     payload[1] = payload[0].copy()
                     payload[1]["cmd_typ"] = "55"
@@ -243,54 +241,49 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
         result = None
         for req in payload:
             result = self._api_post("/cgi-bin/cmd.cgi", payload[req])
+
         return result
 
-    def schedule_downtime(
-        self, object_name, object_type, hours=8, comment=DOWNTIME_COMMENT
-    ):
+    def schedule_downtime(self, obj, hours=8, comment=DOWNTIME_COMMENT):
         """
         Adds scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
         Optionally, you can specify a customized comment and downtime
         period (the default is 8 hours).
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: host or hostgroup
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         :param hours: Amount of hours for the downtime (default: 8 hours)
         :type hours: int
         :param comment: Downtime comment
         :type comment: str
         """
-        return self._manage_downtime(
-            object_name, object_type, hours, comment, remove_downtime=False
-        )
+        return self._manage_downtime(obj, hours, comment, remove_downtime=False)
 
-    def remove_downtime(self, object_name, object_type="host"):
+    def remove_downtime(self, obj, object_type="host"):
         """
         Removes scheduled downtime for a host.
         For this, a object name is required.
         At this point, it is not possible to remove downtime for a
         whole hostgroup.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         """
         return self._manage_downtime(
-            object_name, object_type, hours=1, comment="", remove_downtime=True
+            obj, hours=1, comment="", remove_downtime=True
         )
 
-    def has_downtime(self, object_name):
+    def has_downtime(self, obj):
         """
         Returns whether a particular object (host, hostgroup) is currently in
         scheduled downtime. This required specifying an object name and type.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         """
         # retrieve host information
-        result = self._api_get("/cgi-bin/status.cgi?host={}".format(object_name))
+        result = self._api_get("/cgi-bin/status.cgi?host={}".format(obj.monitoring_id))
         # get _all_ the ugly images
         tree = html.fromstring(result)
         data = tree.xpath("//td/a/img/@src")
@@ -313,7 +306,6 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
         :type text: str
         :param regexp: regular expression
         :type regexp: str
-
         """
         pattern = re.compile(regexp)
         return bool(pattern.match(text))
@@ -326,7 +318,6 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
 
         :param text: text
         :type text: str
-
         """
         # blacklisted strings
         blacklist = {"", "\n"}
@@ -367,17 +358,17 @@ class NagiosCGIClient(MonitoringClientBase, HttpApiClient):
             if code in state[:8].lower():
                 return codes[code]
 
-    def get_services(self, object_name, only_failed=True):
+    def get_services(self, obj, only_failed=True):
         """
         Returns all or failed services for a particular host.
 
-        :param object_name:
-        :type object_name: str
+        :param obj: Host to get services from
+        :type obj: Host
         :param only_failed: True will only report failed services
         :type only_failed: bool
         """
         # set-up URL
-        url = "/cgi-bin/status.cgi?host={}&style=detail".format(object_name)
+        url = "/cgi-bin/status.cgi?host={}&style=detail".format(obj.monitoring_id)
         if only_failed:
             url = "{}&hoststatustypes=15&servicestatustypes=16".format(url)
         # retrieve data

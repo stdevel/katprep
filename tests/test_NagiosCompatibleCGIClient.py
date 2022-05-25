@@ -11,6 +11,7 @@ import time
 import pytest
 
 from katprep.exceptions import SessionException, UnsupportedRequestException
+from katprep.host import Host, HostGroup
 from katprep.monitoring.nagios import NagiosCGIClient
 
 from .utilities import load_config
@@ -60,13 +61,16 @@ def icingaClient(config):
 @pytest.fixture
 def nagiosClient(config):
     try:
-        yield NagiosCGIClient(
+        client = NagiosCGIClient(
             logging.ERROR,
             config["legacy"]["hostname"],
             config["legacy"]["cgi_user"],
             config["legacy"]["cgi_pass"],
             verify_ssl=False
         )
+        client.set_nagios(True)
+
+        yield client
     finally:
         time.sleep(8)
 
@@ -101,24 +105,25 @@ def test_scheduling_downtime_for_host(monitoringClient, config, nagiosType):
     Ensure that checking downtime is working.
     For Icinga we also ensure that unscheduling downtimes works.
     """
-    host = config[nagiosType]["host"]
-    monitoringClient.schedule_downtime(host, "host")
-    assert monitoringClient.has_downtime(host)
-
-    if nagiosType == 'main':  # Icinga
-        assert monitoringClient.remove_downtime(host)
-    else:  # Nagios
-        with pytest.raises(UnsupportedRequestException):
-            # try to remove downtime
-            monitoringClient.remove_downtime("dummy")
+    host = Host(config[nagiosType]["host"], {}, None)
+    monitoringClient.schedule_downtime(host)
+    try:
+        assert monitoringClient.has_downtime(host)
+    finally:
+        if nagiosType == 'main':  # Icinga
+            assert monitoringClient.remove_downtime(host)
+        else:  # Nagios
+            with pytest.raises(UnsupportedRequestException):
+                # try to remove downtime
+                monitoringClient.remove_downtime(host)
 
 
 def test_schedule_downtime_hostgrp(icingaClient, config):
     """
     Ensure that scheduling downtimes for hostgroups is working
     """
-    hostgroup = config["main"]["hostgroup"]
-    assert icingaClient.schedule_downtime(hostgroup, "hostgroup")
+    hostgroup = HostGroup(config["main"]["hostgroup"])
+    assert icingaClient.schedule_downtime(hostgroup)
 
 
 def test_get_hosts(monitoringClient, config, nagiosType):
@@ -133,8 +138,7 @@ def test_get_services(monitoringClient, config, nagiosType):
     """
     Ensure that hosts include existing services
     """
-    services = monitoringClient.get_services(
-        config[nagiosType]["host"], only_failed=False
-    )
+    host = Host(config[nagiosType]["host"], {}, None)
+    services = monitoringClient.get_services(host, only_failed=False)
     assert config[nagiosType]["host_service"] in [service['name'] for service in services]
     assert len(services) == config[nagiosType]["host_services"]

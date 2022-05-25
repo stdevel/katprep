@@ -8,9 +8,10 @@ from __future__ import absolute_import
 import logging
 import pytest
 import time
-from katprep.management.vmware import PyvmomiClient
+from katprep.host import Host
 from katprep.exceptions import (EmptySetException, InvalidCredentialsException,
 SessionException)
+from katprep.virtualization.vmware import PyvmomiClient
 
 from .utilities import load_config
 
@@ -89,7 +90,8 @@ def test_restart_vm(client, config, forcefully):
     """
     Ensure that restarting VMs is possible
     """
-    client.restart_vm(config["valid_objects"]["vm"], force=forcefully)
+    host = Host(config["valid_objects"]["vm"], {}, None)
+    client.restart_vm(host, force=forcefully)
 
 
 @pytest.mark.parametrize("forcefully", [True, False])

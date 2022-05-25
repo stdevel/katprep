@@ -78,5 +78,5 @@ Subpackages
 
 .. toctree::
 
-    katprep.clients
-
+    katprep.management
+    katprep.monitoring

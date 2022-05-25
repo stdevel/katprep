@@ -1,18 +1,20 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>NAME &#8212; katprep 0.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>NAME &#8212; katprep 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
@@ -25,7 +27,8 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>  
 
@@ -34,38 +37,47 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="name">
+  <section id="name">
 <h1>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
 <p><strong>katprep</strong> — Python toolkit for automating system maintenance and
-generating patch reports along with Foreman/Katello and Red Hat
-Satellite 6.x</p>
-</div>
-<div class="section" id="description">
+generating patch reports along with Foreman/Katello and Uyuni</p>
+</section>
+<section id="description">
 <h1>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
 <p>katprep is a toolkit for automating system maintenance tasks such as:</p>
 <ul class="simple">
-<li>Preparing system maintenance (scheduling downtimes, creating VM
-snapshots)</li>
-<li>Installing errata and non-erratum package upgrades</li>
-<li>Showing status of maintenance progress</li>
-<li>Checking monitoring and snapshot status</li>
-<li>Reverting VM snapshots</li>
-<li>Removing downtimes and snapshots</li>
-<li>Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
-IT certifications)</li>
+<li><p>Preparing system maintenance (scheduling downtimes, creating VM
+snapshots)</p></li>
+<li><p>Installing errata and non-erratum package upgrades</p></li>
+<li><p>Showing status of maintenance progress</p></li>
+<li><p>Checking monitoring and snapshot status</p></li>
+<li><p>Reverting VM snapshots</p></li>
+<li><p>Removing downtimes and snapshots</p></li>
+<li><p>Generating maintenance reports (e.g. because of of ISO/IEC 27001:2005
+IT certifications)</p></li>
 </ul>
 <p>For VM management, the <strong>libvirt</strong> and <strong>pyVmomi</strong> (VMware vSphere
 Python API bindings) libraries are used, therefore at least the
-following hypervisors are supported: - VMware vSphere, Workstation,
-Player - VirtualBox - QEMU - KVM - XEN - Microsoft Hyper-V</p>
+following hypervisors are supported:</p>
+<ul class="simple">
+<li><p>VMware vSphere, Workstation, Player</p></li>
+<li><p>VirtualBox</p></li>
+<li><p>QEMU</p></li>
+<li><p>KVM</p></li>
+<li><p>XEN</p></li>
+<li><p>Microsoft Hyper-V</p></li>
+</ul>
 <p>Check-out the libvirt website (<a class="reference external" href="https://libvirt.org/drivers.html">https://libvirt.org/drivers.html</a>) for
 additional drivers.</p>
-<p>For managing monitoring, the following products are supported: -
-Nagios/Icinga 1.x - Icinga2</p>
+<p>For managing monitoring, the following products are supported:</p>
+<ul class="simple">
+<li><p>Nagios/Icinga 1.x</p></li>
+<li><p>Icinga2</p></li>
+</ul>
 <p>When creating reports, the document converter Pandoc is used. This
 enables exporting reports in various formats; this utility offers
 pre-defined Markdown and HTML templates.</p>
-<div class="section" id="virtualization-uris">
+<section id="virtualization-uris">
 <h2>Virtualization URIs<a class="headerlink" href="#virtualization-uris" title="Permalink to this headline">¶</a></h2>
 <p>When using <strong>libvirt</strong> specify a valid connection URI, such as:</p>
 <div class="line-block">
@@ -84,8 +96,8 @@ hostname, such as:</p>
 <div class="line">vcenter.localdomain.loc</div>
 <div class="line">esxi.giertz.loc</div>
 </div>
-</div>
-<div class="section" id="monitoring-urls">
+</section>
+<section id="monitoring-urls">
 <h2>Monitoring URLs:<a class="headerlink" href="#monitoring-urls" title="Permalink to this headline">¶</a></h2>
 <p>When using <strong>nagios</strong> (<em>NagiosCGIClient</em>), specify the full Nagios or
 Icinga 1.x URL - make sure <strong>not</strong> to include <strong>/cgi-bin</strong>. Examples:</p>
@@ -95,26 +107,28 @@ Icinga 1.x URL - make sure <strong>not</strong> to include <strong>/cgi-bin</str
 </div>
 <p>When using <strong>icinga</strong> (<em>IcingaAPIClient</em>), specify the full API URL
 including the port - such as:</p>
-<p><a class="reference external" href="https://bigbrother.giertz.loc:5665">https://bigbrother.giertz.loc:5665</a></p>
+<div class="line-block">
+<div class="line"><a class="reference external" href="https://bigbrother.giertz.loc:5665">https://bigbrother.giertz.loc:5665</a></div>
 </div>
-<div class="section" id="utilities">
+</section>
+<section id="utilities">
 <h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
 <p>The following utilities are part of the katprep framework:</p>
 <ul class="simple">
-<li><strong>katprep_authconfig(1)</strong> - Manages credentials for third-party
-systems triggered by katprep</li>
-<li><strong>katprep_maintenance(1)</strong> - Prepares, executes and verifies system
-maintenance tasks</li>
-<li><strong>katprep_parameters(1)</strong> - Bulk edits Puppet host parameters for
-managed hosts</li>
-<li><strong>katprep_populate(1)</strong> - Auto-discovers and updates monitoring and
-hypervisor information for managed systems</li>
-<li><strong>katprep_report(1)</strong> - Creates reports after system maintenance</li>
-<li><strong>katprep_snapshot(1)</strong> - Creates infrastructure status overview
-snapshots</li>
+<li><p><strong>katprep_authconfig(1)</strong> - Manages credentials for third-party
+systems triggered by katprep</p></li>
+<li><p><strong>katprep_maintenance(1)</strong> - Prepares, executes and verifies system
+maintenance tasks</p></li>
+<li><p><strong>katprep_parameters(1)</strong> - Bulk edits Puppet host parameters for
+managed hosts</p></li>
+<li><p><strong>katprep_populate(1)</strong> - Auto-discovers and updates monitoring and
+hypervisor information for managed systems</p></li>
+<li><p><strong>katprep_report(1)</strong> - Creates reports after system maintenance</p></li>
+<li><p><strong>katprep_snapshot(1)</strong> - Creates infrastructure status overview
+snapshots</p></li>
 </ul>
-</div>
-<div class="section" id="usage">
+</section>
+<section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>In order to automate system maintenance, you will need to represent your
 system landscape in katprep as the toolkit needs to know <em>which</em> hosts
@@ -136,36 +150,37 @@ reports by leveraging <strong>katprep_report(1)</strong>.</p>
 <p>So, in summary - to automate patching your system landscape, execute the
 following tools:</p>
 <ol class="arabic simple">
-<li><strong>katprep_snapshot(1)</strong> to create an infrastructure snapshot</li>
-<li><strong>katprep_maintenance(1)</strong> to prepare, execute and clean-up
-maintenance</li>
-<li><strong>katprep_snapshot(1)</strong> to create another infrastructure snapshot</li>
-<li><strong>katprep_report(1)</strong> to create maintenance reports (optional)</li>
+<li><p><strong>katprep_snapshot(1)</strong> to create an infrastructure snapshot</p></li>
+<li><p><strong>katprep_maintenance(1)</strong> to prepare, execute and clean-up
+maintenance</p></li>
+<li><p><strong>katprep_snapshot(1)</strong> to create another infrastructure snapshot</p></li>
+<li><p><strong>katprep_report(1)</strong> to create maintenance reports (optional)</p></li>
 </ol>
-</div>
-</div>
-<div class="section" id="bugs">
+</section>
+</section>
+<section id="bugs">
 <h1>BUGS<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
 <p>See GitHub issues: <a class="reference external" href="https://github.com/stdevel/katprep/issues">https://github.com/stdevel/katprep/issues</a></p>
-</div>
-<div class="section" id="author">
+</section>
+<section id="author">
 <h1>AUTHOR<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h1>
 <p>Christian Stankowic <a class="reference external" href="mailto:info&#37;&#52;&#48;cstan&#46;io">info<span>&#64;</span>cstan<span>&#46;</span>io</a></p>
-</div>
-<div class="section" id="see-also">
+</section>
+<section id="see-also">
 <h1>SEE ALSO<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h1>
 <p><strong>katprep_authconfig(1)</strong>, <strong>katprep_maintenance(1)</strong>,
 <strong>katprep_parameters(1)</strong>, <strong>katprep_populate(1)</strong>,
 <strong>katprep_report(1)</strong>, <strong>katprep_snapshot(1)</strong></p>
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">NAME</a></li>
 <li><a class="reference internal" href="#description">DESCRIPTION</a><ul>
@@ -188,17 +203,15 @@ maintenance</li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -212,12 +225,13 @@ maintenance</li>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">NAME</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Christian Stankowic.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
+        &#169; Copyright 2022, Christian Stankowic.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>

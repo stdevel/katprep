@@ -23,8 +23,8 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.5.0',
-    description='Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Red Hat Satellite 6.x',
+    version='0.6.0',
+    description='Python toolkit for automating system maintenance and generating patch reports along with Foreman/Katello and Uyuni',
     long_description=long_description,
     url='https://github.com/stdevel/katprep',
     author='Christian Stankowic',
@@ -93,12 +93,12 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-           'katprep_authconfig=katprep.authconfig:cli',
-           'katprep_maintenance=katprep.maintenance:cli',
-           'katprep_parameters=katprep.parameters:cli',
-           'katprep_populate=katprep.populate:cli',
-           'katprep_report=katprep.report:cli',
-           'katprep_snapshot=katprep.snapshot:cli',
+           'katprep_authconfig=katprep.cli.authconfig:cli',
+           'katprep_maintenance=katprep.cli.maintenance:cli',
+           'katprep_parameters=katprep.cli.parameters:cli',
+           'katprep_populate=katprep.cli.populate:cli',
+           'katprep_report=katprep.cli.report:cli',
+           'katprep_snapshot=katprep.cli.snapshot:cli',
         ],
     },
 )

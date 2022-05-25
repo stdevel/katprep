@@ -19,19 +19,15 @@ class MonitoringClientBase(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def schedule_downtime(
-        self, object_name, object_type, hours=8, comment=DOWNTIME_COMMENT
-    ):
+    def schedule_downtime(self, obj, hours=8, comment=DOWNTIME_COMMENT):
         """
         Adds scheduled downtime for a host or hostgroup.
         For this, a object name and type are required.
         Optionally, you can specify a customized comment and downtime
         period (the default is 8 hours).
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: host or hostgroup
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         :param hours: Amount of hours for the downtime (default: 8 hours)
         :type hours: int
         :param comment: Downtime comment
@@ -39,25 +35,23 @@ class MonitoringClientBase(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def remove_downtime(self, object_name, object_type):
+    def remove_downtime(self, obj):
         """
         Removes scheduled downtime for a host or hostgroup
         For this, a object name is required.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
-        :param object_type: host or hostgroup
-        :type object_type: str
+        :param obj: Host or hostgroup to manage
+        :type obj: Host or HostGroup
         """
 
     @abstractmethod
-    def has_downtime(self, object_name):
+    def has_downtime(self, obj):
         """
         Returns whether a particular object host is currently in scheduled
         downtime.
 
-        :param object_name: Hostname or hostgroup name
-        :type object_name: str
+        :param obj: Host to check
+        :type obj: Host
         """
 
     @abstractmethod
@@ -70,14 +64,12 @@ class MonitoringClientBase(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def get_services(self, object_name, only_failed=True):
+    def get_services(self, obj, only_failed=True):
         """
         Returns all or failed services for a particular host.
 
-        :param object_name:
-        :type object_name: str
-        :param only_failed: True will only report failed services
-        :type only_failed: bool
+        :param obj: Host to get services from
+        :type obj: Host
         """
 
 

@@ -1,17 +1,14 @@
-% katprep_maintenance(1) Version 0.5.0 | katprep documentation
+% katprep_maintenance(1) Version 0.6.0 | katprep documentation
 
-NAME
-====
+# NAME
 
 **katprep_maintenance** — Prepares, executes and verifies system maintenance tasks
 
-SYNOPSIS
-========
+# SYNOPSIS
 
-| **katprep_maintenance** \[**-h**] \[**-v**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--insecure**] \[**-s** _server_] \[**-r**] \[**-R**] \[**--virt-uri** _uri_] \[**-k**] \[**--mon-url** _url_] \[**--mon-type** _nagios_|_icinga_] \[**-S**] \[**-t** _hours_] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-E** _name_] \[**-I** _name_] _snapshot\_report_ \[**prepare**|**execute**|**status**|**revert**|**verify**|**cleanup**]
+| **katprep_maintenance** \[**-h**] \[**--version**] \[**-q**] \[**-d**] \[**-n**] \[**-C** _authentication\_contianer_] \[**-P** _password_] \[**--insecure**] \[**--mgmt-type** _foreman_|_uyuni_] \[**-s** _server_] \[**-r**] \[**-R**] \[**--virt-uri** _uri_] \[**-k**] \[**--mon-url** _url_] \[**--mon-type** _nagios_|_icinga2_] \[**-K**] \[**-S**] \[**-t** _hours_] \[**-l** _name_|_id_ | **-o** _name_|_id_ | **-g** _name_|_id_ | **-e** _name_|_id_] \[**-E** _name_] \[**-I** _name_] _snapshot\_report_ \[**prepare**|**execute**|**status**|**revert**|**verify**|**cleanup**]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 This utility controls maintenance tasks such as:
 
@@ -28,14 +25,13 @@ If these requirements are set, all necessary information are retrieved from Fore
 
 You can filter maintenance tasks per various entities, such as hostgroups, hostnames, locations and organizations.
 
-Options
--------
+## Options
 
 -h, --help
 
 :   Prints brief usage information.
 
--v, --version
+--version
 
 :   Prints the current version number.
 
@@ -122,8 +118,7 @@ Options
 
 :   Only includes particular hosts (default: no)
 
-Commands
---------
+## Commands
 
 This utility supports the following commands
 
@@ -137,8 +132,7 @@ This utility supports the following commands
 **IMPORTANT NOTE**:
 For rebooting VMs after system maintenance, at least Foreman 1.15.x or Red Hat Satellite 6.3 is required.
 
-FILES
-=====
+## FILES
 
 *~/.katpreprc*
 
@@ -148,17 +142,14 @@ FILES
 
 :   Individual katprep authentication container file.
 
-BUGS
-====
+# BUGS
 
 See GitHub issues: <https://github.com/stdevel/katprep/issues>
 
-AUTHOR
-======
+# AUTHOR
 
 Christian Stankowic <info@cstan.io>
 
-SEE ALSO
-========
+# SEE ALSO
 
 **katprep(1)**, **katprep.authconfig(1)**, **katprep_parameters(1)**, **katprep_populate(1)**, **katprep_snapshot(1)**

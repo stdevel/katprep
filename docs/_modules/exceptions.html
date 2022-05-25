@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>exceptions &#8212; katprep 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">exceptions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for exceptions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Exceptions used by the management classes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="SessionException"><a class="viewcode-back" href="../katprep.html#exceptions.SessionException">[docs]</a><span class="k">class</span> <span class="nc">SessionException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for session errors</span>
+
+<span class="sd">    .. class:: SessionException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="InvalidCredentialsException"><a class="viewcode-back" href="../katprep.html#exceptions.InvalidCredentialsException">[docs]</a><span class="k">class</span> <span class="nc">InvalidCredentialsException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for invalid credentials</span>
+
+<span class="sd">    .. class:: InvalidCredentialsException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="APILevelNotSupportedException"><a class="viewcode-back" href="../katprep.html#exceptions.APILevelNotSupportedException">[docs]</a><span class="k">class</span> <span class="nc">APILevelNotSupportedException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for unsupported API levels</span>
+
+<span class="sd">    .. class:: APILevelNotSupportedException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="UnsupportedRequestException"><a class="viewcode-back" href="../katprep.html#exceptions.UnsupportedRequestException">[docs]</a><span class="k">class</span> <span class="nc">UnsupportedRequestException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for unsupported requests</span>
+
+<span class="sd">    .. class:: UnsupportedRequest</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="InvalidHostnameFormatException"><a class="viewcode-back" href="../katprep.html#exceptions.InvalidHostnameFormatException">[docs]</a><span class="k">class</span> <span class="nc">InvalidHostnameFormatException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for invalid hostname formats (non-FQDN)</span>
+
+<span class="sd">    .. class:: InvalidHostnameFormatException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="UnsupportedFilterException"><a class="viewcode-back" href="../katprep.html#exceptions.UnsupportedFilterException">[docs]</a><span class="k">class</span> <span class="nc">UnsupportedFilterException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for unsupported filters</span>
+
+<span class="sd">    .. class:: UnsupportedFilterException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="EmptySetException"><a class="viewcode-back" href="../katprep.html#exceptions.EmptySetException">[docs]</a><span class="k">class</span> <span class="nc">EmptySetException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for empty result sets</span>
+
+<span class="sd">    .. class:: EmptySetException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="CustomVariableExistsException"><a class="viewcode-back" href="../katprep.html#exceptions.CustomVariableExistsException">[docs]</a><span class="k">class</span> <span class="nc">CustomVariableExistsException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for already existing custom variables</span>
+
+<span class="sd">    .. class:: CustomVariableExistsException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="SnapshotExistsException"><a class="viewcode-back" href="../katprep.html#exceptions.SnapshotExistsException">[docs]</a><span class="k">class</span> <span class="nc">SnapshotExistsException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for already existing snapshots</span>
+
+<span class="sd">    .. class:: SnapshotExistsException</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="UnauthenticatedError"><a class="viewcode-back" href="../katprep.html#exceptions.UnauthenticatedError">[docs]</a><span class="k">class</span> <span class="nc">UnauthenticatedError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for showing that a client wasn&#39;t able to authenticate itself</span>
+
+<span class="sd">    .. class:: UnauthenticatedError</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="SSLCertVerificationError"><a class="viewcode-back" href="../katprep.html#exceptions.SSLCertVerificationError">[docs]</a><span class="k">class</span> <span class="nc">SSLCertVerificationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception for invalid SSL certificates</span>
+
+<span class="sd">    .. class:: SSLCertVerificationError</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">katprep 0.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">exceptions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Christian Stankowic.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>
