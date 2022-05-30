@@ -62,18 +62,17 @@ class LibvirtClient(BaseConnector, SnapshotManager, PowerManager):
         :param uri: a libvirt URI
         :type uri: str
         """
+        if "://" not in uri:
+            return False
+
         prefixes = {
             "lxc", "qemu", "xen", "hyperv", "vbox", "openvz", "uml", "phyp",
             "vz", "bhyve", "esx", "vpx", "vmwareplayer", "vmwarews",
             "vmwarefusion"
         }
-        #check whether a valid prefix was found
-        for prefix in prefixes:
-            if prefix in uri and "://" in uri:
-                return True
-        return False
 
-
+        # check whether a valid prefix was found
+        return any(uri.startswith(prefix) for prefix in prefixes)
 
     def _connect(self):
         """This function establishes a connection to the hypervisor."""
