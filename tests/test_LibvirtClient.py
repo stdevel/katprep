@@ -93,3 +93,13 @@ def test_snapshot_handling(virtClient, config, snapshot_name):
             print(err)
     finally:
         virtClient.remove_snapshot(host, snapshot_name)
+
+@pytest.mark.parametrize("uri", [
+    "openvz://some.host.tld",
+    pytest.param("invalid://openvz",
+                 marks=pytest.mark.xfail(reason="Invalid protocol"))
+])
+def test_uri_validation(uri):
+    LibvirtClient = pytest.importorskip("katprep.virtualization.libvirt.LibvirtClient")
+
+    assert LibvirtClient.validate_uri("https://openvz/")
